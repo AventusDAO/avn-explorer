@@ -1,6 +1,8 @@
 .DS_Store
 lib
 archive/postgres-data*
+balances/db/data
+archive/db/data
 
 # Logs
 logs

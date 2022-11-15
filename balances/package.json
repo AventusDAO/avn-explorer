@@ -11,7 +11,6 @@
     "query-node:start": "squid-graphql-server"
   },
   "dependencies": {
-    "@subsquid/cli": "^0.4.1",
     "@subsquid/graphql-server": "^1.1.0",
     "@subsquid/ss58": "^0.1.1",
     "@subsquid/substrate-processor": "^1.2.0",
@@ -24,6 +23,7 @@
     "type-graphql": "^1.2.0-rc.1"
   },
   "devDependencies": {
+    "@subsquid/cli": "^0.4.1",
     "@subsquid/substrate-metadata-explorer": "^1.0.3",
     "@subsquid/substrate-typegen": "^1.0.2",
     "@subsquid/typeorm-codegen": "^0.0.2",

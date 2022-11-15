@@ -1,4 +1,4 @@
-# AvN Balances
+# Balances
  
 This is a Squid based processor listing accounts and their AVT balance changes.
 
