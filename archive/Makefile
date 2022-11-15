@@ -9,6 +9,9 @@ explorer-parachain:
 ingest-parachain:
 	@docker-compose -f ./docker-compose.parachain.yml up db ingest 
 
+pgadmin-parchain:
+	@docker-compose -f ./docker-compose.parachain.yml up db pgadmin -d
+
 down-parachain:
 	@docker-compose -f ./docker-compose.parachain.yml down
 

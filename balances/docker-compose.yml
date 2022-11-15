@@ -4,8 +4,32 @@ services:
   db:
     image: postgres:14
     environment:
+      POSTGRES_USER: postgres
       POSTGRES_DB: avn-balances
       POSTGRES_PASSWORD: avn-balances
+    volumes:
+      - ./db/data/parachain:/var/lib/postgresql/data
     ports:
       - "${DB_PORT}:5432"
       # command: ["postgres", "-c", "log_statement=all"]
+    networks:
+      - balances
+
+  # PG Admin is optional.
+  # pgadmin:
+  #   container_name: pgadmin_container_2
+  #   image: dpage/pgadmin4
+  #   environment:
+  #     PGADMIN_DEFAULT_EMAIL: pgadmin4@pgadmin.org
+  #     PGADMIN_DEFAULT_PASSWORD: admin
+  #     PGADMIN_CONFIG_SERVER_MODE: 'False'
+  #   volumes:
+  #      - ./db/data/pgadmin:/var/lib/pgadmin
+  #   ports:
+  #     - "5544:80"
+  #   restart: unless-stopped
+  #   networks:
+  #     - balances
+
+networks: 
+  balances:

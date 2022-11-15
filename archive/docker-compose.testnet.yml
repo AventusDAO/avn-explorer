@@ -3,7 +3,7 @@ services:
     image: postgres:14  # CockroachDB cluster might be a better fit for production deployment
     restart: always
     volumes:
-      - ./postgres-data-testnet:/var/lib/postgresql/data
+      - ./db/data/testnet:/var/lib/postgresql/data
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
@@ -68,6 +68,22 @@ services:
       - "4444:3000"
     networks:
       - testnet
-      
+
+  # PG Admin is optional.
+  # pgadmin:
+  #   container_name: pgadmin_container
+  #   image: dpage/pgadmin4
+  #   environment:
+  #     PGADMIN_DEFAULT_EMAIL: pgadmin4@pgadmin.org
+  #     PGADMIN_DEFAULT_PASSWORD: admin
+  #     PGADMIN_CONFIG_SERVER_MODE: 'False'
+  #   volumes:
+  #      - ./db/pg-admin:/var/lib/pgadmin
+  #   ports:
+  #     - "5543:80"
+  #   networks:
+  #     - testnet
+  #   restart: unless-stopped
+
 networks:
   testnet:
