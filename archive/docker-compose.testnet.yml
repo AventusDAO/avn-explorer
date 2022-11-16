@@ -64,26 +64,30 @@ services:
       DB_NAME: "avn-archive-testnet"
       DB_USER: "postgres"
       DB_PASS: "postgres"
+      # setup sensible limits for production
+      # GQL_DB_STATEMENT_TIMEOUT_MS: 2000
+      # GQL_MAX_ROOT_FIELDS: 200
+      # GQL_MAX_RESPONSE_NODES: 300000
     ports:
       - "4444:3000"
     networks:
       - testnet
 
   # PG Admin is optional.
-  # pgadmin:
-  #   container_name: pgadmin_container
-  #   image: dpage/pgadmin4
-  #   environment:
-  #     PGADMIN_DEFAULT_EMAIL: pgadmin4@pgadmin.org
-  #     PGADMIN_DEFAULT_PASSWORD: admin
-  #     PGADMIN_CONFIG_SERVER_MODE: 'False'
-  #   volumes:
-  #      - ./db/pg-admin:/var/lib/pgadmin
-  #   ports:
-  #     - "5543:80"
-  #   networks:
-  #     - testnet
-  #   restart: unless-stopped
+  pgadmin:
+    container_name: pgadmin_container
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: pgadmin4@pgadmin.org
+      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    volumes:
+       - ./db/pg-admin:/var/lib/pgadmin
+    ports:
+      - "5543:80"
+    networks:
+      - testnet
+    restart: unless-stopped
 
 networks:
   testnet:
