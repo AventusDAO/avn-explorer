@@ -1,0 +1,23 @@
+{
+  "outDir": "../src/types/generated/parachain-dev",
+  "specVersions": "./versions-parachain.dev.jsonl",
+  "typesBundle": "./types/avn-parachain.json",
+  "events": [
+    "Balances.Transfer",
+    "Balances.Endowed",
+    "Balances.BalanceSet",
+    "Balances.Reserved",
+    "Balances.Unreserved",
+    "Balances.ReserveRepatriated",
+    "Balances.Deposit",
+    "Balances.Withdraw",
+    "Balances.Slashed"
+  ],
+  "calls": [
+  ],
+  "storage": [
+    "System.Account",
+    "Balances.Account",
+    "Balances.TotalIssuance"
+  ]
+}
