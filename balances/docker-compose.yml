@@ -8,7 +8,7 @@ services:
       POSTGRES_DB: avn-balances
       POSTGRES_PASSWORD: avn-balances
     volumes:
-      - ./db/data/parachain:/var/lib/postgresql/data
+      - ./db/data/${AVN_ENV}:/var/lib/postgresql/data
     ports:
       - "${DB_PORT}:5432"
       # command: ["postgres", "-c", "log_statement=all"]

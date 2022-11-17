@@ -1,31 +1,17 @@
-# Parachain-Dev
+up:
+	@docker-compose up -d
 
-up-parchain:
-	@docker-compose -f ./docker-compose.parachain.yml up
+explorer:
+	@docker-compose up db gateway explorer -d
 
-explorer-parachain:
-	@docker-compose -f ./docker-compose.parachain.yml up -d db gateway explorer
+ingest:
+	@docker-compose up db ingest -d 
 
-ingest-parachain:
-	@docker-compose -f ./docker-compose.parachain.yml up db ingest 
+pgadmin:
+	@docker-compose up db pgadmin -d
 
-pgadmin-parchain:
-	@docker-compose -f ./docker-compose.parachain.yml up db pgadmin -d
+down:
+	@docker-compose down
 
-down-parachain:
-	@docker-compose -f ./docker-compose.parachain.yml down
-
-# Testnet
-
-up-testnet:
-	@docker-compose -f ./docker-compose.testnet.yml up
-
-explorer-testnet:
-	@docker-compose -f ./docker-compose.testnet.yml up -d db gateway explorer
-
-ingest-testnet:
-	@docker-compose -f ./docker-compose.testnet.yml up db ingest
-
-down-testnet:
-	@docker-compose -f ./docker-compose.testnet.yml down
-
+ingest-logs:
+	@docker logs archive_ingest_1 --follow --timestamps
