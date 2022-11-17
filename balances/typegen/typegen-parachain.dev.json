@@ -1,7 +1,7 @@
 {
   "outDir": "../src/types/generated/parachain-dev",
-  "specVersions": "./versions-parachain.dev.jsonl",
-  "typesBundle": "./types/avn-parachain.json",
+  "specVersions": "../../types/versions-parachain.dev.jsonl",
+  "typesBundle": "../../types/avn-parachain.json",
   "events": [
     "Balances.Transfer",
     "Balances.Endowed",
