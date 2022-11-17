@@ -1,5 +1,5 @@
 {
-  "name": "squid",
+  "name": "avn-balances",
   "private": true,
   "scripts": {
     "build": "rm -rf lib && tsc",
