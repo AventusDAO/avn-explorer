@@ -30,9 +30,9 @@ import { Event, Block, ChainContext } from './types/generated/parachain-dev/supp
 
 const config = parachainConfig
 const processor = new SubstrateBatchProcessor()
-    .setBatchSize(config.batchSize || 500)
+    .setBatchSize(config.batchSize ?? 500)
     .setDataSource(config.dataSource)
-    .setBlockRange(config.blockRange || { from: 0 })
+    .setBlockRange(config.blockRange ?? { from: 0 })
     .addEvent('Balances.Endowed', {
         data: { event: { args: true } },
     } as const)
@@ -97,7 +97,7 @@ async function processBalances(ctx: Context): Promise<void> {
         }
 
         if (lastStateTimestamp == null) {
-            lastStateTimestamp = (await getLastChainState(ctx.store))?.timestamp.getTime() || 0
+            lastStateTimestamp = (await getLastChainState(ctx.store))?.timestamp.getTime() ?? 0
         }
         if (block.header.timestamp - lastStateTimestamp >= SAVE_PERIOD) {
             const accountIdsU8 = [...accountIdsHex].map((id) => decodeHex(id))
@@ -316,9 +316,9 @@ async function getBalances(
     ctx: ChainContext,
     block: Block,
     accounts: Uint8Array[]
-): Promise<(Balance | undefined)[] | undefined> {
+): Promise<Array<(Balance | undefined)> | undefined> {
     return (
-        (await getSystemAccountBalances(ctx, block, accounts)) ||
+        (await getSystemAccountBalances(ctx, block, accounts)) ??
         (await getBalancesAccountBalances(ctx, block, accounts))
     )
 }

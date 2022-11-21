@@ -1,0 +1,6 @@
+**/node_modules/*
+**/out/*
+**/generated/*
+next-env.d.ts
+node_modules
+dist
