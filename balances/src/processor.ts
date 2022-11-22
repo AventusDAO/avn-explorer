@@ -1,4 +1,3 @@
-
 import {
     BatchContext,
     BatchProcessorCallItem,
@@ -10,14 +9,13 @@ import {
     
 } from '@subsquid/substrate-processor'
 import { Store, TypeormDatabase } from '@subsquid/typeorm-store'
+import { randomUUID } from 'crypto'
 import { saveCurrentChainState, saveRegularChainState } from './chainState'
 import config from './config'
 import { getProcessor } from './configured'
 import { Account, Balance, ChainState } from './model'
 import { parachainConfig } from './config'
 import { getBalanceSetAccount, getDepositAccount, getEndowedAccount, getReservedAccount, getReserveRepatriatedAccounts, getSlashedAccount, getTransferAccounts, getUnreservedAccount, getWithdrawAccount } from './eventHandlers/accountEventHandlers'
-
-
 import { BalancesAccountStorage, SystemAccountStorage } from './types/generated/parachain-dev/storage'
 import { Block, ChainContext } from './types/generated/parachain-dev/support'
 import { encodeId } from './utils'
@@ -76,26 +74,31 @@ async function getLastChainState(store: Store) {
 
 async function processBalances(ctx: Context): Promise<void> {
     const accountIdsHex = new Set<string>()
+    let accountIdsU8:Buffer[];
+    let balances: IBalance[]|undefined;
 
     for (const block of ctx.blocks) {
         for (const item of block.items) {
             if (item.kind === 'call') {
                 processBalancesCallItem(ctx, item, accountIdsHex)
-                console.log("ITEM1", item?.call.origin)
             } else if (item.kind === 'event') {
-                console.log("ITEM2", item.event)
                 processBalancesEventItem(ctx, item, accountIdsHex, block.header)
-                const accountIdsU8 = [...accountIdsHex].map((id) => decodeHex(id))
-                saveBalances(ctx, block.header, accountIdsU8)
             }
+        }
+        accountIdsU8 = [...accountIdsHex].map((id) => decodeHex(id))
+        balances = await getBalances(ctx, block.header, accountIdsU8)
+        if (!balances) {
+            ctx.log.warn('No balances')
+            return
         }
         if (lastStateTimestamp == null) {
             lastStateTimestamp = (await getLastChainState(ctx.store))?.timestamp.getTime() ?? 0
         }
         if (block.header.timestamp - lastStateTimestamp >= SAVE_PERIOD) {
-            const accountIdsU8 = [...accountIdsHex].map((id) => decodeHex(id))
+           
 
-            // await saveAccounts(ctx, block.header, accountIdsU8)
+
+            await saveAccounts(ctx, block.header, accountIdsU8, balances)
             await saveRegularChainState(ctx, block.header)
 
             lastStateTimestamp = block.header.timestamp
@@ -104,81 +107,81 @@ async function processBalances(ctx: Context): Promise<void> {
     }
 
     const block = ctx.blocks[ctx.blocks.length - 1]
-    // const accountIdsU8 = [...accountIdsHex].map((id) => decodeHex(id))
+    accountIdsU8 = [...accountIdsHex].map((id) => decodeHex(id))
+    balances =  await getBalances(ctx, block.header, accountIdsU8)
 
-    // await saveAccounts(ctx, block.header, accountIdsU8)
+    await saveAccounts(ctx, block.header, accountIdsU8, balances)
+    await saveBalances(ctx, block.header, accountIdsU8, balances)
     await saveCurrentChainState(ctx, block.header)
 }
 
-async function saveBalances(ctx: Context, block: SubstrateBlock, accountIds: Uint8Array[]) {
-    const balancesMap = new Map<string, Balance>()
-
-    for (let i = 0; i < accountIds.length; i++) {
-        const accountId = encodeId(accountIds[i], config)
-        const balance = balances[i]
-
-        if (!balance) continue
-        const free = balance.free ?? 0n
-        const reserved = balance.reserved ?? 0n
-        const total = free + reserved
-        
-        balancesMap.set(accountId, {
-            id: accountId,
-            free,
-            reserved,
-            total,
-            accountId,
-            updatedAt: block.height
-        })
-        
-    }
-    await ctx.store.save([...balancesMap.values()])
-
-    // await ctx.store.save([...accounts.values()])
-    // await ctx.store.remove([...deletions.values()])
-
-    // ctx.log.child('accounts').info(`updated: ${accounts.size}, deleted: ${deletions.size}`)
-}
-
-async function saveAccounts(ctx: Context, block: SubstrateBlock, accountIds: Uint8Array[]) {
-    const balances = await getBalances(ctx, block, accountIds)
-    if (!balances) {
-        ctx.log.warn('No balances')
-        return
-    }
-
+async function saveAccounts(
+    ctx: Context, 
+    block: SubstrateBlock, 
+    accountIds: Uint8Array[], 
+    balances: IBalance[] | undefined
+) {
     const accounts = new Map<string, Account>()
     const deletions = new Map<string, Account>()
 
     for (let i = 0; i < accountIds.length; i++) {
         const id = encodeId(accountIds[i], config)
-        const balance = balances[i]
+        const balance = balances?.[i]
 
         if (!balance) continue
+        const total = balance.free + balance.reserved
+        if (total > 0n) {
+            accounts.set(
+                id,
+                new Account({
+                    id,
+                    updatedAt: block.height,
+                })
+            )
+        } else {
+            deletions.set(id, new Account({ id }))
+        }
     }
 
-    
-        // const total = balance.free + balance.reserved
-    //     if (total > 0n) {
-    //         accounts.set(
-    //             id,
-    //             new Account({
-    //                 id,
-    //                 free: balance.free,
-    //                 reserved: balance.reserved,
-    //                 total,
-    //                 updatedAt: block.height,
-    //             })
-    //         )
-    //     } else {
-    //         deletions.set(id, new Account({ id }))
-    //     }
-    // }
+    await ctx.store.save([...accounts.values()])
+    await ctx.store.remove([...deletions.values()])
 
-    // await ctx.store.save([...accounts.values()])
-    // await ctx.store.remove([...deletions.values()])
+    ctx
+        .log
+        .child('accounts')
+        .info(`updated: ${accounts.size}, deleted: ${deletions.size}`)
+}
 
-    // ctx.log.child('accounts').info(`updated: ${accounts.size}, deleted: ${deletions.size}`)
+async function saveBalances(
+    ctx: Context, 
+    block: SubstrateBlock, 
+    accountIds: Uint8Array[], 
+    balances: IBalance[]|undefined
+) {    
+    const balancesMap = new Map<string, Balance>()    
+
+    for (let i = 0; i < accountIds.length; i++) {
+        const id = encodeId(accountIds[i], config)
+        const balance = balances?.[i]
+
+        if (!balance) continue
+
+        balancesMap.set(id, new Balance({
+            id: randomUUID(),
+            accountId: id,
+            free: balance.free,
+            reserved: balance.reserved,
+            total: balance.free + balance.reserved,
+            updatedAt: block.height
+        }))
+    }
+
+    await ctx.store.save([...balancesMap.values()])
+
+    ctx
+        .log
+        .child('balances')
+        .info(`updated: ${balancesMap.size}`)
 }
 
 function processBalancesCallItem(ctx: Context, item: CallItem, accountIdsHex: Set<string>) {
@@ -245,23 +248,23 @@ function processBalancesEventItem(ctx: Context, item: EventItem, accountIdsHex: 
 }
 
 
-// interface Balance {
-//     free: bigint
-//     reserved: bigint
-// }
+interface IBalance {
+    free: bigint
+    reserved: bigint
+}
 
 async function getBalances(
     ctx: ChainContext,
     block: Block,
     accounts: Uint8Array[]
-): Promise<Array<(Partial<Balance> | undefined)> | undefined> {
+): Promise<IBalance[] | undefined> {
     return (
         (await getSystemAccountBalances(ctx, block, accounts)) ??
         (await getBalancesAccountBalances(ctx, block, accounts))
     )
 }
 
-async function getBalancesAccountBalances(ctx: ChainContext, block: Block, accounts: Uint8Array[]) {
+async function getBalancesAccountBalances(ctx: ChainContext, block: Block, accounts: Uint8Array[]): Promise<IBalance[] | undefined> {
     const storage = new BalancesAccountStorage(ctx, block)
     if (!storage.isExists) return undefined
 
@@ -275,7 +278,7 @@ async function getBalancesAccountBalances(ctx: ChainContext, block: Block, accou
     return data.map((d) => ({ free: d.free, reserved: d.reserved }))
 }
 
-async function getSystemAccountBalances(ctx: ChainContext, block: Block, accounts: Uint8Array[]) {
+async function getSystemAccountBalances(ctx: ChainContext, block: Block, accounts: Uint8Array[]): Promise<IBalance[] | undefined> {
     const storage = new SystemAccountStorage(ctx, block)
     if (!storage.isExists) return undefined
 
@@ -286,7 +289,7 @@ async function getSystemAccountBalances(ctx: ChainContext, block: Block, account
         accounts.map((a) => [a])
     )
 
-    return data.map((d) => ({ free: d.data.free, reserved: d.data.reserved }))
+    return data.map((d) => ({ free: d.data.free, reserved: d.data.reserved })) as IBalance[]
 }
 
 export class UnknownVersionError extends Error {

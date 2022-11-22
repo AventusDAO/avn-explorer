@@ -16,7 +16,7 @@ export async function getChainState(ctx: BatchContext<Store, unknown>, block: Su
     state.timestamp = new Date(block.timestamp)
     state.blockNumber = block.height
     state.tokenBalance = (await getTotalIssuance(ctx, block)) ?? 0n
-
+    
     state.tokenHolders = await ctx.store.count(Account)
 
     return state

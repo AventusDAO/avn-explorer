@@ -1,4 +1,4 @@
-import {Entity as Entity_, Column as Column_, PrimaryGeneratedColumn as PrimaryGeneratedColumn_} from "typeorm"
+import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_} from "typeorm"
 import * as marshal from "../generated/marshal"
 
 @Entity_()
@@ -7,7 +7,7 @@ export class Balance {
     Object.assign(this, props)
   }
 
-  @PrimaryGeneratedColumn_()
+  @PrimaryColumn_()
   id!: string
 
   @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false, precision:80, scale: 0})

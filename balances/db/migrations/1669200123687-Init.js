@@ -1,5 +1,5 @@
-module.exports = class Data1669042353144 {
-  name = 'Data1669042353144'
+module.exports = class Data1669200123687 {
+  name = 'Data1669200123687'
 
   async up(db) {
     await db.query(`CREATE TABLE "current_chain_state" ("id" character varying NOT NULL, "token_balance" numeric(80,0) NOT NULL, "token_holders" integer NOT NULL, "timestamp" TIMESTAMP WITH TIME ZONE NOT NULL, "block_number" integer NOT NULL, CONSTRAINT "PK_635aee56410df525938bf40f669" PRIMARY KEY ("id"))`)
@@ -9,7 +9,7 @@ module.exports = class Data1669042353144 {
     await db.query(`CREATE INDEX "IDX_b15977afb801d90143ea51cdec" ON "chain_state" ("timestamp") `)
     await db.query(`CREATE INDEX "IDX_5596acea2cba293bbdc32b577c" ON "chain_state" ("block_number") `)
     await db.query(`CREATE TABLE "balance" ("id" character varying NOT NULL, "free" numeric(80,0) NOT NULL, "reserved" numeric(80,0) NOT NULL, "total" numeric(80,0) NOT NULL, "updated_at" integer, "account_id" text NOT NULL, CONSTRAINT "PK_079dddd31a81672e8143a649ca0" PRIMARY KEY ("id"))`)
-    await db.query(`CREATE TABLE "account" ("id" character varying NOT NULL, "free" numeric(80,0) NOT NULL, "reserved" numeric(80,0) NOT NULL, "total" numeric(80,0) NOT NULL, "updated_at" integer, CONSTRAINT "PK_54115ee388cdb6d86bb4bf5b2ea" PRIMARY KEY ("id"))`)
+    await db.query(`CREATE TABLE "account" ("id" character varying NOT NULL, "updated_at" integer, CONSTRAINT "PK_54115ee388cdb6d86bb4bf5b2ea" PRIMARY KEY ("id"))`)
   }
 
   async down(db) {
