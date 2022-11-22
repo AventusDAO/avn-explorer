@@ -1,20 +1,36 @@
-import { SubstrateProcessor } from '@subsquid/substrate-processor'
+export enum NetworkPrefix {
+  aventus = 65,
+  substrate = 42
+}
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-type Parameters<T> = T extends (...args: infer T) => any ? T : never
-
-enum HandlerParams {
-    NAME,
-    OPTIONS,
-    FUNC,
+interface DataSource {
+  /**
+   * Subsquid substrate archive endpoint URL
+   */
+  archive: string
+  /**
+   * Chain node RPC websocket URL
+   */
+  chain?: string
 }
 
 export interface ProcessorConfig {
-    chainName: string
-    prefix: number | string
-    dataSource: Parameters<SubstrateProcessor<any>['setDataSource']>[HandlerParams.NAME]
-    typesBundle: Parameters<SubstrateProcessor<any>['setTypesBundle']>[HandlerParams.NAME]
-    batchSize?: Parameters<SubstrateProcessor<any>['setBatchSize']>[HandlerParams.NAME]
-    port?: Parameters<SubstrateProcessor<any>['setPrometheusPort']>[HandlerParams.NAME]
-    blockRange?: Parameters<SubstrateProcessor<any>['setBlockRange']>[HandlerParams.NAME]
+  prefix: NetworkPrefix
+  dataSource: DataSource
+  /**
+   * name of a JSON file of the types bundle
+   */
+  typesBundle?: string
+  batchSize?: number
+  prometheusPort?: string | number
+  blockRange?: {
+    /**
+     * Start of segment (inclusive)
+     */
+    from: number
+    /**
+     * End of segment (inclusive). Defaults to infinity.
+     */
+    to?: number
+  }
 }
