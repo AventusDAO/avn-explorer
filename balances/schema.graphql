@@ -13,3 +13,12 @@ type ChainState @entity {
   timestamp: DateTime! @index
   blockNumber: Int! @index
 }
+
+type Balance @entity {
+  id: ID!
+  free: BigInt!
+  reserved: BigInt!
+  total: BigInt!
+  updatedAt: Int
+  accountId: String!
+}
