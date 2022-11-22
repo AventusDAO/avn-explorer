@@ -3,4 +3,6 @@
 **/generated/*
 next-env.d.ts
 node_modules
-dist
+lib
+archive/db
+balances/db

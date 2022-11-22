@@ -15,7 +15,6 @@ export const testnetConfig: ProcessorConfig = {
 }
 
 export const parachainConfig: ProcessorConfig = {
-    // eslint-disable-next-line sonarjs/no-duplicate-string
     chainName: 'avn-parachain',
     prefix: 65,
     dataSource: {
