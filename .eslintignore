@@ -1,0 +1,8 @@
+**/node_modules/*
+**/out/*
+**/generated/*
+next-env.d.ts
+node_modules
+lib
+archive/db
+balances/db
