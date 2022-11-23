@@ -5,8 +5,7 @@ import {
     BatchProcessorItem,
     decodeHex,
     SubstrateBlock,
-    SubstrateCall,
-    
+    SubstrateCall,    
 } from '@subsquid/substrate-processor'
 import { Store, TypeormDatabase } from '@subsquid/typeorm-store'
 import { randomUUID } from 'crypto'
@@ -16,6 +15,8 @@ import { getProcessor } from './configured'
 import { Account, Balance, ChainState } from './model'
 import { parachainConfig } from './config'
 import { getBalanceSetAccount, getDepositAccount, getEndowedAccount, getReservedAccount, getReserveRepatriatedAccounts, getSlashedAccount, getTransferAccounts, getUnreservedAccount, getWithdrawAccount } from './eventHandlers/accountEventHandlers'
+import { IBalance } from './types/custom/balance'
+
 import { BalancesAccountStorage, SystemAccountStorage } from './types/generated/parachain-dev/storage'
 import { Block, ChainContext } from './types/generated/parachain-dev/support'
 import { encodeId } from './utils'
@@ -89,7 +90,7 @@ async function processBalances(ctx: Context): Promise<void> {
         balances = await getBalances(ctx, block.header, accountIdsU8)
         if (!balances) {
             ctx.log.warn('No balances')
-            return
+            continue
         }
         if (lastStateTimestamp == null) {
             lastStateTimestamp = (await getLastChainState(ctx.store))?.timestamp.getTime() ?? 0
@@ -119,7 +120,7 @@ async function saveAccounts(
     ctx: Context, 
     block: SubstrateBlock, 
     accountIds: Uint8Array[], 
-    balances: IBalance[] | undefined
+    balances?: IBalance[]
 ) {
     const accounts = new Map<string, Account>()
     const deletions = new Map<string, Account>()
@@ -156,7 +157,7 @@ async function saveBalances(
     ctx: Context, 
     block: SubstrateBlock, 
     accountIds: Uint8Array[], 
-    balances: IBalance[]|undefined
+    balances?: IBalance[]
 ) {    
     const balancesMap = new Map<string, Balance>()    
 
@@ -248,10 +249,7 @@ function processBalancesEventItem(ctx: Context, item: EventItem, accountIdsHex: 
 }
 
 
-interface IBalance {
-    free: bigint
-    reserved: bigint
-}
+
 
 async function getBalances(
     ctx: ChainContext,

@@ -1,104 +1,104 @@
-import { toHex } from "@subsquid/substrate-processor"
-import { UnknownVersionError } from "../processor"
+import { toHex } from '@subsquid/substrate-processor'
+import { UnknownVersionError } from '../processor'
 import {
-    BalancesBalanceSetEvent,
-    BalancesDepositEvent,
-    BalancesEndowedEvent,
-    BalancesReservedEvent,
-    BalancesReserveRepatriatedEvent,
-    BalancesSlashedEvent,
-    BalancesTransferEvent,
-    BalancesUnreservedEvent,
-    BalancesWithdrawEvent,
+  BalancesBalanceSetEvent,
+  BalancesDepositEvent,
+  BalancesEndowedEvent,
+  BalancesReservedEvent,
+  BalancesReserveRepatriatedEvent,
+  BalancesSlashedEvent,
+  BalancesTransferEvent,
+  BalancesUnreservedEvent,
+  BalancesWithdrawEvent
 } from '../types/generated/parachain-dev/events'
-import { ChainContext, Event } from "../types/generated/parachain-dev/support"
+import { ChainContext, Event } from '../types/generated/parachain-dev/support'
 
 export function getBalanceSetAccount(ctx: ChainContext, event: Event) {
-    const data = new BalancesBalanceSetEvent(ctx, event)
+  const data = new BalancesBalanceSetEvent(ctx, event)
 
-    if (data.isV10) {
-        return toHex(data.asV10.who)
-    } else {
-        throw new UnknownVersionError(data.constructor.name)
-    }
+  if (data.isV10) {
+    return toHex(data.asV10.who)
+  } else {
+    throw new UnknownVersionError(data.constructor.name)
+  }
 }
 
 export function getTransferAccounts(ctx: ChainContext, event: Event) {
-    const data = new BalancesTransferEvent(ctx, event)
-    ctx._chain.getStorage
-    if (data.isV10) {
-        return [toHex(data.asV10.from), toHex(data.asV10.to)]
-    } else {
-        throw new UnknownVersionError(data.constructor.name)
-    }
+  const data = new BalancesTransferEvent(ctx, event)
+  ctx._chain.getStorage
+  if (data.isV10) {
+    return [toHex(data.asV10.from), toHex(data.asV10.to)]
+  } else {
+    throw new UnknownVersionError(data.constructor.name)
+  }
 }
 
 export function getEndowedAccount(ctx: ChainContext, event: Event) {
-    const data = new BalancesEndowedEvent(ctx, event)
+  const data = new BalancesEndowedEvent(ctx, event)
 
-    if (data.isV10) {
-        return toHex(data.asV10.account)
-    } else {
-        throw new UnknownVersionError(data.constructor.name)
-    }
+  if (data.isV10) {
+    return toHex(data.asV10.account)
+  } else {
+    throw new UnknownVersionError(data.constructor.name)
+  }
 }
 
 export function getDepositAccount(ctx: ChainContext, event: Event) {
-    const data = new BalancesDepositEvent(ctx, event)
+  const data = new BalancesDepositEvent(ctx, event)
 
-    if (data.isV10) {
-        return toHex(data.asV10.who)
-    } else {
-        throw new UnknownVersionError(data.constructor.name)
-    }
+  if (data.isV10) {
+    return toHex(data.asV10.who)
+  } else {
+    throw new UnknownVersionError(data.constructor.name)
+  }
 }
 
 export function getReservedAccount(ctx: ChainContext, event: Event) {
-    const data = new BalancesReservedEvent(ctx, event)
+  const data = new BalancesReservedEvent(ctx, event)
 
-    if (data.isV10) {
-        return toHex(data.asV10.who)
-    } else {
-        throw new UnknownVersionError(data.constructor.name)
-    }
+  if (data.isV10) {
+    return toHex(data.asV10.who)
+  } else {
+    throw new UnknownVersionError(data.constructor.name)
+  }
 }
 
 export function getUnreservedAccount(ctx: ChainContext, event: Event) {
-    const data = new BalancesUnreservedEvent(ctx, event)
+  const data = new BalancesUnreservedEvent(ctx, event)
 
-    if (data.isV10) {
-        return toHex(data.asV10.who)
-    } else {
-        throw new UnknownVersionError(data.constructor.name)
-    }
+  if (data.isV10) {
+    return toHex(data.asV10.who)
+  } else {
+    throw new UnknownVersionError(data.constructor.name)
+  }
 }
 
 export function getWithdrawAccount(ctx: ChainContext, event: Event) {
-    const data = new BalancesWithdrawEvent(ctx, event)
-    
-    if (data.isV10) {
-        return toHex(data.asV10.who)
-    } else {
-        throw new UnknownVersionError(data.constructor.name)
-    }
+  const data = new BalancesWithdrawEvent(ctx, event)
+
+  if (data.isV10) {
+    return toHex(data.asV10.who)
+  } else {
+    throw new UnknownVersionError(data.constructor.name)
+  }
 }
 
 export function getSlashedAccount(ctx: ChainContext, event: Event) {
-    const data = new BalancesSlashedEvent(ctx, event)
+  const data = new BalancesSlashedEvent(ctx, event)
 
-    if (data.isV10) {
-        return toHex(data.asV10.who)
-    } else {
-        throw new UnknownVersionError(data.constructor.name)
-    }
+  if (data.isV10) {
+    return toHex(data.asV10.who)
+  } else {
+    throw new UnknownVersionError(data.constructor.name)
+  }
 }
 
 export function getReserveRepatriatedAccounts(ctx: ChainContext, event: Event) {
-    const data = new BalancesReserveRepatriatedEvent(ctx, event)
+  const data = new BalancesReserveRepatriatedEvent(ctx, event)
 
-    if (data.isV10) {
-        return [toHex(data.asV10.from), toHex(data.asV10.to)]
-    } else {
-        throw new UnknownVersionError(data.constructor.name)
-    }
+  if (data.isV10) {
+    return [toHex(data.asV10.from), toHex(data.asV10.to)]
+  } else {
+    throw new UnknownVersionError(data.constructor.name)
+  }
 }

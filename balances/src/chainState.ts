@@ -1,6 +1,6 @@
 import { BatchContext, SubstrateBlock } from '@subsquid/substrate-processor'
 import { Store } from '@subsquid/typeorm-store'
-import { Account, ChainState, CurrentChainState } from './model'
+import {  Account, ChainState, CurrentChainState } from './model'
 import { UnknownVersionError } from './processor'
 import { BalancesTotalIssuanceStorage } from './types/generated/parachain-dev/storage'
 // import { PERIOD } from './consts/consts'
