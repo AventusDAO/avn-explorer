@@ -19,8 +19,8 @@ export class Balance {
   @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false, precision:80, scale: 0})
   total!: bigint
 
-  @Column_("int4", {nullable: true})
-  updatedAt!: number | undefined | null
+  @Column_("int4", {nullable: false})
+  updatedAt!: number
 
   @Column_("text", {nullable: false})
   accountId!: string
