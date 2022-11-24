@@ -8,3 +8,5 @@ public
 lib
 balances/db
 archive/db
+.pnp.cjs
+.pnp.loader.mjs

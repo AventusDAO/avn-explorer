@@ -13,6 +13,6 @@
 
 ## Dependencies
 
-This is a monorepo configured with Yarn v3 (but without zero-installs). 
+This is a monorepo configured with Yarn v3 (but without zero-installs).
 
 To update a dependency use `yarn up dotenv` - it will update all `dotenv` dependencies across all packages automatically. It's important to keep the installed package versions identical (especially such as `typescript`) to avoid errors when sharing the code between packages.

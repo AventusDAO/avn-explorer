@@ -3,25 +3,13 @@
     "avn": {
       "types": [
         {
-          "minmax": [
-            0,
-            264
-          ],
+          "minmax": [0, 264],
           "types": {
             "CheckResult": {
-              "_enum": [
-                "Ok",
-                "Invalid",
-                "HttpErrorCheckingEvent",
-                "Unknown"
-              ]
+              "_enum": ["Ok", "Invalid", "HttpErrorCheckingEvent", "Unknown"]
             },
             "ChallengeReason": {
-              "_enum": [
-                "IncorrectResult",
-                "IncorrectEventData",
-                "Unknown"
-              ]
+              "_enum": ["IncorrectResult", "IncorrectEventData", "Unknown"]
             },
             "Challenge": {
               "event_id": "EthEventId",
@@ -212,12 +200,7 @@
               "ingress_counter": "IngressCounter"
             },
             "ValidatorsActionStatus": {
-              "_enum": [
-                "AwaitingConfirmation",
-                "Confirmed",
-                "Actioned",
-                "None"
-              ]
+              "_enum": ["AwaitingConfirmation", "Confirmed", "Actioned", "None"]
             },
             "ValidatorsActionData": {
               "status": "ValidatorsActionStatus",
@@ -228,18 +211,10 @@
             },
             "Public": "[u8;33]",
             "ValidatorsActionType": {
-              "_enum": [
-                "Voluntary",
-                "Slashed",
-                "Activation",
-                "Unknown"
-              ]
+              "_enum": ["Voluntary", "Slashed", "Activation", "Unknown"]
             },
             "EthereumLogOffenceType": {
-              "_enum": [
-                "IncorrectValidationResultSubmitted",
-                "ChallengeAttemptedOnValidResult"
-              ]
+              "_enum": ["IncorrectValidationResultSubmitted", "ChallengeAttemptedOnValidResult"]
             },
             "InvalidEthereumLogOffence": {
               "session_index": "u32",
@@ -259,11 +234,7 @@
               ]
             },
             "ValidatorOffenceType": {
-              "_enum": [
-                "InvalidSignatureSubmitted",
-                "RejectedValidAction",
-                "ApprovedInvalidAction"
-              ]
+              "_enum": ["InvalidSignatureSubmitted", "RejectedValidAction", "ApprovedInvalidAction"]
             },
             "SummaryChallengeReason": {
               "_enum": {
@@ -306,11 +277,7 @@
               "rate": "RoyaltyRate"
             },
             "NftSaleType": {
-              "_enum": [
-                "Unknown",
-                "Ethereum",
-                "Fiat"
-              ]
+              "_enum": ["Unknown", "Ethereum", "Fiat"]
             },
             "MinterTier1Address": "H160",
             "OpId": "u64",
@@ -328,25 +295,13 @@
           }
         },
         {
-          "minmax": [
-            264,
-            270
-          ],
+          "minmax": [264, 270],
           "types": {
             "CheckResult": {
-              "_enum": [
-                "Ok",
-                "Invalid",
-                "HttpErrorCheckingEvent",
-                "Unknown"
-              ]
+              "_enum": ["Ok", "Invalid", "HttpErrorCheckingEvent", "Unknown"]
             },
             "ChallengeReason": {
-              "_enum": [
-                "IncorrectResult",
-                "IncorrectEventData",
-                "Unknown"
-              ]
+              "_enum": ["IncorrectResult", "IncorrectEventData", "Unknown"]
             },
             "Challenge": {
               "event_id": "EthEventId",
@@ -537,12 +492,7 @@
               "ingress_counter": "IngressCounter"
             },
             "ValidatorsActionStatus": {
-              "_enum": [
-                "AwaitingConfirmation",
-                "Confirmed",
-                "Actioned",
-                "None"
-              ]
+              "_enum": ["AwaitingConfirmation", "Confirmed", "Actioned", "None"]
             },
             "ValidatorsActionData": {
               "status": "ValidatorsActionStatus",
@@ -553,18 +503,10 @@
             },
             "Public": "[u8;33]",
             "ValidatorsActionType": {
-              "_enum": [
-                "Voluntary",
-                "Slashed",
-                "Activation",
-                "Unknown"
-              ]
+              "_enum": ["Voluntary", "Slashed", "Activation", "Unknown"]
             },
             "EthereumLogOffenceType": {
-              "_enum": [
-                "IncorrectValidationResultSubmitted",
-                "ChallengeAttemptedOnValidResult"
-              ]
+              "_enum": ["IncorrectValidationResultSubmitted", "ChallengeAttemptedOnValidResult"]
             },
             "InvalidEthereumLogOffence": {
               "session_index": "u32",
@@ -584,11 +526,7 @@
               ]
             },
             "ValidatorOffenceType": {
-              "_enum": [
-                "InvalidSignatureSubmitted",
-                "RejectedValidAction",
-                "ApprovedInvalidAction"
-              ]
+              "_enum": ["InvalidSignatureSubmitted", "RejectedValidAction", "ApprovedInvalidAction"]
             },
             "SummaryChallengeReason": {
               "_enum": {
@@ -631,11 +569,7 @@
               "rate": "RoyaltyRate"
             },
             "NftSaleType": {
-              "_enum": [
-                "Unknown",
-                "Ethereum",
-                "Fiat"
-              ]
+              "_enum": ["Unknown", "Ethereum", "Fiat"]
             },
             "MinterTier1Address": "H160",
             "OpId": "u64",
@@ -653,25 +587,13 @@
           }
         },
         {
-          "minmax": [
-            270,
-            271
-          ],
+          "minmax": [270, 271],
           "types": {
             "CheckResult": {
-              "_enum": [
-                "Ok",
-                "Invalid",
-                "HttpErrorCheckingEvent",
-                "Unknown"
-              ]
+              "_enum": ["Ok", "Invalid", "HttpErrorCheckingEvent", "Unknown"]
             },
             "ChallengeReason": {
-              "_enum": [
-                "IncorrectResult",
-                "IncorrectEventData",
-                "Unknown"
-              ]
+              "_enum": ["IncorrectResult", "IncorrectEventData", "Unknown"]
             },
             "Challenge": {
               "event_id": "EthEventId",
@@ -863,12 +785,7 @@
               "ingress_counter": "IngressCounter"
             },
             "ValidatorsActionStatus": {
-              "_enum": [
-                "AwaitingConfirmation",
-                "Confirmed",
-                "Actioned",
-                "None"
-              ]
+              "_enum": ["AwaitingConfirmation", "Confirmed", "Actioned", "None"]
             },
             "ValidatorsActionData": {
               "status": "ValidatorsActionStatus",
@@ -879,18 +796,10 @@
             },
             "Public": "[u8;33]",
             "ValidatorsActionType": {
-              "_enum": [
-                "Voluntary",
-                "Slashed",
-                "Activation",
-                "Unknown"
-              ]
+              "_enum": ["Voluntary", "Slashed", "Activation", "Unknown"]
             },
             "EthereumLogOffenceType": {
-              "_enum": [
-                "IncorrectValidationResultSubmitted",
-                "ChallengeAttemptedOnValidResult"
-              ]
+              "_enum": ["IncorrectValidationResultSubmitted", "ChallengeAttemptedOnValidResult"]
             },
             "InvalidEthereumLogOffence": {
               "session_index": "u32",
@@ -910,11 +819,7 @@
               ]
             },
             "ValidatorOffenceType": {
-              "_enum": [
-                "InvalidSignatureSubmitted",
-                "RejectedValidAction",
-                "ApprovedInvalidAction"
-              ]
+              "_enum": ["InvalidSignatureSubmitted", "RejectedValidAction", "ApprovedInvalidAction"]
             },
             "SummaryChallengeReason": {
               "_enum": {
@@ -957,11 +862,7 @@
               "rate": "RoyaltyRate"
             },
             "NftSaleType": {
-              "_enum": [
-                "Unknown",
-                "Ethereum",
-                "Fiat"
-              ]
+              "_enum": ["Unknown", "Ethereum", "Fiat"]
             },
             "MinterTier1Address": "H160",
             "OpId": "u64",
@@ -979,25 +880,13 @@
           }
         },
         {
-          "minmax": [
-            271,
-            null
-          ],
+          "minmax": [271, null],
           "types": {
             "CheckResult": {
-              "_enum": [
-                "Ok",
-                "Invalid",
-                "HttpErrorCheckingEvent",
-                "Unknown"
-              ]
+              "_enum": ["Ok", "Invalid", "HttpErrorCheckingEvent", "Unknown"]
             },
             "ChallengeReason": {
-              "_enum": [
-                "IncorrectResult",
-                "IncorrectEventData",
-                "Unknown"
-              ]
+              "_enum": ["IncorrectResult", "IncorrectEventData", "Unknown"]
             },
             "Challenge": {
               "event_id": "EthEventId",
@@ -1191,12 +1080,7 @@
               "ingress_counter": "IngressCounter"
             },
             "ValidatorsActionStatus": {
-              "_enum": [
-                "AwaitingConfirmation",
-                "Confirmed",
-                "Actioned",
-                "None"
-              ]
+              "_enum": ["AwaitingConfirmation", "Confirmed", "Actioned", "None"]
             },
             "ValidatorsActionData": {
               "status": "ValidatorsActionStatus",
@@ -1207,18 +1091,10 @@
             },
             "Public": "[u8;33]",
             "ValidatorsActionType": {
-              "_enum": [
-                "Voluntary",
-                "Slashed",
-                "Activation",
-                "Unknown"
-              ]
+              "_enum": ["Voluntary", "Slashed", "Activation", "Unknown"]
             },
             "EthereumLogOffenceType": {
-              "_enum": [
-                "IncorrectValidationResultSubmitted",
-                "ChallengeAttemptedOnValidResult"
-              ]
+              "_enum": ["IncorrectValidationResultSubmitted", "ChallengeAttemptedOnValidResult"]
             },
             "InvalidEthereumLogOffence": {
               "session_index": "u32",
@@ -1238,11 +1114,7 @@
               ]
             },
             "ValidatorOffenceType": {
-              "_enum": [
-                "InvalidSignatureSubmitted",
-                "RejectedValidAction",
-                "ApprovedInvalidAction"
-              ]
+              "_enum": ["InvalidSignatureSubmitted", "RejectedValidAction", "ApprovedInvalidAction"]
             },
             "SummaryChallengeReason": {
               "_enum": {
@@ -1286,11 +1158,7 @@
               "rate": "RoyaltyRate"
             },
             "NftSaleType": {
-              "_enum": [
-                "Unknown",
-                "Ethereum",
-                "Fiat"
-              ]
+              "_enum": ["Unknown", "Ethereum", "Fiat"]
             },
             "MinterTier1Address": "H160",
             "OpId": "u64",
