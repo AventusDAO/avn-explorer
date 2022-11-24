@@ -6,7 +6,7 @@ This is a Squid based processor listing accounts and their AVT balance changes.
 
 - Make sure you have access to an Aventus chain archive
 - Configure `.env` file
-- Install dependencies: `npm i`
+- Install dependencies: `yarn`
 - Build project: `make build`
 - Run database: `make up`
 - Start processing: `make process`

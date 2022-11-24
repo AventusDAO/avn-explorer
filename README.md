@@ -10,6 +10,7 @@
 - [Install Yarn](https://yarnpkg.com/getting-started/install): `$ corepack enable && corepack prepare yarn@stable --activate`
 - Install dependencies: run `$ yarn` anywhere in the repository
 - Allow VSCode to use Workspace installed Typscript version when it asks you
+- To support features like go-to-definition with Yarn v3, a plugin like ZipFS is needed. They're listed in [VSCode extension recommendation](/.vscode/extensions.json).
 
 ## Dependencies
 
