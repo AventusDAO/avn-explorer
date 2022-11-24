@@ -12,9 +12,7 @@ import { Store, TypeormDatabase } from '@subsquid/typeorm-store'
 import { randomUUID } from 'crypto'
 import { saveCurrentChainState, saveRegularChainState } from './chainState'
 import config from './config'
-import { getProcessor } from './configured'
 import { Account, Balance, ChainState } from './model'
-import { parachainConfig } from './config'
 import {
   getBalanceSetAccount,
   getDepositAccount,
@@ -115,7 +113,6 @@ async function processBalances(ctx: Context): Promise<void> {
       }
 
       await saveAccounts(ctx, block.header, accountIdsU8, balances)
-      // await saveBalances(ctx, block.header, accountIdsU8, balances)
       await saveRegularChainState(ctx, block.header)
 
       lastStateTimestamp = block.header.timestamp
@@ -175,20 +172,26 @@ async function saveBalances(
   balances?: IBalance[]
 ) {
   const balancesMap: { [id: string]: Balance } = {}
-  // const prevAccountIds = new Set()
+  const accountBalances = await Promise.all(
+    accountIds.map(async id => {
+        const accountId = encodeId(id, config)
+      return await ctx.store.findOne(Balance, {
+        where: { accountId },
+        order: { updatedAt: 'DESC' }
+      })
+    })
+  )
 
   for (let i = 0; i < accountIds.length; i++) {
     const id = encodeId(accountIds[i], config)
     const balance = balances?.[i]
 
     if (!balance) continue
-    const dbbalances = await (
-      await ctx.store.findBy(Balance, { accountId: id })
-    )?.sort((a, b) => (a.updatedAt > b.updatedAt ? -1 : 1))
-    console.log('DBBALANCES', dbbalances)
-    const total = balance.free + balance.reserved
 
-    if (dbbalances.length && balancesMap[id]?.total === dbbalances[0].total) {
+    const total = balance.free + balance.reserved
+    const dbBalance = accountBalances.find( a=> a?.accountId === id )
+
+    if (dbBalance && total === dbBalance.total) {
       continue
     }
 
