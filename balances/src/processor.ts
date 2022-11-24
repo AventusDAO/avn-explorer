@@ -5,14 +5,14 @@ import {
     BatchProcessorEventItem,
     BatchProcessorItem,
     decodeHex,
-    SubstrateBatchProcessor,
     SubstrateBlock,
     SubstrateCall,
     toHex,
 } from '@subsquid/substrate-processor'
 import { Store, TypeormDatabase } from '@subsquid/typeorm-store'
 import { saveCurrentChainState, saveRegularChainState } from './chainState'
-import { parachainConfig } from './config'
+import config from './config'
+import { getProcessor } from './configured'
 import { Account, ChainState } from './model'
 import {
     BalancesBalanceSetEvent,
@@ -28,11 +28,7 @@ import {
 import { BalancesAccountStorage, SystemAccountStorage } from './types/generated/parachain-dev/storage'
 import { Event, Block, ChainContext } from './types/generated/parachain-dev/support'
 
-const config = parachainConfig
-const processor = new SubstrateBatchProcessor()
-    .setBatchSize(config.batchSize ?? 500)
-    .setDataSource(config.dataSource)
-    .setBlockRange(config.blockRange ?? { from: 0 })
+const processor = getProcessor()
     .addEvent('Balances.Endowed', {
         data: { event: { args: true } },
     } as const)
