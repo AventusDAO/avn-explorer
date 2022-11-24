@@ -4,12 +4,10 @@
   "packageManager": "yarn@3.3.0",
   "scripts": {
     "build": "rm -rf lib && tsc",
-    "init": "node db/init.js",
-    "db:migrate": "node db/init.js",
-    "processor:migrate": "echo skip",
+    "processor:migrate": "yarn squid-typeorm-migration-apply",
     "processor:start": "node lib/processor.js",
     "processor:debug": "node -r dotenv/config lib/processor.js",
-    "query-node:start": "squid-graphql-server"
+    "server:start": "squid-graphql-server"
   },
   "dependencies": {
     "@subsquid/graphql-server": "^1.1.0",
@@ -20,8 +18,6 @@
     "dotenv": "^10.0.0",
     "graphql": "^15.5.0",
     "pg": "^8.7.1",
-    "reflect-metadata": "^0.1.13",
-    "snake-case": "^3.0.4",
     "type-graphql": "^1.2.0-rc.1",
     "typeorm": "^0.3.10"
   },

@@ -30,7 +30,6 @@ const getAvnEnvironement = (): AvnEnvironement => {
   return env
 }
 
-
 export const getConfig = (): ProcessorConfig => {
   const archive = process.env.ARCHIVE_URL
   if (!archive) throw new Error(`missing ARCHIVE_URL env var`)

@@ -10,9 +10,9 @@ import {
     toHex,
 } from '@subsquid/substrate-processor'
 import { Store, TypeormDatabase } from '@subsquid/typeorm-store'
-import { saveCurrentChainState, saveRegularChainState } from './chainState'
 import config from './config'
 import { getProcessor } from './configured'
+import { saveCurrentChainState, saveRegularChainState } from './chainState'
 import { Account, ChainState } from './model'
 import {
     BalancesBalanceSetEvent,

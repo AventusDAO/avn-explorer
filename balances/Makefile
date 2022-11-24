@@ -1,13 +1,13 @@
 process: migrate
-	@node -r dotenv/config lib/processor.js
+	@yarn processor:debug
 
 
 serve:
-	@yarn squid-graphql-server
+	@yarn server:start
 
 
 migrate:
-	@yarn squid-typeorm-migration-apply
+	@yarn processor:migrate
 
 
 migration:
