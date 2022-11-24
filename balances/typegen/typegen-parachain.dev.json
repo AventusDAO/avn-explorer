@@ -1,7 +1,6 @@
 {
   "outDir": "../src/types/generated/parachain-dev",
-  "specVersions": "../../types/versions-parachain.dev.jsonl",
-  "typesBundle": "../../types/avn-parachain.json",
+  "specVersions": "../../packages/metadata/versions-parachain.dev.jsonl",
   "events": [
     "Balances.Transfer",
     "Balances.Endowed",
@@ -13,11 +12,6 @@
     "Balances.Withdraw",
     "Balances.Slashed"
   ],
-  "calls": [
-  ],
-  "storage": [
-    "System.Account",
-    "Balances.Account",
-    "Balances.TotalIssuance"
-  ]
+  "calls": [],
+  "storage": ["System.Account", "Balances.Account", "Balances.TotalIssuance"]
 }

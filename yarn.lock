@@ -184,9 +184,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@avn-explorer/types@workspace:types":
+"@avn-explorer/metadata@workspace:packages/metadata":
   version: 0.0.0-use.local
-  resolution: "@avn-explorer/types@workspace:types"
+  resolution: "@avn-explorer/metadata@workspace:packages/metadata"
   dependencies:
     "@subsquid/cli": ^0.7.2
     "@subsquid/substrate-metadata-explorer": ^1.0.8
