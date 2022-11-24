@@ -1,8 +1,11 @@
 set -e
-npx sqd codegen
-npm run build
-rm -rf db/migrations/*.js
-npx sqd db drop
-npx sqd db create
-npx sqd db create-migration Init
-npx sqd db migrate
+make codegen
+make build
+make down
+sleep 10
+rm -rf ./db/migrations/*.js
+rm -rf ./db/data
+make up
+sleep 30
+make migration
+make migrate

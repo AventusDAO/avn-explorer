@@ -2,13 +2,13 @@ up:
 	@docker-compose up -d
 
 explorer:
-	@docker-compose up db gateway explorer -d
+	@docker-compose up -d db gateway explorer
 
 ingest:
-	@docker-compose up db ingest -d 
+	@docker-compose up -d db ingest 
 
 pgadmin:
-	@docker-compose up db pgadmin -d
+	@docker-compose up -d db pgadmin
 
 down:
 	@docker-compose down

@@ -1,12 +1,8 @@
 {
-  "name": "types",
+  "name": "@avn-explorer/types",
   "private": true,
-  "scripts": {
-  },
-  "dependencies": {
-  },
   "devDependencies": {
-    "@subsquid/cli": "^0.4.1",
-    "@subsquid/substrate-metadata-explorer": "^1.0.3"
+    "@subsquid/cli": "^0.7.2",
+    "@subsquid/substrate-metadata-explorer": "^1.0.8"
   }
 }

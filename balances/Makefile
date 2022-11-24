@@ -3,31 +3,31 @@ process: migrate
 
 
 serve:
-	@npx squid-graphql-server
+	@yarn squid-graphql-server
 
 
 migrate:
-	@npx squid-typeorm-migration apply
+	@yarn squid-typeorm-migration-apply
 
 
 migration:
-	@npx squid-typeorm-migration generate
+	@yarn squid-typeorm-migration-generate
 
 
 build:
-	@npm run build
+	@yarn build
 
 
 codegen:
-	@npx squid-typeorm-codegen
+	@yarn squid-typeorm-codegen
 
 
 typegen-testnet:
-	@npx squid-substrate-typegen ./typegen/typegen.testnet.json
+	@yarn squid-substrate-typegen ./typegen/typegen.testnet.json
 
 
 typegen-parachain:
-	@npx squid-substrate-typegen ./typegen/typegen-parachain.dev.json
+	@yarn squid-substrate-typegen ./typegen/typegen-parachain.dev.json
 
 
 up:

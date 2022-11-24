@@ -1,9 +1,19 @@
+# Custom
 .DS_Store
 lib
 archive/postgres-data*
 balances/db/data
 archive/db/data
 archive/db/pg-admin
+
+# Dependencies
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
 
 # Logs
 logs
