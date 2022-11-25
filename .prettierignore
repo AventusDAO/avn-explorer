@@ -6,5 +6,8 @@ public
 .yarn
 .yarnrc
 lib
-balances/db
-archive/db
+.pnp.cjs
+.pnp.loader.mjs
+apps/balances/db/data
+apps/archive/db/pg-admin
+apps/archive/db/data

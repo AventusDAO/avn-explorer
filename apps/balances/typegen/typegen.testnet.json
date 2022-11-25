@@ -1,0 +1,18 @@
+{
+  "outDir": "../src/types/generated/testnet",
+  "specVersions": "../../packages/metadata/versions.testnet.jsonl",
+  "typesBundle": "../../packages/metadata/avn-types.json",
+  "events": [
+    "Balances.Transfer",
+    "Balances.Endowed",
+    "Balances.BalanceSet",
+    "Balances.Reserved",
+    "Balances.Unreserved",
+    "Balances.ReserveRepatriated",
+    "Balances.Deposit",
+    "Balances.Withdraw",
+    "Balances.Slashed"
+  ],
+  "calls": [],
+  "storage": ["System.Account", "Balances.Account", "Balances.TotalIssuance"]
+}

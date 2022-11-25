@@ -1,0 +1,8 @@
+{
+  "name": "@avn-explorer/metadata",
+  "private": true,
+  "devDependencies": {
+    "@subsquid/cli": "^0.7.2",
+    "@subsquid/substrate-metadata-explorer": "^1.0.8"
+  }
+}

@@ -1,27 +1,30 @@
 {
   "name": "avn-explorer",
   "version": "1.0.0",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
     "prettier:check": "prettier -c .",
     "lint:check": "eslint '*/**/*.{js,ts,tsx}'"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Aventus-Network-Services/avn-explorer.git"
-  },
-  "bugs": {
-    "url": "https://github.com/Aventus-Network-Services/avn-explorer/issues"
-  },
-  "homepage": "https://github.com/Aventus-Network-Services/avn-explorer#readme",
   "devDependencies": {
+    "@types/node": "^18.11.9",
+    "@typescript-eslint/eslint-plugin": "^5.44.0",
+    "@typescript-eslint/parser": "^5.44.0",
     "eslint": "^8.28.0",
     "eslint-config-prettier": "^8.5.0",
     "eslint-config-standard-with-typescript": "^23.0.0",
     "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-n": "^15.5.1",
     "eslint-plugin-node": "^11.1.0",
     "eslint-plugin-prettier": "^4.2.1",
     "eslint-plugin-promise": "^6.1.1",
     "eslint-plugin-standard": "^5.0.0",
-    "prettier": "^2.7.1"
-  }
+    "prettier": "^2.7.1",
+    "typescript": "^4.9.3"
+  },
+  "packageManager": "yarn@3.3.0"
 }
