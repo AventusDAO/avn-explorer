@@ -4,7 +4,7 @@ Package containing configuration utilities for apps.
 
 ## Environement variables
 
-Add these to the app utilizng the package:
+Add these variable to the app using this package:
 ```
 DB_NAME=avn-balances
 DB_PASS=avn-balances
