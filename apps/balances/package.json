@@ -3,6 +3,7 @@
   "private": true,
   "packageManager": "yarn@3.3.0",
   "scripts": {
+    "check:types": "tsc --pretty --noEmit",
     "build": "rm -rf lib && tsc",
     "processor:migrate": "yarn squid-typeorm-migration-apply",
     "processor:start": "node lib/processor.js",

@@ -6,6 +6,7 @@
   "main": "lib/configured",
   "typings": "lib/configured",
   "scripts": {
+    "check:types": "tsc --pretty --noEmit",
     "build": "rm -rf lib && tsc"
   },
   "dependencies": {
