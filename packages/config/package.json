@@ -3,8 +3,8 @@
   "private": true,
   "version": "1.0.0",
   "packageManager": "yarn@3.3.0",
-  "main": "lib/configured",
-  "typings": "lib/configured",
+  "main": "lib/index",
+  "typings": "lib/index",
   "scripts": {
     "check:types": "tsc --pretty --noEmit",
     "build": "rm -rf lib && tsc"
