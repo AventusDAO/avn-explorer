@@ -1,10 +1,10 @@
 {
-  "name": "avn-explorer",
+  "name": "@avn/explorer",
   "version": "1.0.0",
   "private": true,
   "workspaces": [
-    "apps/*",
-    "packages/*"
+    "apps/balances",
+    "packages/config"
   ],
   "scripts": {
     "prettier:check": "prettier -c .",

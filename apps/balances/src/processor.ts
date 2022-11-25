@@ -4,14 +4,13 @@ import {
   BatchProcessorEventItem,
   BatchProcessorItem,
   decodeHex,
-  SubstrateBatchProcessor,
   SubstrateBlock,
   SubstrateCall
 } from '@subsquid/substrate-processor'
 import { Store, TypeormDatabase } from '@subsquid/typeorm-store'
 import { randomUUID } from 'crypto'
 import config from './config'
-import { getProcessor } from './configured'
+import { getProcessor } from '@avn/config'
 import { saveCurrentChainState, saveRegularChainState } from './chainState'
 import { Account, ChainState } from './model'
 import {
@@ -34,7 +33,7 @@ import {
 import { Block, ChainContext } from './types/generated/parachain-dev/support'
 import { encodeId } from './utils'
 
-const processor = new SubstrateBatchProcessor()
+const processor = getProcessor()
   .setBatchSize(config.batchSize ?? 500)
   .setDataSource(config.dataSource)
   .setBlockRange(config.blockRange ?? { from: 0 })

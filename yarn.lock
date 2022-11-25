@@ -159,10 +159,11 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@avn-explorer/balances@workspace:apps/balances":
+"@avn/balances@workspace:apps/balances":
   version: 0.0.0-use.local
-  resolution: "@avn-explorer/balances@workspace:apps/balances"
+  resolution: "@avn/balances@workspace:apps/balances"
   dependencies:
+    "@avn/config": ^1.0.0
     "@subsquid/cli": ^0.7.2
     "@subsquid/graphql-server": ^1.1.0
     "@subsquid/ss58": ^0.1.1
@@ -182,12 +183,36 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@avn-explorer/metadata@workspace:packages/metadata":
+"@avn/config@^1.0.0, @avn/config@workspace:packages/config":
   version: 0.0.0-use.local
-  resolution: "@avn-explorer/metadata@workspace:packages/metadata"
+  resolution: "@avn/config@workspace:packages/config"
   dependencies:
     "@subsquid/cli": ^0.7.2
-    "@subsquid/substrate-metadata-explorer": ^1.0.8
+    "@subsquid/substrate-processor": ^1.2.0
+    "@types/node": ^18.11.9
+    dotenv: ^10.0.0
+    typescript: ^4.9.3
+  languageName: unknown
+  linkType: soft
+
+"@avn/explorer@workspace:.":
+  version: 0.0.0-use.local
+  resolution: "@avn/explorer@workspace:."
+  dependencies:
+    "@types/node": ^18.11.9
+    "@typescript-eslint/eslint-plugin": ^5.44.0
+    "@typescript-eslint/parser": ^5.44.0
+    eslint: ^8.28.0
+    eslint-config-prettier: ^8.5.0
+    eslint-config-standard-with-typescript: ^23.0.0
+    eslint-plugin-import: ^2.26.0
+    eslint-plugin-n: ^15.5.1
+    eslint-plugin-node: ^11.1.0
+    eslint-plugin-prettier: ^4.2.1
+    eslint-plugin-promise: ^6.1.1
+    eslint-plugin-standard: ^5.0.0
+    prettier: ^2.7.1
+    typescript: ^4.9.3
   languageName: unknown
   linkType: soft
 
@@ -2113,27 +2138,6 @@ __metadata:
   checksum: 20eb47b3cefd7db027b9bbb993c658abd36d4edd3fe1060e83699a03ee275b0c9b216cc076ff3f2db29073225fb70e7613987af14269ac1fe2a19803ccc97f1a
   languageName: node
   linkType: hard
-
-"avn-explorer@workspace:.":
-  version: 0.0.0-use.local
-  resolution: "avn-explorer@workspace:."
-  dependencies:
-    "@types/node": ^18.11.9
-    "@typescript-eslint/eslint-plugin": ^5.44.0
-    "@typescript-eslint/parser": ^5.44.0
-    eslint: ^8.28.0
-    eslint-config-prettier: ^8.5.0
-    eslint-config-standard-with-typescript: ^23.0.0
-    eslint-plugin-import: ^2.26.0
-    eslint-plugin-n: ^15.5.1
-    eslint-plugin-node: ^11.1.0
-    eslint-plugin-prettier: ^4.2.1
-    eslint-plugin-promise: ^6.1.1
-    eslint-plugin-standard: ^5.0.0
-    prettier: ^2.7.1
-    typescript: ^4.9.3
-  languageName: unknown
-  linkType: soft
 
 "aws-sdk@npm:^2.1069.0":
   version: 2.1261.0

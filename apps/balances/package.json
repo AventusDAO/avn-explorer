@@ -1,5 +1,5 @@
 {
-  "name": "@avn-explorer/balances",
+  "name": "@avn/balances",
   "private": true,
   "packageManager": "yarn@3.3.0",
   "scripts": {
@@ -10,6 +10,7 @@
     "server:start": "squid-graphql-server"
   },
   "dependencies": {
+    "@avn/config": "^1.0.0",
     "@subsquid/graphql-server": "^1.1.0",
     "@subsquid/ss58": "^0.1.1",
     "@subsquid/substrate-processor": "^1.2.0",
