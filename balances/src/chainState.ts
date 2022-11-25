@@ -1,6 +1,6 @@
 import { BatchContext, SubstrateBlock } from '@subsquid/substrate-processor'
 import { Store } from '@subsquid/typeorm-store'
-import { Account, ChainState, CurrentChainState } from './model'
+import {  Account, ChainState, CurrentChainState } from './model'
 import { UnknownVersionError } from './processor'
 import { BalancesTotalIssuanceStorage } from './types/generated/parachain-dev/storage'
 // import { PERIOD } from './consts/consts'
@@ -16,7 +16,7 @@ export async function getChainState(ctx: BatchContext<Store, unknown>, block: Su
     state.timestamp = new Date(block.timestamp)
     state.blockNumber = block.height
     state.tokenBalance = (await getTotalIssuance(ctx, block)) ?? 0n
-
+    
     state.tokenHolders = await ctx.store.count(Account)
 
     return state
