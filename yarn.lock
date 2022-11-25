@@ -216,6 +216,15 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@avn/metadata@workspace:packages/metadata":
+  version: 0.0.0-use.local
+  resolution: "@avn/metadata@workspace:packages/metadata"
+  dependencies:
+    "@subsquid/cli": ^0.7.2
+    "@subsquid/substrate-metadata-explorer": ^1.0.8
+  languageName: unknown
+  linkType: soft
+
 "@babel/code-frame@npm:^7.0.0":
   version: 7.18.6
   resolution: "@babel/code-frame@npm:7.18.6"
