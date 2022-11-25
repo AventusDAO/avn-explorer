@@ -1,9 +1,11 @@
 # Custom
 .DS_Store
 lib
-balances/db/data
-packages/archive/db/pg-admin
-packages/archive/db/data
+
+# DB
+apps/balances/db/data
+apps/archive/db/pg-admin
+apps/archive/db/data
 
 # Dependencies
 .pnp.*

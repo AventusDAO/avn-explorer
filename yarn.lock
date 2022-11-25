@@ -159,9 +159,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@avn-explorer/balances@workspace:balances":
+"@avn-explorer/balances@workspace:apps/balances":
   version: 0.0.0-use.local
-  resolution: "@avn-explorer/balances@workspace:balances"
+  resolution: "@avn-explorer/balances@workspace:apps/balances"
   dependencies:
     "@subsquid/cli": ^0.7.2
     "@subsquid/graphql-server": ^1.1.0
