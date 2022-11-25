@@ -10,3 +10,6 @@ balances/db
 archive/db
 .pnp.cjs
 .pnp.loader.mjs
+packages/archive/db/pg-admin
+packages/archive/db/data
+balances/db/data

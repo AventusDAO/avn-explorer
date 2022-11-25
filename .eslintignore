@@ -4,5 +4,6 @@
 next-env.d.ts
 node_modules
 lib
-archive/db
-balances/db
+packages/archive/db/pg-admin
+packages/archive/db/data
+balances/db/data
