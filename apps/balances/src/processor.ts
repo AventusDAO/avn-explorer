@@ -12,7 +12,7 @@ import { randomUUID } from 'crypto'
 import config from './config'
 import { getProcessor } from '@avn/config'
 import { saveCurrentChainState, saveRegularChainState } from './chainState'
-import { Account, ChainState } from './model'
+import { Account, Balance, ChainState } from './model'
 import {
   getBalanceSetAccount,
   getDepositAccount,
