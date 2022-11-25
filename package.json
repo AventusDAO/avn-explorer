@@ -1,5 +1,5 @@
 {
-  "name": "avn-explorer",
+  "name": "@avn/explorer",
   "version": "1.0.0",
   "private": true,
   "workspaces": [
@@ -7,8 +7,10 @@
     "packages/*"
   ],
   "scripts": {
-    "prettier:check": "prettier -c .",
-    "lint:check": "eslint '*/**/*.{js,ts,tsx}'"
+    "check:prettier": "prettier -c .",
+    "check:lint": "eslint '*/**/*.{js,ts,tsx}'",
+    "check:types": "yarn workspaces foreach run check:types",
+    "build": "yarn workspaces foreach run build"
   },
   "devDependencies": {
     "@types/node": "^18.11.9",

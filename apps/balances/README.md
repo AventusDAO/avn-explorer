@@ -15,18 +15,4 @@ This is a Squid based processor listing accounts and their AVT balance changes.
 
 ## Environement variables
 
-```
-DB_NAME=avn-balances
-DB_PASS=avn-balances
-DB_USER=postgres
-DB_PORT=23798
-GQL_PORT=4350
-
-AVN_ENV=parachain-dev
-ARCHIVE_URL=http://localhost:8888/graphql
-
-PROCESSOR_PROMETHEUS_PORT=3000
-# PROCESSOR_RANGE_FROM=0
-# PROCESSOR_RANGE_TO=
-PROCESSOR_BATCH_SIZE=300
-```
+Add `.env` file with required environement variables. Consult [config package README.md](../../packages/config/README.md).
