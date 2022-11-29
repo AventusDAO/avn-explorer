@@ -6,7 +6,7 @@ import {
 import { toHex } from '@subsquid/substrate-processor'
 import { UnknownVersionError } from '../processor'
 
-type AccountData = any[]
+type AccountData = Uint8Array[]
 
 type ReturnedData = {
   tokenId: Uint8Array
@@ -20,7 +20,7 @@ export const getTokenLowerData = (ctx: ChainContext, event: Event): ReturnedData
     const v10Data = data.asV10
     return {
       tokenId: v10Data.tokenId,
-      accounts: [toHex(v10Data.sender), toHex(v10Data.recipient)]
+      accounts: [v10Data.sender, v10Data.recipient]
     }
   } else {
     throw new UnknownVersionError(data.constructor.name)
@@ -34,7 +34,7 @@ export const getTokenTransferredData = (ctx: ChainContext, event: Event): Return
     const v10Data = data.asV10
     return {
       tokenId: v10Data.tokenId,
-      accounts: [toHex(v10Data.sender), toHex(v10Data.recipient)]
+      accounts: [v10Data.sender, v10Data.recipient]
     }
   } else {
     throw new UnknownVersionError(data.constructor.name)
@@ -48,7 +48,7 @@ export const getTokenLiftedData = (ctx: ChainContext, event: Event): ReturnedDat
     const v10Data = data.asV10
     return {
       tokenId: v10Data.tokenId,
-      accounts: [toHex(v10Data.recipient)]
+      accounts: [v10Data.recipient]
     }
   } else {
     throw new UnknownVersionError(data.constructor.name)

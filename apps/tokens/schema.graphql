@@ -21,8 +21,26 @@ type Token @entity {
   tokenBalances: [TokenBalance!]! @derivedFrom(field: "token")
 }
 
+type Account @entity {
+  id: ID!
+  updatedAt: Int
+}
+
 type TokenBalance @entity {
   id: ID!
   amount: BigInt!
   token: Token!
+}
+
+type TokenBalanceForAccount @entity {
+  id: ID!
+  amount: BigInt!
+  token: Token!
+  account: Account!
+}
+
+type ChainState @entity {
+  id: ID!
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
 }

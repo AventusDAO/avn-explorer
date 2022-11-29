@@ -7,9 +7,12 @@ import {
   SubstrateCall
 } from '@subsquid/substrate-processor'
 import { Store, TypeormDatabase } from '@subsquid/typeorm-store'
+import * as ss58 from '@subsquid/ss58'
 import config from './config'
 import { getProcessor } from '@avn/config'
 import { getTokenLiftedData, getTokenLowerData, getTokenTransferredData } from './eventHandlers'
+import { getLastChainState, setChainState } from './service/chainState.service'
+import { Account, Token } from './model'
 
 const processor = getProcessor()
   .setBatchSize(config.batchSize ?? 500)
@@ -40,38 +43,56 @@ const SAVE_PERIOD = 12 * 60 * 60 * 1000
 let lastStateTimestamp: number | undefined
 
 async function processTokens(ctx: Context): Promise<void> {
-  const accountIdsHex = new Set<string>()
+  const accountIds = new Set<Uint8Array>()
   const tokenIds = new Set<Uint8Array>()
 
   for (const block of ctx.blocks) {
     for (const item of block.items) {
       if (item.kind === 'call') {
-        processTokensCallItem(ctx, item, accountIdsHex, tokenIds)
+        processTokensCallItem(ctx, item, accountIds, tokenIds)
       } else if (item.kind === 'event') {
-        processTokensEventItem(ctx, item, accountIdsHex, tokenIds, block.header)
+        processTokensEventItem(ctx, item, accountIds, tokenIds, block.header)
       }
+    }
+
+    if (lastStateTimestamp == null) {
+      lastStateTimestamp = (await getLastChainState(ctx.store))?.timestamp.getTime() ?? 0
+    }
+
+    if (block.header.timestamp - lastStateTimestamp! >= SAVE_PERIOD) {
+      await saveAccounts(ctx, block.header, accountIds)
     }
 
     // why account ids are encoded into hex and then decoded?
     // do I need chainstate for recording accounts and tokens (I suspect I dont)
-
-    if (lastStateTimestamp == null) {
-      lastStateTimestamp =
-        (await getLastChainState(ctx.store))?.timestamp.getTime() ?? 0
-    }
-    if (block.header.timestamp - lastStateTimestamp >= SAVE_PERIOD) {
-      const accountIdsU8 = [...accountIdsHex].map(id => decodeHex(id))
-      balances = await getBalances(ctx, block.header, accountIdsU8)
-      if (!balances) {
-        ctx.log.warn('No balances')
-      }
   }
+
+  const block = ctx.blocks[ctx.blocks.length - 1]
+  await saveAccounts(ctx, block.header, accountIds)
+  await saveTokens(ctx, block.header, tokenIds)
+  await setChainState(ctx, block.header)
+}
+
+async function saveAccounts(
+  ctx: Context,
+  block: SubstrateBlock,
+  accountIds: Set<Uint8Array>
+): Promise<void> {
+  const accounts = [...accountIds].map(
+    (id: Uint8Array) => new Account({ id: encodeId(id), updatedAt: block.height })
+  )
+  await ctx.store.save(accounts)
+}
+
+async function saveTokens(ctx: Context, block: SubstrateBlock, tokenIds: Set<Uint8Array>) {
+  const tokens = [...tokenIds].map((id: Uint8Array) => new Token({ id: encodeId(id) }))
+  await ctx.store.save(tokens)
 }
 
 function processTokensCallItem(
   ctx: Context,
   item: CallItem,
-  accountIdsHex: Set<string>,
+  accountIds: Set<Uint8Array>,
   tokenIds: Set<Uint8Array>
 ) {
   const call = item.call as SubstrateCall
@@ -80,32 +101,33 @@ function processTokensCallItem(
   const id = getOriginAccountId(call.origin)
   if (id == null) return
 
-  accountIdsHex.add(id)
+  accountIds.add(id)
 }
 
 function processTokensEventItem(
   ctx: Context,
   item: EventItem,
-  accountIdsHex: Set<string>,
+  accountIds: Set<Uint8Array>,
   tokenIds: Set<Uint8Array>,
   block: SubstrateBlock
 ) {
+  console.log('ITEM !!!', item)
   switch (item.name) {
     case 'TokenManager.TokenTransferred': {
       const { tokenId, accounts } = getTokenTransferredData(ctx, item.event)
-      accounts?.forEach(acc => accountIdsHex.add(acc))
+      accounts?.forEach(acc => accountIds.add(acc))
       tokenIds.add(tokenId)
       break
     }
     case 'TokenManager.TokenLowered': {
       const { tokenId, accounts } = getTokenLowerData(ctx, item.event)
-      accounts?.forEach(acc => accountIdsHex.add(acc))
+      accounts?.forEach(acc => accountIds.add(acc))
       tokenIds.add(tokenId)
       break
     }
     case 'TokenManager.TokenLifted': {
       const { tokenId, accounts } = getTokenLiftedData(ctx, item.event)
-      accounts?.forEach(acc => accountIdsHex.add(acc))
+      accounts?.forEach(acc => accountIds.add(acc))
       tokenIds.add(tokenId)
       break
     }
@@ -125,4 +147,8 @@ export function getOriginAccountId(origin: any) {
   } else {
     return undefined
   }
+}
+
+export function encodeId(id: Uint8Array) {
+  return ss58.codec(65).encode(id)
 }
