@@ -1,6 +1,6 @@
 {
   "outDir": "../src/types/generated/parachain-dev",
-  "specVersions": "../../packages/metadata/versions-parachain.dev.jsonl",
+  "specVersions": "../../../packages/metadata/versions-parachain.dev.jsonl",
   "events": [
     "Balances.Transfer",
     "Balances.Endowed",

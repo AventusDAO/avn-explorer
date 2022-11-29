@@ -1,0 +1,28 @@
+# type Token @entity {
+#   id: ID!
+#   accounts: [Account!]! @derivedFrom(field: "tokens")
+#   tokenBalances: [TokenBalance!]! @derivedFrom(field: "token")
+# }
+
+# type TokenBalance @entity {
+#   id: ID!
+#   amount: Int!
+#   token: Token!
+# }
+
+# type Account @entity {
+#   id: ID!
+#   updatedAt: Int!
+# }
+
+type Token @entity {
+  id: ID!
+  name: String!
+  tokenBalances: [TokenBalance!]! @derivedFrom(field: "token")
+}
+
+type TokenBalance @entity {
+  id: ID!
+  amount: BigInt!
+  token: Token!
+}

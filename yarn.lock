@@ -169,65 +169,27 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ardatan/relay-compiler@npm:12.0.0":
-  version: 12.0.0
-  resolution: "@ardatan/relay-compiler@npm:12.0.0"
-  dependencies:
-    "@babel/core": ^7.14.0
-    "@babel/generator": ^7.14.0
-    "@babel/parser": ^7.14.0
-    "@babel/runtime": ^7.0.0
-    "@babel/traverse": ^7.14.0
-    "@babel/types": ^7.0.0
-    babel-preset-fbjs: ^3.4.0
-    chalk: ^4.0.0
-    fb-watchman: ^2.0.0
-    fbjs: ^3.0.0
-    glob: ^7.1.1
-    immutable: ~3.7.6
-    invariant: ^2.2.4
-    nullthrows: ^1.1.1
-    relay-runtime: 12.0.0
-    signedsource: ^1.0.0
-    yargs: ^15.3.1
-  peerDependencies:
-    graphql: "*"
-  bin:
-    relay-compiler: bin/relay-compiler
-  checksum: f0cec120d02961ee8652e0dde72d9e425bc97cad5d0f767d8764cfd30952294eb2838432f33e4da8bb6999d0c13dcd1df128280666bfea373294d98aa8033ae7
-  languageName: node
-  linkType: hard
-
-"@ardatan/sync-fetch@npm:0.0.1":
-  version: 0.0.1
-  resolution: "@ardatan/sync-fetch@npm:0.0.1"
-  dependencies:
-    node-fetch: ^2.6.1
-  checksum: af39bdfb4c2b35bd2c6acc540a5e302730dae17e73d3a18cd1a4aa50c1c741cb1869dffdef1379c491da5ad2e3cfa2bf3a8064e6046c12b46c6a97f54f100a8d
-  languageName: node
-  linkType: hard
-
-"@avn/balances-client@workspace:apps/balances-client":
+"@avn-explorer/token-balances@workspace:apps/tokens":
   version: 0.0.0-use.local
-  resolution: "@avn/balances-client@workspace:apps/balances-client"
+  resolution: "@avn-explorer/token-balances@workspace:apps/tokens"
   dependencies:
-    "@graphql-codegen/cli": ^2.15.0
-    "@graphql-codegen/typed-document-node": ^2.3.7
-    "@graphql-codegen/typescript": ^2.8.2
-    "@graphql-codegen/typescript-operations": ^2.5.7
-    "@types/react": ^18.0.24
-    "@types/react-dom": ^18.0.8
-    "@vitejs/plugin-react": ^2.2.0
-    autoprefixer: ^10.4.13
+    "@avn/config": ^1.0.0
+    "@subsquid/cli": ^0.7.2
+    "@subsquid/graphql-server": ^1.1.0
+    "@subsquid/ss58": ^0.1.1
+    "@subsquid/substrate-processor": ^1.2.0
+    "@subsquid/substrate-typegen": ^1.5.0
+    "@subsquid/typeorm-codegen": ^0.2.3
+    "@subsquid/typeorm-migration": ^0.1.3
+    "@subsquid/typeorm-store": ^0.1.5
+    "@types/node": ^18.11.9
+    class-validator: ^0.13.2
+    dotenv: ^10.0.0
     graphql: ^15.5.0
-    postcss: ^8.4.19
-    react: ^18.2.0
-    react-dom: ^18.2.0
-    tailwindcss: ^3.2.4
-    ts-node: ^10.9.1
+    pg: ^8.7.1
+    type-graphql: ^1.2.0-rc.1
+    typeorm: ^0.3.10
     typescript: ^4.9.3
-    urql: ^3.0.3
-    vite: ^3.2.3
   languageName: unknown
   linkType: soft
 
