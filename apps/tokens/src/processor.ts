@@ -4,16 +4,19 @@ import {
   BatchProcessorEventItem,
   BatchProcessorItem,
   SubstrateBlock,
-  SubstrateCall
+  SubstrateCall,
+  decodeHex
 } from '@subsquid/substrate-processor'
+import { randomUUID } from 'crypto'
 import { Store, TypeormDatabase } from '@subsquid/typeorm-store'
 import * as ss58 from '@subsquid/ss58'
 import config from './config'
 import { getProcessor } from '@avn/config'
 import { getTokenLiftedData, getTokenLowerData, getTokenTransferredData } from './eventHandlers'
 import { getLastChainState, setChainState } from './service/chainState.service'
-import { Account, Token } from './model'
 import { Block, ChainContext } from './types/generated/parachain-dev/support'
+import { TokenManagerBalancesStorage } from './types/generated/parachain-dev/storage'
+import { TokenBalanceForAccount } from './model'
 
 const processor = getProcessor()
   .setBatchSize(config.batchSize ?? 500)
@@ -44,15 +47,15 @@ const SAVE_PERIOD = 12 * 60 * 60 * 1000
 let lastStateTimestamp: number | undefined
 
 async function processTokens(ctx: Context): Promise<void> {
-  const accountIds = new Set<Uint8Array>()
-  const tokenIds = new Set<Uint8Array>()
+  const accountIdsHex = new Set<string>()
+  const tokenIdsHex = new Set<string>()
 
   for (const block of ctx.blocks) {
     for (const item of block.items) {
       if (item.kind === 'call') {
-        processTokensCallItem(ctx, item, accountIds, tokenIds)
+        processTokensCallItem(ctx, item, accountIdsHex, tokenIdsHex)
       } else if (item.kind === 'event') {
-        processTokensEventItem(ctx, item, accountIds, tokenIds, block.header)
+        processTokensEventItem(ctx, item, accountIdsHex, tokenIdsHex)
       }
     }
 
@@ -61,54 +64,75 @@ async function processTokens(ctx: Context): Promise<void> {
     }
 
     if (block.header.timestamp - lastStateTimestamp! >= SAVE_PERIOD) {
-      await getTokenManagerData(ctx, block.header, [...tokenIds])
-      await saveAccounts(ctx, block.header, accountIds)
+      const accountIds = [...accountIdsHex].map(id => decodeHex(id))
+      const tokenIds = [...tokenIdsHex].map(id => decodeHex(id))
     }
-
-    // why account ids are encoded into hex and then decoded?
-    // do I need chainstate for recording accounts and tokens (I suspect I dont)
   }
 
   const block = ctx.blocks[ctx.blocks.length - 1]
-  const tokens = [...tokenIds]
-  await getTokenManagerData(ctx, block.header, tokens)
-  await saveAccounts(ctx, block.header, accountIds)
-  await saveTokens(ctx, block.header, tokenIds)
+  const accountIds = [...accountIdsHex].map(id => decodeHex(id))
+  const tokenIds = [...tokenIdsHex].map(id => decodeHex(id))
+  const tokenManagerData = await getTokenManagerData(ctx, block.header, tokenIds, accountIds)
+  console.log('tokenManagerData', tokenManagerData, 'accountIds', [...accountIdsHex], 'tokenIds', [
+    ...tokenIdsHex
+  ])
+  await saveTokenBalanceForAccount(ctx, block.header, tokenIds, accountIds, tokenManagerData!)
   await setChainState(ctx, block.header)
 }
 
-async function saveAccounts(
+async function saveTokenBalanceForAccount(
   ctx: Context,
-  block: SubstrateBlock,
-  accountIds: Set<Uint8Array>
-): Promise<void> {
-  const accounts = [...accountIds].map(
-    (id: Uint8Array) => new Account({ id: encodeId(id), updatedAt: block.height })
-  )
-  await ctx.store.save(accounts)
+  block: Block,
+  tokenIds: Uint8Array[],
+  accountIds: Uint8Array[],
+  balance: bigint[]
+) {
+  if (tokenIds.length && accountIds.length) {
+    const balancesToBeSaved = accountIds.map((aid, index) => {
+      return new TokenBalanceForAccount({
+        id: randomUUID(),
+        tokenId: encodeId(tokenIds[0]),
+        accountId: encodeId(aid),
+        amount: balance[index]! ?? 0
+      })
+    })
+    ctx.store.save(balancesToBeSaved)
+  }
 }
 
-async function saveTokens(ctx: Context, block: SubstrateBlock, tokenIds: Set<Uint8Array>) {
-  const tokens = [...tokenIds].map((id: Uint8Array) => new Token({ id: encodeId(id) }))
-  await ctx.store.save(tokens)
-}
+async function getTokenManagerData(
+  ctx: ChainContext,
+  block: Block,
+  tokenIds: Uint8Array[],
+  accountIds: Uint8Array[]
+) {
+  const storage = new TokenManagerBalancesStorage(ctx, block)
+  if (!storage.isExists || !storage.isV10) {
+    return
+  }
 
-async function getTokenManagerData(ctx: ChainContext, block: Block, tokens: Uint8Array[]) {
-  console.log('HELP 2 !!!', tokens)
-  const data = await ctx._chain.queryStorage(
-    block.hash,
-    'TokenManager',
-    'Balances',
-    0xea055d6f2e2280ecfd691e28f3062047c3904273ea699ec5d05c43a5b8413e55
-  )
-  console.log('HELP !!!', data)
+  let v10InputArray: [Uint8Array, Uint8Array][] = []
+
+  if (tokenIds.length === 1) {
+    v10InputArray = accountIds.map(id => [tokenIds[0], id])
+  } else if (accountIds.length === 1) {
+    v10InputArray = tokenIds.map(id => [id, accountIds[0]])
+  } else {
+    for (const tokenId of tokenIds) {
+      for (const accountId of accountIds) {
+        v10InputArray.push([tokenId, accountId])
+      }
+    }
+  }
+
+  return await storage.getManyAsV10(v10InputArray)
 }
 
 function processTokensCallItem(
   ctx: Context,
   item: CallItem,
-  accountIds: Set<Uint8Array>,
-  tokenIds: Set<Uint8Array>
+  accountIds: Set<string>,
+  tokenIds: Set<string>
 ) {
   const call = item.call as SubstrateCall
   if (call.parent != null) return
@@ -122,11 +146,9 @@ function processTokensCallItem(
 function processTokensEventItem(
   ctx: Context,
   item: EventItem,
-  accountIds: Set<Uint8Array>,
-  tokenIds: Set<Uint8Array>,
-  block: SubstrateBlock
+  accountIds: Set<string>,
+  tokenIds: Set<string>
 ) {
-  console.log('ITEM !!!', item)
   switch (item.name) {
     case 'TokenManager.TokenTransferred': {
       const { tokenId, accounts } = getTokenTransferredData(ctx, item.event)

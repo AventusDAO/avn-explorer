@@ -7,8 +7,8 @@ import {
 import * as marshal from '../generated/marshal'
 
 @Entity_()
-export class TokenBalance {
-  constructor(props?: Partial<TokenBalance>) {
+export class TokenBalanceForAccount {
+  constructor(props?: Partial<TokenBalanceForAccount>) {
     Object.assign(this, props)
   }
 
@@ -26,4 +26,8 @@ export class TokenBalance {
   @Index_()
   @Column_('text', { nullable: false })
   tokenId!: string
+
+  @Index_()
+  @Column_('text', { nullable: false })
+  accountId!: string
 }

@@ -7,10 +7,10 @@ import {
 import { toHex } from '@subsquid/substrate-processor'
 import { UnknownVersionError } from '../processor'
 
-type AccountData = Uint8Array[]
+type AccountData = string[]
 
 type ReturnedData = {
-  tokenId: Uint8Array
+  tokenId: string
   accounts?: AccountData
 }
 
@@ -20,8 +20,8 @@ export const getTokenLowerData = (ctx: ChainContext, event: Event): ReturnedData
   if (data.isV10) {
     const v10Data = data.asV10
     return {
-      tokenId: v10Data.tokenId,
-      accounts: [v10Data.sender, v10Data.recipient]
+      tokenId: toHex(v10Data.tokenId),
+      accounts: [toHex(v10Data.sender), toHex(v10Data.recipient)]
     }
   } else {
     throw new UnknownVersionError(data.constructor.name)
@@ -34,8 +34,8 @@ export const getTokenTransferredData = (ctx: ChainContext, event: Event): Return
   if (data.isV10) {
     const v10Data = data.asV10
     return {
-      tokenId: v10Data.tokenId,
-      accounts: [v10Data.sender, v10Data.recipient]
+      tokenId: toHex(v10Data.tokenId),
+      accounts: [toHex(v10Data.sender), toHex(v10Data.recipient)]
     }
   } else {
     throw new UnknownVersionError(data.constructor.name)
@@ -48,8 +48,8 @@ export const getTokenLiftedData = (ctx: ChainContext, event: Event): ReturnedDat
   if (data.isV10) {
     const v10Data = data.asV10
     return {
-      tokenId: v10Data.tokenId,
-      accounts: [v10Data.recipient]
+      tokenId: toHex(v10Data.tokenId),
+      accounts: [toHex(v10Data.recipient)]
     }
   } else {
     throw new UnknownVersionError(data.constructor.name)
