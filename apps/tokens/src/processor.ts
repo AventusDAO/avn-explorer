@@ -13,6 +13,7 @@ import { getProcessor } from '@avn/config'
 import { getTokenLiftedData, getTokenLowerData, getTokenTransferredData } from './eventHandlers'
 import { getLastChainState, setChainState } from './service/chainState.service'
 import { Account, Token } from './model'
+import { Block, ChainContext } from './types/generated/parachain-dev/support'
 
 const processor = getProcessor()
   .setBatchSize(config.batchSize ?? 500)
@@ -60,6 +61,7 @@ async function processTokens(ctx: Context): Promise<void> {
     }
 
     if (block.header.timestamp - lastStateTimestamp! >= SAVE_PERIOD) {
+      await getTokenManagerData(ctx, block.header, [...tokenIds])
       await saveAccounts(ctx, block.header, accountIds)
     }
 
@@ -68,6 +70,8 @@ async function processTokens(ctx: Context): Promise<void> {
   }
 
   const block = ctx.blocks[ctx.blocks.length - 1]
+  const tokens = [...tokenIds]
+  await getTokenManagerData(ctx, block.header, tokens)
   await saveAccounts(ctx, block.header, accountIds)
   await saveTokens(ctx, block.header, tokenIds)
   await setChainState(ctx, block.header)
@@ -87,6 +91,17 @@ async function saveAccounts(
 async function saveTokens(ctx: Context, block: SubstrateBlock, tokenIds: Set<Uint8Array>) {
   const tokens = [...tokenIds].map((id: Uint8Array) => new Token({ id: encodeId(id) }))
   await ctx.store.save(tokens)
+}
+
+async function getTokenManagerData(ctx: ChainContext, block: Block, tokens: Uint8Array[]) {
+  console.log('HELP 2 !!!', tokens)
+  const data = await ctx._chain.queryStorage(
+    block.hash,
+    'TokenManager',
+    'Balances',
+    0xea055d6f2e2280ecfd691e28f3062047c3904273ea699ec5d05c43a5b8413e55
+  )
+  console.log('HELP !!!', data)
 }
 
 function processTokensCallItem(
@@ -150,5 +165,5 @@ export function getOriginAccountId(origin: any) {
 }
 
 export function encodeId(id: Uint8Array) {
-  return ss58.codec(65).encode(id)
+  return ss58.codec(config.prefix).encode(id)
 }

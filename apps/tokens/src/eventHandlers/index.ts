@@ -1,7 +1,8 @@
 import { ChainContext, Event } from '../types/generated/parachain-dev/support'
 import {
   TokenManagerTokenLiftedEvent,
-  TokenManagerTokenLoweredEvent
+  TokenManagerTokenLoweredEvent,
+  TokenManagerTokenTransferredEvent
 } from '../types/generated/parachain-dev/events'
 import { toHex } from '@subsquid/substrate-processor'
 import { UnknownVersionError } from '../processor'
@@ -28,7 +29,7 @@ export const getTokenLowerData = (ctx: ChainContext, event: Event): ReturnedData
 }
 
 export const getTokenTransferredData = (ctx: ChainContext, event: Event): ReturnedData => {
-  const data = new TokenManagerTokenLoweredEvent(ctx, event)
+  const data = new TokenManagerTokenTransferredEvent(ctx, event)
 
   if (data.isV10) {
     const v10Data = data.asV10
