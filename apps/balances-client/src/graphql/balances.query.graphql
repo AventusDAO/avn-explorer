@@ -1,0 +1,21 @@
+query GetBalances {
+  balances {
+    accountId
+    id
+    free
+    reserved
+    total
+    updatedAt
+  }
+}
+
+query GetBalancesForAccount($accountId: String!) {
+  balances(where: { accountId_eq: $accountId }) {
+    accountId
+    id
+    free
+    reserved
+    total
+    updatedAt
+  }
+}
