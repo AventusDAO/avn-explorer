@@ -3,10 +3,11 @@ import './index.css'
 import { useQuery } from 'urql'
 import { GetBalancesDocument, GetBalancesForAccountDocument } from './graphql/generated'
 import { Table } from './components/Table'
+import { RecentBalance } from './components/RecentBalance'
 
 function App() {
   const [accountId, setAccountId] = useState('')
-  let result
+  let result = {}
   if (!accountId) {
     result = useQuery({
       query: GetBalancesDocument
@@ -15,11 +16,10 @@ function App() {
     result = useQuery({
       query: GetBalancesForAccountDocument,
       variables: { accountId }
-    })[0]
+    })?.[0]
   }
 
   const { fetching, error, data } = result
-  console.log(data)
 
   return (
     <div className='bg-pearl-800 flex-col h-screen w-full flex items-center justify-center p-4 gap-y-12'>
@@ -42,11 +42,11 @@ function App() {
           />
         </div>
       </div>
-      {accountId}
+      <RecentBalance accountId={accountId} />
       {fetching ? (
         <h3>Loading...</h3>
       ) : error ? (
-        <h3 className='text-red-400'>{error}</h3>
+        <h3 className='text-red-400'>{error.message}</h3>
       ) : !data.balances.length ? (
         <h3>No results!</h3>
       ) : (

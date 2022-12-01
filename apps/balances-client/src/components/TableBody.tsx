@@ -8,15 +8,13 @@ export function TableBody({ items }: TableBodyProps) {
     <tbody>
       {items.map(balance => {
         return (
-          <tr className='border-b'>
+          <tr className='border-b' key={balance.id}>
             <td className='px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900'>
               {balance.accountId}
             </td>
+
             <td className='px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900'>
               {balance.free}
-            </td>
-            <td className='px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900'>
-              {balance.id}
             </td>
             <td className='px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900'>
               {balance.reserved}

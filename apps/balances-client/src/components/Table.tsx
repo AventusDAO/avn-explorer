@@ -14,16 +14,20 @@ export type Balance = {
 type TableProps = {
   data?: Balance[]
 }
+
 export function Table(props: TableProps) {
   const [pageNumber, setPageNumber] = useState(0)
   const [recordsPerPage, setRecordsPerPage] = useState(10)
   const balances = props?.data
+  // display the most recent total balance instead of the account id
 
   if (!balances) return
 
-  const headings = Object.keys(balances[0]).filter(head => head !== '__typename')
+  const headings = Object.keys(balances[0]).filter(head => !['__typename', 'id'].includes(head))
   const pageIndex = pageNumber * recordsPerPage
-  const items = balances.slice(pageIndex, pageIndex + recordsPerPage)
+  const items = balances
+    .sort((a, b) => (a.total < b.total ? 1 : -1))
+    .slice(pageIndex, pageIndex + recordsPerPage)
 
   return (
     <div className='flex flex-col'>
