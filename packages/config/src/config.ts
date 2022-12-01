@@ -1,4 +1,4 @@
-import environement from './environements'
+import environment from './environments'
 import { ProcessorConfig } from './types'
 
 export const getConfig = (): ProcessorConfig => {
@@ -19,7 +19,7 @@ export const getConfig = (): ProcessorConfig => {
     ? parseInt(process.env.PROCESSOR_BATCH_SIZE)
     : undefined
 
-  const { prefix, endpoint: chain, typesBundle } = environement
+  const { prefix, endpoint: chain, typesBundle } = environment
 
   return {
     prefix,

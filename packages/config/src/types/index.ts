@@ -3,7 +3,7 @@ export enum NetworkPrefix {
   substrate = 42
 }
 
-export interface AvnEnvironement {
+export interface AvnEnvironment {
   name: string
   endpoint: string
   prefix: NetworkPrefix

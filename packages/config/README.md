@@ -2,7 +2,7 @@
 
 Package containing configuration utilities for apps.
 
-## Environement variables
+## Environment variables
 
 Add these variable to the app using this package:
 ```

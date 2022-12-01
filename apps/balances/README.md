@@ -13,6 +13,6 @@ This is a Squid based processor listing accounts and their AVT balance changes.
 - Serve the data over GraphQL: `make serve`
 - To inspect the data via GraphQL UI go to: `http://localhost:4350/graphql`
 
-## Environement variables
+## Environment variables
 
-Add `.env` file with required environement variables. Consult [config package README.md](../../packages/config/README.md).
+Add `.env` file with required environment variables. Consult [config package README.md](../../packages/config/README.md).

@@ -1,6 +1,6 @@
-import { AvnEnvironement, NetworkPrefix } from './types'
+import { AvnEnvironment, NetworkPrefix } from './types'
 
-export const environements: AvnEnvironement[] = [
+export const environments: AvnEnvironment[] = [
   {
     name: 'parachain-dev',
     endpoint: 'wss://avn-parachain.dev.aventus.io',
@@ -14,12 +14,12 @@ export const environements: AvnEnvironement[] = [
   }
 ]
 
-const getAvnEnvironement = (): AvnEnvironement => {
+const getAvnEnvironment = (): AvnEnvironment => {
   const envName = process.env.AVN_ENV
   if (!envName) throw new Error('missing AVN_ENV env var')
-  const env = environements.find(e => e.name === envName)
+  const env = environments.find(e => e.name === envName)
   if (!env) throw new Error('invalid AVN_ENV env var')
   return env
 }
 
-export default getAvnEnvironement()
+export default getAvnEnvironment()
