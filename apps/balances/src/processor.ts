@@ -9,8 +9,7 @@ import {
 } from '@subsquid/substrate-processor'
 import { Store, TypeormDatabase } from '@subsquid/typeorm-store'
 import { randomUUID } from 'crypto'
-import config from './config'
-import { getProcessor } from '@avn/config'
+import { config, getProcessor } from '@avn/config'
 import { saveCurrentChainState, saveRegularChainState } from './chainState'
 import { Account, Balance, ChainState } from './model'
 import {
