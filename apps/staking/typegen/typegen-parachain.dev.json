@@ -1,7 +1,13 @@
 {
   "outDir": "../src/types/generated/parachain-dev",
-  "specVersions": "../../packages/metadata/versions-parachain.dev.jsonl",
-  "events": [],
+  "specVersions": "../../../packages/metadata/versions-parachain.dev.jsonl",
+  "events": [
+    "Staking.Reward",
+    "Staking.Slash",
+    "Staking.Bonded",
+    "Staking.Unbonded",
+    "Staking.Withdrawn"
+  ],
   "calls": [],
   "storage": []
 }
