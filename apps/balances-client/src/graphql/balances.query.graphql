@@ -1,0 +1,32 @@
+query GetBalances {
+  balances {
+    accountId
+    id
+    free
+    reserved
+    total
+    updatedAt
+  }
+}
+
+query GetBalancesForAccount($accountId: String!) {
+  balances(where: { accountId_eq: $accountId }) {
+    accountId
+    id
+    free
+    reserved
+    total
+    updatedAt
+  }
+}
+
+query GetMostRecentBalanceRecordForAccount($accountId: String) {
+  balances(limit: 1, orderBy: updatedAt_DESC, where: { accountId_eq: $accountId }) {
+    updatedAt
+    total
+    reserved
+    id
+    free
+    accountId
+  }
+}
