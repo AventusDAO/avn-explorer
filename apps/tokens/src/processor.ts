@@ -17,6 +17,7 @@ import { getLastChainState, setChainState } from './service/chainState.service'
 import { Block, ChainContext } from './types/generated/parachain-dev/support'
 import { TokenManagerBalancesStorage } from './types/generated/parachain-dev/storage'
 import { TokenBalanceForAccount } from './model'
+import { toHex } from '@subsquid/substrate-processor'
 
 const processor = getProcessor()
   .setBatchSize(config.batchSize ?? 500)
@@ -82,7 +83,7 @@ async function processTokens(ctx: Context): Promise<void> {
 
 async function saveTokenBalanceForAccount(
   ctx: Context,
-  block: Block,
+  block: SubstrateBlock,
   tokenIds: Uint8Array[],
   accountIds: Uint8Array[],
   balance: bigint[]
@@ -91,12 +92,14 @@ async function saveTokenBalanceForAccount(
     const balancesToBeSaved = accountIds.map((aid, index) => {
       return new TokenBalanceForAccount({
         id: randomUUID(),
-        tokenId: encodeId(tokenIds[0]),
+        tokenId: toHex(tokenIds[0]),
         accountId: encodeId(aid),
-        amount: balance[index]! ?? 0
+        amount: balance[index]! ?? 0,
+        updatedAt: block.height
       })
     })
     ctx.store.save(balancesToBeSaved)
+    ctx.log.child('token balances saved').info(`updated: ${balancesToBeSaved.length}`)
   }
 }
 

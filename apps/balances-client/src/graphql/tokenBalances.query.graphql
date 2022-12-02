@@ -1,0 +1,48 @@
+query GetTokenBalancesForAccountAndToken($accountId: String, $tokenId: String) {
+  tokenBalanceForAccounts(where: { accountId_eq: $accountId, tokenId_eq: $tokenId }) {
+    id
+    tokenId
+    amount
+    accountId
+  }
+}
+
+query GetTokenBalancesForToken($tokenId: String) {
+  tokenBalanceForAccounts(where: { tokenId_eq: $tokenId }) {
+    id
+    tokenId
+    amount
+    accountId
+  }
+}
+
+query GetTokenBalancesForAccount($accountId: String) {
+  tokenBalanceForAccounts(where: { accountId_eq: $accountId }) {
+    id
+    tokenId
+    amount
+    accountId
+  }
+}
+
+query GetTokenBalances {
+  tokenBalanceForAccounts {
+    id
+    tokenId
+    amount
+    accountId
+  }
+}
+
+query GetMostRecentTokenBalanceRecordForAccount($accountId: String, $tokenId: String) {
+  tokenBalanceForAccounts(
+    limit: 1
+    orderBy: updatedAt_DESC
+    where: { accountId_eq: $accountId, tokenId_eq: $tokenId }
+  ) {
+    id
+    tokenId
+    amount
+    accountId
+  }
+}

@@ -11,21 +11,27 @@ export type Balance = {
   updatedAt: number
 }
 
+export type TokenBalance = {
+  id: string
+  tokenId: string
+  amount: string
+  accountId: string
+}
+
 type TableProps = {
-  data?: Balance[]
+  data?: (Balance | TokenBalance)[]
 }
 
 export function Table(props: TableProps) {
   const [pageNumber, setPageNumber] = useState(0)
   const [recordsPerPage, setRecordsPerPage] = useState(10)
-  const balances = props?.data
-  // display the most recent total balance instead of the account id
+  const data = props?.data
 
-  if (!balances) return
+  if (!data) return
 
-  const headings = Object.keys(balances[0]).filter(head => !['__typename', 'id'].includes(head))
+  const headings = Object.keys(data[0]).filter(head => !['__typename', 'id'].includes(head))
   const pageIndex = pageNumber * recordsPerPage
-  const items = balances
+  const items = data
     .sort((a, b) => (a.total < b.total ? 1 : -1))
     .slice(pageIndex, pageIndex + recordsPerPage)
 
@@ -40,18 +46,22 @@ export function Table(props: TableProps) {
             </table>
           </div>
           <div className='flex flex-row justify-between'>
+            {pageNumber > 0 ? (
+              <button
+                onClick={e => {
+                  e.preventDefault()
+                  if (pageNumber > 0) setPageNumber(pageNumber - 1)
+                }}
+              >
+                prev
+              </button>
+            ) : (
+              ''
+            )}
             <button
               onClick={e => {
                 e.preventDefault()
-                if (pageNumber > 0) setPageNumber(pageNumber - 1)
-              }}
-            >
-              prev
-            </button>{' '}
-            <button
-              onClick={e => {
-                e.preventDefault()
-                if (balances.length / recordsPerPage >= pageNumber) setPageNumber(pageNumber + 1)
+                if (data.length / recordsPerPage >= pageNumber) setPageNumber(pageNumber + 1)
               }}
             >
               next

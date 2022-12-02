@@ -30,4 +30,8 @@ export class TokenBalanceForAccount {
   @Index_()
   @Column_('text', { nullable: false })
   accountId!: string
+
+  @Index_()
+  @Column_('int4', { nullable: true })
+  updatedAt!: number | undefined | null
 }
