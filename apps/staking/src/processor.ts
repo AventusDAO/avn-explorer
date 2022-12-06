@@ -7,28 +7,25 @@ import {
   SubstrateBlock
 } from '@subsquid/substrate-processor'
 import { Store, TypeormDatabase } from '@subsquid/typeorm-store'
-
-const eventsList = [
-  'Staking.Reward',
-  'Staking.Slash',
-  'Staking.Bonded',
-  'Staking.Unbonded',
-  'Staking.Withdrawn'
-]
+import { parachainStakingEventNames } from './events'
 
 type Item = BatchProcessorItem<typeof processor>
 type EventItem = BatchProcessorEventItem<typeof processor>
 type CallItem = BatchProcessorCallItem<typeof processor>
 type Context = BatchContext<Store, Item>
 
-const processor = getProcessor({ events: eventsList })
+const processor = getProcessor({ events: parachainStakingEventNames })
   .addCall('*', {
     data: { call: { origin: true } }
   } as const)
   .includeAllBlocks()
 
 const processStaking = async (ctx: Context): Promise<void> => {
-  ctx.log.child('processor').debug(ctx.blocks.map(b => b.items))
+  const itemNames = ctx.blocks
+    .map(b => b.items.filter(i => parachainStakingEventNames.includes(i.name)).map(i => i.name))
+    .flat()
+  if (itemNames.length > 0)
+    ctx.log.child('staking').debug(`staking items` + JSON.stringify(itemNames))
 }
 
 processor.run(new TypeormDatabase(), processStaking)

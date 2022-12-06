@@ -5,6 +5,7 @@
   "scripts": {
     "check:types": "tsc --pretty --noEmit",
     "build": "rm -rf lib && tsc",
+    "build:watch": "rm -rf lib && tsc -w",
     "processor:migrate": "yarn squid-typeorm-migration-apply",
     "processor:start": "node lib/processor.js",
     "processor:debug": "node -r dotenv/config lib/processor.js",
