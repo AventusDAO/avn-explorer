@@ -1,5 +1,5 @@
 {
-  "name": "@avn-explorer/token-balances",
+  "name": "@avn-explorer/tokens",
   "private": true,
   "packageManager": "yarn@3.3.0",
   "scripts": {

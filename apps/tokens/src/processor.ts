@@ -10,8 +10,7 @@ import {
 import { randomUUID } from 'crypto'
 import { Store, TypeormDatabase } from '@subsquid/typeorm-store'
 import * as ss58 from '@subsquid/ss58'
-import config from './config'
-import { getProcessor } from '@avn/config'
+import { config, getProcessor } from '@avn/config'
 import { getTokenLiftedData, getTokenLowerData, getTokenTransferredData } from './eventHandlers'
 import { getLastChainState, setChainState } from './service/chainState.service'
 import { Block, ChainContext } from './types/generated/parachain-dev/support'
@@ -74,9 +73,9 @@ async function processTokens(ctx: Context): Promise<void> {
   const accountIds = [...accountIdsHex].map(id => decodeHex(id))
   const tokenIds = [...tokenIdsHex].map(id => decodeHex(id))
   const tokenManagerData = await getTokenManagerData(ctx, block.header, tokenIds, accountIds)
-  console.log('tokenManagerData', tokenManagerData, 'accountIds', [...accountIdsHex], 'tokenIds', [
-    ...tokenIdsHex
-  ])
+  ctx.log
+    .child('tokens')
+    .debug(`tokenManagerData ${tokenManagerData}, accountIds ${[...accountIdsHex]} tokenIds ${[...tokenIdsHex]}`)
   await saveTokenBalanceForAccount(ctx, block.header, tokenIds, accountIds, tokenManagerData!)
   await setChainState(ctx, block.header)
 }
@@ -94,13 +93,12 @@ async function saveTokenBalanceForAccount(
         id: randomUUID(),
         tokenId: toHex(tokenIds[0]),
         accountId: encodeId(aid),
-        amount: balance[index]! ?? 0,
+        amount: balance[index] ?? 0,
         updatedAt: block.height
       })
     })
     ctx.store.save(balancesToBeSaved)
-    ctx.log.child('token balances saved').info(`updated: ${balancesToBeSaved.length}`)
-  }
+    ctx.log.child('tokens').info(`updated balances: ${balancesToBeSaved.length}`)  }
 }
 
 async function getTokenManagerData(
@@ -174,11 +172,6 @@ function processTokensEventItem(
   }
 }
 
-export class UnknownVersionError extends Error {
-  constructor(name: string) {
-    super(`There is no relevant version for ${name}`)
-  }
-}
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function getOriginAccountId(origin: any) {
