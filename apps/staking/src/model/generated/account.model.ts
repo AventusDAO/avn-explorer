@@ -1,4 +1,5 @@
 import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_} from "typeorm"
+import * as marshal from "./marshal"
 
 @Entity_()
 export class Account {
@@ -8,6 +9,9 @@ export class Account {
 
   @PrimaryColumn_()
   id!: string
+
+  @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
+  stakedAmount!: bigint
 
   @Column_("int4", {nullable: true})
   updatedAt!: number | undefined | null
