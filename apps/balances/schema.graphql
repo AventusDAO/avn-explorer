@@ -19,3 +19,4 @@ type Balance @entity {
   updatedAt: Int
   accountId: String!
 }
+

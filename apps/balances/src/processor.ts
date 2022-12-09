@@ -10,7 +10,7 @@ import {
 import { Store, TypeormDatabase } from '@subsquid/typeorm-store'
 import { randomUUID } from 'crypto'
 import { config, getProcessor } from '@avn/config'
-import { saveCurrentChainState, saveRegularChainState } from './chainState'
+import { getLastChainState, saveCurrentChainState, saveRegularChainState } from './chainState'
 import { Account, Balance, ChainState } from './model'
 import {
   getBalanceSetAccount,
@@ -22,7 +22,7 @@ import {
   getTransferAccounts,
   getUnreservedAccount,
   getWithdrawAccount
-} from './eventHandlers/accountEventHandlers'
+} from './eventHandlers'
 import { IBalance } from './types/custom/balance'
 
 import {
@@ -78,14 +78,7 @@ processor.run(new TypeormDatabase(), processBalances)
 const SAVE_PERIOD = 12 * 60 * 60 * 1000
 let lastStateTimestamp: number | undefined
 
-async function getLastChainState(store: Store) {
-  return await store.get(ChainState, {
-    where: {},
-    order: {
-      timestamp: 'DESC'
-    }
-  })
-}
+
 
 async function processBalances(ctx: Context): Promise<void> {
   const accountIdsHex = new Set<string>()

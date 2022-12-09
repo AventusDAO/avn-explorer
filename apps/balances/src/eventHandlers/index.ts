@@ -11,7 +11,8 @@ import {
   BalancesUnreservedEvent,
   BalancesWithdrawEvent
 } from '../types/generated/parachain-dev/events'
-import { ChainContext, Event } from '../types/generated/parachain-dev/support'
+import { BalancesTotalIssuanceStorage } from '../types/generated/parachain-dev/storage'
+import { Block, ChainContext, Event } from '../types/generated/parachain-dev/support'
 
 export function getBalanceSetAccount(ctx: ChainContext, event: Event) {
   const data = new BalancesBalanceSetEvent(ctx, event)
@@ -101,4 +102,15 @@ export function getReserveRepatriatedAccounts(ctx: ChainContext, event: Event) {
   } else {
     throw new UnknownVersionError(data.constructor.name)
   }
+}
+
+export async function getTotalIssuance(ctx: ChainContext, block: Block) {
+  const storage = new BalancesTotalIssuanceStorage(ctx, block)
+  if (!storage.isExists) return undefined
+
+  if (storage.isV10) {
+    return await storage.getAsV10()
+  }
+
+  throw new UnknownVersionError(storage.constructor.name)
 }
