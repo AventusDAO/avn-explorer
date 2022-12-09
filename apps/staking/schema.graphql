@@ -3,3 +3,9 @@ type Account @entity {
   stakedAmount: BigInt!
   updatedAt: Int
 }
+
+type ChainState @entity {
+  id: ID!
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+}	

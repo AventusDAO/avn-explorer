@@ -12,7 +12,6 @@ export const getProcessor = (options?: ProcessorOptions): SubstrateBatchProcesso
     .setBlockRange(config.blockRange ?? { from: 0 })
 
   options?.events.forEach(eventName => {
-    console.log('add event ' + eventName)
     processor.addEvent(eventName, {
       data: { event: { args: true } }
     } as const)
