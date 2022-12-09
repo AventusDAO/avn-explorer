@@ -5,7 +5,7 @@ explorer:
 	@docker-compose up -d db gateway explorer
 
 ingest:
-	@docker-compose up -d db ingest 
+	@docker-compose up db ingest 
 
 pgadmin:
 	@docker-compose up -d db pgadmin
