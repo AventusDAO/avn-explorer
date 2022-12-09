@@ -1,5 +1,5 @@
 import assert from 'assert'
-import {Block, Chain, ChainContext, BlockContext, Result, Option} from './support'
+import { Block, Chain, ChainContext, BlockContext, Result, Option } from './support'
 
 export class TokenManagerBalancesStorage {
   private readonly _chain: Chain
@@ -16,25 +16,33 @@ export class TokenManagerBalancesStorage {
   /**
    *  The number of units of tokens held by any given account.
    */
-  get isV10() {
-    return this._chain.getStorageItemTypeHash('TokenManager', 'Balances') === '70874cd5f158184b9b398819cb71b85684c5adb4e5cc9e1065d1115dac23d5f2'
+  get isV4() {
+    return (
+      this._chain.getStorageItemTypeHash('TokenManager', 'Balances') ===
+      '70874cd5f158184b9b398819cb71b85684c5adb4e5cc9e1065d1115dac23d5f2'
+    )
   }
 
   /**
    *  The number of units of tokens held by any given account.
    */
-  async getAsV10(key: [Uint8Array, Uint8Array]): Promise<bigint> {
-    assert(this.isV10)
+  async getAsV4(key: [Uint8Array, Uint8Array]): Promise<bigint> {
+    assert(this.isV4)
     return this._chain.getStorage(this.blockHash, 'TokenManager', 'Balances', key)
   }
 
-  async getManyAsV10(keys: [Uint8Array, Uint8Array][]): Promise<(bigint)[]> {
-    assert(this.isV10)
-    return this._chain.queryStorage(this.blockHash, 'TokenManager', 'Balances', keys.map(k => [k]))
+  async getManyAsV4(keys: [Uint8Array, Uint8Array][]): Promise<bigint[]> {
+    assert(this.isV4)
+    return this._chain.queryStorage(
+      this.blockHash,
+      'TokenManager',
+      'Balances',
+      keys.map(k => [k])
+    )
   }
 
-  async getAllAsV10(): Promise<(bigint)[]> {
-    assert(this.isV10)
+  async getAllAsV4(): Promise<bigint[]> {
+    assert(this.isV4)
     return this._chain.queryStorage(this.blockHash, 'TokenManager', 'Balances')
   }
 

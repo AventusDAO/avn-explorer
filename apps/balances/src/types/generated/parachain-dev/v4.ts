@@ -1,4 +1,4 @@
-import type {Result, Option} from './support'
+import type { Result, Option } from './support'
 
 export type BalanceStatus = BalanceStatus_Free | BalanceStatus_Reserved
 
