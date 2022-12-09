@@ -63,6 +63,7 @@ async function processTokens(ctx: Context): Promise<void> {
       lastStateTimestamp = (await getLastChainState(ctx.store))?.timestamp.getTime() ?? 0
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     if (block.header.timestamp - lastStateTimestamp! >= SAVE_PERIOD) {
       const accountIds = [...accountIdsHex].map(id => decodeHex(id))
       const tokenIds = [...tokenIdsHex].map(id => decodeHex(id))
@@ -80,6 +81,7 @@ async function processTokens(ctx: Context): Promise<void> {
         ...tokenIdsHex
       ]}`
     )
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   await saveTokenBalanceForAccount(ctx, block.header, tokenIds, accountIds, tokenManagerData!)
   await setChainState(ctx, block.header)
 }
@@ -101,7 +103,7 @@ async function saveTokenBalanceForAccount(
         updatedAt: block.height
       })
     })
-    ctx.store.save(balancesToBeSaved)
+    await ctx.store.save(balancesToBeSaved)
     ctx.log.child('tokens').info(`updated balances: ${balancesToBeSaved.length}`)
   }
 }
@@ -131,7 +133,7 @@ async function getTokenManagerData(
     }
   }
 
-  return await storage.getManyAsV4(v10InputArray)
+  return storage.getManyAsV4(v10InputArray)
 }
 
 function processTokensCallItem(
