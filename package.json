@@ -7,9 +7,10 @@
     "packages/*"
   ],
   "scripts": {
-    "check:prettier": "prettier -c .",
-    "check:lint": "eslint '*/**/*.{js,ts,tsx}'",
-    "check:types": "yarn workspaces foreach run check:types",
+    "prettier:check": "prettier -c .",
+    "prettier:fix": "prettier -w .",
+    "lint:check": "eslint '*/**/*.{js,ts,tsx}'",
+    "types:check": "yarn workspaces foreach run check:types",
     "build": "yarn workspaces foreach run build"
   },
   "devDependencies": {

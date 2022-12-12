@@ -1,6 +1,6 @@
 services:
   db:
-    image: postgres:14  # CockroachDB cluster might be a better fit for production deployment
+    image: postgres:14 # CockroachDB cluster might be a better fit for production deployment
     restart: always
     volumes:
       - ./db/data/${AVN_ENV}:/var/lib/postgresql/data
@@ -17,14 +17,17 @@ services:
     restart: on-failure
     image: subsquid/substrate-ingest:firesquid
     command: [
-        "-e", "${AVN_NODE}",
+        '-e',
+        '${AVN_NODE}',
         # add another endpoint to increase archiving speed and reliability.
         #  "-e", "wss://avn-parachain-2.dev.aventus.io",
 
-        "-c", "10", # allow up to 10 pending requests for the above endpoint (default is 5)
+        '-c',
 
-        "--out", "postgres://${DB_USER}:${DB_PASS}@db:${DB_PORT}/${DB_NAME}"
-    ]
+        '10', # allow up to 10 pending requests for the above endpoint (default is 5)
+        '--out',
+        'postgres://${DB_USER}:${DB_PASS}@db:${DB_PORT}/${DB_NAME}'
+      ]
     networks:
       - avn-archive
 
@@ -34,14 +37,15 @@ services:
     image: subsquid/substrate-gateway:firesquid
     environment:
       DATABASE_MAX_CONNECTIONS: 5
-      RUST_LOG: "actix_web=info,actix_server=info"
+      RUST_LOG: 'actix_web=info,actix_server=info'
     command: [
-       "--database-url", "postgres://${DB_USER}:${DB_PASS}@db:${DB_PORT}/${DB_NAME}",
-       # "--evm-support" # uncomment for chains with Frontier EVM pallet
-                         # (e.g. Moonbeam/Moonriver or Astar/Shiden)
-    ]
+        '--database-url',
+        'postgres://${DB_USER}:${DB_PASS}@db:${DB_PORT}/${DB_NAME}'
+        # "--evm-support" # uncomment for chains with Frontier EVM pallet
+        # (e.g. Moonbeam/Moonriver or Astar/Shiden)
+      ]
     ports:
-      - "${GATEWAY_PORT}:8000"
+      - '${GATEWAY_PORT}:8000'
     networks:
       - avn-archive
 
@@ -62,7 +66,7 @@ services:
       # GQL_MAX_ROOT_FIELDS: 200
       # GQL_MAX_RESPONSE_NODES: 300000
     ports:
-      - "${EXPLORER_PORT}:3000"
+      - '${EXPLORER_PORT}:3000'
     networks:
       - avn-archive
 
