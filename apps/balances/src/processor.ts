@@ -9,7 +9,7 @@ import {
 } from '@subsquid/substrate-processor'
 import { Store, TypeormDatabase } from '@subsquid/typeorm-store'
 import { randomUUID } from 'crypto'
-import { config, getProcessor } from '@avn/config'
+import { getConfig, getProcessor } from '@avn/config'
 import { getLastChainState, saveCurrentChainState, saveRegularChainState } from './chainState'
 import { Account, Balance } from './model'
 import {
@@ -32,10 +32,8 @@ import {
 import { Block, ChainContext } from './types/generated/parachain-dev/support'
 import { encodeId } from './utils'
 
+const config = getConfig()
 const processor = getProcessor()
-  .setBatchSize(config.batchSize ?? 500)
-  .setDataSource(config.dataSource)
-  .setBlockRange(config.blockRange ?? { from: 0 })
   .addEvent('Balances.Endowed', {
     data: { event: { args: true } }
   } as const)
