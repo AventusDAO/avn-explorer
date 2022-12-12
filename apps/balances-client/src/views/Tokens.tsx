@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useQuery } from 'urql'
 import { TabsEnum } from '../App'
 import { RecentBalance } from '../components/RecentBalance'
-import { Table } from '../components/Table'
+import { Table, TokenBalance } from '../components/Table'
 import {
   GetTokenBalancesDocument,
   GetTokenBalancesForAccountAndTokenDocument,
@@ -14,7 +14,11 @@ export function TokenBalances() {
   const [accountId, setAccountId] = useState('')
   const [tokenId, setTokenId] = useState('')
 
-  let result = {}
+  let result: {
+    fetching: boolean
+    error: Object
+    data: { tokenBalanceForAccounts: TokenBalance[] }
+  } | null = null
   if (!accountId && !tokenId) {
     result = useQuery({
       query: GetTokenBalancesDocument
@@ -34,6 +38,9 @@ export function TokenBalances() {
       query: GetTokenBalancesForAccountAndTokenDocument,
       variables: { accountId, tokenId }
     })?.[0]
+  }
+  if (!result) {
+    throw new Error('no data fetched')
   }
   const { fetching, error, data } = result
 
@@ -65,7 +72,7 @@ export function TokenBalances() {
       ) : !data.tokenBalanceForAccounts.length ? (
         <h3>No results!</h3>
       ) : (
-        <Table data={data.tokenBalanceForAccounts} />
+        <Table<TokenBalance> data={data.tokenBalanceForAccounts} />
       )}
     </>
   )

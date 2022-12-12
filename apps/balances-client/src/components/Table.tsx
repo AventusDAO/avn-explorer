@@ -2,37 +2,47 @@ import { useState } from 'react'
 import { TableBody } from './TableBody'
 import { TableHeading } from './TableHeading'
 
-export type Balance = {
-  id: string
-  accountId: string
-  free: string
-  reserved: string
-  total: string
-  updatedAt: number
+export class Balance {
+  id: string = ''
+  accountId: string = ''
+  free: string = ''
+  reserved: string = ''
+  total: string = ''
+  updatedAt: number = 0
 }
 
-export type TokenBalance = {
-  id: string
-  tokenId: string
-  amount: string
-  accountId: string
+export class TokenBalance {
+  id: string = ''
+  tokenId: string = ''
+  amount: string = ''
+  accountId: string = ''
 }
 
-type TableProps = {
-  data?: (Balance | TokenBalance)[]
+type TableProps<T> = {
+  data?: T[]
 }
 
-export function Table(props: TableProps) {
+export function Table<T extends object>(props: TableProps<T>) {
   const [pageNumber, setPageNumber] = useState(0)
   const [recordsPerPage, setRecordsPerPage] = useState(10)
-  const data = props?.data
+  const data = props.data
 
   if (!data) return
 
   const headings = Object.keys(data[0]).filter(head => !['__typename', 'id'].includes(head))
   const pageIndex = pageNumber * recordsPerPage
+  const maxPageNumber = Math.floor((data.length - 1) / recordsPerPage)
+
+  console.log(pageNumber)
   const items = data
-    .sort((a, b) => (a.total < b.total ? 1 : -1))
+    .sort((a, b) => {
+      if (a instanceof Balance && b instanceof Balance) {
+        return a.total < b.total ? 1 : -1
+      } else if (a instanceof TokenBalance && b instanceof TokenBalance) {
+        return a.amount < b.amount ? 1 : -1
+      }
+      return 0
+    })
     .slice(pageIndex, pageIndex + recordsPerPage)
 
   return (
@@ -58,14 +68,19 @@ export function Table(props: TableProps) {
             ) : (
               ''
             )}
-            <button
-              onClick={e => {
-                e.preventDefault()
-                if (data.length / recordsPerPage >= pageNumber) setPageNumber(pageNumber + 1)
-              }}
-            >
-              next
-            </button>
+
+            {maxPageNumber > pageNumber ? (
+              <button
+                onClick={e => {
+                  e.preventDefault()
+                  if (maxPageNumber > pageNumber) setPageNumber(pageNumber + 1)
+                }}
+              >
+                next
+              </button>
+            ) : (
+              ''
+            )}
           </div>
         </div>
       </div>

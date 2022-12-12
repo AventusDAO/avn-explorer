@@ -14,6 +14,7 @@ export function Tabs({ tabs, activeTab, setActiveTab }: TabsProps) {
               e.preventDefault()
               setActiveTab(t)
             }}
+            key={t}
           >
             <a
               href='#'
