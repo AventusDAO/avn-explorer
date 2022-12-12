@@ -1,4 +1,4 @@
-version: "3"
+version: '3'
 
 services:
   db:
@@ -10,7 +10,7 @@ services:
     volumes:
       - ./db/data/${AVN_ENV}:/var/lib/postgresql/data
     ports:
-      - "23800:5432"
+      - '23800:5432'
       # command: ["postgres", "-c", "log_statement=all"]
     networks:
       - tokens
@@ -31,5 +31,5 @@ services:
   #   networks:
   #     - tokens
 
-networks: 
+networks:
   tokens:

@@ -11,7 +11,7 @@ import { Store, TypeormDatabase } from '@subsquid/typeorm-store'
 import { randomUUID } from 'crypto'
 import { config, getProcessor } from '@avn/config'
 import { getLastChainState, saveCurrentChainState, saveRegularChainState } from './chainState'
-import { Account, Balance, ChainState } from './model'
+import { Account, Balance } from './model'
 import {
   getBalanceSetAccount,
   getDepositAccount,

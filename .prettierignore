@@ -11,3 +11,5 @@ lib
 apps/balances/db/data
 apps/archive/db/pg-admin
 apps/archive/db/data
+**/types/generated/parachain-dev/**
+**/model/generated/**

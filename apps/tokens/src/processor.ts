@@ -5,7 +5,8 @@ import {
   BatchProcessorItem,
   SubstrateBlock,
   SubstrateCall,
-  decodeHex
+  decodeHex,
+  toHex
 } from '@subsquid/substrate-processor'
 import { randomUUID } from 'crypto'
 import { Store, TypeormDatabase } from '@subsquid/typeorm-store'
@@ -16,7 +17,6 @@ import { getLastChainState, setChainState } from './service/chainState.service'
 import { Block, ChainContext } from './types/generated/parachain-dev/support'
 import { TokenManagerBalancesStorage } from './types/generated/parachain-dev/storage'
 import { TokenBalanceForAccount } from './model'
-import { toHex } from '@subsquid/substrate-processor'
 
 const processor = getProcessor()
   .setBatchSize(config.batchSize ?? 500)
@@ -63,6 +63,7 @@ async function processTokens(ctx: Context): Promise<void> {
       lastStateTimestamp = (await getLastChainState(ctx.store))?.timestamp.getTime() ?? 0
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     if (block.header.timestamp - lastStateTimestamp! >= SAVE_PERIOD) {
       const accountIds = [...accountIdsHex].map(id => decodeHex(id))
       const tokenIds = [...tokenIdsHex].map(id => decodeHex(id))
@@ -75,7 +76,12 @@ async function processTokens(ctx: Context): Promise<void> {
   const tokenManagerData = await getTokenManagerData(ctx, block.header, tokenIds, accountIds)
   ctx.log
     .child('tokens')
-    .debug(`tokenManagerData ${tokenManagerData}, accountIds ${[...accountIdsHex]} tokenIds ${[...tokenIdsHex]}`)
+    .debug(
+      `tokenManagerData ${tokenManagerData}, accountIds ${[...accountIdsHex]} tokenIds ${[
+        ...tokenIdsHex
+      ]}`
+    )
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   await saveTokenBalanceForAccount(ctx, block.header, tokenIds, accountIds, tokenManagerData!)
   await setChainState(ctx, block.header)
 }
@@ -97,8 +103,9 @@ async function saveTokenBalanceForAccount(
         updatedAt: block.height
       })
     })
-    ctx.store.save(balancesToBeSaved)
-    ctx.log.child('tokens').info(`updated balances: ${balancesToBeSaved.length}`)  }
+    await ctx.store.save(balancesToBeSaved)
+    ctx.log.child('tokens').info(`updated balances: ${balancesToBeSaved.length}`)
+  }
 }
 
 async function getTokenManagerData(
@@ -108,11 +115,11 @@ async function getTokenManagerData(
   accountIds: Uint8Array[]
 ) {
   const storage = new TokenManagerBalancesStorage(ctx, block)
-  if (!storage.isExists || !storage.isV10) {
+  if (!storage.isExists || !storage.isV4) {
     return
   }
 
-  let v10InputArray: [Uint8Array, Uint8Array][] = []
+  let v10InputArray: Array<[Uint8Array, Uint8Array]> = []
 
   if (tokenIds.length === 1) {
     v10InputArray = accountIds.map(id => [tokenIds[0], id])
@@ -126,7 +133,7 @@ async function getTokenManagerData(
     }
   }
 
-  return await storage.getManyAsV10(v10InputArray)
+  return storage.getManyAsV4(v10InputArray)
 }
 
 function processTokensCallItem(
