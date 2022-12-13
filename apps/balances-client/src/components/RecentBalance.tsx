@@ -8,31 +8,30 @@ type RecentBalanceProps = {
   pageType: TabsEnum
   tokenId?: string
 }
-export function RecentBalance({ accountId, pageType, tokenId }: RecentBalanceProps) {
+export function RecentBalance({ accountId, pageType, tokenId }: RecentBalanceProps): JSX.Element {
   if (!accountId) {
     return <div></div>
   }
-  let recentBalanceResult
-  if (pageType === TabsEnum.BALANCE) {
-    recentBalanceResult = useQuery({
-      query: GetMostRecentBalanceRecordForAccountDocument,
-      variables: { accountId }
-    })?.[0]
-  } else {
-    if (tokenId) {
-      recentBalanceResult = useQuery({
-        query: GetMostRecentTokenBalanceRecordForAccountDocument,
-        variables: { accountId, tokenId }
-      })?.[0]
-    }
+let query: any
+let variables: { accountId?: string; tokenId?: string } = {}
+if (pageType === TabsEnum.BALANCE) {
+  query = GetMostRecentBalanceRecordForAccountDocument
+  variables = { accountId }
+} else {
+  if (tokenId) {
+    query = GetMostRecentTokenBalanceRecordForAccountDocument
+    variables = { accountId, tokenId }
   }
-
-  const totalBalance = recentBalanceResult?.data?.balances?.[0]?.total
+}
+const result = useQuery({ query, variables })[0]
+const totalBalance = result?.data?.balances?.[0]?.total
   if (totalBalance) {
     return (
-      <>
+      <div>
         <h3>Most recent balance: {totalBalance}</h3>
-      </>
+      </div>
     )
+  } else {
+    return <div></div>
   }
 }

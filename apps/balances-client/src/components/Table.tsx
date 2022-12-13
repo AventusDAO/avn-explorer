@@ -22,12 +22,12 @@ type TableProps<T> = {
   data?: T[]
 }
 
-export function Table<T extends object>(props: TableProps<T>) {
+export function Table<T extends object>(props: TableProps<T>): JSX.Element {
   const [pageNumber, setPageNumber] = useState(0)
   const [recordsPerPage, setRecordsPerPage] = useState(10)
   const data = props.data
 
-  if (!data) return
+  if (!data) return <div>no data</div>
 
   const headings = Object.keys(data[0]).filter(head => !['__typename', 'id'].includes(head))
   const pageIndex = pageNumber * recordsPerPage
