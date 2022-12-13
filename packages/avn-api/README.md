@@ -24,7 +24,7 @@ yarn repl
 > let hash = await api.rpc.chain.getBlockHash(88)
 > let signedBlock = await api.rpc.chain.getBlock(hash)
 > let events = await api.query.system.events.at(hash)
-> events[3].toHuman()
+> events[3].toHuman() // print the event you're interested in
 ```
 
 ```javascript
