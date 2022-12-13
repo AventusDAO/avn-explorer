@@ -34,4 +34,3 @@ export const getConfig = (): ProcessorConfig => {
   }
 }
 
-export default getConfig()

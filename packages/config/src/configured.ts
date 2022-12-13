@@ -1,11 +1,13 @@
 import { SubstrateBatchProcessor } from '@subsquid/substrate-processor'
-import config from './config'
+import { getConfig } from './config'
 
 export interface ProcessorOptions {
   events: string[]
 }
 
 export const getProcessor = (options?: ProcessorOptions): SubstrateBatchProcessor => {
+  const config = getConfig()
+
   const processor = new SubstrateBatchProcessor()
     .setBatchSize(config.batchSize ?? 300)
     .setDataSource(config.dataSource)

@@ -1,3 +1,3 @@
-export { default as config } from './config'
+export * from './config'
 export * from './configured'
-export * from './environments'
+export { environments, default as environment } from './environments'
