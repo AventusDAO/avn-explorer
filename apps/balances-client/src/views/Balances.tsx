@@ -1,8 +1,8 @@
 import { useState } from 'react'
-import { useQuery } from 'urql'
+import { useQuery, UseQueryState } from 'urql'
 import { TabsEnum } from '../App'
 import { RecentBalance } from '../components/RecentBalance'
-import { Table } from '../components/Table'
+import { Table, Balance } from '../components/Table'
 import {
   GetBalancesDocument,
   GetBalancesForAccountDocument
@@ -10,16 +10,20 @@ import {
 
 export function AccountBalances() {
   const [accountId, setAccountId] = useState('')
-  let result = {}
+
+  let query: any
+  let variables: { accountId?: string } = {}
+
   if (!accountId) {
-    result = useQuery({
-      query: GetBalancesDocument
-    })?.[0]
+    query = GetBalancesDocument
   } else {
-    result = useQuery({
-      query: GetBalancesForAccountDocument,
-      variables: { accountId }
-    })?.[0]
+    query = GetBalancesForAccountDocument
+    variables = { accountId }
+  }
+  const result = useQuery({ query, variables })[0]
+
+  if (!result) {
+    throw new Error('no data fetched')
   }
 
   const { fetching, error, data } = result
@@ -53,7 +57,7 @@ export function AccountBalances() {
       ) : !data.balances.length ? (
         <h3>No results!</h3>
       ) : (
-        <Table data={data.balances} />
+        <Table<Balance> data={data?.balances} />
       )}
     </>
   )

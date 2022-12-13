@@ -1,12 +1,15 @@
+import { SetStateAction } from 'react'
+import { TabsEnum } from '../App'
+
 export type TabsProps = {
-  tabs: string[]
-  activeTab: string
-  setActiveTab: (e) => void
+  tabs: TabsEnum[]
+  activeTab: TabsEnum
+  setActiveTab: (e: SetStateAction<TabsEnum>) => void
 }
 export function Tabs({ tabs, activeTab, setActiveTab }: TabsProps) {
   return (
     <ul className='flex flex-wrap text-sm font-medium justify-around text-center text-gray-500 border-b border-gray-200 dark:border-gray-700 dark:text-gray-400'>
-      {tabs.map(t => {
+      {tabs.map((t: TabsEnum) => {
         return (
           <li
             className='mr-2'
@@ -14,6 +17,7 @@ export function Tabs({ tabs, activeTab, setActiveTab }: TabsProps) {
               e.preventDefault()
               setActiveTab(t)
             }}
+            key={t}
           >
             <a
               href='#'

@@ -13,7 +13,7 @@ export enum TabsEnum {
 }
 
 function App() {
-  const [activeTab, setActiveTab] = useState(TabsEnum.BALANCE)
+  const [activeTab, setActiveTab] = useState<TabsEnum>(TabsEnum.BALANCE)
 
   return (
     <div className='bg-pearl-800 flex-col h-full w-full flex items-center justify-center p-4 gap-y-12'>
