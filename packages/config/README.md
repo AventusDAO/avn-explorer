@@ -7,8 +7,8 @@ Package containing configuration utilities for apps.
 Add these variable to the app using this package:
 
 ```
-DB_NAME=avn-balances
-DB_PASS=avn-balances
+DB_NAME=<app-name>-<AVN_ENV> # e.g. `staking-parachain-dev`
+DB_PASS=postgres
 DB_USER=postgres
 DB_PORT=23798
 GQL_PORT=4350
