@@ -1,9 +1,15 @@
+version: '3'
+
+volumes:
+  db-data:
+  # pgadmin-data:
+
 services:
   db:
     image: postgres:14 # CockroachDB cluster might be a better fit for production deployment
     restart: always
     volumes:
-      - ./db/data/${AVN_ENV}:/var/lib/postgresql/data
+      - db-data:/var/lib/postgresql/data
     environment:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASS}
@@ -79,7 +85,7 @@ services:
   #     PGADMIN_DEFAULT_PASSWORD: admin
   #     PGADMIN_CONFIG_SERVER_MODE: 'False'
   #   volumes:
-  #      - ./db/pg-admin:/var/lib/pgadmin
+  #      - pgadmin-data:/var/lib/pgadmin
   #   ports:
   #     - "${DB_PORT}:80"
   #   networks:

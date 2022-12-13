@@ -11,7 +11,12 @@ This is a Squid based processor listing staking rewards.
 - Run database: `make up`
 - Start processing: `make process`
 - Serve the data over GraphQL: `make serve`
-- To inspect the data via GraphQL UI go to: `http://localhost:4350/graphql`
+- To inspect the data via GraphQL UI go to: `http://localhost:${GQL_PORT}/graphql`
+
+## Development scripts
+
+- Compile files in watch mode: `yarn build:watch`
+- Clear DB and restart processing on each build: `yarn dev`
 
 ## Environement variables
 

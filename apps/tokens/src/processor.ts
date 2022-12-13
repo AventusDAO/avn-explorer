@@ -11,17 +11,15 @@ import {
 import { randomUUID } from 'crypto'
 import { Store, TypeormDatabase } from '@subsquid/typeorm-store'
 import * as ss58 from '@subsquid/ss58'
-import { config, getProcessor } from '@avn/config'
+import { getConfig, getProcessor } from '@avn/config'
 import { getTokenLiftedData, getTokenLowerData, getTokenTransferredData } from './eventHandlers'
 import { getLastChainState, setChainState } from './service/chainState.service'
 import { Block, ChainContext } from './types/generated/parachain-dev/support'
 import { TokenManagerBalancesStorage } from './types/generated/parachain-dev/storage'
 import { TokenBalanceForAccount } from './model'
 
+const config = getConfig()
 const processor = getProcessor()
-  .setBatchSize(config.batchSize ?? 500)
-  .setDataSource(config.dataSource)
-  .setBlockRange(config.blockRange ?? { from: 0 })
   .addEvent('TokenManager.TokenLifted', {
     data: { event: { args: true } }
   } as const)
@@ -133,7 +131,7 @@ async function getTokenManagerData(
     }
   }
 
-  return storage.getManyAsV4(v10InputArray)
+  return await storage.getManyAsV4(v10InputArray)
 }
 
 function processTokensCallItem(

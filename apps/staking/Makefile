@@ -16,6 +16,7 @@ serve:
 reset:
 	@yarn db:reset
 
+reprocess: reset process
 
 migrate:
 	@yarn processor:migrate
@@ -33,4 +34,4 @@ typegen-parachain:
 	@yarn squid-substrate-typegen ./typegen/typegen-parachain.dev.json
 
 
-.PHONY: up down build process serve reset migrate migration codegen typegen-testnet typegen-parachain
+.PHONY: up down build process serve reset reprocess migrate migration codegen typegen-testnet typegen-parachain
