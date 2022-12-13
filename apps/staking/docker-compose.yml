@@ -7,8 +7,8 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_DB: avn-staking
       POSTGRES_PASSWORD: avn-staking
-    volumes:
-      - ./db/data/${AVN_ENV}:/var/lib/postgresql/data
+    # volumes:
+    #   - ./db/data/${AVN_ENV}:/var/lib/postgresql/data
     ports:
       - '${DB_PORT}:5432'
       # command: ["postgres", "-c", "log_statement=all"]
