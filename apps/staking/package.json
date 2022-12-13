@@ -6,7 +6,7 @@
     "check:types": "tsc --pretty --noEmit",
     "build": "rm -rf lib && tsc",
     "build:watch": "tsc -w",
-    "dev": "nodemon --exec \"yarn db:reset & yarn processor:debug\"",
+    "dev": "nodemon",
     "processor:start": "node lib/processor.js",
     "processor:migrate": "yarn squid-typeorm-migration-apply",
     "processor:debug": "node -r dotenv/config lib/processor.js",

@@ -8,11 +8,11 @@ import {
   ParachainStakingNominatorLeftEvent,
   ParachainStakingNominatorLeftCandidateEvent
 } from '../types/generated/parachain-dev/events'
-import { Nominator, ParachainStakingEventName } from '../types/custom'
+import { NominatorEncoded, ParachainStakingEventName } from '../types/custom'
 import { UnknownVersionError } from './errors'
 
 type IEventHandler<T = any> = (ctx: ChainContext, event: Event) => T
-type INominatorEventHandler = IEventHandler<Nominator>
+type INominatorEventHandler = IEventHandler<NominatorEncoded>
 
 // const missingHandler: INominatorEventHandler = (_ctx, event) => {
 //   throw new Error(`missing handler for ${event.name}`)

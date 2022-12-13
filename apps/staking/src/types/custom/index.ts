@@ -1,4 +1,7 @@
 export * from './events'
 
-export type Address = Uint8Array
-export type Nominator = Address
+export type AddressEncoded = Uint8Array
+export type NominatorEncoded = AddressEncoded
+
+export type Address = string
+export type Nominator = string

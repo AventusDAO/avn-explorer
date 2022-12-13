@@ -1,4 +1,4 @@
-import { getProcessor } from '@avn/config'
+import { getConfig, getProcessor } from '@avn/config'
 import {
   BatchContext,
   // BatchProcessorCallItem,
@@ -7,12 +7,15 @@ import {
 } from '@subsquid/substrate-processor'
 import { Store, TypeormDatabase } from '@subsquid/typeorm-store'
 import { stakingNominatorEventHandlers } from './handlers/stakingHandlers'
+import { Nominator } from './types/custom'
+import { encodeId } from './utils'
 
 type Item = BatchProcessorItem<typeof processor>
 type EventItem = BatchProcessorEventItem<typeof processor>
 // type CallItem = BatchProcessorCallItem<typeof processor>
 type Context = BatchContext<Store, Item>
 
+const config = getConfig()
 const processor = getProcessor()
   .addEvent('ParachainStaking.NominationIncreased', {
     data: { event: { args: true } }
@@ -41,30 +44,25 @@ const processor = getProcessor()
 // .includeAllBlocks()
 
 const processStaking = async (ctx: Context): Promise<void> => {
-  const itemNames = ctx.blocks
-    .map(b => b.items)
-    .flat()
-    .map(i => i.name)
-  // .filter(i => parachainStakingEventNames.includes(i))
-
-  if (itemNames.length > 0) {
-    const blocks = ctx.blocks.map(b => b.header.height)
-    ctx.log
-      .child('staking')
-      .debug(
-        `[${blocks[0]}-${blocks[blocks.length - 1]}]: staking items` + JSON.stringify(itemNames)
-      )
-  }
-
   // process all items in range
-  ctx.blocks
+  const nominators = ctx.blocks
     .map(b => b.items)
     .flat()
     .map(item => processItem(ctx, item))
+
+  if (nominators.length > 0) {
+    const blocks = ctx.blocks.map(b => b.header.height)
+    const uniqueNominators = [...new Set(nominators)]
+    ctx.log
+      .child('staking')
+      .debug(
+        `[${blocks[0]}-${blocks[blocks.length - 1]}]: nominators` + JSON.stringify(uniqueNominators)
+      )
+  }
 }
 
-function processItem(ctx: Context, item: Item): void {
-  console.log('processing item ' + item.name)
+function processItem(ctx: Context, item: Item): Nominator {
+  // console.log('processing item ' + item.name)
   if (item.kind === 'event') {
     item = item as EventItem
     if (item.name === '*') {
@@ -73,15 +71,10 @@ function processItem(ctx: Context, item: Item): void {
     const handler = stakingNominatorEventHandlers[item.name]
     if (!handler) throw new Error(`Missing handler for event: ${item.name}`)
     const nominator = handler(ctx, item.event)
-    ctx.log
-      .child('staking')
-      .debug(
-        `Revalidate Nominator ${nominator.toString()} at ${
-          ctx.blocks[ctx.blocks.length - 1].header.height
-        }`
-      )
+    return encodeId(nominator, config.prefix)
   } else {
     ctx.log.child('staking').error(`Unhandled items of kind: ${item.kind}, name: ${item.name}`)
+    throw new Error('')
   }
 }
 
