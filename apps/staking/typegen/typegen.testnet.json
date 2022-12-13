@@ -2,13 +2,7 @@
   "outDir": "../src/types/generated/testnet",
   "specVersions": "../../../packages/metadata/versions.testnet.jsonl",
   "typesBundle": "../../../packages/metadata/avn-types.json",
-  "events": [
-    "Staking.Reward",
-    "Staking.Slash",
-    "Staking.Bonded",
-    "Staking.Unbonded",
-    "Staking.Withdrawn"
-  ],
+  "events": [],
   "calls": [],
   "storage": []
 }

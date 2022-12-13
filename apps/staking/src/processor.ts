@@ -24,8 +24,14 @@ const processStaking = async (ctx: Context): Promise<void> => {
   const itemNames = ctx.blocks
     .map(b => b.items.filter(i => parachainStakingEventNames.includes(i.name)).map(i => i.name))
     .flat()
-  if (itemNames.length > 0)
-    ctx.log.child('staking').debug(`staking items` + JSON.stringify(itemNames))
+  if (itemNames.length > 0) {
+    const blocks = ctx.blocks.map(b => b.header.height)
+    ctx.log
+      .child('staking')
+      .debug(
+        `[${blocks[0]}-${blocks[blocks.length - 1]}]: staking items` + JSON.stringify(itemNames)
+      )
+  }
 }
 
 processor.run(new TypeormDatabase(), processStaking)
