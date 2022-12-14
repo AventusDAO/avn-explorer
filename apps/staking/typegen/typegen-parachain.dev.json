@@ -11,5 +11,5 @@
     "ParachainStaking.NominatorLeftCandidate"
   ],
   "calls": [],
-  "storage": []
+  "storage": ["ParachainStaking.NominatorState"]
 }
