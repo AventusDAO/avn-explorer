@@ -8,8 +8,8 @@ import {
 import { Store, TypeormDatabase } from '@subsquid/typeorm-store'
 import { getLastChainState, setChainState } from './services/chainState'
 import { stakingNominatorEventHandlers } from './handlers/stakingHandlers'
-import { AddressHex, Nominator } from './types/custom'
-import { getNominations, saveAccounts } from './services/accounts'
+import { AddressHex, Address } from './types/custom'
+import { getNominators, saveAccounts } from './services/accounts'
 
 type Item = BatchProcessorItem<typeof processor>
 type EventItem = BatchProcessorEventItem<typeof processor>
@@ -45,7 +45,7 @@ const processStaking = async (ctx: Context): Promise<void> => {
   const pendingAccounts = new Set<AddressHex>()
   for (const block of ctx.blocks) {
     block.items
-      .map(item => processItem(ctx, item))
+      .map(item => getNominatorAddress(ctx, item))
       .map(n => toHex(n))
       .forEach(pendingAccounts.add, pendingAccounts)
 
@@ -54,8 +54,8 @@ const processStaking = async (ctx: Context): Promise<void> => {
     }
 
     if (block.header.timestamp - lastStateTimestamp >= SAVE_PERIOD) {
-      const nominations = await getNominations(ctx, block.header, [...pendingAccounts])
-      await saveAccounts(ctx, block.header, nominations)
+      const nominators = await getNominators(ctx, block.header, [...pendingAccounts])
+      await saveAccounts(ctx, block.header, nominators)
       await setChainState(ctx, block.header)
 
       lastStateTimestamp = block.header.timestamp
@@ -64,12 +64,12 @@ const processStaking = async (ctx: Context): Promise<void> => {
   }
 
   const block = ctx.blocks[ctx.blocks.length - 1]
-  const nominations = await getNominations(ctx, block.header, [...pendingAccounts])
-  await saveAccounts(ctx, block.header, nominations)
+  const nominators = await getNominators(ctx, block.header, [...pendingAccounts])
+  await saveAccounts(ctx, block.header, nominators)
   await setChainState(ctx, block.header)
 }
 
-function processItem(ctx: Context, item: Item): Nominator {
+function getNominatorAddress(ctx: Context, item: Item): Address {
   if (item.kind === 'event') {
     item = item as EventItem
     if (item.name === '*') {

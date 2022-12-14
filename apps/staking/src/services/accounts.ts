@@ -4,8 +4,11 @@ import { NetworkPrefix } from '@avn/config/lib/types'
 import { getConfig } from '@avn/config'
 import { SubstrateBlock, decodeHex } from '@subsquid/substrate-processor'
 import { Context } from '../processor'
-import { Address, AddressEncoded, AddressHex } from '../types/custom'
-import { Block, ChainContext } from '../types/generated/parachain-dev/support'
+import { Address, AddressEncoded, AddressHex, INominator } from '../types/custom'
+import { Block } from '../types/generated/parachain-dev/support'
+import { ParachainStakingNominatorStateStorage } from '../types/generated/parachain-dev/storage'
+import { UnknownVersionError } from '../handlers/errors'
+import { Nominator as NominatorV12 } from '../types/generated/parachain-dev/v12'
 
 const config = getConfig()
 
@@ -16,14 +19,14 @@ export function encodeId(id: Uint8Array, prefix: NetworkPrefix = config.prefix):
 export async function saveAccounts(
   ctx: Context,
   block: SubstrateBlock,
-  nominations: Array<[AddressHex, bigint]>
+  nominators: INominator[]
 ): Promise<void> {
   const accounts = new Map<string, Account>()
   const deletions = new Map<string, Account>()
 
-  for (let i = 0; i < nominations.length; i++) {
-    const [address, stakedAmount] = nominations[i]
-    const id = encodeId(decodeHex(address))
+  for (let i = 0; i < nominators.length; i++) {
+    const { id: address, total: stakedAmount } = nominators[i]
+    const id = encodeId(address)
 
     if (stakedAmount > 0n) {
       accounts.set(
@@ -45,11 +48,24 @@ export async function saveAccounts(
   ctx.log.child('accounts').info(`updated: ${accounts.size}, deleted: ${deletions.size}`)
 }
 
-export async function getNominations(
-  ctx: ChainContext,
+export async function getNominators(
+  ctx: Context,
   block: Block,
   accounts: AddressHex[]
-): Promise<Array<[AddressHex, bigint]>> {
-  // todo:
-  return await Promise.resolve(accounts.map(a => [a, 0n]))
+): Promise<INominator[]> {
+  const storage = new ParachainStakingNominatorStateStorage(ctx, block)
+  if (!storage.isExists) ctx.log.error(`Missing ParachainStakingNominatorStateStorage`)
+  if (storage.isV12) {
+    const nominatorsRes = await storage.getManyAsV12(accounts.map(decodeHex))
+    if (nominatorsRes.find(n => !n)) throw new Error(`Nominator is undefined`)
+    const nominators = nominatorsRes as NominatorV12[]
+    return nominators.map(n => {
+      return {
+        id: n.id,
+        total: n.total
+      }
+    })
+  } else {
+    throw new UnknownVersionError(`ParachainStakingNominatorStateStorage`)
+  }
 }
