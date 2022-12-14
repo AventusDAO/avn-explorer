@@ -10,7 +10,7 @@ export class Account {
   @PrimaryColumn_()
   id!: string
 
-  @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
+  @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false, precision:80, scale: 0})
   stakedAmount!: bigint
 
   @Column_("int4", {nullable: true})

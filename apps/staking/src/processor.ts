@@ -6,11 +6,7 @@ import {
   toHex
 } from '@subsquid/substrate-processor'
 import { Store, TypeormDatabase } from '@subsquid/typeorm-store'
-import {
-  getLastChainState,
-  saveCurrentChainState,
-  saveRegularChainState
-} from './services/chainState'
+import { getLastChainState, setChainState } from './services/chainState'
 import { stakingNominatorEventHandlers } from './handlers/stakingHandlers'
 import { AddressHex, Nominator } from './types/custom'
 import { getNominations, saveAccounts } from './services/accounts'
@@ -60,7 +56,7 @@ const processStaking = async (ctx: Context): Promise<void> => {
     if (block.header.timestamp - lastStateTimestamp >= SAVE_PERIOD) {
       const nominations = await getNominations(ctx, block.header, [...pendingAccounts])
       await saveAccounts(ctx, block.header, nominations)
-      await saveRegularChainState(ctx, block.header)
+      await setChainState(ctx, block.header)
 
       lastStateTimestamp = block.header.timestamp
       pendingAccounts.clear()
@@ -70,7 +66,7 @@ const processStaking = async (ctx: Context): Promise<void> => {
   const block = ctx.blocks[ctx.blocks.length - 1]
   const nominations = await getNominations(ctx, block.header, [...pendingAccounts])
   await saveAccounts(ctx, block.header, nominations)
-  await saveCurrentChainState(ctx, block.header)
+  await setChainState(ctx, block.header)
 }
 
 function processItem(ctx: Context, item: Item): Nominator {
