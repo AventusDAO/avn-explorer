@@ -19,7 +19,7 @@ reset:
 reprocess: reset process
 
 migrate:
-	@yarn processor:migrate
+	@yarn db:migrate
 
 migration:
 	@yarn squid-typeorm-migration-generate

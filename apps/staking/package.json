@@ -8,10 +8,10 @@
     "build:watch": "tsc -w",
     "dev": "nodemon",
     "processor:start": "node lib/processor.js",
-    "processor:migrate": "yarn squid-typeorm-migration-apply",
     "processor:debug": "node --inspect --enable-source-maps -r dotenv/config lib/processor.js",
     "server:start": "squid-graphql-server",
-    "db:reset": "node ./scripts/reset-db.js"
+    "db:reset": "node ./scripts/reset-db.js && yarn db:migrate",
+    "db:migrate": "yarn squid-typeorm-migration-apply"
   },
   "dependencies": {
     "@avn/config": "^1.0.0",
