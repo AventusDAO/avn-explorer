@@ -1,13 +1,9 @@
 export * from './events'
 
-export type AddressEncoded = Uint8Array
-export type NominatorEncoded = AddressEncoded
+export type Address = Uint8Array
+export type Nominator = Address
 
-export type Address = string
-export type Nominator = string
+export type AddressEncoded = string
+export type NominatorEncoded = string
 
-export interface NominatorUpdate {
-  nominator: Nominator
-  timestamp: number
-  blockNumber: number
-}
+export type AddressHex = string

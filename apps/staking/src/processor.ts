@@ -1,23 +1,27 @@
-import { getConfig, getProcessor } from '@avn/config'
+import { getProcessor } from '@avn/config'
 import {
   BatchContext,
-  // BatchProcessorCallItem,
   BatchProcessorEventItem,
   BatchProcessorItem,
-  SubstrateBlock,
-  BatchBlock
+  toHex
 } from '@subsquid/substrate-processor'
 import { Store, TypeormDatabase } from '@subsquid/typeorm-store'
+import {
+  getLastChainState,
+  saveCurrentChainState,
+  saveRegularChainState
+} from './services/chainState'
 import { stakingNominatorEventHandlers } from './handlers/stakingHandlers'
-import { Nominator, NominatorUpdate } from './types/custom'
-import { encodeId } from './utils'
+import { AddressHex, Nominator } from './types/custom'
+import { getNominations, saveAccounts } from './services/accounts'
 
 type Item = BatchProcessorItem<typeof processor>
 type EventItem = BatchProcessorEventItem<typeof processor>
-// type CallItem = BatchProcessorCallItem<typeof processor>
-type Context = BatchContext<Store, Item>
+export type Context = BatchContext<Store, Item>
 
-const config = getConfig()
+const SAVE_PERIOD = 12 * 60 * 60 * 1000
+let lastStateTimestamp: number | undefined
+
 const processor = getProcessor()
   .addEvent('ParachainStaking.NominationIncreased', {
     data: { event: { args: true } }
@@ -40,37 +44,36 @@ const processor = getProcessor()
   .addEvent('ParachainStaking.NominatorLeftCandidate', {
     data: { event: { args: true } }
   } as const)
-// .addCall('*', {
-//   data: { call: { origin: true } }
-// } as const)
-// .includeAllBlocks()
 
 const processStaking = async (ctx: Context): Promise<void> => {
-  // process all items in range
-  const nominators = ctx.blocks.map(block => processBlock(ctx, block))
+  const pendingAccounts = new Set<AddressHex>()
+  for (const block of ctx.blocks) {
+    block.items
+      .map(item => processItem(ctx, item))
+      .map(n => toHex(n))
+      .forEach(pendingAccounts.add, pendingAccounts)
 
-  if (nominators.length > 0) {
-    const blocks = ctx.blocks.map(b => b.header.height)
-    const uniqueNominators = [...new Set(nominators)]
-    ctx.log
-      .child('staking')
-      .debug(
-        `[${blocks[0]}-${blocks[blocks.length - 1]}]: nominators` + JSON.stringify(uniqueNominators)
-      )
+    if (lastStateTimestamp == null) {
+      lastStateTimestamp = (await getLastChainState(ctx.store))?.timestamp.getTime() ?? 0
+    }
+
+    if (block.header.timestamp - lastStateTimestamp >= SAVE_PERIOD) {
+      const nominations = await getNominations(ctx, block.header, [...pendingAccounts])
+      await saveAccounts(ctx, block.header, nominations)
+      await saveRegularChainState(ctx, block.header)
+
+      lastStateTimestamp = block.header.timestamp
+      pendingAccounts.clear()
+    }
   }
+
+  const block = ctx.blocks[ctx.blocks.length - 1]
+  const nominations = await getNominations(ctx, block.header, [...pendingAccounts])
+  await saveAccounts(ctx, block.header, nominations)
+  await saveCurrentChainState(ctx, block.header)
 }
 
-async function getStake(nominatorUpdate: NominatorUpdate): Promise<bigint> {
-  // TODO:
-  return await Promise.resolve(0n)
-}
-
-function processBlock(ctx: Context, block: BatchBlock<Item>) {
-  const updates = block.items.map(item => processItem(ctx, item, block.header))
-  updates.map(el => getStake)
-}
-
-function processItem(ctx: Context, item: Item, header: SubstrateBlock): NominatorUpdate {
+function processItem(ctx: Context, item: Item): Nominator {
   if (item.kind === 'event') {
     item = item as EventItem
     if (item.name === '*') {
@@ -78,13 +81,7 @@ function processItem(ctx: Context, item: Item, header: SubstrateBlock): Nominato
     }
     const handler = stakingNominatorEventHandlers[item.name]
     if (!handler) throw new Error(`Missing handler for event: ${item.name}`)
-    const nominator = handler(ctx, item.event)
-    const update: NominatorUpdate = {
-      nominator: encodeId(nominator, config.prefix),
-      timestamp: header.timestamp,
-      blockNumber: header.height
-    }
-    return update
+    return handler(ctx, item.event)
   } else {
     const errMsg = `Unhandled items of kind: ${item.kind}, name: ${item.name}`
     ctx.log.child('staking').error(errMsg)

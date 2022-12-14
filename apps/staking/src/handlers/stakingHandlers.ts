@@ -8,17 +8,13 @@ import {
   ParachainStakingNominatorLeftEvent,
   ParachainStakingNominatorLeftCandidateEvent
 } from '../types/generated/parachain-dev/events'
-import { NominatorEncoded, ParachainStakingEventName } from '../types/custom'
+import { Nominator, ParachainStakingEventName } from '../types/custom'
 import { UnknownVersionError } from './errors'
 
 type IEventHandler<T = any> = (ctx: ChainContext, event: Event) => T
-type INominatorEventHandler = IEventHandler<NominatorEncoded>
+type INominatorEventHandler = IEventHandler<Nominator>
 
-// const missingHandler: INominatorEventHandler = (_ctx, event) => {
-//   throw new Error(`missing handler for ${event.name}`)
-// }
-
-const handleNominationIncreased: INominatorEventHandler = (ctx, event) => {
+const handleNominationIncreased: INominatorEventHandler = (ctx, event): Nominator => {
   const data = new ParachainStakingNominationIncreasedEvent(ctx, event)
   if (data.isV12) {
     return data.asV12.nominator
@@ -27,7 +23,7 @@ const handleNominationIncreased: INominatorEventHandler = (ctx, event) => {
   }
 }
 
-const handleNominationDecreased: INominatorEventHandler = (ctx, event) => {
+const handleNominationDecreased: INominatorEventHandler = (ctx, event): Nominator => {
   const data = new ParachainStakingNominationDecreasedEvent(ctx, event)
   if (data.isV12) {
     return data.asV12.nominator
@@ -36,7 +32,7 @@ const handleNominationDecreased: INominatorEventHandler = (ctx, event) => {
   }
 }
 
-const handleNominatorLeft: INominatorEventHandler = (ctx, event) => {
+const handleNominatorLeft: INominatorEventHandler = (ctx, event): Nominator => {
   const data = new ParachainStakingNominatorLeftEvent(ctx, event)
   if (data.isV12) {
     return data.asV12.nominator
@@ -44,7 +40,7 @@ const handleNominatorLeft: INominatorEventHandler = (ctx, event) => {
     throw new UnknownVersionError(event.name)
   }
 }
-const handleNominationRevoked: INominatorEventHandler = (ctx, event) => {
+const handleNominationRevoked: INominatorEventHandler = (ctx, event): Nominator => {
   const data = new ParachainStakingNominationRevokedEvent(ctx, event)
   if (data.isV12) {
     return data.asV12.nominator
@@ -52,7 +48,8 @@ const handleNominationRevoked: INominatorEventHandler = (ctx, event) => {
     throw new UnknownVersionError(event.name)
   }
 }
-const handleNominationKicked: INominatorEventHandler = (ctx, event) => {
+
+const handleNominationKicked: INominatorEventHandler = (ctx, event): Nominator => {
   const data = new ParachainStakingNominationKickedEvent(ctx, event)
   if (data.isV12) {
     return data.asV12.nominator
@@ -60,7 +57,8 @@ const handleNominationKicked: INominatorEventHandler = (ctx, event) => {
     throw new UnknownVersionError(event.name)
   }
 }
-const handleNomination: INominatorEventHandler = (ctx, event) => {
+
+const handleNomination: INominatorEventHandler = (ctx, event): Nominator => {
   const data = new ParachainStakingNominationEvent(ctx, event)
   if (data.isV12) {
     return data.asV12.nominator
@@ -68,7 +66,8 @@ const handleNomination: INominatorEventHandler = (ctx, event) => {
     throw new UnknownVersionError(event.name)
   }
 }
-const handleNominatorLeftCandidate: INominatorEventHandler = (ctx, event) => {
+
+const handleNominatorLeftCandidate: INominatorEventHandler = (ctx, event): Nominator => {
   const data = new ParachainStakingNominatorLeftCandidateEvent(ctx, event)
   if (data.isV12) {
     return data.asV12.nominator
