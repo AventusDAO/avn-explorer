@@ -8,8 +8,7 @@ import {
   ParachainStakingNominatorLeftEvent,
   ParachainStakingNominatorLeftCandidateEvent
 } from '../types/generated/parachain-dev/events'
-import { Address, ParachainStakingEventName } from '../types/custom'
-import { UnknownVersionError } from './errors'
+import { Address, ParachainStakingEventName, UnknownVersionError } from '../types/custom'
 
 type IEventHandler<T = any> = (ctx: ChainContext, event: Event) => T
 type INominatorEventHandler = IEventHandler<Address>

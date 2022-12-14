@@ -3,7 +3,8 @@ import {
   BatchContext,
   BatchProcessorEventItem,
   BatchProcessorItem,
-  toHex
+  toHex,
+  decodeHex
 } from '@subsquid/substrate-processor'
 import { Store, TypeormDatabase } from '@subsquid/typeorm-store'
 import { getLastChainState, setChainState } from './services/chainState'
@@ -54,7 +55,7 @@ const processStaking = async (ctx: Context): Promise<void> => {
     }
 
     if (block.header.timestamp - lastStateTimestamp >= SAVE_PERIOD) {
-      const nominators = await getNominators(ctx, block.header, [...pendingAccounts])
+      const nominators = await getNominators(ctx, block.header, [...pendingAccounts].map(decodeHex))
       await saveAccounts(ctx, block.header, nominators)
       await setChainState(ctx, block.header)
 
@@ -64,7 +65,7 @@ const processStaking = async (ctx: Context): Promise<void> => {
   }
 
   const block = ctx.blocks[ctx.blocks.length - 1]
-  const nominators = await getNominators(ctx, block.header, [...pendingAccounts])
+  const nominators = await getNominators(ctx, block.header, [...pendingAccounts].map(decodeHex))
   await saveAccounts(ctx, block.header, nominators)
   await setChainState(ctx, block.header)
 }
