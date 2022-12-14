@@ -5,3 +5,9 @@ export type NominatorEncoded = AddressEncoded
 
 export type Address = string
 export type Nominator = string
+
+export interface NominatorUpdate {
+  nominator: Nominator
+  timestamp: number
+  blockNumber: number
+}

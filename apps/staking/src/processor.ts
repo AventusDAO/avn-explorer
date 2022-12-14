@@ -3,11 +3,13 @@ import {
   BatchContext,
   // BatchProcessorCallItem,
   BatchProcessorEventItem,
-  BatchProcessorItem
+  BatchProcessorItem,
+  SubstrateBlock,
+  BatchBlock
 } from '@subsquid/substrate-processor'
 import { Store, TypeormDatabase } from '@subsquid/typeorm-store'
 import { stakingNominatorEventHandlers } from './handlers/stakingHandlers'
-import { Nominator } from './types/custom'
+import { Nominator, NominatorUpdate } from './types/custom'
 import { encodeId } from './utils'
 
 type Item = BatchProcessorItem<typeof processor>
@@ -45,10 +47,7 @@ const processor = getProcessor()
 
 const processStaking = async (ctx: Context): Promise<void> => {
   // process all items in range
-  const nominators = ctx.blocks
-    .map(b => b.items)
-    .flat()
-    .map(item => processItem(ctx, item))
+  const nominators = ctx.blocks.map(block => processBlock(ctx, block))
 
   if (nominators.length > 0) {
     const blocks = ctx.blocks.map(b => b.header.height)
@@ -61,8 +60,17 @@ const processStaking = async (ctx: Context): Promise<void> => {
   }
 }
 
-function processItem(ctx: Context, item: Item): Nominator {
-  // console.log('processing item ' + item.name)
+async function getStake(nominatorUpdate: NominatorUpdate): Promise<bigint> {
+  // TODO:
+  return await Promise.resolve(0n)
+}
+
+function processBlock(ctx: Context, block: BatchBlock<Item>) {
+  const updates = block.items.map(item => processItem(ctx, item, block.header))
+  updates.map(el => getStake)
+}
+
+function processItem(ctx: Context, item: Item, header: SubstrateBlock): NominatorUpdate {
   if (item.kind === 'event') {
     item = item as EventItem
     if (item.name === '*') {
@@ -71,10 +79,16 @@ function processItem(ctx: Context, item: Item): Nominator {
     const handler = stakingNominatorEventHandlers[item.name]
     if (!handler) throw new Error(`Missing handler for event: ${item.name}`)
     const nominator = handler(ctx, item.event)
-    return encodeId(nominator, config.prefix)
+    const update: NominatorUpdate = {
+      nominator: encodeId(nominator, config.prefix),
+      timestamp: header.timestamp,
+      blockNumber: header.height
+    }
+    return update
   } else {
-    ctx.log.child('staking').error(`Unhandled items of kind: ${item.kind}, name: ${item.name}`)
-    throw new Error('')
+    const errMsg = `Unhandled items of kind: ${item.kind}, name: ${item.name}`
+    ctx.log.child('staking').error(errMsg)
+    throw new Error(errMsg)
   }
 }
 

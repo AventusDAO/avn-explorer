@@ -10,3 +10,15 @@ export interface NominatorAdded_AddedToTop {
 export interface NominatorAdded_AddedToBottom {
     __kind: 'AddedToBottom'
 }
+
+export interface Nominator {
+    id: Uint8Array
+    nominations: Bond[]
+    total: bigint
+    lessTotal: bigint
+}
+
+export interface Bond {
+    owner: Uint8Array
+    amount: bigint
+}
