@@ -4,7 +4,8 @@
   "private": true,
   "workspaces": [
     "apps/*",
-    "packages/*"
+    "packages/*",
+    "!apps/balances-client"
   ],
   "scripts": {
     "prettier:check": "prettier -c .",
