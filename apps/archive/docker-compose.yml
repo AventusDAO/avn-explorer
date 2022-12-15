@@ -87,7 +87,7 @@ services:
   #   volumes:
   #      - pgadmin-data:/var/lib/pgadmin
   #   ports:
-  #     - "${DB_PORT}:80"
+  #     - "5544:80"
   #   networks:
   #     - avn-archive
   #   restart: unless-stopped

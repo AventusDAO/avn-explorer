@@ -15,7 +15,7 @@ export function encodeId(id: Uint8Array, prefix: NetworkPrefix = config.prefix):
   return ss58.codec(prefix).encode(id)
 }
 
-const mapINominator = (nominator: INominator, block: SubstrateBlock): Account =>
+const mapINominatorToAccount = (nominator: INominator, block: SubstrateBlock): Account =>
   new Account({
     id: encodeId(nominator.id),
     updatedAt: block.height,
@@ -29,11 +29,11 @@ export async function saveAccounts(
 ): Promise<void> {
   const accounts = nominators
     .filter(n => n.total > 0n)
-    .map(nominator => mapINominator(nominator, block))
+    .map(nominator => mapINominatorToAccount(nominator, block))
 
   const deletions = nominators
     .filter(n => n.total <= 0n)
-    .map(nominator => mapINominator(nominator, block))
+    .map(nominator => mapINominatorToAccount(nominator, block))
 
   await ctx.store.save([...accounts])
   await ctx.store.remove([...deletions])

@@ -10,7 +10,7 @@
     "processor:start": "node lib/processor.js",
     "processor:debug": "node --inspect --enable-source-maps -r dotenv/config lib/processor.js",
     "server:start": "squid-graphql-server",
-    "db:reset": "node ./scripts/reset-db.js && yarn db:migrate",
+    "db:reset": "node ./scripts/reset-db.js",
     "db:migrate": "yarn squid-typeorm-migration-apply"
   },
   "dependencies": {
