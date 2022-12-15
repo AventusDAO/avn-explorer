@@ -7,13 +7,12 @@ Raw archives of the chain data
 - Configure `.env`
 
 ```
-DB_NAME=avn-archive
-DB_PASS=avn-archive
+DB_NAME=parachain-dev
+DB_PASS=postgres
 DB_USER=postgres
 DB_PORT=5432
 GATEWAY_PORT=8888
 EXPLORER_PORT=4444
-AVN_ENV=parachain-dev
 AVN_NODE=wss://avn-parachain.dev.aventus.io
 ```
 

@@ -1,5 +1,6 @@
 import * as ss58 from '@subsquid/ss58'
-import { ProcessorConfig } from './types/custom/processorConfig'
-export function encodeId(id: Uint8Array, config: ProcessorConfig) {
-    return ss58.codec(config.prefix).encode(id)
+import { NetworkPrefix } from '@avn/config/lib/types'
+
+export function encodeId(id: Uint8Array, prefix: NetworkPrefix): string {
+  return ss58.codec(prefix).encode(id)
 }
