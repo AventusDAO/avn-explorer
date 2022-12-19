@@ -1,12 +1,7 @@
 import { BatchContext, SubstrateBlock } from '@subsquid/substrate-processor'
 import { Store } from '@subsquid/typeorm-store'
 import { getTotalIssuance } from './eventHandlers'
-import { Account, ChainState, CurrentChainState } from './model'
-// import { PERIOD } from './consts/consts'
-// import chains from './consts/chains'
-// import config from './config'
-// import { UnknownVersionError } from './common/errors'
-// import { ChainInfo } from './common/types'
+import { Account, ChainState } from './model'
 
 export async function getChainState(ctx: BatchContext<Store, unknown>, block: SubstrateBlock) {
   const state = new ChainState({ id: block.id })

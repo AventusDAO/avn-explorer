@@ -4,13 +4,13 @@ services:
   db:
     image: postgres:14
     environment:
-      POSTGRES_USER: postgres
-      POSTGRES_DB: avn-tokens
-      POSTGRES_PASSWORD: avn-tokens
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_PASSWORD: ${DB_PASS}
     volumes:
-      - ./db/data/${AVN_ENV}:/var/lib/postgresql/data
+      - db-data:/var/lib/postgresql/data
     ports:
-      - '23800:5432'
+      - '${DB_PORT}:5432'
       # command: ["postgres", "-c", "log_statement=all"]
     networks:
       - tokens
@@ -24,7 +24,7 @@ services:
   #     PGADMIN_DEFAULT_PASSWORD: admin
   #     PGADMIN_CONFIG_SERVER_MODE: 'False'
   #   volumes:
-  #      - ./db/data/pgadmin:/var/lib/pgadmin
+  #      - pgadmin-data:/var/lib/pgadmin
   #   ports:
   #     - "5544:80"
   #   restart: unless-stopped

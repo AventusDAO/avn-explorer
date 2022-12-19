@@ -9,7 +9,7 @@ import {
 import { Store, TypeormDatabase } from '@subsquid/typeorm-store'
 import { getLastChainState, setChainState } from './services/chainState'
 import { stakingNominatorEventHandlers } from './handlers/stakingHandlers'
-import { AddressHex, Address } from './types/custom'
+import { AddressHex, Address } from '@avn/types'
 import { getNominators, saveAccounts } from './services/accounts'
 
 type Item = BatchProcessorItem<typeof processor>

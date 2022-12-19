@@ -15,6 +15,8 @@
   },
   "dependencies": {
     "@avn/config": "^1.0.0",
+    "@avn/types": "^1.0.0",
+    "@avn/utils": "^1.0.0",
     "@subsquid/graphql-server": "^1.1.0",
     "@subsquid/ss58": "^0.1.1",
     "@subsquid/substrate-processor": "^1.2.0",

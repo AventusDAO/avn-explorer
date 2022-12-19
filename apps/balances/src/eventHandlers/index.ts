@@ -1,5 +1,5 @@
 import { toHex } from '@subsquid/substrate-processor'
-import { UnknownVersionError } from '../processor'
+import { UnknownVersionError } from '@avn/types'
 import {
   BalancesBalanceSetEvent,
   BalancesDepositEvent,

@@ -11,14 +11,14 @@ import {
 import { randomUUID } from 'crypto'
 import { Store, TypeormDatabase } from '@subsquid/typeorm-store'
 import * as ss58 from '@subsquid/ss58'
-import { getConfig, getProcessor } from '@avn/config'
+import { getProcessor } from '@avn/config'
+import { encodeId } from '@avn/utils'
 import { getTokenLiftedData, getTokenLowerData, getTokenTransferredData } from './eventHandlers'
 import { getLastChainState, setChainState } from './service/chainState.service'
 import { Block, ChainContext } from './types/generated/parachain-dev/support'
 import { TokenManagerBalancesStorage } from './types/generated/parachain-dev/storage'
 import { TokenBalanceForAccount } from './model'
 
-const config = getConfig()
 const processor = getProcessor()
   .addEvent('TokenManager.TokenLifted', {
     data: { event: { args: true } }
@@ -177,7 +177,6 @@ function processTokensEventItem(
   }
 }
 
-
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function getOriginAccountId(origin: any) {
   if (origin && origin.__kind === 'system' && origin.value.__kind === 'Signed') {
@@ -185,8 +184,4 @@ export function getOriginAccountId(origin: any) {
   } else {
     return undefined
   }
-}
-
-export function encodeId(id: Uint8Array) {
-  return ss58.codec(config.prefix).encode(id)
 }
