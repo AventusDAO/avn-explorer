@@ -1,7 +1,7 @@
 import { Account } from '../model'
 import { SubstrateBlock } from '@subsquid/substrate-processor'
 import { Context } from '../processor'
-import { Address, UnknownVersionError } from '@avn/types'
+import { Address, AddressEncoded, UnknownVersionError } from '@avn/types'
 import { encodeId } from '@avn/utils'
 import { INominator, IRewardedData } from '../types/custom'
 import { Block } from '../types/generated/parachain-dev/support'
@@ -15,24 +15,39 @@ const mapINominatorToAccount = (nominator: INominator, block: SubstrateBlock): A
     stakedAmount: nominator.total
   })
 
+const mapIRewardedDataToAccount = (rewardedData: IRewardedData, block: SubstrateBlock): Account =>
+  new Account({
+    id: encodeId(rewardedData.id),
+    updatedAt: block.height,
+    totalRewards: rewardedData.amount
+  })
+
 export async function saveAccounts(
   ctx: Context,
   block: SubstrateBlock,
   nominators: INominator[],
-  rewards: IRewardedData[]
+  rewarded: IRewardedData[]
 ): Promise<void> {
-  const accounts = nominators
-    .filter(n => n.total > 0n)
-    .map(nominator => mapINominatorToAccount(nominator, block))
+  const accounts = new Map<AddressEncoded, Account>()
+  rewarded.map(r => mapIRewardedDataToAccount(r, block)).forEach(val => accounts.set(val.id, val))
+  nominators.forEach(nominator => {
+    const acc = accounts.get(encodeId(nominator.id))
+    if (!acc) return mapINominatorToAccount(nominator, block)
+    acc.stakedAmount = nominator.total
+  })
 
-  const deletions = nominators
-    .filter(n => n.total <= 0n)
-    .map(nominator => mapINominatorToAccount(nominator, block))
+  await ctx.store.save([...accounts.values()])
+  ctx.log.child('accounts').info(`updated: ${[...accounts.values()].length}`)
 
-  await ctx.store.save([...accounts])
-  await ctx.store.remove([...deletions])
-
-  ctx.log.child('accounts').info(`updated: ${accounts.length}, deleted: ${deletions.length}`)
+  // const news = nominators
+  //   .filter(n => n.total > 0n)
+  //   .map(nominator => mapINominatorToAccount(nominator, block))
+  // const deletions = nominators
+  //   .filter(n => n.total <= 0n)
+  //   .map(nominator => mapINominatorToAccount(nominator, block))
+  // await ctx.store.save([...news])
+  // await ctx.store.remove([...deletions])
+  // ctx.log.child('accounts').info(`updated: ${news.length}`)
 }
 
 export async function getNominators(

@@ -1,6 +1,7 @@
 type Account @entity {
   id: ID!
   stakedAmount: BigInt!
+  totalRewards: BigInt!
   updatedAt: Int
 }
 
