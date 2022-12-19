@@ -1,0 +1,23 @@
+{
+  "name": "@avn/utils",
+  "private": true,
+  "version": "1.0.0",
+  "packageManager": "yarn@3.3.0",
+  "main": "lib/index",
+  "typings": "lib/index",
+  "scripts": {
+    "types:check": "tsc --pretty --noEmit",
+    "build": "rm -rf lib && tsc",
+    "build:watch": "rm -rf lib && tsc -w"
+  },
+  "dependencies": {
+    "@avn/config": "^1.0.0",
+    "@avn/types": "^1.0.0",
+    "@subsquid/ss58": "^0.1.1",
+    "dotenv": "^10.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^18.11.9",
+    "typescript": "^4.9.3"
+  }
+}

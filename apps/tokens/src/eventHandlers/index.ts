@@ -5,13 +5,7 @@ import {
   TokenManagerTokenTransferredEvent
 } from '../types/generated/parachain-dev/events'
 import { toHex } from '@subsquid/substrate-processor'
-
-export class UnknownVersionError extends Error {
-  constructor(name: string) {
-    super(`There is no relevant version for ${name}`)
-  }
-}
-
+import { UnknownVersionError } from '@avn/types'
 
 type AccountData = string[]
 

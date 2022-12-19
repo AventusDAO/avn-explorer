@@ -9,7 +9,7 @@ import {
 } from '@subsquid/substrate-processor'
 import { Store, TypeormDatabase } from '@subsquid/typeorm-store'
 import { randomUUID } from 'crypto'
-import { getConfig, getProcessor } from '@avn/config'
+import { getProcessor } from '@avn/config'
 import { getLastChainState, saveCurrentChainState, saveRegularChainState } from './chainState'
 import { Account, Balance } from './model'
 import {
@@ -30,9 +30,8 @@ import {
   SystemAccountStorage
 } from './types/generated/parachain-dev/storage'
 import { Block, ChainContext } from './types/generated/parachain-dev/support'
-import { encodeId } from './utils'
+import { encodeId } from '@avn/utils'
 
-const config = getConfig()
 const processor = getProcessor()
   .addEvent('Balances.Endowed', {
     data: { event: { args: true } }
@@ -126,7 +125,7 @@ async function saveAccounts(
   const deletions = new Map<string, Account>()
 
   for (let i = 0; i < accountIds.length; i++) {
-    const id = encodeId(accountIds[i], config.prefix)
+    const id = encodeId(accountIds[i])
     const balance = balances?.[i]
 
     if (!balance) continue
@@ -159,7 +158,7 @@ async function saveBalances(
   const balancesMap: { [id: string]: Balance } = {}
   const accountBalances = await Promise.all(
     accountIds.map(async id => {
-      const accountId = encodeId(id, config.prefix)
+      const accountId = encodeId(id)
       return await ctx.store.findOne(Balance, {
         where: { accountId },
         order: { updatedAt: 'DESC' }
@@ -168,7 +167,7 @@ async function saveBalances(
   )
 
   for (let i = 0; i < accountIds.length; i++) {
-    const id = encodeId(accountIds[i], config.prefix)
+    const id = encodeId(accountIds[i])
     const balance = balances?.[i]
 
     if (!balance) continue
@@ -317,11 +316,6 @@ async function getSystemAccountBalances(
   })) as IBalance[]
 }
 
-export class UnknownVersionError extends Error {
-  constructor(name: string) {
-    super(`There is no relevant version for ${name}`)
-  }
-}
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function getOriginAccountId(origin: any) {

@@ -1,4 +1,4 @@
-import { Address } from '.'
+import { Address } from '@avn/types'
 
 export interface INominator {
   id: Address

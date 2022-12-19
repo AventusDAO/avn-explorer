@@ -1,19 +1,12 @@
 import { Account } from '../model'
-import * as ss58 from '@subsquid/ss58'
-import { NetworkPrefix } from '@avn/config/lib/types'
-import { getConfig } from '@avn/config'
 import { SubstrateBlock } from '@subsquid/substrate-processor'
 import { Context } from '../processor'
-import { Address, AddressEncoded, INominator, UnknownVersionError } from '../types/custom'
+import { Address, UnknownVersionError } from '@avn/types'
+import { encodeId } from '@avn/utils'
+import { INominator } from '../types/custom'
 import { Block } from '../types/generated/parachain-dev/support'
 import { ParachainStakingNominatorStateStorage } from '../types/generated/parachain-dev/storage'
 import { Nominator as NominatorV12 } from '../types/generated/parachain-dev/v12'
-
-const config = getConfig()
-
-export function encodeId(id: Uint8Array, prefix: NetworkPrefix = config.prefix): AddressEncoded {
-  return ss58.codec(prefix).encode(id)
-}
 
 const mapINominatorToAccount = (nominator: INominator, block: SubstrateBlock): Account =>
   new Account({
