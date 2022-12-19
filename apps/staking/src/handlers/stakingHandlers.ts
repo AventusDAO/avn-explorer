@@ -1,4 +1,3 @@
-import { ChainContext, Event } from '../types/generated/parachain-dev/support'
 import {
   ParachainStakingNominationEvent,
   ParachainStakingNominationDecreasedEvent,
@@ -8,10 +7,9 @@ import {
   ParachainStakingNominatorLeftEvent,
   ParachainStakingNominatorLeftCandidateEvent
 } from '../types/generated/parachain-dev/events'
-import { ParachainStakingEventName } from '../types/custom'
+import { IEventHandler, ParachainStakingNominatorEventName } from '../types/custom'
 import { Address, UnknownVersionError } from '@avn/types'
 
-type IEventHandler<T = any> = (ctx: ChainContext, event: Event) => T
 type INominatorEventHandler = IEventHandler<Address>
 
 const handleNominationIncreased: INominatorEventHandler = (ctx, event): Address => {
@@ -77,7 +75,7 @@ const handleNominatorLeftCandidate: INominatorEventHandler = (ctx, event): Addre
 }
 
 export const stakingNominatorEventHandlers: Record<
-  ParachainStakingEventName,
+  ParachainStakingNominatorEventName,
   INominatorEventHandler
 > = {
   'ParachainStaking.NominationIncreased': handleNominationIncreased,

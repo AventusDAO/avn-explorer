@@ -3,7 +3,7 @@ import { SubstrateBlock } from '@subsquid/substrate-processor'
 import { Context } from '../processor'
 import { Address, UnknownVersionError } from '@avn/types'
 import { encodeId } from '@avn/utils'
-import { INominator } from '../types/custom'
+import { INominator, IRewardedData } from '../types/custom'
 import { Block } from '../types/generated/parachain-dev/support'
 import { ParachainStakingNominatorStateStorage } from '../types/generated/parachain-dev/storage'
 import { Nominator as NominatorV12 } from '../types/generated/parachain-dev/v12'
@@ -18,7 +18,8 @@ const mapINominatorToAccount = (nominator: INominator, block: SubstrateBlock): A
 export async function saveAccounts(
   ctx: Context,
   block: SubstrateBlock,
-  nominators: INominator[]
+  nominators: INominator[],
+  rewards: IRewardedData[]
 ): Promise<void> {
   const accounts = nominators
     .filter(n => n.total > 0n)

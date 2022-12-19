@@ -192,3 +192,32 @@ export class ParachainStakingNominatorLeftCandidateEvent {
         return this._chain.decodeEvent(this.event)
     }
 }
+
+export class ParachainStakingRewardedEvent {
+    private readonly _chain: Chain
+    private readonly event: Event
+
+    constructor(ctx: EventContext)
+    constructor(ctx: ChainContext, event: Event)
+    constructor(ctx: EventContext, event?: Event) {
+        event = event || ctx.event
+        assert(event.name === 'ParachainStaking.Rewarded')
+        this._chain = ctx._chain
+        this.event = event
+    }
+
+    /**
+     * Paid the account (nominator or collator) the balance as liquid rewards.
+     */
+    get isV12(): boolean {
+        return this._chain.getEventHash('ParachainStaking.Rewarded') === '1a005a96fdd51900b5609e011c697b2588490316080f642724ed18b187dfc5e5'
+    }
+
+    /**
+     * Paid the account (nominator or collator) the balance as liquid rewards.
+     */
+    get asV12(): {account: Uint8Array, rewards: bigint} {
+        assert(this.isV12)
+        return this._chain.decodeEvent(this.event)
+    }
+}
