@@ -3,8 +3,7 @@ import {
   BatchContext,
   BatchProcessorEventItem,
   BatchProcessorItem,
-  toHex,
-  decodeHex
+  toHex
 } from '@subsquid/substrate-processor'
 import { Store, TypeormDatabase } from '@subsquid/typeorm-store'
 import { getLastChainState, setChainState } from './services/chainState'
@@ -13,10 +12,12 @@ import { AddressHex, Address } from '@avn/types'
 import { getNominators, saveAccounts } from './services/accounts'
 import {
   IRewardedData,
+  IStakingAccountUpdate,
   ParachainStakingNominatorEventName,
   ParachainStakingRewardsEventName
 } from './types/custom'
 import { rewardedEventHandlers } from './handlers'
+import { Block } from './types/generated/parachain-dev/support'
 
 type Item = BatchProcessorItem<typeof processor>
 type EventItem = BatchProcessorEventItem<typeof processor>
@@ -51,28 +52,65 @@ const processor = getProcessor()
     data: { event: { args: true } }
   })
 
+type StakingUpdates = Map<AddressHex, IStakingAccountUpdate>
+
+const fetchTotalNominationsForUpdates = async (
+  ctx: Context,
+  block: Block,
+  updates: StakingUpdates
+): Promise<void> => {
+  const getNominationUpdates = (up: StakingUpdates): IStakingAccountUpdate[] =>
+    [...up.values()].filter(acc => !!acc.hasNominations)
+
+  const nominatorIds = getNominationUpdates(updates).map(acc => acc.id)
+  const nominators = await getNominators(ctx, block, nominatorIds)
+  nominators.forEach(nominator => {
+    const update = updates.get(toHex(nominator.id))
+    if (!update) throw new Error(`Could not find pending update for a nominator`)
+    update.nominationsTotal = nominator.total
+  })
+}
+
 const processStaking = async (ctx: Context): Promise<void> => {
-  const pendingNominators = new Set<AddressHex>()
-  const rewardsCollected = new Map<AddressHex, IRewardedData>()
+  const pendingUpdates: StakingUpdates = new Map<AddressHex, IStakingAccountUpdate>()
 
   for (const block of ctx.blocks) {
     block.items
-      .filter(item => Object.keys(ParachainStakingNominatorEventName).includes(item.name))
+      .filter(item =>
+        (Object.values(ParachainStakingNominatorEventName) as string[]).includes(item.name)
+      )
       .map(item => getNominatorAddress(ctx, item))
-      .map(n => toHex(n))
-      .forEach(pendingNominators.add, pendingNominators)
+      .forEach((id: Address) => {
+        const hexId = toHex(id)
+        const pendingUpdate = pendingUpdates.get(hexId)
+        if (pendingUpdate) {
+          pendingUpdate.hasNominations = true
+        } else {
+          pendingUpdates.set(hexId, {
+            id,
+            hasNominations: true,
+            rewards: []
+          })
+        }
+      })
 
     block.items
-      .filter(item => Object.keys(ParachainStakingRewardsEventName).includes(item.name))
+      .filter(item =>
+        (Object.values(ParachainStakingRewardsEventName) as string[]).includes(item.name)
+      )
       .map(item => getReward(ctx, item))
-      .forEach(item => {
-        const id = toHex(item.id)
-        const existingRewards = rewardsCollected.get(id)?.amount ?? 0n
-        const newRewards = existingRewards + item.amount
-        rewardsCollected.set(id, {
-          id: item.id,
-          amount: newRewards
-        })
+      .forEach((data: IRewardedData) => {
+        const hexId = toHex(data.id)
+        const pendingUpdate = pendingUpdates.get(hexId)
+        if (pendingUpdate) {
+          pendingUpdate.rewards.push(data.amount)
+        } else {
+          pendingUpdates.set(hexId, {
+            id: data.id,
+            hasNominations: false,
+            rewards: [data.amount]
+          })
+        }
       })
 
     if (lastStateTimestamp == null) {
@@ -80,23 +118,18 @@ const processStaking = async (ctx: Context): Promise<void> => {
     }
 
     if (block.header.timestamp - lastStateTimestamp >= SAVE_PERIOD) {
-      const nominators = await getNominators(
-        ctx,
-        block.header,
-        [...pendingNominators].map(decodeHex)
-      )
-      await saveAccounts(ctx, block.header, nominators, [...rewardsCollected.values()])
+      await fetchTotalNominationsForUpdates(ctx, block.header, pendingUpdates)
+      await saveAccounts(ctx, block.header, [...pendingUpdates.values()])
       await setChainState(ctx, block.header)
 
       lastStateTimestamp = block.header.timestamp
-      pendingNominators.clear()
-      rewardsCollected.clear()
+      pendingUpdates.clear()
     }
   }
 
   const block = ctx.blocks[ctx.blocks.length - 1]
-  const nominators = await getNominators(ctx, block.header, [...pendingNominators].map(decodeHex))
-  await saveAccounts(ctx, block.header, nominators, [...rewardsCollected.values()])
+  await fetchTotalNominationsForUpdates(ctx, block.header, pendingUpdates)
+  await saveAccounts(ctx, block.header, [...pendingUpdates.values()])
   await setChainState(ctx, block.header)
 }
 
