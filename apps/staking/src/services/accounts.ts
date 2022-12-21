@@ -7,21 +7,43 @@ import { INominationData, IStakingAccountUpdate } from '../types/custom'
 import { Block } from '../types/generated/parachain-dev/support'
 import { ParachainStakingNominatorStateStorage } from '../types/generated/parachain-dev/storage'
 import { Nominator as NominatorV12 } from '../types/generated/parachain-dev/v12'
+import { In } from 'typeorm'
 
 export async function saveAccounts(
   ctx: Context,
   block: SubstrateBlock,
   updates: IStakingAccountUpdate[]
 ): Promise<void> {
-  const accounts = updates.map(
-    update =>
-      new Account({
-        id: encodeId(update.id),
-        updatedAt: block.height,
-        totalRewards: update.rewards.reduce((prev, curr) => prev + curr, 0n),
-        stakedAmount: update.nominationsTotal ?? 0n
+  const existingAccounts = await ctx.store.find(Account, {
+    where: {
+      id: In(updates.map(item => encodeId(item.id)))
+    }
+  })
+
+  const accounts = updates.map(item => {
+    const id = encodeId(item.id)
+    const newRewards = item.rewards.reduce((prev, curr) => prev + curr, 0n)
+    const updatedAt = block.height
+    const existingAccount = existingAccounts.find(acc => acc.id === id)
+    if (existingAccount) {
+      const totalRewards = existingAccount.totalRewards + newRewards
+      const stakedAmount = item.nominationsTotal ?? existingAccount.stakedAmount
+      return new Account({
+        id,
+        totalRewards,
+        updatedAt,
+        stakedAmount
       })
-  )
+    } else {
+      return new Account({
+        id,
+        updatedAt,
+        totalRewards: newRewards,
+        stakedAmount: item.nominationsTotal ?? 0n
+      })
+    }
+  })
+
   await ctx.store.save(accounts)
 
   ctx.log.child('accounts').info(`updated: ${[...accounts.values()].length}`)

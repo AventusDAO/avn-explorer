@@ -52,7 +52,6 @@ const processor = getProcessor()
     data: { event: { args: true } }
   })
 
-
 class StakingUpdates {
   #ctx: Context
   #updates = new Map<AddressHex, IStakingAccountUpdate>()
@@ -76,28 +75,30 @@ class StakingUpdates {
   }
 
   addNominator(id: Address): void {
-    const existingUpdate = this.getItem(id)
-    if (!existingUpdate) {
+    const item = this.getItem(id)
+    if (!item) {
       return this.setItem({
         id,
         hasNominations: true,
         rewards: []
       })
     }
-    existingUpdate.hasNominations = true
+
+    item.hasNominations = true
   }
 
   addReward(data: IRewardedData): void {
     const { id, amount } = data
-    const existingUpdate = this.getItem(id)
-    if (!existingUpdate) {
+    const item = this.getItem(id)
+    if (!item) {
       return this.setItem({
         id: data.id,
         hasNominations: false,
         rewards: [data.amount]
       })
     }
-    existingUpdate.rewards.push(amount)
+
+    item.rewards.push(amount)
   }
 
   async fetchTotalNominations(block: Block): Promise<void> {
@@ -127,6 +128,7 @@ const processStaking = async (ctx: Context): Promise<void> => {
   const pendingUpdates: StakingUpdates = new StakingUpdates(ctx)
 
   for (const block of ctx.blocks) {
+    // get nominator ids from events and add to StakingUpdates items
     block.items
       .filter(item =>
         (Object.values(ParachainStakingNominatorEventName) as string[]).includes(item.name)
@@ -134,6 +136,7 @@ const processStaking = async (ctx: Context): Promise<void> => {
       .map(item => getNominatorAddress(ctx, item))
       .forEach(pendingUpdates.addNominator, pendingUpdates)
 
+    // get reward amounts and add to StakingUpdates items
     block.items
       .filter(item =>
         (Object.values(ParachainStakingRewardsEventName) as string[]).includes(item.name)
