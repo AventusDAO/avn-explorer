@@ -49,7 +49,7 @@ export async function saveAccounts(
   ctx.log.child('accounts').info(`updated: ${[...accounts.values()].length}`)
 }
 
-export async function getNominators(
+export async function getNominations(
   ctx: Context,
   block: Block,
   accounts: Address[]
