@@ -52,27 +52,79 @@ const processor = getProcessor()
     data: { event: { args: true } }
   })
 
-type StakingUpdates = Map<AddressHex, IStakingAccountUpdate>
 
-const fetchTotalNominationsForUpdates = async (
-  ctx: Context,
-  block: Block,
-  updates: StakingUpdates
-): Promise<void> => {
-  const getNominationUpdates = (up: StakingUpdates): IStakingAccountUpdate[] =>
-    [...up.values()].filter(acc => !!acc.hasNominations)
+class StakingUpdates {
+  #ctx: Context
+  #updates = new Map<AddressHex, IStakingAccountUpdate>()
 
-  const nominatorIds = getNominationUpdates(updates).map(acc => acc.id)
-  const nominators = await getNominators(ctx, block, nominatorIds)
-  nominators.forEach(nominator => {
-    const update = updates.get(toHex(nominator.id))
-    if (!update) throw new Error(`Could not find pending update for a nominator`)
-    update.nominationsTotal = nominator.total
-  })
+  constructor(ctx: Context) {
+    this.#ctx = ctx
+  }
+
+  private getItem(id: Address): IStakingAccountUpdate | undefined {
+    const hexId = toHex(id)
+    return this.#updates.get(hexId)
+  }
+
+  private setItem(update: IStakingAccountUpdate): void {
+    const hexId = toHex(update.id)
+    this.#updates.set(hexId, update)
+  }
+
+  private hasFetchedNominations(): boolean {
+    return ![...this.#updates.values()].find(item => item.hasNominations && !!item.nominationsTotal)
+  }
+
+  addNominator(id: Address): void {
+    const existingUpdate = this.getItem(id)
+    if (!existingUpdate) {
+      return this.setItem({
+        id,
+        hasNominations: true,
+        rewards: []
+      })
+    }
+    existingUpdate.hasNominations = true
+  }
+
+  addReward(data: IRewardedData): void {
+    const { id, amount } = data
+    const existingUpdate = this.getItem(id)
+    if (!existingUpdate) {
+      return this.setItem({
+        id: data.id,
+        hasNominations: false,
+        rewards: [data.amount]
+      })
+    }
+    existingUpdate.rewards.push(amount)
+  }
+
+  async fetchTotalNominations(block: Block): Promise<void> {
+    const nominatorIds = [...this.#updates.values()]
+      .filter(acc => !!acc.hasNominations)
+      .map(acc => acc.id)
+    const nominators = await getNominators(this.#ctx, block, nominatorIds)
+    nominators.forEach(nominator => {
+      const update = this.#updates.get(toHex(nominator.id))
+      if (!update) throw new Error(`Could not find pending update for a nominator`)
+      update.nominationsTotal = nominator.total
+    })
+  }
+
+  getAll(): IStakingAccountUpdate[] {
+    if (!this.hasFetchedNominations)
+      this.#ctx.log.child('StakingUpdates').warn('Forgot to fetch nominations')
+    return [...this.#updates.values()]
+  }
+
+  clear(): void {
+    this.#updates.clear()
+  }
 }
 
 const processStaking = async (ctx: Context): Promise<void> => {
-  const pendingUpdates: StakingUpdates = new Map<AddressHex, IStakingAccountUpdate>()
+  const pendingUpdates: StakingUpdates = new StakingUpdates(ctx)
 
   for (const block of ctx.blocks) {
     block.items
@@ -80,46 +132,22 @@ const processStaking = async (ctx: Context): Promise<void> => {
         (Object.values(ParachainStakingNominatorEventName) as string[]).includes(item.name)
       )
       .map(item => getNominatorAddress(ctx, item))
-      .forEach((id: Address) => {
-        const hexId = toHex(id)
-        const pendingUpdate = pendingUpdates.get(hexId)
-        if (pendingUpdate) {
-          pendingUpdate.hasNominations = true
-        } else {
-          pendingUpdates.set(hexId, {
-            id,
-            hasNominations: true,
-            rewards: []
-          })
-        }
-      })
+      .forEach(pendingUpdates.addNominator, pendingUpdates)
 
     block.items
       .filter(item =>
         (Object.values(ParachainStakingRewardsEventName) as string[]).includes(item.name)
       )
       .map(item => getReward(ctx, item))
-      .forEach((data: IRewardedData) => {
-        const hexId = toHex(data.id)
-        const pendingUpdate = pendingUpdates.get(hexId)
-        if (pendingUpdate) {
-          pendingUpdate.rewards.push(data.amount)
-        } else {
-          pendingUpdates.set(hexId, {
-            id: data.id,
-            hasNominations: false,
-            rewards: [data.amount]
-          })
-        }
-      })
+      .forEach(pendingUpdates.addReward, pendingUpdates)
 
     if (lastStateTimestamp == null) {
       lastStateTimestamp = (await getLastChainState(ctx.store))?.timestamp.getTime() ?? 0
     }
 
     if (block.header.timestamp - lastStateTimestamp >= SAVE_PERIOD) {
-      await fetchTotalNominationsForUpdates(ctx, block.header, pendingUpdates)
-      await saveAccounts(ctx, block.header, [...pendingUpdates.values()])
+      await pendingUpdates.fetchTotalNominations(block.header)
+      await saveAccounts(ctx, block.header, pendingUpdates.getAll())
       await setChainState(ctx, block.header)
 
       lastStateTimestamp = block.header.timestamp
@@ -128,8 +156,8 @@ const processStaking = async (ctx: Context): Promise<void> => {
   }
 
   const block = ctx.blocks[ctx.blocks.length - 1]
-  await fetchTotalNominationsForUpdates(ctx, block.header, pendingUpdates)
-  await saveAccounts(ctx, block.header, [...pendingUpdates.values()])
+  await pendingUpdates.fetchTotalNominations(block.header)
+  await saveAccounts(ctx, block.header, pendingUpdates.getAll())
   await setChainState(ctx, block.header)
 }
 
