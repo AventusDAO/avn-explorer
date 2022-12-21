@@ -26,20 +26,20 @@ export async function saveAccounts(
     const updatedAt = block.height
     const existingAccount = existingAccounts.find(acc => acc.id === id)
     if (existingAccount) {
-      const totalRewards = existingAccount.totalRewards + newRewards
-      const stakedAmount = item.nominationsTotal ?? existingAccount.stakedAmount
+      const rewardsTotal = existingAccount.rewardsTotal + newRewards
+      const stakedAmountTotal = item.nominationsTotal ?? existingAccount.stakedAmountTotal
       return new Account({
         id,
-        totalRewards,
+        rewardsTotal,
         updatedAt,
-        stakedAmount
+        stakedAmountTotal
       })
     } else {
       return new Account({
         id,
         updatedAt,
-        totalRewards: newRewards,
-        stakedAmount: item.nominationsTotal ?? 0n
+        rewardsTotal: newRewards,
+        stakedAmountTotal: item.nominationsTotal ?? 0n
       })
     }
   })

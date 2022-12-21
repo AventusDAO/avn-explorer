@@ -16,7 +16,7 @@ export class Account {
     precision: 80,
     scale: 0
   })
-  stakedAmount!: bigint
+  stakedAmountTotal!: bigint
 
   @Column_('numeric', {
     transformer: marshal.bigintTransformer,
@@ -24,7 +24,7 @@ export class Account {
     precision: 80,
     scale: 0
   })
-  totalRewards!: bigint
+  rewardsTotal!: bigint
 
   @Column_('int4', { nullable: true })
   updatedAt!: number | undefined | null
