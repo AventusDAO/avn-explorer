@@ -8,7 +8,8 @@
     "ParachainStaking.NominationRevoked",
     "ParachainStaking.NominationKicked",
     "ParachainStaking.Nomination",
-    "ParachainStaking.NominatorLeftCandidate"
+    "ParachainStaking.NominatorLeftCandidate",
+    "ParachainStaking.Rewarded"
   ],
   "calls": [],
   "storage": ["ParachainStaking.NominatorState"]
