@@ -7,6 +7,7 @@ on:
       - 'apps/balances/**'
       # check if one of the used packages is changed
       - 'packages/types/**'
+      - 'packages/config/**'
       - 'packages/utils/**'
 
 defaults:
