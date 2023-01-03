@@ -9,10 +9,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Install dependencies
         run: yarn
       - name: Run lint checks
         run: yarn lint:check
-      - name: Run prety checks
+      - name: Run pretty checks
         run: yarn prettier:check
