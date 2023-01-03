@@ -1,10 +1,12 @@
-name: Staking Types
+name: Check Staking app TypeScript
 
 on:
   pull_request:
     branches: [main]
     paths:
       - 'apps/staking/**'
+      - 'packages/types/**'
+      - 'packages/utils/**'
 
 defaults:
   run:

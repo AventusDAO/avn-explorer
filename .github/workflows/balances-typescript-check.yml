@@ -1,10 +1,12 @@
-name: Balances Eslint
+name: Check Balances app TypeScript
 
 on:
   pull_request:
     branches: [main]
     paths:
       - 'apps/balances/**'
+      - 'packages/types/**'
+      - 'packages/utils/**'
 
 defaults:
   run:
@@ -18,5 +20,5 @@ jobs:
       - uses: actions/checkout@v2
       - name: Install dependencies
         run: yarn
-      - name: Run Eslint checks
-        run: yarn eslint:check
+      - name: Run typescript checks
+        run: yarn types:check

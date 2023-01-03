@@ -1,14 +1,16 @@
-name: Balances Types
+name: Check Tokens app TypeScript
 
 on:
   pull_request:
     branches: [main]
     paths:
-      - 'apps/balances/**'
+      - 'apps/tokens/**'
+      - 'packages/types/**'
+      - 'packages/utils/**'
 
 defaults:
   run:
-    working-directory: apps/balances
+    working-directory: apps/tokens
 
 jobs:
   Tests:

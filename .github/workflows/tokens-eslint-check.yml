@@ -1,4 +1,4 @@
-name: Tokens Eslint
+name: Check Tokens app Eslint
 
 on:
   pull_request:
