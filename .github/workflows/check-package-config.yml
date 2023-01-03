@@ -11,7 +11,7 @@ defaults:
     working-directory: packages/config
 
 jobs:
-  check_code:
+  check_config_package:
     runs-on: ubuntu-latest
 
     steps:

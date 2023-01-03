@@ -5,7 +5,7 @@ on:
     branches: [main]
 
 jobs:
-  check_code:
+  check_linter_prettier:
     runs-on: ubuntu-latest
 
     steps:

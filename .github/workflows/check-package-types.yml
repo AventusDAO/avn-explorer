@@ -11,7 +11,7 @@ defaults:
     working-directory: packages/types
 
 jobs:
-  check_code:
+  check_types_package:
     runs-on: ubuntu-latest
 
     steps:

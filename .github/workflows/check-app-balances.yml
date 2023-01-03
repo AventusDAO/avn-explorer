@@ -15,18 +15,17 @@ defaults:
     working-directory: apps/balances
 
 jobs:
-  check_code:
+  check_balances_app:
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v2
       - name: Install dependencies
         run: yarn
-      - name: Build types package
-        run: yarn workspaces @avn/types run build
-      - name: Build utils package
-        run: yarn workspaces @avn/config run build
-      - name: Build utils package
-        run: yarn workspaces @avn/utils run build
+      - name: Build dependency packages
+        run: |
+          yarn workspaces @avn/types run build
+          yarn workspaces @avn/config run build
+          yarn workspaces @avn/utils run build
       - name: Run typescript checks
         run: yarn types:check

@@ -11,7 +11,7 @@ defaults:
     working-directory: packages/utils
 
 jobs:
-  check_code:
+  check_utils_package:
     runs-on: ubuntu-latest
 
     steps:
