@@ -14,7 +14,7 @@ defaults:
     working-directory: apps/balances
 
 jobs:
-  Tests:
+  check_code:
     runs-on: ubuntu-latest
 
     steps:

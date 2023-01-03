@@ -14,7 +14,7 @@ defaults:
     working-directory: apps/staking
 
 jobs:
-  Tests:
+  check_code:
     runs-on: ubuntu-latest
 
     steps:
