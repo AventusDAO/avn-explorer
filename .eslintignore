@@ -4,6 +4,5 @@
 next-env.d.ts
 node_modules
 lib
-apps/balances/db/data
-apps/archive/db/pg-admin
-apps/archive/db/data
+# temporary app with errors
+apps/balances-client

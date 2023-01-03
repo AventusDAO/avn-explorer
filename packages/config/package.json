@@ -6,7 +6,7 @@
   "main": "lib/index",
   "typings": "lib/index",
   "scripts": {
-    "check:types": "tsc --pretty --noEmit",
+    "types:check": "tsc --pretty --noEmit",
     "build": "rm -rf lib && tsc",
     "build:watch": "rm -rf lib && tsc -w"
   },

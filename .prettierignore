@@ -8,8 +8,8 @@ public
 lib
 .pnp.cjs
 .pnp.loader.mjs
-apps/balances/db/data
-apps/archive/db/pg-admin
-apps/archive/db/data
+# generated code
 **/types/generated/parachain-dev/**
 **/model/generated/**
+# temporary app with errors
+apps/balances-client

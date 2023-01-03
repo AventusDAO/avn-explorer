@@ -3,7 +3,7 @@
   "private": true,
   "packageManager": "yarn@3.3.0",
   "scripts": {
-    "check:types": "tsc --pretty --noEmit",
+    "types:check": "tsc --pretty --noEmit",
     "build": "rm -rf lib && tsc",
     "build:watch": "tsc -w",
     "dev": "nodemon",

@@ -1,0 +1,22 @@
+name: Tokens Eslint
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'apps/tokens/**'
+
+defaults:
+  run:
+    working-directory: apps/tokens
+
+jobs:
+  Tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install dependencies
+        run: yarn
+      - name: Run Eslint checks
+        run: yarn eslint:check
