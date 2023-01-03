@@ -1,10 +1,13 @@
-name: Check Tokens app Eslint
+name: Check Tokens app
 
 on:
   pull_request:
     branches: [main]
     paths:
       - 'apps/tokens/**'
+      # check if one of the used packages is changed
+      - 'packages/types/**'
+      - 'packages/utils/**'
 
 defaults:
   run:
@@ -18,5 +21,5 @@ jobs:
       - uses: actions/checkout@v2
       - name: Install dependencies
         run: yarn
-      - name: Run Eslint checks
-        run: yarn eslint:check
+      - name: Run typescript checks
+        run: yarn types:check

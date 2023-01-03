@@ -1,16 +1,14 @@
-name: Check Staking app TypeScript
+name: Check Utils package
 
 on:
   pull_request:
     branches: [main]
     paths:
-      - 'apps/staking/**'
-      - 'packages/types/**'
       - 'packages/utils/**'
 
 defaults:
   run:
-    working-directory: apps/staking
+    working-directory: packages/utils
 
 jobs:
   Tests:
@@ -20,5 +18,5 @@ jobs:
       - uses: actions/checkout@v2
       - name: Install dependencies
         run: yarn
-      - name: Run typescript checks
+      - name: Run Typescript checks
         run: yarn types:check

@@ -1,0 +1,18 @@
+name: Check linter and prettier for all apps and packages
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  Tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install dependencies
+        run: yarn
+      - name: Run lint checks
+        run: yarn lint:check
+      - name: Run prety checks
+        run: yarn prettier:check

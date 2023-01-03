@@ -1,16 +1,17 @@
-name: Check Balances app TypeScript
+name: Check Staking app
 
 on:
   pull_request:
     branches: [main]
     paths:
-      - 'apps/balances/**'
+      - 'apps/staking/**'
+      # check if one of the used packages is changed
       - 'packages/types/**'
       - 'packages/utils/**'
 
 defaults:
   run:
-    working-directory: apps/balances
+    working-directory: apps/staking
 
 jobs:
   Tests:
