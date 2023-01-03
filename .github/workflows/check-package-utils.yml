@@ -22,9 +22,9 @@ jobs:
           cache: 'yarn'
       - name: Install dependencies
         run: yarn
-        run: yarn workspaces @avn/types run build
+        run: yarn workspace @avn/types run build
       - name: Build utils package
-        run: yarn workspaces @avn/config run build
+        run: yarn workspace @avn/config run build
       - name: Build utils package
       - name: Run Typescript checks
         run: yarn types:check

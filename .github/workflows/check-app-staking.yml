@@ -28,8 +28,8 @@ jobs:
         run: yarn
       - name: Build dependency packages
         run: |
-          yarn workspaces @avn/types run build
-          yarn workspaces @avn/config run build
-          yarn workspaces @avn/utils run build
+          yarn workspace @avn/types run build
+          yarn workspace @avn/config run build
+          yarn workspace @avn/utils run build
       - name: Run typescript checks
         run: yarn types:check
