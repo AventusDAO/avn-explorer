@@ -11,5 +11,6 @@ lib
 # generated code
 **/types/generated/parachain-dev/**
 **/model/generated/**
+**/db/migrations/*.js
 # temporary app with errors
 apps/balances-client

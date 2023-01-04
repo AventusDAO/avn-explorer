@@ -10,7 +10,6 @@ Add these variable to the app using this package:
 AVN_ENV=parachain-dev
 ```
 
-
 ## Preconfigured repl tool for exploring data programmatically
 
 ```
@@ -20,6 +19,7 @@ yarn repl
 ### Examples:
 
 #### Get block / extrinsics / events data
+
 ```javascript
 > let hash = await api.rpc.chain.getBlockHash(88)
 > let signedBlock = await api.rpc.chain.getBlock(hash)
@@ -34,6 +34,7 @@ yarn repl
 ```
 
 #### Get ParachainStaking events metadata
+
 ```javascript
 > let meta = await api.rpc.state.getMetadata()
 > meta.toJSON().metadata.v14.pallets.filter(p => p.name=='ParachainStaking')

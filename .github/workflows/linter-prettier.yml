@@ -18,6 +18,5 @@ jobs:
         run: yarn
       - name: Run lint checks
         run: yarn lint:check
-      # Disabled temporarily until the Prettier is fixed in the next PR
-      # - name: Run pretty checks
-      #   run: yarn prettier:check
+      - name: Run pretty checks
+        run: yarn prettier:check

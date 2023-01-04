@@ -33,4 +33,3 @@ export const getConfig = (): ProcessorConfig => {
     prometheusPort: process.env.PROCESSOR_PROMETHEUS_PORT
   }
 }
-
