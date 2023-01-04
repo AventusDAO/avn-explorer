@@ -6,3 +6,5 @@ node_modules
 lib
 # temporary app with errors
 apps/balances-client
+# generated migrations code
+**/db/migrations/*.js
