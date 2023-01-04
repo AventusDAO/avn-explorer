@@ -11,7 +11,7 @@
     "prettier:check": "prettier -c .",
     "prettier:fix": "prettier -w .",
     "lint:check": "eslint '*/**/*.{js,ts,tsx}'",
-    "types:check": "yarn workspaces foreach run check:types",
+    "types:check": "yarn workspaces foreach run types:check",
     "build": "yarn workspaces foreach run build"
   },
   "devDependencies": {

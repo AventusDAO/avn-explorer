@@ -1,0 +1,30 @@
+name: Check Utils package
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'packages/utils/**'
+
+defaults:
+  run:
+    working-directory: packages/utils
+
+jobs:
+  check_utils_package:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18.6'
+          cache: 'yarn'
+      - name: Install dependencies
+        run: yarn
+      - name: Build dependency packages
+        run: |
+          yarn workspace @avn/types run build
+          yarn workspace @avn/config run build
+      - name: Run Typescript checks
+        run: yarn types:check

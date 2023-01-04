@@ -1,0 +1,26 @@
+name: Check Types package
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'packages/config/**'
+
+defaults:
+  run:
+    working-directory: packages/config
+
+jobs:
+  check_config_package:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18.6'
+          cache: 'yarn'
+      - name: Install dependencies
+        run: yarn
+      - name: Run Typescript checks
+        run: yarn types:check
