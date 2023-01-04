@@ -194,11 +194,7 @@ async function saveBalances(
   ctx.log.child('balances').info(`updated: ${Object.values(balancesMap).length}`)
 }
 
-function processBalancesCallItem(
-  ctx: Context,
-  item: CallItem,
-  accountIdsHex: Set<string>
-) {
+function processBalancesCallItem(ctx: Context, item: CallItem, accountIdsHex: Set<string>) {
   const call = item.call as SubstrateCall
   if (call.parent != null) return
 
@@ -316,14 +312,9 @@ async function getSystemAccountBalances(
   })) as IBalance[]
 }
 
-
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function getOriginAccountId(origin: any) {
-  if (
-    origin &&
-    origin.__kind === 'system' &&
-    origin.value.__kind === 'Signed'
-  ) {
+  if (origin && origin.__kind === 'system' && origin.value.__kind === 'Signed') {
     return origin.value.value
   } else {
     return undefined

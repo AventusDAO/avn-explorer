@@ -1,4 +1,4 @@
 export interface IBalance {
-    free: bigint
-    reserved: bigint
+  free: bigint
+  reserved: bigint
 }
