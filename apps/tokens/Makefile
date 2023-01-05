@@ -7,7 +7,7 @@ serve:
 
 
 migrate:
-	@yarn processor:migrate
+	@yarn db:migrate
 
 
 migration:

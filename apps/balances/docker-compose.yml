@@ -1,5 +1,9 @@
 version: '3'
 
+volumes:
+  db-data:
+  # pgadmin-data:
+
 services:
   db:
     image: postgres:14
