@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { useQuery, UseQueryState } from 'urql'
 import { TabsEnum } from '../App'
 import { RecentBalance } from '../components/RecentBalance'
@@ -7,30 +7,37 @@ import {
   GetBalancesDocument,
   GetBalancesForAccountDocument
 } from '../graphql/generated-balances-types'
+import { Loading, Error, NoResults } from '../components/States'
+
+const queries = {
+  '': {
+    query: GetBalancesDocument,
+    variables: {}
+  },
+  account: {
+    query: GetBalancesForAccountDocument,
+    variables: (accountId: string) => ({ accountId })
+  }
+}
 
 export function AccountBalances() {
   const [accountId, setAccountId] = useState('')
 
-  let query: any
-  let variables: { accountId?: string } = {}
+  const key = accountId ? 'account' : ''
 
-  if (!accountId) {
-    query = GetBalancesDocument
-  } else {
-    query = GetBalancesForAccountDocument
-    variables = { accountId }
-  }
-  const result = useQuery({ query, variables })[0]
+  const { query, variables } = useMemo(() => queries[key], [accountId])
+  const result: UseQueryState<any, { accountId?: string }> = useQuery({
+    query,
+    variables: typeof variables === 'function' ? variables(accountId) : variables
+  })[0]
 
   if (!result) {
-    throw new Error('no data fetched')
+    throw new Error({ error: 'no data fetched' })
   }
-
   const { fetching, error, data } = result
 
   return (
     <>
-      <input type='text' className='' onChange={e => setAccountId(e.target.value)} />
       <div>
         <label htmlFor='address' className='block text-sm font-medium text-gray-700'>
           Account address
@@ -51,11 +58,11 @@ export function AccountBalances() {
       </div>
       <RecentBalance accountId={accountId} pageType={TabsEnum.BALANCE} />
       {fetching ? (
-        <h3>Loading...</h3>
+        <Loading />
       ) : error ? (
-        <h3 className='text-red-400'>{error.message}</h3>
+        <Error error={error} />
       ) : !data.balances.length ? (
-        <h3>No results!</h3>
+        <NoResults />
       ) : (
         <Table<Balance> data={data?.balances} />
       )}
