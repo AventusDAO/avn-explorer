@@ -1,0 +1,17 @@
+query GetAccounts {
+    accounts{
+        id,
+        stakedAmountTotal,
+        rewardsTotal,
+        updatedAt
+    }
+}
+
+query GetAccountById($accountId:ID!) {
+    accounts( where: { id_eq:$accountId } ) {
+        id,
+        stakedAmountTotal,
+        rewardsTotal,
+        updatedAt
+    }
+}
