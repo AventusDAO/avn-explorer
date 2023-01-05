@@ -17,7 +17,7 @@ services:
       - '${DB_PORT}:5432'
       # command: ["postgres", "-c", "log_statement=all"]
     networks:
-      - balances
+      - staking
 
   # PG Admin is optional.
   # pgadmin:
@@ -33,7 +33,7 @@ services:
   #     - "5544:80"
   #   restart: unless-stopped
   #   networks:
-  #     - balances
+  #     - staking
 
 networks:
-  balances:
+  staking:
