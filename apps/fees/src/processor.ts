@@ -1,0 +1,35 @@
+import { getProcessor } from '@avn/config'
+import {
+  BatchContext,
+  BatchProcessorEventItem,
+  BatchProcessorItem
+} from '@subsquid/substrate-processor'
+import { Store, TypeormDatabase } from '@subsquid/typeorm-store'
+import { getLastChainState, setChainState } from './services/chainState'
+
+type Item = BatchProcessorItem<typeof processor>
+type EventItem = BatchProcessorEventItem<typeof processor>
+export type Context = BatchContext<Store, Item>
+
+const SAVE_PERIOD = 12 * 60 * 60 * 1000
+let lastStateTimestamp: number | undefined
+
+const processor = getProcessor()
+
+const processFees = async (ctx: Context): Promise<void> => {
+  for (const block of ctx.blocks) {
+    if (lastStateTimestamp == null) {
+      lastStateTimestamp = (await getLastChainState(ctx.store))?.timestamp.getTime() ?? 0
+    }
+
+    if (block.header.timestamp - lastStateTimestamp >= SAVE_PERIOD) {
+      await setChainState(ctx, block.header)
+      lastStateTimestamp = block.header.timestamp
+    }
+  }
+
+  const block = ctx.blocks[ctx.blocks.length - 1]
+  await setChainState(ctx, block.header)
+}
+
+processor.run(new TypeormDatabase(), processFees)

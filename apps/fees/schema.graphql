@@ -1,0 +1,11 @@
+type Account @entity {
+  id: ID!
+  feesTotal: BigInt!
+  updatedAt: Int
+}
+
+type ChainState @entity {
+  id: ID!
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+}
