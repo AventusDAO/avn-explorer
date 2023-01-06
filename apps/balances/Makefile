@@ -26,7 +26,7 @@ typegen-testnet:
 	@yarn squid-substrate-typegen ./typegen/typegen.testnet.json
 
 
-typegen-parachain:
+typegen-parachain-dev:
 	@yarn squid-substrate-typegen ./typegen/typegen-parachain.dev.json
 
 
