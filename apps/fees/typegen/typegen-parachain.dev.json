@@ -1,7 +1,7 @@
 {
   "outDir": "../src/types/generated/parachain-dev",
   "specVersions": "../../../packages/metadata/versions-parachain.dev.jsonl",
-  "events": [],
+  "events": ["transactionPayment.TransactionFeePaid"],
   "calls": [],
   "storage": []
 }
