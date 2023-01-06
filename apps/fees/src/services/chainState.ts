@@ -25,7 +25,7 @@ export async function setChainState(
 }
 
 export async function getLastChainState(store: Store): Promise<ChainState | undefined> {
-  return store.get(ChainState, {
+  return await store.get(ChainState, {
     where: {},
     order: {
       timestamp: 'DESC'
