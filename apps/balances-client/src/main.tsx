@@ -7,12 +7,12 @@ export const balancesClient = createClient({
   url: import.meta.env.VITE_BALANCES_URL || 'http://localhost:4350/graphql'
 })
 
-export const stakingClient = createClient({
-  url: import.meta.env.VITE_STAKING_URL || 'http://localhost:4352/graphql'
-})
-
 export const tokensClient = createClient({
   url: import.meta.env.VITE_TOKENS_URL || 'http://localhost:4351/graphql'
+})
+
+export const stakingClient = createClient({
+  url: import.meta.env.VITE_STAKING_URL || 'http://localhost:4352/graphql'
 })
 
 ReactDOM.createRoot(document.getElementById('root') as HTMLElement).render(
