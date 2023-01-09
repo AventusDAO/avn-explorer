@@ -9,7 +9,7 @@ export type Context = BatchContext<Store, Item>
 const SAVE_PERIOD = 12 * 60 * 60 * 1000
 let lastStateTimestamp: number | undefined
 
-const processor = getProcessor().addEvent('transactionPayment.TransactionFeePaid')
+const processor = getProcessor().addEvent('TransactionPayment.TransactionFeePaid')
 
 const processFees = async (ctx: Context): Promise<void> => {
   for (const block of ctx.blocks) {
@@ -20,7 +20,7 @@ const processFees = async (ctx: Context): Promise<void> => {
         if (item.kind !== 'event') {
           throw new Error(`item must be of 'event' kind`)
         }
-        if (item.event.name === 'transactionPayment.TransactionFeePaid') {
+        if (item.event.name === 'TransactionPayment.TransactionFeePaid') {
           console.log(item.event)
         }
       })
