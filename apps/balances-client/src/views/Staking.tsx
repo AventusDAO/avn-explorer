@@ -1,31 +1,29 @@
-import { useState, useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { useQuery, UseQueryState } from 'urql'
-import { TabsEnum } from '../App'
-import { RecentBalance } from '../components/RecentBalance'
-import { Table, Balance } from '../components/Table'
-import {
-  GetBalancesDocument,
-  GetBalancesForAccountDocument
-} from '../graphql/generated-balances-types'
-import { Loading, Error, NoResults } from '../components/States'
+import { Loading, NoResults } from '../components/States'
+import { Staking, Table } from '../components/Table'
+import { GetAccountByIdDocument, GetAccountsDocument } from '../graphql/generated-staking-types'
 
 const queries = {
   '': {
-    query: GetBalancesDocument,
+    query: GetAccountsDocument,
     variables: {}
   },
-  account: {
-    query: GetBalancesForAccountDocument,
+  id: {
+    query: GetAccountByIdDocument,
     variables: (accountId: string) => ({ accountId })
   }
 }
 
-export function AccountBalances() {
+function formatStakingAccountData(data: Staking[]): Staking[] {
+  return data.map((entry: Staking) => ({ accountId: entry.id, ...entry }))
+}
+
+export function StakingView() {
   const [accountId, setAccountId] = useState('')
+  const key = accountId ? 'id' : ''
 
-  const key = accountId ? 'account' : ''
-
-  const { query, variables } = useMemo(() => queries[key], [accountId])
+  const { query, variables } = queries[key]
   const result: UseQueryState<any, { accountId?: string }> = useQuery({
     query,
     variables: typeof variables === 'function' ? variables(accountId) : variables
@@ -56,15 +54,14 @@ export function AccountBalances() {
           />
         </div>
       </div>
-      <RecentBalance accountId={accountId} pageType={TabsEnum.BALANCE} />
       {fetching ? (
         <Loading />
       ) : error ? (
         <Error error={error} />
-      ) : !data.balances.length ? (
+      ) : !data.accounts.length ? (
         <NoResults />
       ) : (
-        <Table<Balance> data={data?.balances} />
+        <Table<Staking> data={formatStakingAccountData(data?.accounts)} />
       )}
     </>
   )

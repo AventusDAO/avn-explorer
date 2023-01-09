@@ -11,6 +11,11 @@ const config: CodegenConfig = {
       schema: 'http://localhost:4351/graphql',
       documents: './src/**/tokenBalances.query.graphql',
       plugins: ['typescript', 'typescript-operations', 'typed-document-node']
+    },
+    './src/graphql/generated-staking-types.ts': {
+      schema: 'http://localhost:4352/graphql',
+      documents: './src/**/staking.query.graphql',
+      plugins: ['typescript', 'typescript-operations', 'typed-document-node']
     }
   }
 }

@@ -18,6 +18,14 @@ export class TokenBalance {
   accountId: string = ''
 }
 
+export class Staking {
+  id: string = ''
+  rewardsTotal: string = ''
+  stakedAmountTotal: string = ''
+  updatedAt: string = ''
+  accountId?: string
+}
+
 type TableProps<T> = {
   data?: T[]
 }
@@ -33,13 +41,14 @@ export function Table<T extends object>(props: TableProps<T>): JSX.Element {
   const pageIndex = pageNumber * recordsPerPage
   const maxPageNumber = Math.floor((data.length - 1) / recordsPerPage)
 
-  console.log(pageNumber)
   const items = data
     .sort((a, b) => {
       if (a instanceof Balance && b instanceof Balance) {
         return a.total < b.total ? 1 : -1
       } else if (a instanceof TokenBalance && b instanceof TokenBalance) {
         return a.amount < b.amount ? 1 : -1
+      } else if (a instanceof Staking && b instanceof Staking) {
+        return a.rewardsTotal < b.rewardsTotal ? 1 : -1
       }
       return 0
     })
