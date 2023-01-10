@@ -2,6 +2,7 @@ import { getProcessor } from '@avn/config'
 import { BatchContext, BatchProcessorItem } from '@subsquid/substrate-processor'
 import { Store, TypeormDatabase } from '@subsquid/typeorm-store'
 import { feesEventHandlers } from '../handlers/feesHandler'
+import { saveAccounts } from '../services/accounts'
 import { BatchUpdates } from '../services/batchUpdates'
 import { getLastChainState, setChainState } from '../services/chainState'
 
@@ -11,7 +12,15 @@ export type Context = BatchContext<Store, Item>
 const SAVE_PERIOD = 12 * 60 * 60 * 1000
 let lastStateTimestamp: number | undefined
 
-const processor = getProcessor().addEvent('TransactionPayment.TransactionFeePaid')
+const processor = getProcessor().addEvent('TransactionPayment.TransactionFeePaid', {
+  data: {
+    event: {
+      args: true,
+      extrinsic: false,
+      call: false
+    }
+  }
+})
 
 const processFees = async (ctx: Context): Promise<void> => {
   const pendingUpdates: BatchUpdates = new BatchUpdates()
@@ -25,7 +34,8 @@ const processFees = async (ctx: Context): Promise<void> => {
         if (item.kind !== 'event') throw new Error(`item must be of 'event' kind`)
         if (item.name === '*') throw new Error('unexpected wildcard name')
         const handler = feesEventHandlers[item.name]
-        return handler(ctx, item.event)
+        const data = handler(ctx, item.event)
+        return data
       })
       .forEach(pendingUpdates.addFeePaid, pendingUpdates)
 
@@ -35,7 +45,7 @@ const processFees = async (ctx: Context): Promise<void> => {
 
     if (block.header.timestamp - lastStateTimestamp >= SAVE_PERIOD) {
       const updatesData = await pendingUpdates.getAllData()
-      // await saveAccounts(ctx, block.header, updatesData)
+      await saveAccounts(ctx, block.header, updatesData)
       await setChainState(ctx, block.header)
 
       lastStateTimestamp = block.header.timestamp
@@ -45,7 +55,7 @@ const processFees = async (ctx: Context): Promise<void> => {
 
   const block = ctx.blocks[ctx.blocks.length - 1]
   const updatesData = await pendingUpdates.getAllData()
-  // await saveAccounts(ctx, block.header, updatesData)
+  await saveAccounts(ctx, block.header, updatesData)
   await setChainState(ctx, block.header)
   pendingUpdates.clear()
 }
