@@ -1,7 +1,6 @@
 import { Address, AddressHex } from '@avn/types'
 import { toHex } from '@subsquid/substrate-processor'
 import { IFeePaidData, IFeesAccountUpdate } from '../types/custom'
-import { Block } from '../types/generated/parachain-dev/support'
 
 export class BatchUpdates {
   #updates = new Map<AddressHex, IFeesAccountUpdate>()

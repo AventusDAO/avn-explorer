@@ -6,7 +6,6 @@ import { AddressHex } from '@avn/types'
 import { BatchUpdates } from '../services/batchUpdates'
 import { IFeePaidData } from '../types/custom'
 import { saveAccounts } from '../services/accounts'
-import { encodeId } from '@avn/utils'
 
 type Item = BatchProcessorItem<typeof processor>
 export type Context = BatchContext<Store, Item>
