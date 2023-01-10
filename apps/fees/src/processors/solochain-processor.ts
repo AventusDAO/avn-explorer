@@ -43,6 +43,17 @@ const processFees = async (ctx: Context): Promise<void> => {
     // get the accounts and the fees paid
     block.items
       .filter(item => item.kind === 'call' && !!item.extrinsic.signature?.address)
+      .reduce((array, item) => {
+        if (item.kind !== 'call') {
+          throw new Error(`item must be of 'call' kind`)
+        }
+        // reduce the items array to a smaller array based on the extrinsic.id of the call
+        // to avoid duplicating fees in utility.batchAll extrinsic
+        const hasSameExtrinsicAlready =
+          array.filter(i => i.kind === 'call' && i.extrinsic.id === item.extrinsic.id).length > 0
+        if (!hasSameExtrinsicAlready) array.push(item)
+        return array
+      }, new Array<Item>())
       .map(item => {
         if (item.kind !== 'call') {
           throw new Error(`item must be of 'call' kind`)
