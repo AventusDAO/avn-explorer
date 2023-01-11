@@ -7,3 +7,7 @@ const config = getConfig()
 export function encodeId(id: Uint8Array, prefix: NetworkPrefix = config.prefix): AddressEncoded {
   return codec(prefix).encode(id)
 }
+
+export function decodeId(id: AddressEncoded, prefix: NetworkPrefix = config.prefix): Uint8Array {
+  return codec(prefix).decode(id)
+}
