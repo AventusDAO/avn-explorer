@@ -207,12 +207,13 @@ async function saveBalances(
 }
 
 function decodeBalance(balanceAsBigEndianHex: string): bigint {
-  const match = balanceAsBigEndianHex.match(/.{2}/g)
+  const cleanedHex = balanceAsBigEndianHex.replace(/^0x/, '')
+  const match = cleanedHex.match(/.{2}/g)
   if (!match) return 0n
   const balanceAsLittleEndian = match.reverse().join('')
-  const cleanedHex = balanceAsLittleEndian.replace(/[^0-9A-Fa-f]/g, '')
-  return BigInt('0x' + cleanedHex) / BigInt(Number.MAX_SAFE_INTEGER)
+  return BigInt(balanceAsLittleEndian)
 }
+
 
 function extractPublicKey(tuple: string): string {
   const parts = tuple.match(/.{64}/g)
@@ -223,8 +224,8 @@ function extractPublicKey(tuple: string): string {
 
 function processEncodedMigratedAccountData(migratedAccountData: [string, string]): MigratedAccount {
   const publicKey = extractPublicKey(migratedAccountData[0])
-  const free = decodeBalance(migratedAccountData[1].slice(0, 64))
-  const reserved = decodeBalance(migratedAccountData[1].slice(64, 128))
+  const free = decodeBalance(migratedAccountData[1].slice(32, 64))
+  const reserved = decodeBalance(migratedAccountData[1].slice(64, 94))
 
   return {
     publicKey: publicKey,
