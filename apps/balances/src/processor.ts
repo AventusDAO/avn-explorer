@@ -14,15 +14,15 @@ import { getProcessor } from '@avn/config'
 import { getLastChainState, saveCurrentChainState, saveRegularChainState } from './chainState'
 import { Account, Balance } from './model'
 import {
-  getBalanceSetAccount,
-  getDepositAccount,
-  getEndowedAccount,
-  getReservedAccount,
-  getReserveRepatriatedAccounts,
-  getSlashedAccount,
-  getTransferAccounts,
-  getUnreservedAccount,
-  getWithdrawAccount
+  getAccountFromBalanceSetEvent,
+  getAccountFromDepositEvent,
+  getAccountFromEndowedEvent,
+  getAccountFromReservedEvent,
+  getAccountFromSlashedEvent,
+  getAccountFromUnreservedEvent,
+  getAccountFromWithdrawEvent,
+  getAccountsFromTransferEvent,
+  getAccountsReserveRepatriatedEvent
 } from './eventHandlers'
 import { IBalance } from './types/custom/balance'
 
@@ -101,18 +101,20 @@ async function processBalances(ctx: Context): Promise<void> {
     if (lastStateTimestamp == null) {
       lastStateTimestamp = (await getLastChainState(ctx.store))?.timestamp.getTime() ?? 0
     }
-    if (block.header.timestamp - lastStateTimestamp >= SAVE_PERIOD) {
-      const accountIdsU8 = [...accountIdsHex].map(id => decodeHex(id))
-      balances = await getBalances(ctx, block.header, accountIdsU8)
-      if (!balances) {
-        ctx.log.warn('No balances')
+    if (lastStateTimestamp) {
+      if (block.header.timestamp - lastStateTimestamp >= SAVE_PERIOD) {
+        const accountIdsU8 = [...accountIdsHex].map(id => decodeHex(id))
+        balances = await getBalances(ctx, block.header, accountIdsU8)
+        if (!balances) {
+          ctx.log.warn('No balances')
+        }
+
+        await saveAccounts(ctx, block.header, accountIdsU8, balances)
+        await saveRegularChainState(ctx, block.header)
+
+        lastStateTimestamp = block.header.timestamp
+        accountIdsHex.clear()
       }
-
-      await saveAccounts(ctx, block.header, accountIdsU8, balances)
-      await saveRegularChainState(ctx, block.header)
-
-      lastStateTimestamp = block.header.timestamp
-      accountIdsHex.clear()
     }
   }
 
@@ -204,29 +206,25 @@ async function saveBalances(
   ctx.log.child('balances').info(`updated: ${Object.values(balancesMap).length}`)
 }
 
-function decodeBalance(num: string): bigint {
-  return (
-    BigInt(
-      '0x' +
-        num
-          .match(/.{2}/g)!
-          .reverse()
-          .join('')
-          .replace(/[^0-9A-Fa-f]/g, '')
-    ) / BigInt(Number.MAX_SAFE_INTEGER)
-  )
+function decodeBalance(balanceAsBigEndianHex: string): bigint {
+  const match = balanceAsBigEndianHex.match(/.{2}/g)
+  if (!match) return 0n
+  const balanceAsLittleEndian = match.reverse().join('')
+  const cleanedHex = balanceAsLittleEndian.replace(/[^0-9A-Fa-f]/g, '')
+  return BigInt('0x' + cleanedHex) / BigInt(Number.MAX_SAFE_INTEGER)
 }
 
 function extractPublicKey(tuple: string): string {
-  let parts = tuple.match(/.{64}/g)!
-  let publicKey = '0x' + parts.pop()
+  const parts = tuple.match(/.{64}/g)
+  if (!parts) return ''
+  const publicKey = `0x${parts.pop()}`
   return publicKey
 }
 
 function processEncodedMigratedAccountData(migratedAccountData: [string, string]): MigratedAccount {
-  let publicKey = extractPublicKey(migratedAccountData[0])
-  let free = decodeBalance(migratedAccountData[1].slice(0, 64))
-  let reserved = decodeBalance(migratedAccountData[1].slice(64, 128))
+  const publicKey = extractPublicKey(migratedAccountData[0])
+  const free = decodeBalance(migratedAccountData[1].slice(0, 64))
+  const reserved = decodeBalance(migratedAccountData[1].slice(64, 128))
 
   return {
     publicKey: publicKey,
@@ -284,7 +282,6 @@ async function processBalancesCallItem(
   }
 }
 
-
 function processBalancesEventItem(
   ctx: Context,
   item: EventItem,
@@ -293,51 +290,54 @@ function processBalancesEventItem(
 ) {
   switch (item.name) {
     case 'Balances.BalanceSet': {
-      const account = getBalanceSetAccount(ctx, item.event)
-
-      accountIdsHex.add(account)
+      const account = getAccountFromBalanceSetEvent(ctx, item.event)
+      if (!(account instanceof Error)) accountIdsHex.add(account)
       break
     }
     case 'Balances.Endowed': {
-      const account = getEndowedAccount(ctx, item.event)
-      accountIdsHex.add(account)
+      const account = getAccountFromEndowedEvent(ctx, item.event)
+      if (!(account instanceof Error)) accountIdsHex.add(account)
       break
     }
     case 'Balances.Deposit': {
-      const account = getDepositAccount(ctx, item.event)
-      accountIdsHex.add(account)
+      const account = getAccountFromDepositEvent(ctx, item.event)
+      if (!(account instanceof Error)) accountIdsHex.add(account)
       break
     }
     case 'Balances.Reserved': {
-      const account = getReservedAccount(ctx, item.event)
-      accountIdsHex.add(account)
+      const account = getAccountFromReservedEvent(ctx, item.event)
+      if (!(account instanceof Error)) accountIdsHex.add(account)
       break
     }
     case 'Balances.Unreserved': {
-      const account = getUnreservedAccount(ctx, item.event)
-      accountIdsHex.add(account)
+      const account = getAccountFromUnreservedEvent(ctx, item.event)
+      if (!(account instanceof Error)) accountIdsHex.add(account)
       break
     }
     case 'Balances.Withdraw': {
-      const account = getWithdrawAccount(ctx, item.event)
-      accountIdsHex.add(account)
+      const account = getAccountFromWithdrawEvent(ctx, item.event)
+      if (!(account instanceof Error)) accountIdsHex.add(account)
       break
     }
     case 'Balances.Slashed': {
-      const account = getSlashedAccount(ctx, item.event)
-      accountIdsHex.add(account)
+      const account = getAccountFromSlashedEvent(ctx, item.event)
+      if (!(account instanceof Error)) accountIdsHex.add(account)
       break
     }
     case 'Balances.Transfer': {
-      const accounts = getTransferAccounts(ctx, item.event)
-      accountIdsHex.add(accounts[0])
-      accountIdsHex.add(accounts[1])
+      const accounts = getAccountsFromTransferEvent(ctx, item.event)
+      if (!(accounts instanceof Error)) {
+        accountIdsHex.add(accounts[0])
+        accountIdsHex.add(accounts[1])
+      }
       break
     }
     case 'Balances.ReserveRepatriated': {
-      const accounts = getReserveRepatriatedAccounts(ctx, item.event)
-      accountIdsHex.add(accounts[0])
-      accountIdsHex.add(accounts[1])
+      const accounts = getAccountsReserveRepatriatedEvent(ctx, item.event)
+      if (!(accounts instanceof Error)) {
+        accountIdsHex.add(accounts[0])
+        accountIdsHex.add(accounts[1])
+      }
       break
     }
   }
@@ -394,7 +394,7 @@ async function getSystemAccountBalances(
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function getOriginAccountId(origin: any) {
+export function getOriginAccountId(origin: any): string | undefined {
   if (origin && origin.__kind === 'system' && origin.value.__kind === 'Signed') {
     return origin.value.value
   } else {

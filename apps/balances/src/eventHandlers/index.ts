@@ -16,7 +16,7 @@ import {
 import { BalancesTotalIssuanceStorage } from '../types/generated/parachain-dev/storage'
 import { Block, ChainContext, Event } from '../types/generated/parachain-dev/support'
 
-export function getBalanceSetAccount(ctx: ChainContext, event: Event) {
+export function getAccountFromBalanceSetEvent(ctx: ChainContext, event: Event): string | Error {
   const data = new BalancesBalanceSetEvent(ctx, event)
 
   if (data.isV4) {
@@ -26,7 +26,7 @@ export function getBalanceSetAccount(ctx: ChainContext, event: Event) {
   }
 }
 
-export function getTransferAccounts(ctx: ChainContext, event: Event) {
+export function getAccountsFromTransferEvent(ctx: ChainContext, event: Event): string[] | Error {
   const data = new BalancesTransferEvent(ctx, event)
   // ctx._chain.getStorage // what was it?
   if (data.isV4) {
@@ -36,7 +36,7 @@ export function getTransferAccounts(ctx: ChainContext, event: Event) {
   }
 }
 
-export function getEndowedAccount(ctx: ChainContext, event: Event) {
+export function getAccountFromEndowedEvent(ctx: ChainContext, event: Event): string | Error {
   const data = new BalancesEndowedEvent(ctx, event)
 
   if (data.isV4) {
@@ -46,7 +46,7 @@ export function getEndowedAccount(ctx: ChainContext, event: Event) {
   }
 }
 
-export function getDepositAccount(ctx: ChainContext, event: Event) {
+export function getAccountFromDepositEvent(ctx: ChainContext, event: Event): string | Error {
   const data = new BalancesDepositEvent(ctx, event)
 
   if (data.isV4) {
@@ -56,7 +56,7 @@ export function getDepositAccount(ctx: ChainContext, event: Event) {
   }
 }
 
-export function getReservedAccount(ctx: ChainContext, event: Event) {
+export function getAccountFromReservedEvent(ctx: ChainContext, event: Event): string | Error {
   const data = new BalancesReservedEvent(ctx, event)
 
   if (data.isV4) {
@@ -66,7 +66,7 @@ export function getReservedAccount(ctx: ChainContext, event: Event) {
   }
 }
 
-export function getUnreservedAccount(ctx: ChainContext, event: Event) {
+export function getAccountFromUnreservedEvent(ctx: ChainContext, event: Event): string | Error {
   const data = new BalancesUnreservedEvent(ctx, event)
 
   if (data.isV4) {
@@ -76,7 +76,7 @@ export function getUnreservedAccount(ctx: ChainContext, event: Event) {
   }
 }
 
-export function getWithdrawAccount(ctx: ChainContext, event: Event) {
+export function getAccountFromWithdrawEvent(ctx: ChainContext, event: Event): string | Error {
   const data = new BalancesWithdrawEvent(ctx, event)
 
   if (data.isV4) {
@@ -86,7 +86,7 @@ export function getWithdrawAccount(ctx: ChainContext, event: Event) {
   }
 }
 
-export function getSlashedAccount(ctx: ChainContext, event: Event) {
+export function getAccountFromSlashedEvent(ctx: ChainContext, event: Event): string | Error {
   const data = new BalancesSlashedEvent(ctx, event)
 
   if (data.isV4) {
@@ -96,7 +96,10 @@ export function getSlashedAccount(ctx: ChainContext, event: Event) {
   }
 }
 
-export function getReserveRepatriatedAccounts(ctx: ChainContext, event: Event) {
+export function getAccountsReserveRepatriatedEvent(
+  ctx: ChainContext,
+  event: Event
+): string[] | Error {
   const data = new BalancesReserveRepatriatedEvent(ctx, event)
 
   if (data.isV4) {
@@ -106,7 +109,10 @@ export function getReserveRepatriatedAccounts(ctx: ChainContext, event: Event) {
   }
 }
 
-export async function getTotalIssuance(ctx: ChainContext, block: Block) {
+export async function getTotalIssuance(
+  ctx: ChainContext,
+  block: Block
+): Promise<bigint | Error | undefined> {
   const storage = new BalancesTotalIssuanceStorage(ctx, block)
   if (!storage.isExists) return undefined
 
@@ -117,16 +123,18 @@ export async function getTotalIssuance(ctx: ChainContext, block: Block) {
   throw new UnknownVersionError(storage.constructor.name)
 }
 
-export function getMigratedSystemAccounts(ctx: ChainContext, event: Event) {
+export function getMigratedSystemAccounts(ctx: ChainContext, event: Event): number | Error {
   const data = new MigrationMigratedSystemAccountsEvent(ctx, event)
   if (data.isV4) {
-    ctx._chain.queryStorage
     return data.asV4
   }
   throw new UnknownVersionError(data.constructor.name)
 }
 
-export async function getMigratedTotalIssuance(ctx: ChainContext, event: Event) {
+export async function getMigratedTotalIssuance(
+  ctx: ChainContext,
+  event: Event
+): Promise<bigint[] | Error> {
   const data = new MigrationMigratedTotalIssuanceEvent(ctx, event)
 
   if (data.isV4) {

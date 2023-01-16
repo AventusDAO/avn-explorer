@@ -3,12 +3,16 @@ import { Store } from '@subsquid/typeorm-store'
 import { getTotalIssuance } from './eventHandlers'
 import { Account, ChainState } from './model'
 
-export async function getChainState(ctx: BatchContext<Store, unknown>, block: SubstrateBlock) {
+export async function getChainState(
+  ctx: BatchContext<Store, unknown>,
+  block: SubstrateBlock
+): Promise<ChainState> {
   const state = new ChainState({ id: block.id })
 
   state.timestamp = new Date(block.timestamp)
   state.blockNumber = block.height
-  state.tokenBalance = (await getTotalIssuance(ctx, block)) ?? 0n
+  const totalIssuance = await getTotalIssuance(ctx, block)
+  if (!(totalIssuance instanceof Error)) state.tokenBalance = totalIssuance ?? 0n
 
   state.tokenHolders = await ctx.store.count(Account)
 
@@ -18,7 +22,7 @@ export async function getChainState(ctx: BatchContext<Store, unknown>, block: Su
 export async function saveRegularChainState(
   ctx: BatchContext<Store, unknown>,
   block: SubstrateBlock
-) {
+): Promise<void> {
   const state = await getChainState(ctx, block)
   await ctx.store.insert(state)
 
@@ -28,12 +32,12 @@ export async function saveRegularChainState(
 export async function saveCurrentChainState(
   ctx: BatchContext<Store, unknown>,
   block: SubstrateBlock
-) {
+): Promise<void> {
   const state = await getChainState(ctx, block)
   await ctx.store.save(new ChainState({ ...state, id: '0' }))
 }
 
-export async function getLastChainState(store: Store) {
+export async function getLastChainState(store: Store): Promise<ChainState | undefined> {
   return await store.get(ChainState, {
     where: {},
     order: {
