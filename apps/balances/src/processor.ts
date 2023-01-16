@@ -5,7 +5,8 @@ import {
   BatchProcessorItem,
   decodeHex,
   SubstrateBlock,
-  SubstrateCall
+  SubstrateCall,
+  SubstrateExtrinsic
 } from '@subsquid/substrate-processor'
 import { Store, TypeormDatabase } from '@subsquid/typeorm-store'
 import { randomUUID } from 'crypto'
@@ -60,6 +61,15 @@ const processor = getProcessor()
   .addEvent('Balances.Slashed', {
     data: { event: { args: true } }
   } as const)
+  .addEvent('Migration.MigratedSystemAccounts', {
+    data: { event: { args: true } }
+  } as const)
+  .addEvent('Migration.MigratedTotalIssuance', {
+    data: { event: { args: true } }
+  } as const)
+  .addCall('Migration.migrate_system_account', {
+    data: { call: { origin: true }, extrinsic: { call: { args: true } } }
+  } as const)
   .addCall('*', {
     data: { call: { origin: true } }
   } as const)
@@ -82,7 +92,7 @@ async function processBalances(ctx: Context): Promise<void> {
   for (const block of ctx.blocks) {
     for (const item of block.items) {
       if (item.kind === 'call') {
-        processBalancesCallItem(ctx, item, accountIdsHex)
+        await processBalancesCallItem(ctx, item, accountIdsHex, block.header)
       } else if (item.kind === 'event') {
         processBalancesEventItem(ctx, item, accountIdsHex, block.header)
       }
@@ -194,15 +204,86 @@ async function saveBalances(
   ctx.log.child('balances').info(`updated: ${Object.values(balancesMap).length}`)
 }
 
-function processBalancesCallItem(ctx: Context, item: CallItem, accountIdsHex: Set<string>) {
-  const call = item.call as SubstrateCall
-  if (call.parent != null) return
-
-  const id = getOriginAccountId(call.origin)
-  if (id == null) return
-
-  accountIdsHex.add(id)
+function decodeBalance(num: string): bigint {
+  return (
+    BigInt(
+      '0x' +
+        num
+          .match(/.{2}/g)!
+          .reverse()
+          .join('')
+          .replace(/[^0-9A-Fa-f]/g, '')
+    ) / BigInt(Number.MAX_SAFE_INTEGER)
+  )
 }
+
+function extractPublicKey(tuple: string): string {
+  let parts = tuple.match(/.{64}/g)!
+  let publicKey = '0x' + parts.pop()
+  return publicKey
+}
+
+function processEncodedMigratedAccountData(migratedAccountData: [string, string]): MigratedAccount {
+  let publicKey = extractPublicKey(migratedAccountData[0])
+  let free = decodeBalance(migratedAccountData[1].slice(0, 64))
+  let reserved = decodeBalance(migratedAccountData[1].slice(64, 128))
+
+  return {
+    publicKey: publicKey,
+    balance: {
+      free,
+      reserved
+    }
+  }
+}
+type MigratedAccount = {
+  publicKey: string
+  balance: IBalance
+}
+
+async function processBalancesCallItem(
+  ctx: Context,
+  item: CallItem,
+  accountIdsHex: Set<string>,
+  block: SubstrateBlock
+) {
+  switch (item.name) {
+    case 'Migration.migrate_system_account': {
+      const balances: IBalance[] = []
+      const accountIds = new Set<string>()
+      const extrinsic = item.extrinsic as SubstrateExtrinsic
+      const accountBatches = extrinsic.call.args.calls.map((c: any) => {
+        return c.value.call.value.accounts
+      })
+
+      for (const batch of accountBatches) {
+        for (const migratedAccountData of batch) {
+          const migratedAccount = processEncodedMigratedAccountData(migratedAccountData)
+          accountIds.add(migratedAccount.publicKey)
+          balances.push(migratedAccount.balance)
+        }
+      }
+
+      const accountIdsU8 = [...accountIdsHex].map(id => decodeHex(id))
+      // const block = ctx.blocks[ctx.blocks.length - 1]
+      await saveAccounts(ctx, block, accountIdsU8, balances)
+      await saveBalances(ctx, block, accountIdsU8, balances)
+      await saveCurrentChainState(ctx, block)
+      break
+    }
+    default: {
+      const call = item.call as SubstrateCall
+
+      if (call.parent != null) return
+
+      const id = getOriginAccountId(call.origin)
+      if (id == null) return
+      accountIdsHex.add(id)
+      break
+    }
+  }
+}
+
 
 function processBalancesEventItem(
   ctx: Context,

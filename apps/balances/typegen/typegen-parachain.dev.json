@@ -10,8 +10,15 @@
     "Balances.ReserveRepatriated",
     "Balances.Deposit",
     "Balances.Withdraw",
-    "Balances.Slashed"
+    "Balances.Slashed",
+    "Migration.MigratedSystemAccounts",
+    "Migration.MigratedTotalIssuance"
   ],
   "calls": [],
-  "storage": ["System.Account", "Balances.Account", "Balances.TotalIssuance"]
+  "storage": [
+    "System.Account",
+    "Balances.Account",
+    "Balances.TotalIssuance",
+    "Migration.migrate_system_account"
+  ]
 }
