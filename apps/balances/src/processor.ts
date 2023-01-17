@@ -259,37 +259,37 @@ function processBalancesEventItem(
   switch (item.name) {
     case 'Balances.BalanceSet': {
       const account = getAccountFromBalanceSetEvent(ctx, item.event)
-      if (!(account instanceof Error)) accountIdsHex.add(account)
+      accountIdsHex.add(account)
       break
     }
     case 'Balances.Endowed': {
       const account = getAccountFromEndowedEvent(ctx, item.event)
-      if (!(account instanceof Error)) accountIdsHex.add(account)
+      accountIdsHex.add(account)
       break
     }
     case 'Balances.Deposit': {
       const account = getAccountFromDepositEvent(ctx, item.event)
-      if (!(account instanceof Error)) accountIdsHex.add(account)
+      accountIdsHex.add(account)
       break
     }
     case 'Balances.Reserved': {
       const account = getAccountFromReservedEvent(ctx, item.event)
-      if (!(account instanceof Error)) accountIdsHex.add(account)
+      accountIdsHex.add(account)
       break
     }
     case 'Balances.Unreserved': {
       const account = getAccountFromUnreservedEvent(ctx, item.event)
-      if (!(account instanceof Error)) accountIdsHex.add(account)
+      accountIdsHex.add(account)
       break
     }
     case 'Balances.Withdraw': {
       const account = getAccountFromWithdrawEvent(ctx, item.event)
-      if (!(account instanceof Error)) accountIdsHex.add(account)
+      accountIdsHex.add(account)
       break
     }
     case 'Balances.Slashed': {
       const account = getAccountFromSlashedEvent(ctx, item.event)
-      if (!(account instanceof Error)) accountIdsHex.add(account)
+      accountIdsHex.add(account)
       break
     }
     case 'Balances.Transfer': {

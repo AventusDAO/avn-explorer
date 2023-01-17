@@ -1,4 +1,5 @@
 import { IBalance } from './types/custom/balance'
+import { AddressEncoded } from '@avn/types'
 
 export function decodeBalance(balanceAsHex: string): bigint {
   const match = balanceAsHex.match(/.{2}/g)
@@ -32,6 +33,6 @@ export function processEncodedMigratedAccountData(
 }
 
 type MigratedAccount = {
-  publicKey: string
+  publicKey: AddressEncoded
   balance: IBalance
 }

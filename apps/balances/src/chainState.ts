@@ -12,7 +12,7 @@ export async function getChainState(
   state.timestamp = new Date(block.timestamp)
   state.blockNumber = block.height
   const totalIssuance = await getTotalIssuance(ctx, block)
-  if (!(totalIssuance instanceof Error)) state.tokenBalance = totalIssuance ?? 0n
+  state.tokenBalance = totalIssuance ?? 0n
 
   state.tokenHolders = await ctx.store.count(Account)
 

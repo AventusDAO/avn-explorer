@@ -16,5 +16,9 @@ jobs:
           cache: 'yarn'
       - name: Install dependencies
         run: yarn
+      - name: Build dependency packages
+        run: |
+          yarn workspace @avn/types run build
+          yarn workspace @avn/config run build
       - name: Run test
         run: yarn test
