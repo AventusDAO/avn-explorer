@@ -264,3 +264,63 @@ export class BalancesWithdrawEvent {
         return this._chain.decodeEvent(this.event)
     }
 }
+
+export class MigrationMigratedSystemAccountsEvent {
+    private readonly _chain: Chain
+    private readonly event: Event
+
+    constructor(ctx: EventContext)
+    constructor(ctx: ChainContext, event: Event)
+    constructor(ctx: EventContext, event?: Event) {
+        event = event || ctx.event
+        assert(event.name === 'Migration.MigratedSystemAccounts')
+        this._chain = ctx._chain
+        this.event = event
+    }
+
+    /**
+     * Number of accounts that have been migrated
+     */
+    get isV4(): boolean {
+        return this._chain.getEventHash('Migration.MigratedSystemAccounts') === '0a0f30b1ade5af5fade6413c605719d59be71340cf4884f65ee9858eb1c38f6c'
+    }
+
+    /**
+     * Number of accounts that have been migrated
+     */
+    get asV4(): number {
+        assert(this.isV4)
+        return this._chain.decodeEvent(this.event)
+    }
+}
+
+export class MigrationMigratedTotalIssuanceEvent {
+    private readonly _chain: Chain
+    private readonly event: Event
+
+    constructor(ctx: EventContext)
+    constructor(ctx: ChainContext, event: Event)
+    constructor(ctx: EventContext, event?: Event) {
+        event = event || ctx.event
+        assert(event.name === 'Migration.MigratedTotalIssuance')
+        this._chain = ctx._chain
+        this.event = event
+    }
+
+    /**
+     * The new and the old issuance after the migration of issuance.
+     * [`OldIssuance`, `NewIssuance`]
+     */
+    get isV4(): boolean {
+        return this._chain.getEventHash('Migration.MigratedTotalIssuance') === 'f7d5bd1431cb954502149f64a8137986d660e0729a3d9731d421496b4298be52'
+    }
+
+    /**
+     * The new and the old issuance after the migration of issuance.
+     * [`OldIssuance`, `NewIssuance`]
+     */
+    get asV4(): [bigint, bigint] {
+        assert(this.isV4)
+        return this._chain.decodeEvent(this.event)
+    }
+}

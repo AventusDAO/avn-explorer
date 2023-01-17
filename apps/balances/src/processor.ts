@@ -5,7 +5,8 @@ import {
   BatchProcessorItem,
   decodeHex,
   SubstrateBlock,
-  SubstrateCall
+  SubstrateCall,
+  SubstrateExtrinsic
 } from '@subsquid/substrate-processor'
 import { Store, TypeormDatabase } from '@subsquid/typeorm-store'
 import { randomUUID } from 'crypto'
@@ -13,15 +14,15 @@ import { getProcessor } from '@avn/config'
 import { getLastChainState, saveCurrentChainState, saveRegularChainState } from './chainState'
 import { Account, Balance } from './model'
 import {
-  getBalanceSetAccount,
-  getDepositAccount,
-  getEndowedAccount,
-  getReservedAccount,
-  getReserveRepatriatedAccounts,
-  getSlashedAccount,
-  getTransferAccounts,
-  getUnreservedAccount,
-  getWithdrawAccount
+  getAccountFromBalanceSetEvent,
+  getAccountFromDepositEvent,
+  getAccountFromEndowedEvent,
+  getAccountFromReservedEvent,
+  getAccountFromSlashedEvent,
+  getAccountFromUnreservedEvent,
+  getAccountFromWithdrawEvent,
+  getAccountsFromTransferEvent,
+  getAccountsReserveRepatriatedEvent
 } from './eventHandlers'
 import { IBalance } from './types/custom/balance'
 
@@ -31,6 +32,7 @@ import {
 } from './types/generated/parachain-dev/storage'
 import { Block, ChainContext } from './types/generated/parachain-dev/support'
 import { encodeId } from '@avn/utils'
+import { processEncodedMigratedAccountData } from './migratedDataParser'
 
 const processor = getProcessor()
   .addEvent('Balances.Endowed', {
@@ -60,6 +62,15 @@ const processor = getProcessor()
   .addEvent('Balances.Slashed', {
     data: { event: { args: true } }
   } as const)
+  .addEvent('Migration.MigratedSystemAccounts', {
+    data: { event: { args: true } }
+  } as const)
+  .addEvent('Migration.MigratedTotalIssuance', {
+    data: { event: { args: true } }
+  } as const)
+  .addCall('Migration.migrate_system_account', {
+    data: { call: { origin: true }, extrinsic: { call: { args: true } } }
+  } as const)
   .addCall('*', {
     data: { call: { origin: true } }
   } as const)
@@ -82,7 +93,7 @@ async function processBalances(ctx: Context): Promise<void> {
   for (const block of ctx.blocks) {
     for (const item of block.items) {
       if (item.kind === 'call') {
-        processBalancesCallItem(ctx, item, accountIdsHex)
+        await processBalancesCallItem(ctx, item, accountIdsHex, block.header)
       } else if (item.kind === 'event') {
         processBalancesEventItem(ctx, item, accountIdsHex, block.header)
       }
@@ -91,18 +102,20 @@ async function processBalances(ctx: Context): Promise<void> {
     if (lastStateTimestamp == null) {
       lastStateTimestamp = (await getLastChainState(ctx.store))?.timestamp.getTime() ?? 0
     }
-    if (block.header.timestamp - lastStateTimestamp >= SAVE_PERIOD) {
-      const accountIdsU8 = [...accountIdsHex].map(id => decodeHex(id))
-      balances = await getBalances(ctx, block.header, accountIdsU8)
-      if (!balances) {
-        ctx.log.warn('No balances')
+    if (lastStateTimestamp) {
+      if (block.header.timestamp - lastStateTimestamp >= SAVE_PERIOD) {
+        const accountIdsU8 = [...accountIdsHex].map(id => decodeHex(id))
+        balances = await getBalances(ctx, block.header, accountIdsU8)
+        if (!balances) {
+          ctx.log.warn('No balances')
+        }
+
+        await saveAccounts(ctx, block.header, accountIdsU8, balances)
+        await saveRegularChainState(ctx, block.header)
+
+        lastStateTimestamp = block.header.timestamp
+        accountIdsHex.clear()
       }
-
-      await saveAccounts(ctx, block.header, accountIdsU8, balances)
-      await saveRegularChainState(ctx, block.header)
-
-      lastStateTimestamp = block.header.timestamp
-      accountIdsHex.clear()
     }
   }
 
@@ -194,14 +207,47 @@ async function saveBalances(
   ctx.log.child('balances').info(`updated: ${Object.values(balancesMap).length}`)
 }
 
-function processBalancesCallItem(ctx: Context, item: CallItem, accountIdsHex: Set<string>) {
-  const call = item.call as SubstrateCall
-  if (call.parent != null) return
+async function processBalancesCallItem(
+  ctx: Context,
+  item: CallItem,
+  accountIdsHex: Set<string>,
+  block: SubstrateBlock
+) {
+  switch (item.name) {
+    case 'Migration.migrate_system_account': {
+      const balances: IBalance[] = []
+      const accountIds = new Set<string>()
+      const extrinsic = item.extrinsic as SubstrateExtrinsic
+      const accountBatches = extrinsic.call.args.calls.map((c: any) => {
+        return c.value.call.value.accounts
+      })
 
-  const id = getOriginAccountId(call.origin)
-  if (id == null) return
+      for (const batch of accountBatches) {
+        for (const migratedAccountData of batch) {
+          const migratedAccount = processEncodedMigratedAccountData(migratedAccountData)
+          accountIds.add(migratedAccount.publicKey)
+          balances.push(migratedAccount.balance)
+        }
+      }
 
-  accountIdsHex.add(id)
+      const accountIdsU8 = [...accountIdsHex].map(id => decodeHex(id))
+      // const block = ctx.blocks[ctx.blocks.length - 1]
+      await saveAccounts(ctx, block, accountIdsU8, balances)
+      await saveBalances(ctx, block, accountIdsU8, balances)
+      await saveCurrentChainState(ctx, block)
+      break
+    }
+    default: {
+      const call = item.call as SubstrateCall
+
+      if (call.parent != null) return
+
+      const id = getOriginAccountId(call.origin)
+      if (id == null) return
+      accountIdsHex.add(id)
+      break
+    }
+  }
 }
 
 function processBalancesEventItem(
@@ -212,51 +258,54 @@ function processBalancesEventItem(
 ) {
   switch (item.name) {
     case 'Balances.BalanceSet': {
-      const account = getBalanceSetAccount(ctx, item.event)
-
+      const account = getAccountFromBalanceSetEvent(ctx, item.event)
       accountIdsHex.add(account)
       break
     }
     case 'Balances.Endowed': {
-      const account = getEndowedAccount(ctx, item.event)
+      const account = getAccountFromEndowedEvent(ctx, item.event)
       accountIdsHex.add(account)
       break
     }
     case 'Balances.Deposit': {
-      const account = getDepositAccount(ctx, item.event)
+      const account = getAccountFromDepositEvent(ctx, item.event)
       accountIdsHex.add(account)
       break
     }
     case 'Balances.Reserved': {
-      const account = getReservedAccount(ctx, item.event)
+      const account = getAccountFromReservedEvent(ctx, item.event)
       accountIdsHex.add(account)
       break
     }
     case 'Balances.Unreserved': {
-      const account = getUnreservedAccount(ctx, item.event)
+      const account = getAccountFromUnreservedEvent(ctx, item.event)
       accountIdsHex.add(account)
       break
     }
     case 'Balances.Withdraw': {
-      const account = getWithdrawAccount(ctx, item.event)
+      const account = getAccountFromWithdrawEvent(ctx, item.event)
       accountIdsHex.add(account)
       break
     }
     case 'Balances.Slashed': {
-      const account = getSlashedAccount(ctx, item.event)
+      const account = getAccountFromSlashedEvent(ctx, item.event)
       accountIdsHex.add(account)
       break
     }
     case 'Balances.Transfer': {
-      const accounts = getTransferAccounts(ctx, item.event)
-      accountIdsHex.add(accounts[0])
-      accountIdsHex.add(accounts[1])
+      const accounts = getAccountsFromTransferEvent(ctx, item.event)
+      if (!(accounts instanceof Error)) {
+        accountIdsHex.add(accounts[0])
+        accountIdsHex.add(accounts[1])
+      }
       break
     }
     case 'Balances.ReserveRepatriated': {
-      const accounts = getReserveRepatriatedAccounts(ctx, item.event)
-      accountIdsHex.add(accounts[0])
-      accountIdsHex.add(accounts[1])
+      const accounts = getAccountsReserveRepatriatedEvent(ctx, item.event)
+      if (!(accounts instanceof Error)) {
+        accountIdsHex.add(accounts[0])
+        accountIdsHex.add(accounts[1])
+      }
       break
     }
   }
@@ -313,7 +362,7 @@ async function getSystemAccountBalances(
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function getOriginAccountId(origin: any) {
+export function getOriginAccountId(origin: any): string | undefined {
   if (origin && origin.__kind === 'system' && origin.value.__kind === 'Signed') {
     return origin.value.value
   } else {
