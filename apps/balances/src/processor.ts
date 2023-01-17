@@ -32,6 +32,7 @@ import {
 } from './types/generated/parachain-dev/storage'
 import { Block, ChainContext } from './types/generated/parachain-dev/support'
 import { encodeId } from '@avn/utils'
+import { processEncodedMigratedAccountData } from './migratedDataParser'
 
 const processor = getProcessor()
   .addEvent('Balances.Endowed', {
@@ -204,40 +205,6 @@ async function saveBalances(
   await ctx.store.save([...Object.values(balancesMap)])
 
   ctx.log.child('balances').info(`updated: ${Object.values(balancesMap).length}`)
-}
-
-function decodeBalance(balanceAsBigEndianHex: string): bigint {
-  const cleanedHex = balanceAsBigEndianHex.replace(/^0x/, '')
-  const match = cleanedHex.match(/.{2}/g)
-  if (!match) return 0n
-  const balanceAsLittleEndian = match.reverse().join('')
-  return BigInt(balanceAsLittleEndian)
-}
-
-
-function extractPublicKey(tuple: string): string {
-  const parts = tuple.match(/.{64}/g)
-  if (!parts) return ''
-  const publicKey = `0x${parts.pop()}`
-  return publicKey
-}
-
-function processEncodedMigratedAccountData(migratedAccountData: [string, string]): MigratedAccount {
-  const publicKey = extractPublicKey(migratedAccountData[0])
-  const free = decodeBalance(migratedAccountData[1].slice(32, 64))
-  const reserved = decodeBalance(migratedAccountData[1].slice(64, 94))
-
-  return {
-    publicKey: publicKey,
-    balance: {
-      free,
-      reserved
-    }
-  }
-}
-type MigratedAccount = {
-  publicKey: string
-  balance: IBalance
 }
 
 async function processBalancesCallItem(
