@@ -8,6 +8,7 @@
 - Make sure you have Docker installed
 - Use Node `>=18.6`
 - [Install Yarn](https://yarnpkg.com/getting-started/install): `$ corepack enable && corepack prepare yarn@stable --activate`
+- [Install editor config for current workspace](https://yarnpkg.com/getting-started/editor-sdks#vscode) `yarn dlx @yarnpkg/sdks vscode`
 - Allow VSCode to use Workspace installed Typscript version when it asks you
 - To support features like go-to-definition with Yarn v3, a plugin like ZipFS is needed. They're listed in [VSCode extension recommendation](/.vscode/extensions.json).
 - Install dependencies: run `$ yarn` anywhere in the repository
