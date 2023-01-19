@@ -10,7 +10,6 @@ import {
 } from '@subsquid/substrate-processor'
 import { randomUUID } from 'crypto'
 import { Store, TypeormDatabase } from '@subsquid/typeorm-store'
-import * as ss58 from '@subsquid/ss58'
 import { getProcessor } from '@avn/config'
 import { encodeId } from '@avn/utils'
 import { getTokenLiftedData, getTokenLowerData, getTokenTransferredData } from './eventHandlers'
@@ -18,6 +17,7 @@ import { getLastChainState, setChainState } from './service/chainState.service'
 import { Block, ChainContext } from './types/generated/parachain-dev/support'
 import { TokenManagerBalancesStorage } from './types/generated/parachain-dev/storage'
 import { TokenBalanceForAccount } from './model'
+import retry from 'async-retry'
 
 const processor = getProcessor()
   .addEvent('TokenManager.TokenLifted', {
@@ -29,6 +29,9 @@ const processor = getProcessor()
   .addEvent('TokenManager.TokenLowered', {
     data: { event: { args: true } }
   } as const)
+  .addCall('Migration.migrate_token_manager_balances', {
+    data: { call: { origin: true }, extrinsic: { call: { args: true } } }
+  } as const)
   .addCall('*', {
     data: { call: { origin: true } }
   } as const)
@@ -38,8 +41,8 @@ type Item = BatchProcessorItem<typeof processor>
 type EventItem = BatchProcessorEventItem<typeof processor>
 type CallItem = BatchProcessorCallItem<typeof processor>
 type Context = BatchContext<Store, Item>
-
-processor.run(new TypeormDatabase(), processTokens)
+const db = new TypeormDatabase()
+processor.run(db, processTokens)
 
 const SAVE_PERIOD = 12 * 60 * 60 * 1000
 let lastStateTimestamp: number | undefined
@@ -51,7 +54,7 @@ async function processTokens(ctx: Context): Promise<void> {
   for (const block of ctx.blocks) {
     for (const item of block.items) {
       if (item.kind === 'call') {
-        processTokensCallItem(ctx, item, accountIdsHex, tokenIdsHex)
+        await processTokensCallItem(ctx, item, accountIdsHex, tokenIdsHex, block.header)
       } else if (item.kind === 'event') {
         processTokensEventItem(ctx, item, accountIdsHex, tokenIdsHex)
       }
@@ -90,7 +93,7 @@ async function saveTokenBalanceForAccount(
   tokenIds: Uint8Array[],
   accountIds: Uint8Array[],
   balance: bigint[]
-) {
+): Promise<void> {
   if (tokenIds.length && accountIds.length) {
     const balancesToBeSaved = accountIds.map((aid, index) => {
       return new TokenBalanceForAccount({
@@ -111,7 +114,7 @@ async function getTokenManagerData(
   block: Block,
   tokenIds: Uint8Array[],
   accountIds: Uint8Array[]
-) {
+): Promise<bigint[] | undefined> {
   const storage = new TokenManagerBalancesStorage(ctx, block)
   if (!storage.isExists || !storage.isV4) {
     return
@@ -134,19 +137,90 @@ async function getTokenManagerData(
   return await storage.getManyAsV4(v10InputArray)
 }
 
-function processTokensCallItem(
+export function extractPublicKey(tuple: string): string {
+  return `0x${tuple.slice(-64)}`
+}
+
+function extractTokenId(input: string): string {
+  return '0x' + input.slice(98, 138)
+}
+
+async function processData(ctx: Context, item: CallItem, block: SubstrateBlock): Promise<void> {
+  if (item.name !== 'Migration.migrate_token_manager_balances') return
+  const chunkSize = 1000
+  let chunk: TokenBalanceForAccount[] = []
+  const migratedTokenBalancesBatches = item.extrinsic.call.args.calls.map(
+    (c: any) => c.value.call.value.tokenAccountPairs
+  )
+
+  for (const batch of migratedTokenBalancesBatches) {
+    for (const migratedData of batch) {
+      chunk.push(
+        new TokenBalanceForAccount({
+          id: randomUUID(),
+          tokenId: extractTokenId(migratedData[0]),
+          accountId: encodeId(decodeHex(extractPublicKey(migratedData[0]))),
+          amount: migratedData[1],
+          updatedAt: block.height
+        })
+      )
+      if (chunk.length === chunkSize) {
+        await processChunk(ctx, chunk)
+        chunk = []
+      }
+    }
+  }
+  if (chunk.length > 0) {
+    await processChunk(ctx, chunk)
+    chunk = []
+  }
+}
+
+async function processChunk(ctx: Context, chunk: TokenBalanceForAccount[]): Promise<void> {
+  ctx.log.child('tokens').info(`Processing chunk of size ${chunk.length}`)
+  await retry(
+    async (bail: any) => {
+      try {
+        ctx.log.child('tokens').debug('Starting transaction')
+        await ctx.store.save<TokenBalanceForAccount>(chunk)
+        ctx.log.child('tokens').info('Transaction successful')
+      } catch (err: any) {
+        ctx.log.child('tokens').warn(`Transaction failed: ${err.message}`)
+        if (err.message === 'Transaction was already closed') {
+          ctx.log.child('tokens').error('Transaction closed, retrying...')
+          throw err
+        } else {
+          bail(err)
+        }
+      }
+    },
+    { retries: 3, minTimeout: 1000 }
+  )
+}
+
+async function processTokensCallItem(
   ctx: Context,
   item: CallItem,
   accountIds: Set<string>,
-  tokenIds: Set<string>
-) {
-  const call = item.call as SubstrateCall
-  if (call.parent != null) return
+  tokenIds: Set<string>,
+  block: SubstrateBlock
+): Promise<void> {
+  switch (item.name) {
+    case 'Migration.migrate_token_manager_balances': {
+      await processData(ctx, item, block)
 
-  const id = getOriginAccountId(call.origin)
-  if (id == null) return
+      break
+    }
+    default: {
+      const call = item.call as SubstrateCall
+      if (call.parent != null) return
 
-  accountIds.add(id)
+      const id = getOriginAccountId(call.origin)
+      if (id == null) return
+
+      accountIds.add(id)
+    }
+  }
 }
 
 function processTokensEventItem(
@@ -154,7 +228,7 @@ function processTokensEventItem(
   item: EventItem,
   accountIds: Set<string>,
   tokenIds: Set<string>
-) {
+): void {
   switch (item.name) {
     case 'TokenManager.TokenTransferred': {
       const { tokenId, accounts } = getTokenTransferredData(ctx, item.event)
@@ -178,7 +252,7 @@ function processTokensEventItem(
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function getOriginAccountId(origin: any) {
+export function getOriginAccountId(origin: any): any {
   if (origin && origin.__kind === 'system' && origin.value.__kind === 'Signed') {
     return origin.value.value
   } else {
