@@ -16,6 +16,7 @@ import {
 } from './types/custom'
 import { rewardedEventHandlers } from './handlers'
 import { BatchUpdates } from './services/batchUpdates'
+import { ParachainMigrationCalls } from './types/custom/calls'
 
 type Item = BatchProcessorItem<typeof processor>
 type EventItem = BatchProcessorEventItem<typeof processor>
@@ -49,6 +50,9 @@ const processor = getProcessor()
   .addEvent('ParachainStaking.Rewarded', {
     data: { event: { args: true } }
   })
+  .addCall('Migration.migrate_stake', {
+    data: { call: { args: true } }
+  })
 
 const processStaking = async (ctx: Context): Promise<void> => {
   const pendingUpdates: BatchUpdates = new BatchUpdates(ctx)
@@ -69,6 +73,13 @@ const processStaking = async (ctx: Context): Promise<void> => {
       )
       .map(item => getReward(ctx, item))
       .forEach(pendingUpdates.addReward, pendingUpdates)
+
+    block.items
+      .filter(item => (Object.values(ParachainMigrationCalls) as string[]).includes(item.name))
+      .forEach((entry: any) => {
+        const migratedData = entry.call.args
+        pendingUpdates.addMigratedData(migratedData)
+      }, pendingUpdates)
 
     if (lastStateTimestamp == null) {
       lastStateTimestamp = (await getLastChainState(ctx.store))?.timestamp.getTime() ?? 0
