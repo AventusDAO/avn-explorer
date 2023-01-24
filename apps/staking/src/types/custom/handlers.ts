@@ -19,3 +19,8 @@ export interface IStakingAccountUpdate {
   nominationsTotal?: bigint
   rewards: bigint[]
 }
+
+export interface IMigratedData {
+  nominator: string
+  totalStake: bigint
+}

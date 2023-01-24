@@ -1,10 +1,9 @@
 import { Address, AddressHex } from '@avn/types'
-import { toHex } from '@subsquid/substrate-processor'
+import { toHex, decodeHex } from '@subsquid/substrate-processor'
 import { Context } from '../processor'
-import { IRewardedData, IStakingAccountUpdate } from '../types/custom'
+import { IMigratedData, IRewardedData, IStakingAccountUpdate } from '../types/custom'
 import { Block } from '../types/generated/parachain-dev/support'
 import { getNominations } from './accounts'
-
 export class BatchUpdates {
   #ctx: Context
   #updates = new Map<AddressHex, IStakingAccountUpdate>()
@@ -26,28 +25,44 @@ export class BatchUpdates {
   addNominator(id: Address): void {
     const item = this.getItem(id)
     if (!item) {
-      return this.setItem({
+      this.setItem({
         id,
         hasNominations: true,
         rewards: []
       })
+    } else {
+      item.hasNominations = true
     }
-
-    item.hasNominations = true
   }
 
   addReward(data: IRewardedData): void {
     const { id, amount } = data
     const item = this.getItem(id)
     if (!item) {
-      return this.setItem({
+      this.setItem({
         id: data.id,
         hasNominations: false,
         rewards: [data.amount]
       })
+    } else {
+      item.rewards.push(amount)
     }
+  }
 
-    item.rewards.push(amount)
+  addMigratedData(data: IMigratedData): void {
+    const { nominator, totalStake } = data
+    const id = decodeHex(nominator)
+    const item = this.getItem(id)
+    if (!item) {
+      this.setItem({
+        id,
+        hasNominations: false,
+        nominationsTotal: totalStake,
+        rewards: []
+      })
+    } else {
+      item.nominationsTotal = totalStake
+    }
   }
 
   private async fetchTotalNominations(block: Block): Promise<void> {
