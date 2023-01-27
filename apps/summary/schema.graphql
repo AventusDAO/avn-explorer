@@ -1,0 +1,12 @@
+type SummaryRoot @entity {
+  rootHash: String!
+  fromBlock: Int!
+  toBlock: Int!
+  isValidated: Boolean!
+}
+
+type ChainState @entity {
+  id: ID!
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+}
