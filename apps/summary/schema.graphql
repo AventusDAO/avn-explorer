@@ -1,6 +1,7 @@
 type SummaryRoot @entity {
-  rootHash: String!
-  fromBlock: Int!
+  id: ID!
+  rootHash: String
+  fromBlock: Int
   toBlock: Int!
   isValidated: Boolean!
 }
