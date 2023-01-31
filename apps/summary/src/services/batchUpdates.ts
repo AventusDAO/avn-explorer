@@ -16,37 +16,6 @@ export class BatchUpdates {
     return this.updates.get(block)
   }
 
-  addSummaryRootFromCall({
-    toBlock = 0,
-    fromBlock,
-    rootHash = '',
-    isValidated = false
-  }: SummaryRoot): void {
-    const item = this.getItem(`${toBlock}`)
-    const newId = randomUUID()
-    if (!item) {
-      this.setItem(
-        new SummaryRoot({
-          rootHash,
-          toBlock,
-          fromBlock: fromBlock ?? 0,
-          isValidated,
-          id: newId
-        })
-      )
-    } else {
-      this.setItem(
-        new SummaryRoot({
-          rootHash,
-          toBlock,
-          fromBlock: item.fromBlock ?? 0,
-          isValidated: item.isValidated,
-          id: item.id || newId
-        })
-      )
-    }
-  }
-
   addSummaryRootFromEvent({
     toBlock = 0,
     fromBlock = 0,

@@ -5,11 +5,6 @@ export interface RootId {
     ingressCounter: bigint
 }
 
-export interface Validator {
-    accountId: Uint8Array
-    key: Uint8Array
-}
-
 export interface RootRange {
     fromBlock: number
     toBlock: number

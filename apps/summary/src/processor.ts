@@ -10,12 +10,9 @@ import { SummaryRoot } from './model'
 import { BatchUpdates } from './services/batchUpdates'
 import { getLastChainState, setChainState } from './services/chainState'
 import { saveSummaries } from './services/summaries'
-import { ParachainSummaryCallName } from './types/custom/calls'
 import { ParachainSummaryEventName } from './types/custom/events'
 
 type Item = BatchProcessorItem<typeof processor>
-type EventItem = BatchProcessorEventItem<typeof processor>
-type CallItem = BatchProcessorCallItem<typeof processor>
 export type Context = BatchContext<Store, Item>
 
 const SAVE_PERIOD = 12 * 60 * 60 * 1000
