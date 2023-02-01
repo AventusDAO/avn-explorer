@@ -1,0 +1,87 @@
+{{- if .Values.archive.gateway.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.archive.gateway.name }}
+  labels:
+    app: {{ .Values.archive.gateway.name }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  revisionHistoryLimit: {{ .Values.revisionHistoryLimit }}
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: {{ .Values.archive.gateway.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.archive.gateway.name }}
+        appVersion: {{ .Chart.AppVersion }}
+        helmVersion: {{ .Chart.Version }}
+    spec:
+      serviceAccountName: {{ .Values.archive.serviceAccountName }}
+      volumes:
+        - name: secrets-store-inline
+          csi:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: archive-spc
+      containers:
+        - name: {{ .Values.archive.gateway.name }}
+          image: "{{ .Values.archive.gateway.image.repository }}:{{ .Values.archive.gateway.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.archive.gateway.image.pullPolicy }}
+          args: ['--database-url', 'postgres://$(DB_USER):$(DB_PASS)@$(DB_HOST):$(DB_PORT)/$(DB_NAME)']
+          volumeMounts:
+            - name: secrets-store-inline
+              mountPath: "/mnt/secrets"
+              readOnly: true
+          ports:
+            - name: www
+              containerPort: {{ .Values.archive.gateway.service.www.port }}
+              protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /metrics
+              port: {{ .Values.archive.gateway.service.www.port }}
+            timeoutSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /metrics
+              port: {{ .Values.archive.gateway.service.www.port }}
+            timeoutSeconds: 5
+          env:
+            - name: DATABASE_MAX_CONNECTIONS
+              value: '5'
+            - name: RUST_LOG
+              value: 'actix_web=info,actix_server=info'
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: archive-secrets
+                  key: db_username
+            - name: DB_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: archive-secrets
+                  key: db_password
+            - name: DB_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: archive-secrets
+                  key: db_hostname
+            - name: DB_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: archive-secrets
+                  key: db_port
+            - name: DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: archive-secrets
+                  key: db_name
+{{- end }}

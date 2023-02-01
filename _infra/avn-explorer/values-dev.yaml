@@ -1,0 +1,8 @@
+awsAccountId: "602004642405"
+enviroment: "dev"
+certificateArn: |
+  arn:aws:acm:eu-west-1:602004642405:certificate/22dcfc84-5305-4d43-9f9b-b31fcc3a2cd1
+
+archive:
+  serviceAccount:
+    role: dev-avn-exporer-archive-sa-archive

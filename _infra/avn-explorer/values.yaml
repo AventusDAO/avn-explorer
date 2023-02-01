@@ -1,0 +1,47 @@
+# Default values for avn-explorer.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+revisionHistoryLimit: 3
+awsAccountId: ""
+enviroment: ""
+certificateArn: ""
+
+archive:
+  serviceAccount:
+    name: archive
+    role: 
+  secretsManagerName: avn-explorer/archive
+  ingest:
+    enabled: true
+    name: archive-ingest
+    image:
+      repository: subsquid/substrate-ingest
+      tag: firesquid
+      pullPolicy: Always
+
+  gateway:
+    enabled: true
+    name: archive-gateway
+    image:
+      repository: subsquid/substrate-gateway
+      tag: firesquid
+      pullPolicy: Always
+    service:
+      www:
+        type: ClusterIP
+        port: 8000
+  
+  explorer:
+    enabled: true
+    name: archive-explorer
+    image:
+      repository: subsquid/substrate-explorer
+      tag: firesquid
+      pullPolicy: Always
+    service:
+      www:
+        type: ClusterIP
+        port: 3000
+

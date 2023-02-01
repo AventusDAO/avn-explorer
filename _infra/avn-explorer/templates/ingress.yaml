@@ -1,0 +1,44 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ .Chart.Name }}-ingress
+  annotations:
+    kubernetes.io/ingress.class: alb
+    alb.ingress.kubernetes.io/scheme: internet-facing
+    alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'
+    alb.ingress.kubernetes.io/inbound-cidrs: "0.0.0.0/0"
+    alb.ingress.kubernetes.io/ssl-policy: ELBSecurityPolicy-FS-1-2-Res-2020-10
+    alb.ingress.kubernetes.io/certificate-arn: {{ .Values.certificateArn }}
+    alb.ingress.kubernetes.io/backend-protocol: HTTP
+    alb.ingress.kubernetes.io/actions.ssl-redirect: '{"Type": "redirect", "RedirectConfig": { "Protocol": "HTTPS", "Port": "443", "StatusCode": "HTTP_301"}}'
+  labels:
+    app: {{ .Chart.Name }}
+
+spec:
+  rules:
+  {{- if .Values.archive.explorer.enabled }}
+  - host: archive-explorer.{{ .Values.enviroment }}.aventus.io
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: {{ .Values.archive.explorer.name }}
+            port:
+              number: {{ .Values.archive.explorer.service.www.port }}
+    {{- end }}
+    {{- if .Values.archive.gateway.enabled }}
+  - host: archive-gateway.{{ .Values.enviroment }}.aventus.io
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: {{ .Values.archive.gateway.name }}
+            port:
+              number: {{ .Values.archive.gateway.service.www.port }}
+    {{- end }}
+  
