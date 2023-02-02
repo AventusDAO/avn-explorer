@@ -1,0 +1,63 @@
+name: balances
+
+on:
+  workflow_dispatch:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    branches:
+      - main
+    paths:
+      - 'apps/balances/**'
+  push:
+    branches:
+      - main
+    paths:
+      - 'apps/balances/**'
+
+defaults:
+  run:
+    shell: bash
+    working-directory: apps/balances
+
+env:
+  SHORT_IMAGE_NAME: avn-explorer
+  ECR_REPOSITORY_PREFIX: balances
+  AWS_REGION: eu-west-2
+  DOCKER_CONTEXT_DIR: apps/balances/
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: Build AvN Explorer balances
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.TESTNET_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.TESTNET_AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: AWS ECR login
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Create tag for PR
+        if: github.ref != 'refs/heads/main'
+        run: echo "DOCKER_TAG=pr-${{ github.event.number }}" >> $GITHUB_ENV
+
+      - name: Create tag for merge
+        if: github.ref == 'refs/heads/main'
+        run: echo "DOCKER_TAG=${GITHUB_SHA::7},latest" >> $GITHUB_ENV
+
+      - name: Build and push Docker image
+        uses: whoan/docker-build-with-cache-action@v5
+        with:
+          image_name: ${{ env.ECR_REPOSITORY_PREFIX }}/${{ env.SHORT_IMAGE_NAME }}
+          stages_image_name: ${{ env.ECR_REPOSITORY_PREFIX }}/${{ env.SHORT_IMAGE_NAME }}-stages
+          push_git_tag: true
+          image_tag: ${{ env.DOCKER_TAG }}
+          registry: ${{ steps.login-ecr.outputs.registry }}
+          context: ${{ env.DOCKER_CONTEXT_DIR }}
+          build_extra_args: --compress=true
