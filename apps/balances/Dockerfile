@@ -10,8 +10,8 @@ COPY package.json .
 COPY .yarnrc.yml .
 COPY tsconfig.json .
 COPY packages packages
-COPY apps/staking apps/staking
+COPY apps/balances apps/balances
 
 RUN yarn install
 RUN yarn build:packages
-RUN yarn workspace @avn/staking run build
+RUN yarn workspace @avn/balances run build

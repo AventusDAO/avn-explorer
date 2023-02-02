@@ -1,0 +1,57 @@
+name: Build Tokens
+
+on:
+  workflow_dispatch:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    branches:
+      - main
+    paths:
+      - 'apps/tokens/**'
+  push:
+    branches:
+      - main
+    paths:
+      - 'apps/tokens/**'
+
+env:
+  SHORT_IMAGE_NAME: tokens
+  ECR_REPOSITORY_PREFIX: avn-explorer
+  AWS_REGION: eu-west-2
+  DOCKERFILE: apps/tokens/Dockerfile
+
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: Build AvN Explorer tokens
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.TESTNET_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.TESTNET_AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: AWS ECR login
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Create tag for PR
+        if: github.ref != 'refs/heads/main'
+        run: echo "DOCKER_TAG=${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY_PREFIX }}/${{ env.SHORT_IMAGE_NAME }}:pr-${{ github.event.number }}" >> $GITHUB_ENV
+
+      - name: Create tag for merge
+        if: github.ref == 'refs/heads/main'
+        run: echo "DOCKER_TAG=${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY_PREFIX }}/${{ env.SHORT_IMAGE_NAME }}:${GITHUB_SHA::7},${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY_PREFIX }}/${{ env.SHORT_IMAGE_NAME }}:latest" >> $GITHUB_ENV
+
+      - name: Build and push
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: ${{ env.DOCKERFILE }}
+          push: true
+          tags: ${{ env.DOCKER_TAG }}
+
