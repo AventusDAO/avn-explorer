@@ -4,14 +4,11 @@ RUN apk add g++ make python3
 
 WORKDIR /app
 
+COPY yarn.lock package.json .yarnrc.yml tsconfig.json .
 COPY .yarn .yarn
-COPY yarn.lock .
-COPY package.json .
-COPY .yarnrc.yml .
-COPY tsconfig.json .
 COPY packages packages
 COPY apps/summary apps/summary
 
-RUN yarn install
-RUN yarn build:packages
-RUN yarn workspace @avn/summary run build
+RUN yarn install && \
+    yarn build:packages && \
+    yarn workspace @avn/summary run build
