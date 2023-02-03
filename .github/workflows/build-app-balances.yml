@@ -11,13 +11,9 @@ on:
   push:
     branches:
       - main
+      - SYS-3130-setup-github-workflows-for-avn-explorer
     paths:
       - 'apps/balances/**'
-
-defaults:
-  run:
-    shell: bash
-    working-directory: apps/balances
 
 env:
   SHORT_IMAGE_NAME: avn-explorer
