@@ -1,0 +1,26 @@
+name: Build Balances
+
+on:
+  workflow_dispatch:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    branches:
+      - main
+    paths:
+      - 'apps/balances/**'
+  push:
+    branches:
+      - main
+    paths:
+      - 'apps/balances/**'
+
+jobs:
+  build:
+    name: AvN Explorer Balances
+    uses: ./.github/workflows/docker-build.yml
+    secrets: inherit
+    with:
+      short_image_name: balances
+      ecr_repository_prefix: avn-explorer
+      aws_region: eu-west-2
+      dockerfile: apps/balances/Dockerfile

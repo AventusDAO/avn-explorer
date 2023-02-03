@@ -7,8 +7,8 @@ WORKDIR /app
 COPY yarn.lock package.json .yarnrc.yml tsconfig.json .
 COPY .yarn .yarn
 COPY packages packages
-COPY apps/staking apps/staking
+COPY apps/summary apps/summary
 
 RUN yarn install && \
     yarn build:packages && \
-    yarn workspace @avn/staking run build
+    yarn workspace @avn/summary run build

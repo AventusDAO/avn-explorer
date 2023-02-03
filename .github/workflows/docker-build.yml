@@ -1,0 +1,51 @@
+name: Docker Build
+
+on:
+  workflow_call:
+    inputs:
+      short_image_name:
+        required: true
+        type: string
+      ecr_repository_prefix:
+        required: true
+        type: string
+      aws_region:
+        required: true
+        type: string
+      dockerfile:
+        required: true
+        type: string
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: Build docker
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.TESTNET_AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.TESTNET_AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ inputs.aws_region }}
+
+      - name: AWS ECR login
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Create tag for PR
+        if: github.ref != 'refs/heads/main'
+        run: echo "DOCKER_TAG=${{ steps.login-ecr.outputs.registry }}/${{ inputs.ecr_repository_prefix }}/${{ inputs.short_image_name }}:pr-${{ github.event.number }}" >> $GITHUB_ENV
+
+      - name: Create tag for merge
+        if: github.ref == 'refs/heads/main'
+        run: echo "DOCKER_TAG=${{ steps.login-ecr.outputs.registry }}/${{ inputs.ecr_repository_prefix }}/${{ inputs.short_image_name }}:${GITHUB_SHA::7},${{ steps.login-ecr.outputs.registry }}/${{ inputs.ecr_repository_prefix }}/${{ inputs.short_image_name }}:latest" >> $GITHUB_ENV
+
+      - name: Build and push
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: ${{ inputs.dockerfile }}
+          push: true
+          tags: ${{ env.DOCKER_TAG }}
