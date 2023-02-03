@@ -8,11 +8,17 @@ on:
       - main
     paths:
       - 'apps/fees/**'
+      - 'packages/types/**'
+      - 'packages/config/**'
+      - 'packages/utils/**'
   push:
     branches:
       - main
     paths:
       - 'apps/fees/**'
+      - 'packages/types/**'
+      - 'packages/config/**'
+      - 'packages/utils/**'
 
 jobs:
   build:

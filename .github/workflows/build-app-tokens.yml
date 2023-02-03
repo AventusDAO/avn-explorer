@@ -8,11 +8,17 @@ on:
       - main
     paths:
       - 'apps/tokens/**'
+      - 'packages/types/**'
+      - 'packages/config/**'
+      - 'packages/utils/**'
   push:
     branches:
       - main
     paths:
       - 'apps/tokens/**'
+      - 'packages/types/**'
+      - 'packages/config/**'
+      - 'packages/utils/**'
 
 jobs:
   build:
