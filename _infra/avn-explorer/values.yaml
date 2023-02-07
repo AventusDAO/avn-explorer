@@ -2,17 +2,26 @@
 # This is a YAML-formatted file.
 # Declare variables to be passed into your templates.
 
+#
+# Global avn-explorer config
+#
 replicaCount: 1
 revisionHistoryLimit: 3
 awsAccountId: ""
 enviroment: ""
 certificateArn: ""
+avn_env: ""
+archive_url: ""
 
+#
+# Service specific config
+#
 archive:
   serviceAccount:
     name: archive
     role: 
   secretsManagerName: avn-explorer/archive
+
   ingest:
     enabled: true
     name: archive-ingest
@@ -45,3 +54,28 @@ archive:
         type: ClusterIP
         port: 3000
 
+balances:
+  serviceAccount:
+    name: balances
+    role: 
+  secretsManagerName: avn-explorer/balances
+  image:
+    repository: 189013141504.dkr.ecr.eu-west-2.amazonaws.com/avn-explorer/balances
+    tag: latest
+    pullPolicy: Always
+
+  server:
+    enabled: true
+    name: balances-server
+    service:
+      www:
+        type: ClusterIP
+        port: 4000
+
+  processor:
+    enabled: true
+    name: balances-processor
+    service:
+      www:
+        type: ClusterIP
+        port: 3000

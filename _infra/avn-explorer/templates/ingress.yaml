@@ -41,4 +41,16 @@ spec:
             port:
               number: {{ .Values.archive.gateway.service.www.port }}
     {{- end }}
+    {{- if .Values.balances.server.enabled }}
+  - host: balances-explorer.{{ .Values.enviroment }}.aventus.io
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: {{ .Values.balances.server.name }}
+            port:
+              number: {{ .Values.balances.server.service.www.port }}
+    {{- end }}
   

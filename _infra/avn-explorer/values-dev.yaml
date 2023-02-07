@@ -1,8 +1,25 @@
+#
+# Global avn-explorer config
+#
 awsAccountId: "602004642405"
 enviroment: "dev"
 certificateArn: |
   arn:aws:acm:eu-west-1:602004642405:certificate/22dcfc84-5305-4d43-9f9b-b31fcc3a2cd1
+avn_env: parachain-dev
+archive_url: https://archive-gateway.dev.aventus.io/graphql
 
+#
+# Service specific config
+#
 archive:
   serviceAccount:
     role: dev-avn-exporer-archive-sa-archive
+
+balances:
+  serviceAccount:
+    role: dev-avn-exporer-balances-sa-balances
+  processor:
+    enabled: true
+  # image:
+  #   tag:
+
