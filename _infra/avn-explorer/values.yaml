@@ -7,19 +7,21 @@
 #
 replicaCount: 1
 revisionHistoryLimit: 3
-awsAccountId: ""
-enviroment: ""
-certificateArn: ""
-avn_env: ""
-archive_url: ""
+awsAccountId: ''
+enviroment: ''
+certificateArn: ''
+avn_env: ''
+archive_url: ''
 
 #
 # Service specific config
 #
+
+# Arhive
 archive:
   serviceAccount:
     name: archive
-    role: 
+    role:
   secretsManagerName: avn-explorer/archive
 
   ingest:
@@ -33,6 +35,7 @@ archive:
   gateway:
     enabled: true
     name: archive-gateway
+    url:
     image:
       repository: subsquid/substrate-gateway
       tag: firesquid
@@ -41,10 +44,11 @@ archive:
       www:
         type: ClusterIP
         port: 8000
-  
+
   explorer:
     enabled: true
     name: archive-explorer
+    url:
     image:
       repository: subsquid/substrate-explorer
       tag: firesquid
@@ -54,10 +58,11 @@ archive:
         type: ClusterIP
         port: 3000
 
+# Balances
 balances:
   serviceAccount:
     name: balances
-    role: 
+    role:
   secretsManagerName: avn-explorer/balances
   image:
     repository: 189013141504.dkr.ecr.eu-west-2.amazonaws.com/avn-explorer/balances
@@ -67,6 +72,7 @@ balances:
   server:
     enabled: true
     name: balances-server
+    url:
     service:
       www:
         type: ClusterIP
@@ -75,6 +81,118 @@ balances:
   processor:
     enabled: true
     name: balances-processor
+    service:
+      www:
+        type: ClusterIP
+        port: 3000
+
+# Fees
+fees:
+  serviceAccount:
+    name: fees
+    role:
+  secretsManagerName: avn-explorer/fees
+  image:
+    repository: 189013141504.dkr.ecr.eu-west-2.amazonaws.com/avn-explorer/fees
+    tag: latest
+    pullPolicy: Always
+
+  server:
+    enabled: true
+    name: fees-server
+    url:
+    service:
+      www:
+        type: ClusterIP
+        port: 4000
+
+  processor:
+    enabled: true
+    name: fees-processor
+    service:
+      www:
+        type: ClusterIP
+        port: 3000
+
+# Staking
+staking:
+  serviceAccount:
+    name: staking
+    role:
+  secretsManagerName: avn-explorer/staking
+  image:
+    repository: 189013141504.dkr.ecr.eu-west-2.amazonaws.com/avn-explorer/staking
+    tag: latest
+    pullPolicy: Always
+
+  server:
+    enabled: true
+    name: staking-server
+    url:
+    service:
+      www:
+        type: ClusterIP
+        port: 4000
+
+  processor:
+    enabled: true
+    name: staking-processor
+    service:
+      www:
+        type: ClusterIP
+        port: 3000
+
+# Summary
+summary:
+  serviceAccount:
+    name: summary
+    role:
+  secretsManagerName: avn-explorer/summary
+  image:
+    repository: 189013141504.dkr.ecr.eu-west-2.amazonaws.com/avn-explorer/summary
+    tag: latest
+    pullPolicy: Always
+
+  server:
+    enabled: true
+    name: summary-server
+    url:
+    service:
+      www:
+        type: ClusterIP
+        port: 4000
+
+  processor:
+    enabled: true
+    name: summary-processor
+    service:
+      www:
+        type: ClusterIP
+        port: 3000
+
+#Tokens
+tokens:
+  serviceAccount:
+    name: tokens
+    role:
+  secretsManagerName: avn-explorer/tokens
+  image:
+    repository: 189013141504.dkr.ecr.eu-west-2.amazonaws.com/avn-explorer/tokens
+    tag: latest
+    pullPolicy: Always
+
+  server:
+    enabled: true
+    name: tokens-server
+    url:
+    service:
+      www:
+        type: ClusterIP
+        port: 4000
+
+  processor:
+    enabled: true
+    name: tokens-processor
     service:
       www:
         type: ClusterIP

@@ -1,8 +1,8 @@
 #
 # Global avn-explorer config
 #
-awsAccountId: "602004642405"
-enviroment: "dev"
+awsAccountId: '602004642405'
+enviroment: 'dev'
 certificateArn: |
   arn:aws:acm:eu-west-1:602004642405:certificate/22dcfc84-5305-4d43-9f9b-b31fcc3a2cd1
 avn_env: parachain-dev
@@ -23,3 +23,26 @@ balances:
   # image:
   #   tag:
 
+fees:
+  serviceAccount:
+    role: dev-avn-exporer-fees-sa-fees
+  # image:
+  #   tag:
+
+staking:
+  serviceAccount:
+    role: dev-avn-exporer-staking-sa-staking
+  # image:
+  #   tag:
+
+summary:
+  serviceAccount:
+    role: dev-avn-exporer-summary-sa-summary
+  # image:
+  #   tag:
+
+tokens:
+  serviceAccount:
+    role: dev-avn-exporer-tokens-sa-tokens
+  # image:
+  #   tag:

@@ -18,7 +18,11 @@ metadata:
 spec:
   rules:
   {{- if .Values.archive.explorer.enabled }}
+  {{- if .Values.archive.explorer.url }}
+  - host: {{ .Values.archive.explorer.url }}
+  {{- else }}
   - host: archive-explorer.{{ .Values.enviroment }}.aventus.io
+  {{- end }}
     http:
       paths:
       - path: /
@@ -28,9 +32,14 @@ spec:
             name: {{ .Values.archive.explorer.name }}
             port:
               number: {{ .Values.archive.explorer.service.www.port }}
-    {{- end }}
-    {{- if .Values.archive.gateway.enabled }}
+  {{- end }}
+
+  {{- if .Values.archive.gateway.enabled }}
+  {{- if .Values.archive.gateway.url }}
+  - host: {{ .Values.archive.gateway.url }}
+  {{- else }}
   - host: archive-gateway.{{ .Values.enviroment }}.aventus.io
+  {{- end }}
     http:
       paths:
       - path: /
@@ -40,9 +49,14 @@ spec:
             name: {{ .Values.archive.gateway.name }}
             port:
               number: {{ .Values.archive.gateway.service.www.port }}
-    {{- end }}
-    {{- if .Values.balances.server.enabled }}
+  {{- end }}
+
+  {{- if .Values.balances.server.enabled }}
+  {{- if .Values.balances.server.url }}
+  - host: {{ .Values.balances.server.url }}
+  {{- else }}
   - host: balances-explorer.{{ .Values.enviroment }}.aventus.io
+  {{- end }}
     http:
       paths:
       - path: /
@@ -52,5 +66,72 @@ spec:
             name: {{ .Values.balances.server.name }}
             port:
               number: {{ .Values.balances.server.service.www.port }}
-    {{- end }}
+  {{- end }}
   
+  {{- if .Values.fees.server.enabled }}
+  {{- if .Values.fees.server.url }}
+  - host: {{ .Values.fees.server.url }}
+  {{- else }}
+  - host: fees-explorer.{{ .Values.enviroment }}.aventus.io
+  {{- end }}
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: {{ .Values.fees.server.name }}
+            port:
+              number: {{ .Values.fees.server.service.www.port }}
+  {{- end }}
+
+  {{- if .Values.staking.server.enabled }}
+  {{- if .Values.staking.server.url }}
+  - host: {{ .Values.staking.server.url }}
+  {{- else }}
+  - host: staking-explorer.{{ .Values.enviroment }}.aventus.io
+  {{- end }}
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: {{ .Values.staking.server.name }}
+            port:
+              number: {{ .Values.staking.server.service.www.port }}
+  {{- end }}
+
+  {{- if .Values.summary.server.enabled }}
+  {{- if .Values.summary.server.url }}
+  - host: {{ .Values.summary.server.url }}
+  {{- else }}
+  - host: summary-explorer.{{ .Values.enviroment }}.aventus.io
+  {{- end }}
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: {{ .Values.summary.server.name }}
+            port:
+              number: {{ .Values.summary.server.service.www.port }}
+  {{- end }}
+  
+  {{- if .Values.tokens.server.enabled }}
+  {{- if .Values.tokens.server.url }}
+  - host: {{ .Values.tokens.server.url }}
+  {{- else }}
+  - host: tokens-explorer.{{ .Values.enviroment }}.aventus.io
+  {{- end }}
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: {{ .Values.tokens.server.name }}
+            port:
+              number: {{ .Values.tokens.server.service.www.port }}
+  {{- end }}

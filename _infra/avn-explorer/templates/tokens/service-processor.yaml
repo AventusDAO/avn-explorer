@@ -1,0 +1,18 @@
+{{- if .Values.tokens.processor.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.tokens.processor.name }}
+  labels:
+    app: {{ .Values.tokens.processor.name }}
+    helmVersion: {{ .Chart.Version }}
+spec:
+  type: {{ .Values.tokens.processor.service.www.type }}
+  ports:
+  - name: {{ .Values.tokens.processor.name }}
+    port: {{ .Values.tokens.processor.service.www.port }}
+    targetPort: {{ .Values.tokens.processor.service.www.port }}
+    protocol: TCP
+  selector:
+    app: {{ .Values.tokens.processor.name }}
+{{- end }}

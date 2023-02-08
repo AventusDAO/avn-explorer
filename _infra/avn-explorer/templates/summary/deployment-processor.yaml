@@ -1,0 +1,82 @@
+{{- if .Values.summary.processor.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.summary.processor.name }}
+  labels:
+    app: {{ .Values.summary.processor.name }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  revisionHistoryLimit: {{ .Values.revisionHistoryLimit }}
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: {{ .Values.summary.processor.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.summary.processor.name }}
+        appVersion: {{ .Chart.AppVersion }}
+        helmVersion: {{ .Chart.Version }}
+    spec:
+      serviceAccountName: {{ .Values.summary.serviceAccount.name }}
+      volumes:
+        - name: secrets-store-inline
+          csi:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: summary-spc
+      containers:
+        - name: {{ .Values.summary.processor.name }}
+          image: "{{ .Values.summary.image.repository }}:{{ .Values.summary.image.tag }}"
+          imagePullPolicy: {{ .Values.summary.image.pullPolicy }}
+          command: ['yarn', 'processor:start']
+          livenessProbe:
+            httpGet:
+              path: /metrics
+              port: 3000
+            timeoutSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /metrics
+              port: 3000
+            timeoutSeconds: 5
+          volumeMounts:
+            - name: secrets-store-inline
+              mountPath: "/mnt/secrets"
+              readOnly: true
+          envFrom:
+            - configMapRef:
+                name: {{ .Release.Name }}-{{ .Values.summary.processor.name }}-config
+          env:
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: summary-secrets
+                  key: db_username
+            - name: DB_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: summary-secrets
+                  key: db_password
+            - name: DB_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: summary-secrets
+                  key: db_hostname
+            - name: DB_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: summary-secrets
+                  key: db_port
+            - name: DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: summary-secrets
+                  key: db_name
+{{- end }}

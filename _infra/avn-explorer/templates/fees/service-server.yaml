@@ -1,0 +1,18 @@
+{{- if .Values.fees.server.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.fees.server.name }}
+  labels:
+    app: {{ .Values.fees.server.name }}
+    helmVersion: {{ .Chart.Version }}
+spec:
+  type: {{ .Values.fees.server.service.www.type }}
+  ports:
+  - name: {{ .Values.fees.server.name }}
+    port: {{ .Values.fees.server.service.www.port }}
+    targetPort: {{ .Values.fees.server.service.www.port }}
+    protocol: TCP
+  selector:
+    app: {{ .Values.fees.server.name }}
+{{- end }}
