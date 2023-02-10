@@ -1,0 +1,18 @@
+{{- if .Values.archive.gateway.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.archive.gateway.name }}
+  labels:
+    app: {{ .Values.archive.gateway.name }}
+    helmVersion: {{ .Chart.Version }}
+spec:
+  type: {{ .Values.archive.gateway.service.www.type }}
+  ports:
+  - name: {{ .Values.archive.gateway.name }}
+    port: {{ .Values.archive.gateway.service.www.port }}
+    targetPort: {{ .Values.archive.gateway.service.www.port }}
+    protocol: TCP
+  selector:
+    app: {{ .Values.archive.gateway.name }}
+{{- end }}

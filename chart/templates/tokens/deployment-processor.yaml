@@ -1,0 +1,82 @@
+{{- if .Values.tokens.processor.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.tokens.processor.name }}
+  labels:
+    app: {{ .Values.tokens.processor.name }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  revisionHistoryLimit: {{ .Values.revisionHistoryLimit }}
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: {{ .Values.tokens.processor.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.tokens.processor.name }}
+        appVersion: {{ .Chart.AppVersion }}
+        helmVersion: {{ .Chart.Version }}
+    spec:
+      serviceAccountName: {{ .Values.tokens.serviceAccount.name }}
+      volumes:
+        - name: secrets-store-inline
+          csi:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: tokens-spc
+      containers:
+        - name: {{ .Values.tokens.processor.name }}
+          image: "{{ .Values.tokens.image.repository }}:{{ .Values.tokens.image.tag }}"
+          imagePullPolicy: {{ .Values.tokens.image.pullPolicy }}
+          command: ['yarn', 'processor:start']
+          livenessProbe:
+            httpGet:
+              path: /metrics
+              port: 3000
+            timeoutSeconds: 5
+          readinessProbe:
+            httpGet:
+              path: /metrics
+              port: 3000
+            timeoutSeconds: 5
+          volumeMounts:
+            - name: secrets-store-inline
+              mountPath: "/mnt/secrets"
+              readOnly: true
+          envFrom:
+            - configMapRef:
+                name: {{ .Release.Name }}-{{ .Values.tokens.processor.name }}-config
+          env:
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: tokens-secrets
+                  key: db_username
+            - name: DB_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: tokens-secrets
+                  key: db_password
+            - name: DB_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: tokens-secrets
+                  key: db_hostname
+            - name: DB_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: tokens-secrets
+                  key: db_port
+            - name: DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: tokens-secrets
+                  key: db_name
+{{- end }}

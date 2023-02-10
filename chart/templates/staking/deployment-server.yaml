@@ -1,0 +1,84 @@
+{{- if .Values.staking.server.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.staking.server.name }}
+  labels:
+    app: {{ .Values.staking.server.name }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  revisionHistoryLimit: {{ .Values.revisionHistoryLimit }}
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  selector:
+    matchLabels:
+      app: {{ .Values.staking.server.name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.staking.server.name }}
+        appVersion: {{ .Chart.AppVersion }}
+        helmVersion: {{ .Chart.Version }}
+    spec:
+      serviceAccountName: {{ .Values.staking.serviceAccount.name }}
+      volumes:
+        - name: secrets-store-inline
+          csi:
+            driver: secrets-store.csi.k8s.io
+            readOnly: true
+            volumeAttributes:
+              secretProviderClass: staking-spc
+      containers:
+        - name: {{ .Values.staking.server.name }}
+          image: "{{ .Values.staking.image.repository }}:{{ .Values.staking.image.tag }}"
+          imagePullPolicy: {{ .Values.staking.image.pullPolicy }}
+          command: ['yarn', 'server:start']
+          volumeMounts:
+            - name: secrets-store-inline
+              mountPath: "/mnt/secrets"
+              readOnly: true
+          ports:
+            - name: www
+              containerPort: {{ .Values.staking.server.service.www.port }}
+              protocol: TCP
+          livenessProbe:
+            tcpSocket:
+              port: {{ .Values.staking.server.service.www.port }}
+            timeoutSeconds: 5
+          readinessProbe:
+            tcpSocket:
+              port: {{ .Values.staking.server.service.www.port }}
+            timeoutSeconds: 5
+          envFrom:
+            - configMapRef:
+                name: {{ .Release.Name }}-{{ .Values.staking.server.name }}-config
+          env:
+            - name: DB_USER
+              valueFrom:
+                secretKeyRef:
+                  name: staking-secrets
+                  key: db_username
+            - name: DB_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: staking-secrets
+                  key: db_password
+            - name: DB_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: staking-secrets
+                  key: db_hostname
+            - name: DB_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: staking-secrets
+                  key: db_port
+            - name: DB_NAME
+              valueFrom:
+                secretKeyRef:
+                  name: staking-secrets
+                  key: db_name
+{{- end }}

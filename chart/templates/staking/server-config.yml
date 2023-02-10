@@ -1,0 +1,8 @@
+{{- if .Values.staking.server.enabled }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-{{ .Values.staking.server.name }}-config
+data:
+  GQL_PORT: "4000"
+{{- end }}

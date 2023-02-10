@@ -1,0 +1,18 @@
+{{- if .Values.summary.processor.enabled }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.summary.processor.name }}
+  labels:
+    app: {{ .Values.summary.processor.name }}
+    helmVersion: {{ .Chart.Version }}
+spec:
+  type: {{ .Values.summary.processor.service.www.type }}
+  ports:
+  - name: {{ .Values.summary.processor.name }}
+    port: {{ .Values.summary.processor.service.www.port }}
+    targetPort: {{ .Values.summary.processor.service.www.port }}
+    protocol: TCP
+  selector:
+    app: {{ .Values.summary.processor.name }}
+{{- end }}
