@@ -1,5 +1,5 @@
 node_modules
-_infra
+chart
 .next
 yarn.lock
 package-lock.json

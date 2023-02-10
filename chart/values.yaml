@@ -17,7 +17,7 @@ archive_url: ''
 # Service specific config
 #
 
-# Arhive
+# Archive
 archive:
   serviceAccount:
     name: archive
