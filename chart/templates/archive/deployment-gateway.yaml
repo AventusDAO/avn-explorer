@@ -23,7 +23,7 @@ spec:
         appVersion: {{ .Chart.AppVersion }}
         helmVersion: {{ .Chart.Version }}
     spec:
-      serviceAccountName: {{ .Values.archive.serviceAccountName }}
+      serviceAccountName: {{ .Values.archive.serviceAccount.name }}
       volumes:
         - name: secrets-store-inline
           csi:
