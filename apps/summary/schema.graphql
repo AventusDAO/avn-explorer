@@ -1,8 +1,8 @@
 type SummaryRoot @entity {
-  id: ID!
+  id: ID! @index
   rootHash: String
-  fromBlock: Int
-  toBlock: Int!
+  fromBlock: Int @index
+  toBlock: Int! @index
   isValidated: Boolean!
 }
 
