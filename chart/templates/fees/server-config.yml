@@ -1,8 +1,0 @@
-{{- if .Values.fees.server.enabled }}
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: {{ .Release.Name }}-{{ .Values.fees.server.name }}-config
-data:
-  GQL_PORT: "4000"
-{{- end }}
