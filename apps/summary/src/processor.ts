@@ -1,10 +1,5 @@
 import { getProcessor } from '@avn/config'
-import {
-  BatchContext,
-  BatchProcessorEventItem,
-  BatchProcessorCallItem,
-  BatchProcessorItem
-} from '@subsquid/substrate-processor'
+import { BatchContext, BatchProcessorItem } from '@subsquid/substrate-processor'
 import { Store, TypeormDatabase } from '@subsquid/typeorm-store'
 import { SummaryRoot } from './model'
 import { BatchUpdates } from './services/batchUpdates'
@@ -21,10 +16,11 @@ let lastStateTimestamp: number | undefined
 const processor = getProcessor()
   .addEvent('Summary.SummaryCalculated', {
     data: { event: { args: true } }
-  })
+  } as const)
   .addEvent('Summary.VotingEnded', {
     data: { event: { args: true } }
-  })
+  } as const)
+  .includeAllBlocks()
 
 const processSummary = async (ctx: Context): Promise<void> => {
   const pendingUpdates: BatchUpdates = new BatchUpdates(ctx)
@@ -69,4 +65,6 @@ const processSummary = async (ctx: Context): Promise<void> => {
   }
 }
 
-processor.run(new TypeormDatabase(), processSummary)
+const db = new TypeormDatabase()
+
+processor.run(db, processSummary)
