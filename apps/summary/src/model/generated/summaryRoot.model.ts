@@ -9,6 +9,7 @@ export class SummaryRoot {
   @PrimaryColumn_()
   id!: string
 
+  @Index_()
   @Column_("text", {nullable: true})
   rootHash!: string | undefined | null
 
@@ -20,6 +21,7 @@ export class SummaryRoot {
   @Column_("int4", {nullable: false})
   toBlock!: number
 
+  @Index_()
   @Column_("bool", {nullable: false})
   isValidated!: boolean
 }

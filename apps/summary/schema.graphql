@@ -1,9 +1,9 @@
 type SummaryRoot @entity {
   id: ID! @index
-  rootHash: String
+  rootHash: String @index
   fromBlock: Int @index
   toBlock: Int! @index
-  isValidated: Boolean!
+  isValidated: Boolean! @index
 }
 
 type ChainState @entity {

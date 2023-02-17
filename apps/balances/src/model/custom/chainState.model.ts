@@ -15,6 +15,7 @@ export class ChainState {
   @PrimaryColumn_()
   id!: string
 
+  @Index_()
   @Column_('numeric', {
     transformer: marshal.bigintTransformer,
     nullable: false,
@@ -23,6 +24,7 @@ export class ChainState {
   })
   tokenBalance!: bigint
 
+  @Index_()
   @Column_('int4', { nullable: false })
   tokenHolders!: number
 

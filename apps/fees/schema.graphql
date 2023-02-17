@@ -1,7 +1,7 @@
 type Account @entity {
   id: ID!
-  feesTotal: BigInt!
-  updatedAt: Int
+  feesTotal: BigInt! @index
+  updatedAt: Int @index
 }
 
 type ChainState @entity {

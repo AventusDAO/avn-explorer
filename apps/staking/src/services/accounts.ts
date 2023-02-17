@@ -58,9 +58,10 @@ export async function getNominations(
   if (!storage.isExists) ctx.log.error(`Missing ParachainStakingNominatorStateStorage`)
   if (storage.isV12) {
     const nominatorsRes = await storage.getManyAsV12(accounts)
-    if (nominatorsRes.find(n => !n)) throw new Error(`Nominator is undefined`)
-    const nominators = nominatorsRes as NominatorV12[]
-    return nominators.map(n => ({
+
+    // if (nominatorsRes.find(n => !n)) throw new Error(`Nominator is undefined`)
+    const nominators = nominatorsRes.filter(Boolean) as NominatorV12[]
+    return nominators.filter(Boolean).map(n => ({
       id: n.id,
       total: n.total
     }))
