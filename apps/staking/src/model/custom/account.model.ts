@@ -1,4 +1,9 @@
-import { Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_ } from 'typeorm'
+import {
+  Entity as Entity_,
+  Column as Column_,
+  PrimaryColumn as PrimaryColumn_,
+  Index as Index_
+} from 'typeorm'
 import * as marshal from '../generated/marshal'
 
 @Entity_()
@@ -10,6 +15,7 @@ export class Account {
   @PrimaryColumn_()
   id!: string
 
+  @Index_()
   @Column_('numeric', {
     transformer: marshal.bigintTransformer,
     nullable: false,
@@ -18,6 +24,7 @@ export class Account {
   })
   stakedAmountTotal!: bigint
 
+  @Index_()
   @Column_('numeric', {
     transformer: marshal.bigintTransformer,
     nullable: false,
@@ -26,6 +33,7 @@ export class Account {
   })
   rewardsTotal!: bigint
 
+  @Index_()
   @Column_('int4', { nullable: true })
   updatedAt!: number | undefined | null
 }

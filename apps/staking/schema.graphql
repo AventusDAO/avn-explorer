@@ -1,8 +1,8 @@
 type Account @entity {
   id: ID!
-  stakedAmountTotal: BigInt!
-  rewardsTotal: BigInt!
-  updatedAt: Int
+  stakedAmountTotal: BigInt! @index
+  rewardsTotal: BigInt! @index
+  updatedAt: Int @index
 }
 
 type ChainState @entity {

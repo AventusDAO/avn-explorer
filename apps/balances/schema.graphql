@@ -1,21 +1,21 @@
 type Account @entity {
-  id: ID!
-  updatedAt: Int
+  id: ID! @index
+  updatedAt: Int @index
 }
 
 type ChainState @entity {
-  id: ID!
-  tokenBalance: BigInt!
-  tokenHolders: Int!
+  id: ID! @index
+  tokenBalance: BigInt! @index
+  tokenHolders: Int! @index
   timestamp: DateTime! @index
   blockNumber: Int! @index
 }
 
 type Balance @entity {
-  id: ID!
-  free: BigInt!
-  reserved: BigInt!
-  total: BigInt!
-  updatedAt: Int
-  accountId: String!
+  id: ID! @index
+  free: BigInt! @index
+  reserved: BigInt! @index
+  total: BigInt! @index
+  updatedAt: Int @index
+  accountId: String! @index
 }

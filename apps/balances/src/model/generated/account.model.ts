@@ -1,8 +1,4 @@
-import {
-  Entity as Entity_,
-  Column as Column_,
-  PrimaryColumn as PrimaryColumn_
-} from 'typeorm'
+import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, Index as Index_} from "typeorm"
 
 @Entity_()
 export class Account {
@@ -13,6 +9,7 @@ export class Account {
   @PrimaryColumn_()
   id!: string
 
-  @Column_('int4', { nullable: true })
+  @Index_()
+  @Column_("int4", {nullable: true})
   updatedAt!: number | undefined | null
 }
