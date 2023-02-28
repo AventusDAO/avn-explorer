@@ -9,14 +9,12 @@ export const environments: AvnEnvironment[] = [
   {
     name: 'testnet',
     endpoint: 'wss://avn-parachain.public-testnet.aventus.io',
-    prefix: NetworkPrefix.aventus,
-    typesBundle: 'avn-types'
+    prefix: NetworkPrefix.aventus
   },
   {
     name: 'mainnet',
     endpoint: 'wss://avn-parachain.mainnet.aventus.io',
-    prefix: NetworkPrefix.aventus,
-    typesBundle: 'avn-types'
+    prefix: NetworkPrefix.aventus
   }
 ]
 
