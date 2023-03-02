@@ -4,17 +4,17 @@ export const environments: AvnEnvironment[] = [
   {
     name: 'parachain-dev',
     endpoint: 'wss://avn-parachain.dev.aventus.io',
-    prefix: NetworkPrefix.aventus
+    prefix: NetworkPrefix.substrate
   },
   {
     name: 'testnet',
     endpoint: 'wss://avn-parachain.public-testnet.aventus.io',
-    prefix: NetworkPrefix.aventus
+    prefix: NetworkPrefix.substrate
   },
   {
     name: 'mainnet',
     endpoint: 'wss://avn-parachain.mainnet.aventus.io',
-    prefix: NetworkPrefix.aventus
+    prefix: NetworkPrefix.substrate
   }
 ]
 
