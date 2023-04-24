@@ -4,7 +4,7 @@ RUN apk add g++ make python3
 
 WORKDIR /app
 
-COPY yarn.lock package.json .yarnrc.yml tsconfig.json .
+COPY yarn.lock package.json .yarnrc.yml tsconfig.json ./
 COPY .yarn .yarn
 COPY packages packages
 COPY apps/tokens apps/tokens
