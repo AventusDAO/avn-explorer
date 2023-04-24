@@ -15,15 +15,8 @@ const client = new Client({
 const dropTables = async schema => {
   console.log(`Dropping tables in ${schema} schema...`)
 
-  // const query = `
-  //   SELECT
-  //     'DROP TABLE IF EXISTS "' || schemaname || '.' || tablename || '" CASCADE;'
-  //   from
-  //     pg_tables WHERE schemaname = '${schema}';
-  // `
   const query = `SELECT schemaname, tablename FROM pg_tables WHERE schemaname = '${schema}';`
-  const res = await client.query(query)
-  const { rows: tables } = res
+  const { rows: tables } = await client.query(query)
 
   for (const { schemaname, tablename } of tables) {
     const dropQuery = `DROP TABLE IF EXISTS ${schemaname}.${tablename};`
