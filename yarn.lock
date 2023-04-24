@@ -315,6 +315,15 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@avn/nuke@workspace:apps/nuke":
+  version: 0.0.0-use.local
+  resolution: "@avn/nuke@workspace:apps/nuke"
+  dependencies:
+    dotenv: ^10.0.0
+    pg: ^8.7.1
+  languageName: unknown
+  linkType: soft
+
 "@avn/staking@workspace:apps/staking":
   version: 0.0.0-use.local
   resolution: "@avn/staking@workspace:apps/staking"
