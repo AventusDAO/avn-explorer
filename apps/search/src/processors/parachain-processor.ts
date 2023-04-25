@@ -20,7 +20,7 @@ const processor = getProcessor().addCall('*', {
     },
     // the extrisic initiated the call
     extrinsic: {
-      signature: false,
+      signature: true,
       success: true, // fetch the extrinsic success status
       fee: false,
       tip: false,
@@ -31,6 +31,8 @@ const processor = getProcessor().addCall('*', {
   }
 } as const)
 
-const handleBatch = async (_ctx: Context): Promise<void> => {}
+const handleBatch = async (ctx: Context): Promise<void> => {
+  console.log(ctx.blocks.map(b => b.items.length))
+}
 
 processor.run(new TypeormDatabase(), handleBatch)

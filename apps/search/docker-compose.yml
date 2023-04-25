@@ -2,6 +2,7 @@ version: '3'
 
 volumes:
   db-data:
+  es-data:
 
 services:
   db:
@@ -31,7 +32,7 @@ services:
       - published: 9300
         target: 9300
     volumes:
-      - db-data:/usr/share/elasticsearch/data
+      - es-data:/usr/share/elasticsearch/data
     healthcheck:
       test: ['CMD-SHELL', 'curl --fail localhost:9200 || exit 1']
     restart: always
@@ -43,4 +44,4 @@ services:
         max-file: '3'
 
 networks:
-  fees:
+  search:

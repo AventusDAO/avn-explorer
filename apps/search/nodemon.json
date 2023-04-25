@@ -7,5 +7,5 @@
     "TS_NODE_CACHE": "false"
   },
   "ext": "js",
-  "exec": "yarn db:reset && yarn db:migrate && yarn processor:debug"
+  "exec": "yarn processor:debug"
 }
