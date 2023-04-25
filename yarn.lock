@@ -315,6 +315,28 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@avn/search@workspace:apps/search":
+  version: 0.0.0-use.local
+  resolution: "@avn/search@workspace:apps/search"
+  dependencies:
+    "@avn/config": ^1.0.0
+    "@avn/types": ^1.0.0
+    "@avn/utils": ^1.0.0
+    "@subsquid/cli": ^0.7.2
+    "@subsquid/logger": ^0.3.0
+    "@subsquid/ss58": ^0.1.1
+    "@subsquid/substrate-processor": ^1.2.0
+    "@subsquid/substrate-typegen": ^1.5.0
+    "@subsquid/typeorm-store": ^0.1.5
+    "@types/node": ^18.11.9
+    class-validator: ^0.13.2
+    dotenv: ^10.0.0
+    nodemon: ^2.0.20
+    typeorm: ^0.3.10
+    typescript: ^4.9.3
+  languageName: unknown
+  linkType: soft
+
 "@avn/staking@workspace:apps/staking":
   version: 0.0.0-use.local
   resolution: "@avn/staking@workspace:apps/staking"

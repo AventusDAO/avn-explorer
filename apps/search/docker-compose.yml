@@ -1,0 +1,46 @@
+version: '3'
+
+volumes:
+  db-data:
+
+services:
+  db:
+    image: postgres:14
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_PASSWORD: ${DB_PASS}
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    ports:
+      - '${DB_PORT}:5432'
+      # command: ["postgres", "-c", "log_statement=all"]
+    networks:
+      - search
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.9.3
+    environment:
+      - discovery.type=single-node
+      - http.cors.enabled=true
+      - http.cors.allow-origin=*
+    # Uncomment the port section bellow to expose elastic search to the host machine.
+    ports:
+      - published: 9200
+        target: 9200
+      - published: 9300
+        target: 9300
+    volumes:
+      - db-data:/usr/share/elasticsearch/data
+    healthcheck:
+      test: ['CMD-SHELL', 'curl --fail localhost:9200 || exit 1']
+    restart: always
+    networks:
+      - search
+    logging:
+      options:
+        max-size: '10m'
+        max-file: '3'
+
+networks:
+  fees:
