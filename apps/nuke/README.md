@@ -5,6 +5,7 @@ Package to clear data in the multitenant DB configuration.
 ## Configuration
 
 Package requires following environment variables:
+
 ```
 DB_NAME=parachain-dev
 DB_HOST=localhost

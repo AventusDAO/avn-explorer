@@ -1,7 +1,5 @@
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
-
-
 /* eslint-disable @typescript-eslint/no-var-requires */
 import { SchemaConfig, getSchemaConfigs } from './config'
 const { Client } = require('pg')
