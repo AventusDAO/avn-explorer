@@ -5,7 +5,7 @@ import { Store, TypeormDatabase } from '@subsquid/typeorm-store'
 type Item = BatchProcessorItem<typeof processor>
 export type Context = BatchContext<Store, Item>
 
-const SAVE_PERIOD = 12 * 60 * 60 * 1000
+const SAVE_PERIOD = 12 * 60 * 60 * 1000 // 12 hours
 let lastStateTimestamp: number | undefined
 
 const processor = getProcessor().addCall('*', {
