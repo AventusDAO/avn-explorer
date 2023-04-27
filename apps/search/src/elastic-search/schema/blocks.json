@@ -17,10 +17,10 @@
       "height": {
         "type": "long"
       },
-      "txCount": {
+      "extrCount": {
         "type": "long"
       },
-      "exCount": {
+      "signedExtrCount": {
         "type": "long"
       }
     }

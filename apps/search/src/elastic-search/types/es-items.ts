@@ -11,8 +11,8 @@ interface EsItem {
 
 export interface EsBlock extends EsItem {
   height: number
-  txCount: number
-  exCount: number
+  extrCount: number
+  signedExtrCount: number
 }
 
 export interface EsExtrinsic extends EsItem {
@@ -21,6 +21,10 @@ export interface EsExtrinsic extends EsItem {
   method: string
   isSigned: boolean
   isFailed: boolean
+  signer: string
+  nonce: number
+  proxySigner?: string
+  proxyNonce?: number
 }
 
 export interface EsEvent extends EsItem {

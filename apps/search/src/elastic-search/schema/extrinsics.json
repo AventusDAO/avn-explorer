@@ -28,6 +28,18 @@
       },
       "isFailed": {
         "type": "boolean"
+      },
+      "signer": {
+        "type": "keyword"
+      },
+      "nonce": {
+        "type": "long"
+      },
+      "proxySigner": {
+        "type": "keyword"
+      },
+      "proxyNonce": {
+        "type": "long"
       }
     }
   }
