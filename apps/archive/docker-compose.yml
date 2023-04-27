@@ -20,8 +20,11 @@ services:
   ingest:
     depends_on:
       - db
-    restart: on-failure
-    image: subsquid/substrate-ingest:firesquid
+    # restart: on-failure
+    # image: subsquid/substrate-ingest:firesquid
+    image: avn-ingest-solochain
+    # volumes:
+    #   - ./solochain-ingest/avn-types.json:/app/avn-types.json
     command: [
         '-e',
         '${AVN_NODE}',
@@ -32,10 +35,16 @@ services:
 
         '10', # allow up to 10 pending requests for the above endpoint (default is 5)
         '--out',
-        'postgres://${DB_USER}:${DB_PASS}@db:${DB_PORT}/${DB_NAME}'
+        'postgres://${DB_USER}:${DB_PASS}@db:${DB_PORT}/${DB_NAME}',
+
+        # types for solochain if it's a custom image
+        "--types-bundle", "/app/avn-types.json",
+        # # types for solochain if added as a volume
+        # "--types-bundle", "/app/avn-types.json",
       ]
     networks:
       - avn-archive
+
 
   gateway:
     depends_on:
