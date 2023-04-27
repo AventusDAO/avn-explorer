@@ -4,15 +4,18 @@ Solochain is based on an older Substrate runtime that requires external custom t
 
 Versioned types bundle is distributed as `avn-types` npm package ([repository](https://github.com/Aventus-Network-Services/avn-types/blob/master/index.js)), but it needs to be transformed to a single JSON file.
 
-We don't have it automated, but the work on solochain is stopped so it doesn't need to be. 
+We don't have it automated, but the work on solochain is stopped so it doesn't need to be.
 
 ## Types error
 
 The ingester had issues parsing the solochain genesis blocks. So if the types need to be updated, see if the following fix needs to added:
+
 ```json
   "EthKey": "H512"
 ```
-to base types and 
+
+to base types and
+
 ```json
   "EthEventCheckResult": {
     "event": "EthEvent",
@@ -23,5 +26,5 @@ to base types and
     "min_challenge_votes": "u32"
   },
 ```
-to types for `[271, null]` specVersion range.
 
+to types for `[271, null]` specVersion range.

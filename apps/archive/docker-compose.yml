@@ -36,15 +36,13 @@ services:
 
         '10', # allow up to 10 pending requests for the above endpoint (default is 5)
         '--out',
-        'postgres://${DB_USER}:${DB_PASS}@db:${DB_PORT}/${DB_NAME}',
-
+        'postgres://${DB_USER}:${DB_PASS}@db:${DB_PORT}/${DB_NAME}'
         # custom types for the solochain
         # "--types-bundle", "/app/avn-types.json", # it's a custom image built from `solochain-ingest/Dockerfile`
         # "--types-bundle", "/app/avn-types.json", # if added as a volume to the `subsquid/substrate-ingest:firesquid`
       ]
     networks:
       - avn-archive
-
 
   gateway:
     depends_on:
