@@ -1,0 +1,46 @@
+{
+  "mappings": {
+    "properties": {
+      "refId": {
+        "type:": "keyword"
+      },
+      "timestamp": {
+        "type": "date",
+        "format": "epoch_millis"
+      },
+      "chainGen": {
+        "type": "short"
+      },
+      "blockHeight": {
+        "type": "long"
+      },
+      "hash": {
+        "type": "keyword"
+      },
+      "section": {
+        "type": "keyword"
+      },
+      "method": {
+        "type": "keyword"
+      },
+      "isSigned": {
+        "type": "boolean"
+      },
+      "isFailed": {
+        "type": "boolean"
+      },
+      "signer": {
+        "type": "keyword"
+      },
+      "nonce": {
+        "type": "long"
+      },
+      "proxySigner": {
+        "type": "keyword"
+      },
+      "proxyNonce": {
+        "type": "long"
+      }
+    }
+  }
+}

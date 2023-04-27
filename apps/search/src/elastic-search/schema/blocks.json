@@ -1,0 +1,28 @@
+{
+  "mappings": {
+    "properties": {
+      "refId": {
+        "type:": "keyword"
+      },
+      "timestamp": {
+        "type": "date",
+        "format": "epoch_millis"
+      },
+      "chainGen": {
+        "type": "short"
+      },
+      "hash": {
+        "type": "keyword"
+      },
+      "height": {
+        "type": "long"
+      },
+      "extrCount": {
+        "type": "long"
+      },
+      "signedExtrCount": {
+        "type": "long"
+      }
+    }
+  }
+}
