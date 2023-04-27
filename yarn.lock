@@ -315,6 +315,17 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@avn/nuke@workspace:apps/nuke":
+  version: 0.0.0-use.local
+  resolution: "@avn/nuke@workspace:apps/nuke"
+  dependencies:
+    "@types/node": ^18.11.9
+    dotenv: ^10.0.0
+    pg: ^8.7.1
+    typescript: ^4.9.3
+  languageName: unknown
+  linkType: soft
+
 "@avn/search@workspace:apps/search":
   version: 0.0.0-use.local
   resolution: "@avn/search@workspace:apps/search"
