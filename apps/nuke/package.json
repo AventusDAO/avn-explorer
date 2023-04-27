@@ -1,0 +1,19 @@
+{
+  "name": "@avn/nuke",
+  "private": true,
+  "packageManager": "yarn@3.3.0",
+  "scripts": {
+    "types:check": "tsc --pretty --noEmit",
+    "build": "rm -rf lib && tsc",
+    "build:watch": "tsc -w",
+    "start": "node lib/index.js"
+  },
+  "dependencies": {
+    "dotenv": "^10.0.0",
+    "pg": "^8.7.1"
+  },
+  "devDependencies": {
+    "@types/node": "^18.11.9",
+    "typescript": "^4.9.3"
+  }
+}
