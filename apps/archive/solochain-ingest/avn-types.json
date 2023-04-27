@@ -779,6 +779,7 @@
               "reserved_eth_transaction": "EthTransactionType"
             },
             "Public": "[u8;33]",
+            "EthKey": "H512",
             "ValidatorsActionType": {
               "_enum": ["Voluntary", "Slashed", "Activation", "Unknown"]
             },
@@ -866,6 +867,14 @@
         {
           "minmax": [271, null],
           "types": {
+            "EthEventCheckResult": {
+              "event": "EthEvent",
+              "result": "CheckResult",
+              "checked_by": "AccountId",
+              "checked_at_block": "BlockNumber",
+              "ready_for_processing_after_block": "BlockNumber",
+              "min_challenge_votes": "u32"
+            },
             "CheckResult": {
               "_enum": ["Ok", "Invalid", "HttpErrorCheckingEvent", "Unknown"]
             },
