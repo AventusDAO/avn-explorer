@@ -120,20 +120,52 @@ const mapExtrinsics = (block: BatchBlock<Item>): EsExtrinsic[] => {
     })
 }
 
+
+const mapEvents = (block: BatchBlock<Item>): EsEvent[] => {
+  const blockHeader: SubstrateBlock = block.header
+  const { height, timestamp } = blockHeader
+  const chainGen = mapChainGen(block)
+
+  return block.items
+    .filter(item => item.kind === 'event')
+    .map(item => {
+      // just for type safety
+      if (item.kind !== 'event') throw new Error(`item must be of 'event' kind`)
+      const _name = item.event.name
+      const [section, name] = _name.split('.')
+      return {
+        refId: item.event.id,
+        timestamp,
+        chainGen,
+        blockHeight: height,
+        section,
+        name
+      }
+    })
+}
+
 let esClient: ElasticSearch | undefined
 const handleBatch = async (ctx: Context): Promise<void> => {
-  if (!esClient) {
+  // TODO: refactor me for readability
+  if (esClient === undefined) {
     esClient = await getElasticSearchClient()
   }
 
+  const batchedBlocks: EsBlock[] = []
+  const batchedExtrinsics: EsExtrinsic[] = []
+  const batchedEvents: EsEvent[] = []
+
   ctx.blocks.forEach(batchBlock => {
+    const events = mapEvents(batchBlock)
     const extrinsics = mapExtrinsics(batchBlock)
     const block = mapBlockBatch(batchBlock, extrinsics)
-    // TODO: events
-    // const events: EsEvent[] = []
-    console.log('block', block)
-    console.log('extrinsics', extrinsics)
+
+    batchedBlocks.push(block)
+    batchedExtrinsics.push(...extrinsics)
+    batchedEvents.push(...events)
   })
+
+  await esClient.storeBatch(batchedBlocks, batchedExtrinsics, batchedEvents)
 }
 
 processor.run(new TypeormDatabase(), handleBatch)

@@ -14,9 +14,6 @@
       "blockHeight": {
         "type": "long"
       },
-      "hash": {
-        "type": "keyword"
-      },
       "section": {
         "type": "keyword"
       },

@@ -6,16 +6,17 @@ interface EsItem {
   refId: string
   timestamp: number
   chainGen: ChainGen
-  hash: string
 }
 
 export interface EsBlock extends EsItem {
+  hash: string
   height: number
   extrCount: number
   signedExtrCount: number
 }
 
 export interface EsExtrinsic extends EsItem {
+  hash: string
   blockHeight: number
   section: string
   method: string
