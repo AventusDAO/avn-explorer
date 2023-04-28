@@ -4,7 +4,7 @@ import { ChainGen } from '@avn/utils'
 
 interface EsItem {
   refId: string
-  timestamp: bigint
+  timestamp: number
   chainGen: ChainGen
   hash: string
 }
@@ -19,12 +19,14 @@ export interface EsExtrinsic extends EsItem {
   blockHeight: number
   section: string
   method: string
-  isSigned: boolean
-  isFailed: boolean
-  signer: string
-  nonce: number
-  proxySigner?: string
-  proxyNonce?: number
+  // TODO: signatures and nonces
+  isSigned?: boolean
+  // isSigned: boolean
+  // isFailed: boolean
+  // signer: string
+  // nonce: number
+  // proxySigner?: string
+  // proxyNonce?: number
 }
 
 export interface EsEvent extends EsItem {
