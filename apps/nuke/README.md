@@ -40,6 +40,15 @@ RESET_TOKENS=true
 DB_USER_TOKENS=tokens
 DB_SCHEMA_TOKENS=tokens
 DB_PASS_TOKENS=
+
+RESET_SEARCH=false
+DB_SCHEMA_SEARCH=search
+DB_USER_SEARCH=search
+DB_PASS_SEARCH=postgres
+ES_URL_SEARCH=http://localhost:9200
+ES_BLOCKS_INDEX_SEARCH=blocks
+ES_EXTRINSICS_INDEX_SEARCH=extrinsics
+ES_EVENTS_INDEX_SEARCH=events
 ```
 
 > NOTE: don't forget to append new env vars when adding a new processor

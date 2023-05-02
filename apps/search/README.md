@@ -25,6 +25,6 @@ Note that the GraphQL variables are not needed, but you need Elastic/Open Search
 ```
 ES_URL=http://localhost:9200
 ES_BLOCKS_INDEX=blocks
-ES_EXTRINSIC_INDEX=extrinsics
+ES_EXTRINSICS_INDEX=extrinsics
 ES_EVENTS_INDEX=events
 ```
