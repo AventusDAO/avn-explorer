@@ -7,8 +7,7 @@ import {
   BatchBlock
 } from '@subsquid/substrate-processor'
 import { Store, TypeormDatabase } from '@subsquid/typeorm-store'
-import { getElasticSearchClient } from './elastic-search'
-import { ElasticSearch } from './elastic-search/elastic-search'
+import { getElasticSearch } from './elastic-search'
 import { EsBlock, EsEvent, EsExtrinsic } from './elastic-search/types'
 
 type Item = BatchProcessorItem<typeof processor>
@@ -150,7 +149,6 @@ const mapExtrinsics = (block: BatchBlock<Item>): EsExtrinsic[] => {
     })
 }
 
-
 const mapEvents = (block: BatchBlock<Item>): EsEvent[] => {
   const blockHeader: SubstrateBlock = block.header
   const { height, timestamp } = blockHeader
@@ -174,12 +172,8 @@ const mapEvents = (block: BatchBlock<Item>): EsEvent[] => {
     })
 }
 
-let esClient: ElasticSearch | undefined
 const handleBatch = async (ctx: Context): Promise<void> => {
-  // TODO: refactor me for readability
-  if (esClient === undefined) {
-    esClient = await getElasticSearchClient()
-  }
+  const elasticSearch = getElasticSearch()
 
   const batchedBlocks: EsBlock[] = []
   const batchedExtrinsics: EsExtrinsic[] = []
@@ -195,7 +189,18 @@ const handleBatch = async (ctx: Context): Promise<void> => {
     batchedEvents.push(...events)
   })
 
-  await esClient.storeBatch(batchedBlocks, batchedExtrinsics, batchedEvents)
+  await elasticSearch.storeBatch(batchedBlocks, batchedExtrinsics, batchedEvents)
 }
 
-processor.run(new TypeormDatabase(), handleBatch)
+const main = async (): Promise<void> => {
+  const elasticSearch = getElasticSearch()
+
+  const isSetUp = await elasticSearch.isSetUp()
+  if (!isSetUp) {
+    await elasticSearch.setupIndexes()
+  }
+
+  processor.run(new TypeormDatabase(), handleBatch)
+}
+
+void main()
