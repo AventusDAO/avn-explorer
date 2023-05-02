@@ -93,7 +93,7 @@ const mapExtrinsics = (block: BatchBlock<Item>): EsExtrinsic[] => {
 
   // find AvnProxy.InnerCallFailed events in the block, to be used for determining extrinsic success status
   const innerCallFailedEvents = block.items.filter(
-    item => item.kind === 'event' && (item.event.name as string) === 'InnerCallFailed'
+    item => item.kind === 'event' && (item.event.name as string) === 'AvnProxy.InnerCallFailed'
   )
 
   return block.items
@@ -125,8 +125,7 @@ const mapExtrinsics = (block: BatchBlock<Item>): EsExtrinsic[] => {
         if (event.event.call?.id === item.call.id) return event
         return undefined
       })
-      const isInnerCallFailed = innerFailedEvent !== undefined
-      const isSuccess = isProcessed && !isInnerCallFailed
+      const isSuccess = isProcessed && innerFailedEvent === undefined
 
       let proxySigner: string | undefined
       if (item.name === 'AvnProxy.proxy') {
