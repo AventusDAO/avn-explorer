@@ -91,6 +91,11 @@ const mapExtrinsics = (block: BatchBlock<Item>): EsExtrinsic[] => {
   const { height, timestamp } = blockHeader
   const chainGen = mapChainGen(block)
 
+  // find AvnProxy.InnerCallFailed events in the block, to be used for determining extrinsic success status
+  const innerCallFailedEvents = block.items.filter(
+    item => item.kind === 'event' && (item.event.name as string) === 'InnerCallFailed'
+  )
+
   return block.items
     .filter(item => item.kind === 'call')
     .reduce((array, item) => {
@@ -108,6 +113,26 @@ const mapExtrinsics = (block: BatchBlock<Item>): EsExtrinsic[] => {
       if (item.kind !== 'call') throw new Error(`item must be of 'call' kind`)
       const name = item.call.name
       const [section, method] = name.split('.')
+
+      const signature = item.extrinsic.signature
+      const isSigned = !!signature
+      const signer = signature?.address?.value
+      const nonce = signature?.signedExtensions?.CheckNonce
+      const isProcessed = item.extrinsic.success
+
+      const innerFailedEvent = innerCallFailedEvents.find(event => {
+        if (event.kind !== 'event') return undefined
+        if (event.event.call?.id === item.call.id) return event
+        return undefined
+      })
+      const isInnerCallFailed = innerFailedEvent !== undefined
+      const isSuccess = isProcessed && !isInnerCallFailed
+
+      let proxySigner: string | undefined
+      if (item.name === 'AvnProxy.proxy') {
+        proxySigner = item.call.args.call.value.proof.signer
+      }
+
       return {
         refId: item.extrinsic.id,
         timestamp,
@@ -115,7 +140,13 @@ const mapExtrinsics = (block: BatchBlock<Item>): EsExtrinsic[] => {
         blockHeight: height,
         hash: item.extrinsic.hash,
         section,
-        method
+        method,
+        isSigned,
+        isProcessed,
+        isSuccess,
+        signer,
+        nonce,
+        proxySigner
       }
     })
 }

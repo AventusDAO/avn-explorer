@@ -20,14 +20,12 @@ export interface EsExtrinsic extends EsItem {
   blockHeight: number
   section: string
   method: string
-  // TODO: signatures and nonces
-  isSigned?: boolean
-  // isSigned: boolean
-  // isFailed: boolean
-  // signer: string
-  // nonce: number
-  // proxySigner?: string
-  // proxyNonce?: number
+  isSigned: boolean
+  isProcessed: boolean
+  isSuccess: boolean
+  signer: string
+  nonce: number
+  proxySigner?: string
 }
 
 export interface EsEvent extends EsItem {

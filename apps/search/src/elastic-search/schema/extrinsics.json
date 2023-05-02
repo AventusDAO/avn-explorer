@@ -26,7 +26,10 @@
       "isSigned": {
         "type": "boolean"
       },
-      "isFailed": {
+      "isProcessed": {
+        "type": "boolean"
+      },
+      "isSuccess": {
         "type": "boolean"
       },
       "signer": {
@@ -37,9 +40,6 @@
       },
       "proxySigner": {
         "type": "keyword"
-      },
-      "proxyNonce": {
-        "type": "long"
       }
     }
   }
