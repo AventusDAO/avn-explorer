@@ -9,6 +9,7 @@ const clearSchema = async (config: SchemaConfig) => {
   const { schema, reset, user, pass } = config
 
   if (!reset) return
+
   if (!schema) throw new Error('Missing schema env var')
   if (!user || !pass) throw new Error('Missing user or pass env var')
 
@@ -19,6 +20,16 @@ const clearSchema = async (config: SchemaConfig) => {
     port: process.env.DB_PORT,
     host: process.env.DB_HOST
   })
+
+  if (config.name === 'search') {
+    const { esUrl, esBlocksIndex, esExtrinsicsIndex, esEventsIndex } = config
+    if (esUrl && esBlocksIndex && esExtrinsicsIndex && esEventsIndex) {
+      console.log('Clearing ElasticSearch indices...')
+      const endpoints = [esBlocksIndex, esExtrinsicsIndex, esEventsIndex].map(e => `${esUrl}/${e}`)
+      const deleteRequests = endpoints.map(async e => await fetch(e, { method: 'DELETE' }))
+      await Promise.all(deleteRequests)
+    }
+  }
 
   console.log(`Connecting user to ${schema} schema...`)
   await client.connect()

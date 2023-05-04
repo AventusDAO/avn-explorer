@@ -2,7 +2,7 @@
   "mappings": {
     "properties": {
       "refId": {
-        "type:": "keyword"
+        "type": "keyword"
       },
       "timestamp": {
         "type": "date",
@@ -13,9 +13,6 @@
       },
       "blockHeight": {
         "type": "long"
-      },
-      "hash": {
-        "type": "keyword"
       },
       "section": {
         "type": "keyword"

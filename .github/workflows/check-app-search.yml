@@ -1,0 +1,35 @@
+name: Check Search app
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'apps/search/**'
+      # check if one of the used packages is changed
+      - 'packages/types/**'
+      - 'packages/config/**'
+      - 'packages/utils/**'
+
+defaults:
+  run:
+    working-directory: apps/search
+
+jobs:
+  check_search_app:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '18.6'
+          cache: 'yarn'
+      - name: Install dependencies
+        run: yarn
+      - name: Build dependency packages
+        run: |
+          yarn workspace @avn/types run build
+          yarn workspace @avn/config run build
+          yarn workspace @avn/utils run build
+      - name: Run typescript checks
+        run: yarn types:check
