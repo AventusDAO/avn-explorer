@@ -1,4 +1,4 @@
-name: Nuke
+name: Build Nuke
 
 on:
   workflow_dispatch:
