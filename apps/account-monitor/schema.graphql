@@ -1,0 +1,27 @@
+type Account @entity {
+  id: ID!
+}
+
+enum TransferType {
+  BALANCES_TRANSFER
+  TOKEN_PROXY_TRANSFER
+}
+
+type Transfer @entity {
+  id: ID!
+  blockNumber: Int! @index
+  timestamp: DateTime! @index
+  extrinsicHash: String @index
+  call: String @index
+  from: Account!
+  to: Account!
+  amount: BigInt! @index
+  tokenId: String @index
+  transferType: TransferType!
+}
+
+type ChainState @entity {
+  id: ID!
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+}
