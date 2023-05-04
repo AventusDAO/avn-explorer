@@ -9,4 +9,4 @@ COPY .yarn .yarn
 COPY apps/nuke apps/nuke
 
 RUN yarn install && \
-    yarn workspace @avn/fees run build
+    yarn workspace @avn/nuke run build
