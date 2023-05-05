@@ -11,7 +11,7 @@ API serving indexed search data from the Open Search database.
 # the url of the database (ElasticSearch)
 DB_URL=http://localhost:9200
 # the list of allowed origins for CORS, comma separated
-CORS_ALLOWED_URLS=http://localhost:3300
+CORS_ALLOWED_URLS=http://localhost:3300,https://explorer.dev.aventus.io
 ```
 
 Additional environment variables used:

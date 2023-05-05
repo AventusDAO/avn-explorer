@@ -22,9 +22,9 @@ export const config = {
 
   server: {
     port: process.env.PORT ?? process.env.PORT ?? 3000,
-    // for dev set http://localhost:8080
+    // for dev set http://localhost:3000 (or whatever UI is using it)
     // for prod set the url of the hosted website
-    // can be multi origins separated by triple comma e.g. https://stats.aventus.io,,,https://staging.stats.aventus.io
+    // can be multi origins separated by a single comma e.g. https://explorer.aventus.io,https://explorer.dev.aventus.io
     corsAllowedUrls: process.env.CORS_ALLOWED_URLS,
     statusPort: process.env.STATUS_PORT ?? 3001
   }

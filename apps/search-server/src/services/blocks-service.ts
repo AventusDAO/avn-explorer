@@ -79,22 +79,22 @@ export const getBlocks = async (
   const query = getBlocksQuery(undefined, !skipSystemBlocks)
   const sort: EsSortItem[] = []
 
-  const defaultSort: EsSortItem = { number: EsSortDirection.Desc }
+  const defaultSort: EsSortItem = { height: EsSortDirection.Desc }
 
   if (sortCsv !== undefined) {
     // throws ApiError (400) if `sort` is not supported
     const supportedSortFields = ['timestamp', 'height']
     const sortItem = processSortParam(sortCsv, supportedSortFields)
 
-    if (sortItem.number) {
+    if (sortItem.height) {
       // if sorting by blockNumber.Asc then also sort by chainType .Asc here
-      const chainTypeSortDirection: EsSortDirection = sortItem.number
-      const chainTypeSort = processSortParam(`chainType,${chainTypeSortDirection}`, ['chainType'])
+      const chainTypeSortDirection: EsSortDirection = sortItem.height
+      const chainTypeSort = processSortParam(`chainGen,${chainTypeSortDirection}`, ['chainGen'])
       sort.push(chainTypeSort)
     }
 
     sort.push(sortItem)
-    if (!Object.keys(sortItem).includes('number')) {
+    if (!Object.keys(sortItem).includes('height')) {
       sort.push(defaultSort)
     }
   } else {
