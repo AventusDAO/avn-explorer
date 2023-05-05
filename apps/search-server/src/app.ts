@@ -8,6 +8,7 @@ import morgan from 'morgan'
 import cors from 'cors'
 
 import statusApp from './status-app'
+import blocks from './routes/blocks'
 
 import { BaseError } from './utils'
 
@@ -47,6 +48,10 @@ const corsOptions = {
   }
 }
 app.use(cors(corsOptions))
+
+// add routes
+app.use('/blocks', blocks)
+
 
 const port = config.server.port
 app.listen(port)

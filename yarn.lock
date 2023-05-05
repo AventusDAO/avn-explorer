@@ -335,6 +335,7 @@ __metadata:
     "@types/express": ^4.17.17
     "@types/morgan": ^1.9.4
     "@types/node": ^18.11.9
+    "@types/qs": ^6
     axios: ^1.4.0
     cors: ^2.8.5
     dotenv: ^10.0.0
@@ -342,6 +343,7 @@ __metadata:
     helmet: ^6.1.5
     morgan: ^1.10.0
     nodemon: ^2.0.20
+    qs: ^6.11.1
     typescript: ^4.9.3
     winston: ^3.8.2
   languageName: unknown
@@ -3206,7 +3208,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/qs@npm:*":
+"@types/qs@npm:*, @types/qs@npm:^6":
   version: 6.9.7
   resolution: "@types/qs@npm:6.9.7"
   checksum: 7fd6f9c25053e9b5bb6bc9f9f76c1d89e6c04f7707a7ba0e44cc01f17ef5284adb82f230f542c2d5557d69407c9a40f0f3515e8319afd14e1e16b5543ac6cdba
@@ -9821,6 +9823,15 @@ __metadata:
   dependencies:
     side-channel: ^1.0.4
   checksum: 6e1f29dd5385f7488ec74ac7b6c92f4d09a90408882d0c208414a34dd33badc1a621019d4c799a3df15ab9b1d0292f97c1dd71dc7c045e69f81a8064e5af7297
+  languageName: node
+  linkType: hard
+
+"qs@npm:^6.11.1":
+  version: 6.11.1
+  resolution: "qs@npm:6.11.1"
+  dependencies:
+    side-channel: ^1.0.4
+  checksum: 82ee78ef12a16f3372fae5b64f76f8aedecb000feea882bbff1af146c147f6eb66b08f9c3f34d7e076f28563586956318b9b2ca41141846cdd6d5ad6f241d52f
   languageName: node
   linkType: hard
 

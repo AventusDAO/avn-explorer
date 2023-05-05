@@ -15,9 +15,9 @@ export const config = {
   db: {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     baseUrl: process.env.DB_URL!,
-    blocksIndex: process.env.DB_BLOCKS_INDEX,
-    extrinsicsIndex: process.env.DB_EXTRINSICS_INDEX,
-    eventsIndex: process.env.DB_EVENTS_INDEX
+    blocksIndex: process.env.DB_BLOCKS_INDEX ?? 'blocks',
+    extrinsicsIndex: process.env.DB_EXTRINSICS_INDEX ?? 'extrinsics',
+    eventsIndex: process.env.DB_EVENTS_INDEX ?? 'events'
   },
 
   server: {
