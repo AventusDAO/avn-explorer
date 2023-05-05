@@ -6,7 +6,6 @@ API serving indexed search data from the Open Search database.
 
 ## Environment variables
 
-
 ```bash
 # the url of the database (ElasticSearch)
 DB_URL=http://localhost:9200

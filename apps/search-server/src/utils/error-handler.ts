@@ -7,10 +7,7 @@ const isProduction = process.env.NODE_ENV === 'production'
 
 class ErrorHandler {
   public async handleError(err: Error): Promise<void> {
-    const errMsg =
-      err.stack && !this.isTrustedError(err)
-        ? err.stack
-        : `${JSON.stringify(err)}`
+    const errMsg = err.stack && !this.isTrustedError(err) ? err.stack : `${JSON.stringify(err)}`
     logger.error(errMsg)
     // ... can do other stuff, e.g. send mail or Slack notification
     return await Promise.resolve()
@@ -71,13 +68,10 @@ export async function errorHandler(
 }
 
 // get the unhandled Promise rejection and throw it (to the `uncaughtException` listener)
-process.on(
-  'unhandledRejection',
-  (reason: Error, _promise: Promise<unknown>) => {
-    reason.name = `UnhandledPromiseRejectionWarning: ${reason.name}`
-    throw reason
-  }
-)
+process.on('unhandledRejection', (reason: Error, _promise: Promise<unknown>) => {
+  reason.name = `UnhandledPromiseRejectionWarning: ${reason.name}`
+  throw reason
+})
 
 // handle uncaught exceptions
 // note: adding "no-misused-promises" until we can upgrade to Express v5 for async functions as middleware and handlers

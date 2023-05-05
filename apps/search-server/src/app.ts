@@ -52,7 +52,6 @@ app.use(cors(corsOptions))
 // add routes
 app.use('/blocks', blocks)
 
-
 const port = config.server.port
 app.listen(port)
 

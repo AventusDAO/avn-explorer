@@ -5,14 +5,14 @@
   "packageManager": "yarn@3.3.0",
   "main": "lib/app",
   "scripts": {
-    "build": "npm run version:print && tsc",
+    "build": "yarn version:print && tsc",
     "build:watch": "tsc -w",
     "dev": "nodemon",
     "start": "NODE_OPTIONS=--enable-source-maps node lib/app.js",
     "start:debug": "yarn version:print && node --inspect --enable-source-maps -r dotenv/config lib/app.js",
     "version:print": "echo '{\"version\":\"'$npm_package_version'\",\"buildTimestamp\":\"'$(date +%s)'\"}' > src/version.json",
     "types:check": "tsc --pretty --noEmit",
-    "test": "yarn types:check"
+    "test": "yarn build && yarn types:check"
   },
   "dependencies": {
     "@avn/types": "^1.0.0",

@@ -5,9 +5,8 @@ const { Console } = transports
 
 const output = printf(
   o =>
-    `${o.timestamp} (${o.ms?.padEnd(7) ?? ''}) [${o.level.padEnd(
-      7
-    )}] ${o.obj.padEnd(11)}:` + (o.message as string)
+    `${o.timestamp} (${o.ms?.padEnd(7) ?? ''}) [${o.level.padEnd(7)}] ${o.obj.padEnd(11)}:` +
+    (o.message as string)
 )
 
 const formats: any[] = []

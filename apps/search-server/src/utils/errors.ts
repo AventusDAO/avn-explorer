@@ -4,12 +4,7 @@ export class BaseError extends Error {
   public readonly httpCode: number
   public readonly isOperational: boolean
 
-  constructor(
-    name: string,
-    httpCode: number,
-    description: string,
-    isOperational: boolean
-  ) {
+  constructor(name: string, httpCode: number, description: string, isOperational: boolean) {
     super(description)
     Object.setPrototypeOf(this, new.target.prototype)
 
@@ -30,11 +25,7 @@ export class ApiError extends BaseError {
     super(name, httpCode, description, isOperational)
   }
 
-  static fromAxios(
-    err: AxiosError,
-    status?: number,
-    message?: string
-  ): ApiError {
+  static fromAxios(err: AxiosError, status?: number, message?: string): ApiError {
     return new ApiError(
       err.name,
       status !== undefined ? status : err.response?.status,
