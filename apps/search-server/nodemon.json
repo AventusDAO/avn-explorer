@@ -1,0 +1,11 @@
+{
+  "ignore": ["**/*.test.ts", "**/*.spec.ts", "**/*.test.js", "**/*.spec.js", ".git"],
+  "watch": ["lib", ".env"],
+  "delay": "2000",
+  "env": {
+    "TS_NODE_FILES": "true",
+    "TS_NODE_CACHE": "false"
+  },
+  "ext": "js",
+  "exec": "yarn start:debug"
+}

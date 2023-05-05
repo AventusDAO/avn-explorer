@@ -1,0 +1,37 @@
+{
+  "name": "@avn/search-server",
+  "description": "Serves data from the OpenSearch database",
+  "version": "1.0.0",
+  "packageManager": "yarn@3.3.0",
+  "main": "lib/app",
+  "scripts": {
+    "build": "npm run version:print && tsc",
+    "build:watch": "tsc -w",
+    "dev": "nodemon",
+    "start": "NODE_OPTIONS=--enable-source-maps node lib/app.js",
+    "start:debug": "yarn version:print && node --inspect --enable-source-maps -r dotenv/config lib/app.js",
+    "version:print": "echo '{\"version\":\"'$npm_package_version'\",\"buildTimestamp\":\"'$(date +%s)'\"}' > src/version.json",
+    "types:check": "tsc --pretty --noEmit",
+    "test": "yarn types:check"
+  },
+  "dependencies": {
+    "@avn/types": "^1.0.0",
+    "@types/node": "^18.11.9",
+    "axios": "^1.4.0",
+    "cors": "^2.8.5",
+    "dotenv": "^10.0.0",
+    "express": "^4.18.2",
+    "helmet": "^6.1.5",
+    "morgan": "^1.10.0",
+    "nodemon": "^2.0.20",
+    "typescript": "^4.9.3",
+    "winston": "^3.8.2"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.13",
+    "@types/express": "^4.17.17",
+    "@types/morgan": "^1.9.4",
+    "@types/node": "^18.11.9",
+    "typescript": "^4.9.3"
+  }
+}
