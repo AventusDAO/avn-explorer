@@ -12,7 +12,7 @@ const processError = (err: any): Error => {
   if (isAxiosError(err)) {
     const axiosError = err as AxiosError
     logger.error(
-      `Failed to fetch blocks. DB response: ${JSON.stringify(axiosError.response?.data)}`
+      `Failed to fetch data from ElasticSearch.\n${JSON.stringify(axiosError.response?.data)}`
     )
     // database (ES) rejected our request, even code could be 400, to external client should be 500
     return ApiError.fromAxios(axiosError, 500, 'Internal Server Error')
