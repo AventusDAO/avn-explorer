@@ -80,7 +80,7 @@ export const getBlocks = async (
     const sortItem = processSortParam(sortCsv, supportedSortFields)
 
     if (sortItem.height) {
-      // if sorting by blockNumber.Asc then also sort by chainType .Asc here
+      // if sorting by blockHeight.Asc then also sort by chainType .Asc here
       const chainTypeSortDirection: EsSortDirection = sortItem.height
       const chainTypeSort = processSortParam(`chainGen,${chainTypeSortDirection}`, ['chainGen'])
       sort.push(chainTypeSort)

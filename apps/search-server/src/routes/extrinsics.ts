@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { getExtrinsics } from '../services/extrinsics-service'
+import { getExtrinsics } from '../services/extrinsics'
 import { asyncCatch, processIntegerParam, processStringParam } from '../utils'
 
 const router = Router()
@@ -15,16 +15,16 @@ router.get(
     const address = processStringParam(req.query.address, 'address')
     const section = processStringParam(req.query.section, 'section')
     const method = processStringParam(req.query.method, 'method')
-    const blockNumberFrom = processIntegerParam(req.query.blockNumberFrom, 'blockNumberFrom')
-    const blockNumberTo = processIntegerParam(req.query.blockNumberTo, 'blockNumberTo')
+    const blockHeightFrom = processIntegerParam(req.query.blockHeightFrom, 'blockHeightFrom')
+    const blockHeightTo = processIntegerParam(req.query.blockHeightTo, 'blockHeightTo')
     const timestampStart = processIntegerParam(req.query.timestampStart, 'timestampStart')
     const timestampEnd = processIntegerParam(req.query.timestampEnd, 'timestampEnd')
 
     const data = await getExtrinsics(size, from, sort, address, undefined, {
       section,
       method,
-      blockNumberFrom,
-      blockNumberTo,
+      blockHeightFrom,
+      blockHeightTo,
       timestampStart,
       timestampEnd
     })
