@@ -1,6 +1,5 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, Index as Index_, ManyToOne as ManyToOne_} from "typeorm"
+import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, Index as Index_} from "typeorm"
 import * as marshal from "./marshal"
-import {Account} from "./account.model"
 import {TransferType} from "./_transferType"
 
 @Entity_()
@@ -26,18 +25,19 @@ export class Transfer {
 
   @Index_()
   @Column_("text", {nullable: true})
-  call!: string | undefined | null
+  from!: string | undefined | null
 
   @Index_()
-  @ManyToOne_(() => Account, {nullable: true})
-  from!: Account
-
+  @Column_("text", {nullable: true})
+  to!: string | undefined | null
+  
   @Index_()
-  @ManyToOne_(() => Account, {nullable: true})
-  to!: Account
-
-  @Index_()
-  @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
+  @Column_('numeric', {
+    transformer: marshal.bigintTransformer,
+    nullable: false,
+    precision: 80,
+    scale: 0
+  })
   amount!: bigint
 
   @Index_()

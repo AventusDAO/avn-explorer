@@ -7,7 +7,7 @@ import {
 import { encodeId } from '@avn/utils'
 import { EventItem } from '@subsquid/substrate-processor/lib/interfaces/dataSelection'
 import { Store, TypeormDatabase } from '@subsquid/typeorm-store'
-import { Account, Transfer, TransferType } from './model'
+import { Transfer, TransferType } from './model'
 import {
   BalancesTransferEvent,
   TokenManagerTokenTransferredEvent
@@ -20,7 +20,6 @@ interface TransferEventData {
   blockNumber: number
   timestamp: Date
   extrinsicHash?: string
-  call?: string
   from: string
   to: string
   amount: bigint
@@ -72,9 +71,6 @@ async function processEvents(ctx: Ctx): Promise<void> {
       if (item.name === 'Balances.Transfer' || item.name === 'TokenManager.TokenTransferred') {
         transfersData.push(handleTransfer(ctx, block.header, item))
       }
-      // else if (item.name === 'TokenManager.TokenTransferred') {
-      //   console.log(item)
-      // }
     }
   }
 
@@ -95,7 +91,6 @@ function handleTransfer(
     blockNumber: block.height,
     timestamp: new Date(block.timestamp),
     extrinsicHash: item.event.extrinsic?.hash,
-    call: item.event.call?.name,
     from: encodeId(event.from),
     to: encodeId(event.to),
     amount: event.amount,
@@ -115,8 +110,8 @@ async function saveTransfers(ctx: Ctx, transfersData: TransferEventData[]): Prom
   }
 
   const accounts = await ctx.store
-    .findBy(Account, { id: In([...accountIds]) })
-    .then(q => new Map(q.map(i => [i.id, i])))
+    .findBy(Transfer, { from: In([...accountIds]) })
+    .then((q: any) => q.map((i: any) => i.fromId))
 
   const transfers: Transfer[] = []
 
@@ -141,9 +136,10 @@ async function saveTransfers(ctx: Ctx, transfersData: TransferEventData[]): Prom
     )
   }
 
-  await ctx.store.save(Array.from(accounts.values()))
+  // await ctx.store.save(Array.from(accounts))
   await ctx.store.insert(transfers)
 }
+
 function normalizeBalancesTransferEvent(
   ctx: Ctx,
   item: EventItem<'Balances.Transfer', { event: { args: true } }>
@@ -170,14 +166,12 @@ function normalizeTokenTransferEvent(
   }
 }
 
-function getAccount(m: Map<string, Account>, id: string): Account {
-  let acc = m.get(id)
-  if (acc == null) {
-    acc = new Account()
-    acc.id = id
-    m.set(id, acc)
+function getAccount(m: string[], id: string): string {
+  const acc = m.includes(id)
+  if (acc === null || acc === undefined) {
+    m.push(id, id)
   }
-  return acc
+  return id
 }
 
 class UknownVersionError extends Error {
