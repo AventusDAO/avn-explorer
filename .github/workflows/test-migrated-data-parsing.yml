@@ -21,4 +21,4 @@ jobs:
           yarn workspace @avn/types run build
           yarn workspace @avn/config run build
       - name: Run test
-        run: yarn test
+        run: yarn workspace @avn/balances run test
