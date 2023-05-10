@@ -1,13 +1,13 @@
 import axios from 'axios'
 import { config } from 'dotenv'
-import { DbClient } from './dbClient.js'
-import ReportService from './reportService.js'
-import { runCli } from './cli.js'
-import { JobManager } from './job.js'
+import { DbClient, IDbConfig } from './dbClient'
+import ReportService from './reportService'
+import { runCli } from './cli'
+import { JobManager } from './job'
 
 config()
 
-export const dataSourceConfig = {
+export const dataSourceConfig: IDbConfig = {
   port: parseInt(process.env.DB_PORT ?? '5432'),
   user: process.env.DB_USER,
   password: process.env.DB_PASS,
@@ -21,7 +21,6 @@ async function messageSender(msg: string) {
 async function main() {
   try {
     const dbClient = new DbClient(dataSourceConfig)
-    await dbClient.connect()
     const dependencies = { dbClient, messageSender }
     const reportManager = new JobManager()
     const reportService = new ReportService(dependencies)

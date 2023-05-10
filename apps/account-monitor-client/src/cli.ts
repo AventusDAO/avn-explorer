@@ -95,6 +95,32 @@ async function createLiveReport(reportService: ReportService) {
   const reportParams: any = {}
 
   reportService.setReportStrategy(ReportStrategyEnum.LiveReport)
+
+  console.log('\nDo you want to monitor a specific token?\n')
+  const tokenChoice = await askQuestion(['Yes', 'No'])
+  let token = null
+  if (tokenChoice === 'Yes') {
+    console.log('\nEnter the token ID:\n')
+    token = await askQuestion([], true)
+  }
+  reportParams.token = token
+
+  console.log('\nEnter the minimum amount for a significant transaction:\n')
+  const minAmount = await askQuestion([], true)
+  reportParams.minAmount = Number(minAmount)
+
+  console.log('\nEnter the accounts you are interested in (separated by commas):\n')
+  const interestingAccounts = await askQuestion([], true)
+  reportParams.interestingAccounts = interestingAccounts.split(',')
+
+  console.log('\nEnter the minimum volume for account monitoring:\n')
+  const minVolume = await askQuestion([], true)
+  reportParams.minVolume = Number(minVolume)
+
+  console.log('\nEnter the minimum number of transactions for account monitoring:\n')
+  const minTransactions = await askQuestion([], true)
+  reportParams.minTransactions = Number(minTransactions)
+
   await reportService.generateReport(reportParams)
 }
 

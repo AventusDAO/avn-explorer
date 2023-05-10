@@ -1,4 +1,5 @@
 import { CronJob } from 'cron'
+import { IReportParams } from './reportService'
 
 enum JobStatusEnum {
   RUNNING = 'running',

@@ -1,6 +1,6 @@
-import { TopVolumeMoveReport } from './reports/topAccountsVolumeStrategy.js'
-import { LiveReport } from './reports/liveReportStrategy.js'
-import DbClient from './dbClient.js'
+import { TopVolumeMoveReport } from './reports/topAccountsVolumeStrategy'
+import { LiveReport } from './reports/liveReportStrategy'
+import DbClient from './dbClient'
 
 export interface IServiceDependencies {
   dbClient: DbClient
