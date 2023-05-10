@@ -9,6 +9,7 @@ import cors from 'cors'
 
 import statusApp from './status-app'
 import blocks from './routes/blocks'
+import extrinsics from './routes/extrinsics'
 
 import { BaseError } from './utils'
 
@@ -51,6 +52,7 @@ app.use(cors(corsOptions))
 
 // add routes
 app.use('/blocks', blocks)
+app.use('/extrinsics', extrinsics)
 
 const port = config.server.port
 app.listen(port)
