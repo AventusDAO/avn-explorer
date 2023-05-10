@@ -7,10 +7,11 @@ Package containing configuration utilities for apps.
 Add these variable to the app using this package:
 
 ```
-DB_NAME=<app-name>-<AVN_ENV> # e.g. `staking-parachain-dev`
+DB_NAME=explorer_fees_db
 DB_PASS=postgres
 DB_USER=postgres
-DB_PORT=23798
+DB_PORT=5432
+DB_HOST=localhost
 GQL_PORT=4350
 
 AVN_ENV=parachain-dev

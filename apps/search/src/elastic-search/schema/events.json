@@ -1,0 +1,25 @@
+{
+  "mappings": {
+    "properties": {
+      "refId": {
+        "type": "keyword"
+      },
+      "timestamp": {
+        "type": "date",
+        "format": "epoch_millis"
+      },
+      "chainGen": {
+        "type": "short"
+      },
+      "blockHeight": {
+        "type": "long"
+      },
+      "section": {
+        "type": "keyword"
+      },
+      "name": {
+        "type": "keyword"
+      }
+    }
+  }
+}
