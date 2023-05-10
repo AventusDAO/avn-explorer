@@ -8,7 +8,7 @@ This is a Squid based processor listing accounts and their AVT balance changes.
 - Configure `.env` file
 - Install dependencies: `yarn`
 - Build project: `make build`
-- Run database: `make up`
+- Optionally run dedicated database server: `make up`
 - Start processing: `make process`
 - Serve the data over GraphQL: `make serve`
 - To inspect the data via GraphQL UI go to: `http://localhost:4350/graphql`

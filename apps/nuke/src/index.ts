@@ -1,22 +1,33 @@
 /* eslint-disable @typescript-eslint/restrict-template-expressions */
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 /* eslint-disable @typescript-eslint/no-var-requires */
-import { SchemaConfig, getSchemaConfigs } from './config'
+import { DatabaseConfig, getDbConfigs } from './config'
 const { Client } = require('pg')
 require('dotenv').config('../env')
 
-const clearSchema = async (config: SchemaConfig) => {
-  const { schema, reset, user, pass } = config
+const clearSchemaTables = async (schemaName: string, client: typeof Client) => {
+  const query = `SELECT schemaname, tablename FROM pg_tables WHERE schemaname = '${schemaName}';`
+  const { rows: tables } = await client.query(query)
+
+  for (const { schemaname, tablename } of tables) {
+    const dropQuery = `DROP TABLE IF EXISTS ${schemaname}.${tablename} CASCADE;`
+    console.log(`Dropping ${schemaname}.${tablename}`)
+    await client.query(dropQuery)
+  }
+}
+
+const clearDatabase = async (config: DatabaseConfig) => {
+  const { db, reset, user, pass } = config
 
   if (!reset) return
 
-  if (!schema) throw new Error('Missing schema env var')
+  if (!db) throw new Error('Missing db env var')
   if (!user || !pass) throw new Error('Missing user or pass env var')
 
   const client = new Client({
-    user: config.user,
-    password: config.pass,
-    database: process.env.DB_NAME,
+    user,
+    password: pass,
+    database: db,
     port: process.env.DB_PORT,
     host: process.env.DB_HOST
   })
@@ -31,34 +42,28 @@ const clearSchema = async (config: SchemaConfig) => {
     }
   }
 
-  console.log(`Connecting user to ${schema} schema...`)
+  console.log(`Connecting user to ${db}...`)
   await client.connect()
 
-  const query = `SELECT schemaname, tablename FROM pg_tables WHERE schemaname = '${schema}';`
-  const { rows: tables } = await client.query(query)
+  await clearSchemaTables('public', client)
+  await clearSchemaTables('squid_processor', client)
 
-  for (const { schemaname, tablename } of tables) {
-    const dropQuery = `DROP TABLE IF EXISTS ${schemaname}.${tablename} CASCADE;`
-    console.log(`Dropping ${schemaname}.${tablename}`)
-    await client.query(dropQuery)
-  }
-
-  console.log(`Done clearing ${schema} schema.`)
+  console.log(`Done clearing ${db}.`)
   await client.end()
 }
 
 const main = async () => {
-  const schemaConfigs = getSchemaConfigs()
+  const schemaConfigs = getDbConfigs()
   console.log(
     'Config: ',
-    schemaConfigs.map(({ reset, schema }) => ({
-      schema,
+    schemaConfigs.map(({ reset, db }) => ({
+      db,
       reset
     }))
   )
 
   for (const config of schemaConfigs) {
-    await clearSchema(config)
+    await clearDatabase(config)
   }
 }
 

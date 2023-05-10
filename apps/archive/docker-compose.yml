@@ -16,6 +16,8 @@ services:
       POSTGRES_DB: ${DB_NAME}
     networks:
       - avn-archive
+    ports:
+      - '${DB_PORT}:5432'
 
   ingest:
     depends_on:
@@ -32,7 +34,7 @@ services:
 
         '10', # allow up to 10 pending requests for the above endpoint (default is 5)
         '--out',
-        'postgres://${DB_USER}:${DB_PASS}@db:${DB_PORT}/${DB_NAME}'
+        'postgres://${DB_USER}:${DB_PASS}@db:5432/${DB_NAME}'
       ]
     networks:
       - avn-archive
@@ -46,7 +48,7 @@ services:
       RUST_LOG: 'actix_web=info,actix_server=info'
     command: [
         '--database-url',
-        'postgres://${DB_USER}:${DB_PASS}@db:${DB_PORT}/${DB_NAME}'
+        'postgres://${DB_USER}:${DB_PASS}@db:5432/${DB_NAME}'
         # "--evm-support" # uncomment for chains with Frontier EVM pallet
         # (e.g. Moonbeam/Moonriver or Astar/Shiden)
       ]
@@ -63,7 +65,7 @@ services:
     environment:
       DB_TYPE: postgres # set to `cockroach` for Cockroach DB
       DB_HOST: db
-      DB_PORT: ${DB_PORT}
+      DB_PORT: 5432
       DB_NAME: ${DB_NAME}
       DB_USER: ${DB_USER}
       DB_PASS: ${DB_PASS}
