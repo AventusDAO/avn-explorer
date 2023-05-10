@@ -1,14 +1,29 @@
-import {
-  IServiceDependencies,
-  ReportParams,
-  ReportStrategy,
-  TopVolumeMoveReport
-} from './reports/topAccountsVolumeStrategy.js'
+import { TopVolumeMoveReport } from './reports/topAccountsVolumeStrategy.js'
 import { LiveReport } from './reports/liveReportStrategy.js'
+import DbClient from './dbClient.js'
+
+export interface IServiceDependencies {
+  dbClient: DbClient
+  messageSender: (msg: string) => Promise<void>
+}
 
 export enum ReportStrategyEnum {
   TopVolumeMoveReport = 'TopVolumeMoveReport',
   LiveReport = 'LiveReport'
+}
+export interface IReportParams {
+  period: string
+  frequency: string
+  token?: string
+  filter?: { type: string; value: string }
+  minAmount: number
+  interestingAccounts: string[]
+  minVolume: number
+  minTransactions: number
+}
+
+export interface ReportStrategy {
+  generateReport: (params: IReportParams) => Promise<void>
 }
 
 class ReportService {
@@ -30,8 +45,12 @@ class ReportService {
     }
   }
 
-  generateReport = async (params: ReportParams) => {
-    if (this.reportStrategy) await this.reportStrategy.generateReport(params)
+  generateReport = async (params: IReportParams) => {
+    if (!this.reportStrategy) {
+      throw new Error('Report strategy not set')
+    }
+
+    await this.reportStrategy.generateReport(params)
   }
 }
 

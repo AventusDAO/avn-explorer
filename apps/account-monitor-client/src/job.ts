@@ -6,12 +6,10 @@ enum JobStatusEnum {
 }
 
 export class Job {
-  //   id: string
   status: JobStatusEnum = JobStatusEnum.STOPPED
   job: CronJob
 
   constructor(reportParams: any, generateReportFunction: any) {
-    // @ts-nocheck
     this.job = new CronJob(reportParams.frequency, () => {
       generateReportFunction(reportParams)
     })
