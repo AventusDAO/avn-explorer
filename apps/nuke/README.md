@@ -41,6 +41,11 @@ DB_USER_TOKENS=tokens
 DB_SCHEMA_TOKENS=explorer_tokens_db
 DB_PASS_TOKENS=
 
+RESET_ACCOUNT_MONITOR=true
+DB_USER_ACCOUNT_MONITOR=account-monitor
+DB_SCHEMA_ACCOUNT_MONITOR=explorer_account_monitor_db
+DB_PASS_ACCOUNT_MONITOR=
+
 RESET_SEARCH=false
 DB_SCHEMA_SEARCH=explorer_search_db
 DB_USER_SEARCH=search
