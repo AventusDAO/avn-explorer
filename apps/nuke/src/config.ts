@@ -1,5 +1,14 @@
 export interface DatabaseConfig {
-  name: 'archive' | 'fees' | 'balances' | 'staking' | 'balances' | 'summary' | 'tokens' | 'search'
+  name:
+    | 'archive'
+    | 'fees'
+    | 'balances'
+    | 'staking'
+    | 'balances'
+    | 'summary'
+    | 'tokens'
+    | 'search'
+    | 'account-monitor'
   reset: boolean
   db?: string
   user?: string
@@ -53,6 +62,13 @@ export const getDbConfigs: () => Readonly<DatabaseConfig[]> = () =>
       db: process.env.DB_SCHEMA_TOKENS,
       user: process.env.DB_USER_TOKENS,
       pass: process.env.DB_PASS_TOKENS
+    },
+    {
+      name: 'account-monitor',
+      reset: process.env.RESET_ACCOUNT_MONITOR === 'true',
+      db: process.env.DB_SCHEMA_ACCOUNT_MONITOR,
+      user: process.env.DB_USER_ACCOUNT_MONITOR,
+      pass: process.env.DB_PASS_ACCOUNT_MONITOR
     },
     {
       name: 'search',
