@@ -28,14 +28,17 @@ We don't have it automated, but the work on solochain is stopped so it doesn't n
 
 ## Types error
 
-The ingester had issues parsing the solochain genesis blocks. So if the types need to be updated, see if the following fix needs to added:
+The ingester had issues parsing the solochain genesis blocks. 
 
+The types in this repo were slightly modified. The following fix has been applied:
+
+1. added `EthKey` type to the base types:
 ```json
   "EthKey": "H512"
 ```
 
-to base types and
 
+2. duplicated `EthEventCheckResult` type from the base types and added to the `specVersion` range of `[271, null]`:
 ```json
   "EthEventCheckResult": {
     "event": "EthEvent",
@@ -46,5 +49,3 @@ to base types and
     "min_challenge_votes": "u32"
   },
 ```
-
-to types for `[271, null]` specVersion range.
