@@ -24,10 +24,8 @@ services:
       - db
     restart: on-failure
     image: subsquid/substrate-ingest:firesquid
-    # solochain-ingest:
-    # image: avn/ingest-solochain
-    # volumes:
-    #   - ./solochain-ingest/avn-types.json:/app/avn-types.json
+    volumes:
+      - ./solochain-ingest/avn-types.json:/app/avn-types.json
     command: [
         '-e',
         '${AVN_NODE}',
@@ -40,8 +38,7 @@ services:
         '--out',
         'postgres://${DB_USER}:${DB_PASS}@db:5432/${DB_NAME}'
         # custom types for the solochain
-        # "--types-bundle", "/app/avn-types.json", # it's a custom image built from `solochain-ingest/Dockerfile`
-        # "--types-bundle", "/app/avn-types.json", # if added as a volume to the `subsquid/substrate-ingest:firesquid`
+        # "--types-bundle", "/app/avn-types.json"
       ]
     networks:
       - avn-archive
