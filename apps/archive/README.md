@@ -28,17 +28,18 @@ We don't have it automated, but the work on solochain is stopped so it doesn't n
 
 ## Types error
 
-The ingester had issues parsing the solochain genesis blocks. 
+The ingester had issues parsing the solochain genesis blocks.
 
 The types in this repo were slightly modified. The following fix has been applied:
 
 1. added `EthKey` type to the base types:
+
 ```json
   "EthKey": "H512"
 ```
 
-
 2. duplicated `EthEventCheckResult` type from the base types and added to the `specVersion` range of `[271, null]`:
+
 ```json
   "EthEventCheckResult": {
     "event": "EthEvent",
