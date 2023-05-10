@@ -24,6 +24,8 @@ services:
       - db
     restart: on-failure
     image: subsquid/substrate-ingest:firesquid
+    volumes:
+      - ./../../packages/metadata/avn-types.json:/app/avn-types.json
     command: [
         '-e',
         '${AVN_NODE}',
@@ -34,7 +36,10 @@ services:
 
         '10', # allow up to 10 pending requests for the above endpoint (default is 5)
         '--out',
-        'postgres://${DB_USER}:${DB_PASS}@db:5432/${DB_NAME}'
+        'postgres://${DB_USER}:${DB_PASS}@db:5432/${DB_NAME}',
+        # custom types for the solochain
+        '--types-bundle',
+        '/app/avn-types.json'
       ]
     networks:
       - avn-archive
