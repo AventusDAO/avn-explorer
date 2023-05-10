@@ -30,23 +30,12 @@ We don't have it automated, but the work on solochain is stopped so it doesn't n
 
 The ingester had issues parsing the solochain genesis blocks.
 
-The types in this repo were slightly modified. The following fix has been applied:
+The types in this repo were slightly modified:
 
-1. added `EthKey` type to the base types:
+1. The subsquid expects a slightly different format. The `avn-types` package has been compiled from a js file, into .json file, to a format required by the `ingester` code.
+
+2. Added `EthKey` type to the base types, that is missing in the `avn-types`:
 
 ```json
   "EthKey": "H512"
-```
-
-2. duplicated `EthEventCheckResult` type from the base types and added to the `specVersion` range of `[271, null]`:
-
-```json
-  "EthEventCheckResult": {
-    "event": "EthEvent",
-    "result": "CheckResult",
-    "checked_by": "AccountId",
-    "checked_at_block": "BlockNumber",
-    "ready_for_processing_after_block": "BlockNumber",
-    "min_challenge_votes": "u32"
-  },
 ```
