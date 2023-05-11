@@ -1,5 +1,5 @@
-import { CronJob } from 'cron'
 import { IReportParams } from './reportService'
+import { ReportStrategy } from './reportService'
 
 enum JobStatusEnum {
   RUNNING = 'running',
@@ -8,28 +8,30 @@ enum JobStatusEnum {
 
 export class Job {
   status: JobStatusEnum = JobStatusEnum.STOPPED
-  job: CronJob
+  reportStrategy: ReportStrategy
 
-  constructor(reportParams: any, generateReportFunction: any) {
-    this.job = new CronJob(reportParams.frequency, () => {
-      generateReportFunction(reportParams)
-    })
+  constructor(reportParams: IReportParams, reportStrategy: ReportStrategy) {
+    this.reportStrategy = reportStrategy
+    this.start(reportParams)
+  }
+
+  start(reportParams: IReportParams) {
+    this.reportStrategy.start(reportParams)
     this.status = JobStatusEnum.RUNNING
-    this.job.start()
   }
 
   stop() {
+    this.reportStrategy.stop()
     this.status = JobStatusEnum.STOPPED
-    this.job.stop()
   }
 }
 
 export class JobManager {
   private readonly jobs = new Map<number, Job>()
 
-  createNewJob(reportParams: any, generateReportFunction: any) {
+  createNewJob(reportParams: IReportParams, reportStrategy: ReportStrategy) {
     const jobIndex = this.jobs.size
-    this.jobs.set(jobIndex, new Job(reportParams, generateReportFunction))
+    this.jobs.set(jobIndex, new Job(reportParams, reportStrategy))
   }
 
   stopJob(id: number) {

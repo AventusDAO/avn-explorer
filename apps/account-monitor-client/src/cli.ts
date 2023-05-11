@@ -1,6 +1,8 @@
 import { JobManager } from './job.js'
 import ReportService, { ReportStrategyEnum } from './reportService.js'
 import readline from 'readline'
+import { TopVolumeMoveReport } from './reports/topAccountsVolumeStrategy.js'
+import { LiveReport } from './reports/liveReportStrategy.js'
 
 const rl = readline.createInterface({
   input: process.stdin,
@@ -17,36 +19,27 @@ export async function runCli(reportService: ReportService, reportManager: JobMan
       'Remove report'
     ])
 
-    if (reportAction === 'Create new report') {
-      console.log('Which type of report would you like to generate?\n')
-      const reportType = await askQuestion(['Top Volume Moves Report', 'Live Report'])
-      if (reportType === 'Top Volume Moves Report') {
-        await createTopVolumeMovesReport(reportService, reportManager)
-      } else if (reportType === 'Live Report') {
-        await createLiveReport(reportService)
-      }
-    } else if (reportAction === 'List reports') {
-      const list = reportManager.listJobs()
-      if (!Object.keys(list).length) {
-        continue
-      }
-      console.log(list)
-    } else if (reportAction === 'Stop report') {
-      const list = reportManager.listJobs()
-      if (!Object.keys(list).length) {
-        continue
-      }
-      console.log('\nWhich job do you want to stop?\n')
-      const jobId = await askQuestion(Object.keys(list))
-      reportManager.stopJob(parseInt(jobId))
-    } else if (reportAction === 'Remove report') {
-      const list = reportManager.listJobs()
-      if (!Object.keys(list).length) {
-        continue
-      }
-      console.log('\nWhich job do you want to stop?\n')
-      const jobId = await askQuestion(Object.keys(list))
-      reportManager.removeJob(parseInt(jobId))
+    switch (reportAction) {
+      case 'Create new report':
+        await handleCreateNewReport(reportService, reportManager)
+        break
+      case 'List reports':
+        const list = reportManager.listJobs()
+        if (Object.keys(list).length) {
+          console.log(list)
+        }
+        break
+      case 'Stop report':
+      case 'Remove report':
+        const jobId = await handleJobAction(reportManager)
+        if (jobId !== null) {
+          reportAction === 'Stop report'
+            ? reportManager.stopJob(jobId)
+            : reportManager.removeJob(jobId)
+        }
+        break
+      default:
+        console.log('Invalid action selected.')
     }
   }
 }
@@ -86,11 +79,25 @@ async function createTopVolumeMovesReport(reportService: ReportService, reportMa
     reportParams.token = token
   }
 
-  reportManager.createNewJob(reportParams, reportService.generateReport)
+  const reportStrategy = new TopVolumeMoveReport(reportService.dependencies)
+  reportManager.createNewJob(reportParams, reportStrategy)
 }
 
-// New function for Live Report
-async function createLiveReport(reportService: ReportService) {
+async function handleCreateNewReport(reportService: ReportService, reportManager: JobManager) {
+  const reportType = await askQuestion(['Top Volume Moves Report', 'Live Report'])
+  switch (reportType) {
+    case 'Top Volume Moves Report':
+      await createTopVolumeMovesReport(reportService, reportManager)
+      break
+    case 'Live Report':
+      await createLiveReport(reportService, reportManager)
+      break
+    default:
+      console.log('Invalid report type selected.')
+  }
+}
+
+async function createLiveReport(reportService: ReportService, reportManager: JobManager) {
   reportService.setReportStrategy(ReportStrategyEnum.LiveReport)
   const reportParams: any = {}
 
@@ -121,7 +128,18 @@ async function createLiveReport(reportService: ReportService) {
   const minTransactions = await askQuestion([], true)
   reportParams.minTransactions = Number(minTransactions)
 
-  await reportService.generateReport(reportParams)
+  const reportStrategy = new LiveReport(reportService.dependencies)
+  reportManager.createNewJob(reportParams, reportStrategy)
+}
+
+async function handleJobAction(reportManager: JobManager) {
+  const list = reportManager.listJobs()
+  if (!Object.keys(list).length) {
+    return null
+  }
+  console.log('\nWhich job do you want to action?\n')
+  const jobId = await askQuestion(Object.keys(list))
+  return parseInt(jobId)
 }
 
 async function askQuestion(choices: string[], freeText: boolean = false): Promise<string> {

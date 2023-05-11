@@ -11,6 +11,7 @@ export enum ReportStrategyEnum {
   TopVolumeMoveReport = 'TopVolumeMoveReport',
   LiveReport = 'LiveReport'
 }
+
 export interface IReportParams {
   period: string
   frequency: string
@@ -23,13 +24,15 @@ export interface IReportParams {
 }
 
 export interface ReportStrategy {
-  generateReport: (params: IReportParams) => Promise<void>
+  generateReport: (params: IReportParams) => Promise<void | any>
+  start: (params?: IReportParams) => void
+  stop: () => void
 }
 
 class ReportService {
   private reportStrategy: ReportStrategy | null = null
 
-  constructor(private readonly dependencies: IServiceDependencies) {}
+  constructor(public readonly dependencies: IServiceDependencies) {}
 
   getReportStrategy() {
     return this.reportStrategy
@@ -51,6 +54,22 @@ class ReportService {
     }
 
     await this.reportStrategy.generateReport(params)
+  }
+
+  startReport() {
+    if (!this.reportStrategy) {
+      throw new Error('Report strategy not set')
+    }
+
+    this.reportStrategy.start()
+  }
+
+  stopReport() {
+    if (!this.reportStrategy) {
+      throw new Error('Report strategy not set')
+    }
+
+    this.reportStrategy.stop()
   }
 }
 
