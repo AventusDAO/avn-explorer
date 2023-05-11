@@ -9,7 +9,7 @@ export class LiveReport implements ReportStrategy {
     const { dbClient, messageSender } = this.dependencies
     const { token, minAmount, interestingAccounts, minVolume, minTransactions } = params
 
-    const newRecordListener = async (record: any) => {
+    this.listener = async (record: any) => {
       try {
         if (token && record.token_id === token && record.amount >= minAmount) {
           await this.sendMessage(
@@ -40,11 +40,7 @@ export class LiveReport implements ReportStrategy {
       }
     }
 
-    dbClient.on('new-record', newRecordListener)
-
-    return () => {
-      dbClient.removeListener('new-record', newRecordListener)
-    }
+    dbClient.on('new-record', this.listener)
   }
 
   start = () => {

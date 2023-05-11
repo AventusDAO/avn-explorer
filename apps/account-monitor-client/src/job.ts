@@ -16,6 +16,7 @@ export class Job {
   }
 
   start(reportParams: IReportParams) {
+    this.reportStrategy.generateReport(reportParams)
     this.reportStrategy.start(reportParams)
     this.status = JobStatusEnum.RUNNING
   }

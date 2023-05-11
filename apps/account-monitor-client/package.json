@@ -23,7 +23,7 @@
     "@types/axios": "^0.14.0",
     "@types/cron": "^2.0.1",
     "@types/dotenv": "^8.2.0",
-    "@types/node": "^18.11.9",
+    "@types/node": "^20.1.2",
     "@types/pg": "^8.6.6",
     "nodemon": "^2.0.22"
   }
