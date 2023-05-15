@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { getEvents } from '../services/events'
-import { Event, DataResponse } from '../types'
+import { SearchEvent, DataResponse } from '../types'
 import { asyncCatch, processIntegerParam, processStringParam } from '../utils'
 const router = Router()
 
@@ -13,7 +13,7 @@ router.get(
     const from = processIntegerParam(req.query.from, 'from')
     const sort = processStringParam(req.query.sort, 'sort')
     const data = await getEvents(size, from, sort)
-    const response: DataResponse<Event[]> = {
+    const response: DataResponse<SearchEvent[]> = {
       data
     }
     res.status(200).json(response)

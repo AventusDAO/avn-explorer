@@ -1,6 +1,13 @@
 import { AxiosError } from 'axios'
 import { ApiError, isAxiosError } from '../utils'
-import { JsonMap, EsSortItem, EsRequestPayload, EsSortDirection, EsQuery, Block } from '../types'
+import {
+  JsonMap,
+  EsSortItem,
+  EsRequestPayload,
+  EsSortDirection,
+  EsQuery,
+  SearchBlock
+} from '../types'
 import { getLogger } from '../utils/logger'
 import { config } from '../config'
 import { processSortParam } from '../utils/paramHelpers'
@@ -20,7 +27,7 @@ const processError = (err: any): Error => {
   return err
 }
 
-interface EsBlocksQuery extends EsQuery {
+interface SearchBlocksQuery extends EsQuery {
   bool: {
     must?: JsonMap[]
   }
@@ -33,7 +40,7 @@ interface EsBlocksQuery extends EsQuery {
  * @returns {EsQuery} query object for ElasticSearch
  */
 const getBlocksQuery = (minTimestamp?: number, withSystemBlocks = true): EsQuery => {
-  const query: EsBlocksQuery = {
+  const query: SearchBlocksQuery = {
     bool: {
       must: []
     }
@@ -56,7 +63,7 @@ export const getBlocks = async (
   from = 0,
   skipSystemBlocks = false,
   sortCsv?: string
-): Promise<Block[]> => {
+): Promise<SearchBlock[]> => {
   const query = getBlocksQuery(undefined, !skipSystemBlocks)
   const sort: EsSortItem[] = []
 
@@ -84,7 +91,10 @@ export const getBlocks = async (
 
   const payload: EsRequestPayload = { size, from, sort, query }
   try {
-    const { data } = await elasticSearch.post<Block>(`${config.db.blocksIndex}/_search`, payload)
+    const { data } = await elasticSearch.post<SearchBlock>(
+      `${config.db.blocksIndex}/_search`,
+      payload
+    )
     return data.hits.hits.map(hit => hit._source)
   } catch (err) {
     throw processError(err)

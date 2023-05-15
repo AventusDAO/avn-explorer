@@ -1,11 +1,12 @@
 import { AxiosError } from 'axios'
 import { ApiError, isAxiosError } from '../../utils'
-import { JsonMap, EsSortItem, EsRequestPayload, EsSortDirection, EsQuery, Event } from '../../types'
+import { EsSortItem, EsRequestPayload, EsSortDirection, EsQuery, SearchEvent } from '../../types'
 import { getLogger } from '../../utils/logger'
 import { config } from '../../config'
 import { processSortParam } from '../../utils/paramHelpers'
 import { elasticSearch } from '../elastic-search'
 import { EventsDataQuery, getEventsQuery } from './query-builder'
+
 const logger = getLogger('events-service')
 
 const supportedSortFields = ['timestamp', 'blockHeight']
@@ -16,8 +17,8 @@ export const getEvents = async (
   from = 0,
   sortCsv?: string,
   dataQuery?: EventsDataQuery
-): Promise<Event[]> => {
-  const query: EsQuery = getEventsQuery(dataQuery)
+): Promise<SearchEvent[]> => {
+  const query = getEventsQuery(dataQuery)
   const sort: EsSortItem[] = []
 
   if (sortCsv !== undefined) {
@@ -35,7 +36,10 @@ export const getEvents = async (
 
   const payload: EsRequestPayload = { size, from, sort, query }
   try {
-    const response = await elasticSearch.post<JsonMap>(`${config.db.eventsIndex}/_search`, payload)
+    const response = await elasticSearch.post<SearchEvent>(
+      `${config.db.eventsIndex}/_search`,
+      payload
+    )
 
     return response.data.hits.hits.map(hit => hit._source)
   } catch (err) {
