@@ -22,43 +22,31 @@ const processError = (err: any): Error => {
 
 interface EsBlocksQuery extends EsQuery {
   bool: {
-    must?: JsonMap | JsonMap[]
-    must_not?: JsonMap | JsonMap[]
-    should?: JsonMap | JsonMap[]
-    minimum_should_match?: number
+    must?: JsonMap[]
   }
 }
-
-export const timestampRangeSubQuery = (minTimestamp: number): EsQuery => ({
-  range: { timestamp: { gte: minTimestamp } }
-})
 
 /**
  * Gets query for fetching blocks within given timestamp range
  * @param {number} minTimestamp optional min timestamp of the block
- * @param {boolean} withSystemBlocks whether to include blocks that contain system extrinsics only (with 0 AVT block rewards)
+ * @param {boolean} withSystemBlocks whether to include blocks that contain system extrinsics only
  * @returns {EsQuery} query object for ElasticSearch
  */
 const getBlocksQuery = (minTimestamp?: number, withSystemBlocks = true): EsQuery => {
   const query: EsBlocksQuery = {
-    bool: {}
+    bool: {
+      must: []
+    }
   }
   if (minTimestamp !== undefined) {
-    query.bool.must = timestampRangeSubQuery(minTimestamp)
+    query.bool.must?.push({
+      range: { timestamp: { gte: minTimestamp } }
+    })
   }
   if (!withSystemBlocks) {
-    // NOTE: using `noSignedTransactions > 0` instead of using the "estimated reward" is more appropriate,
-    // but this property was added after initial launch, so not all of the blocks contain it.
-    // To avoid data reindexing and migration we're fetching rewardToken > 0 OR noSignedTransactions >= 1.
-    query.bool.minimum_should_match = 1
-    query.bool.should = [
-      {
-        range: { rewardToken: { gt: 0 } }
-      },
-      {
-        range: { noSignedTransactions: { gte: 1 } }
-      }
-    ]
+    query.bool.must?.push({
+      range: { noSignedTransactions: { gte: 1 } }
+    })
   }
   return query
 }
