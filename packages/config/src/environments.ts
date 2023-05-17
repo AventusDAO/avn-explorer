@@ -3,32 +3,50 @@ import { AvnEnvironment, NetworkPrefix } from './types'
 export const environments: AvnEnvironment[] = [
   {
     name: 'solochain-dev',
-    endpoint: 'wss://avn.uat.aventus.io',
+    dataSource: {
+      chain: 'wss://avn.uat.aventus.io',
+      archive: 'https://solo-archive-explorer.dev.aventus.io/graphql'
+    },
     prefix: NetworkPrefix.substrate
   },
   {
     name: 'solochain-testnet',
-    endpoint: 'wss://avn.testnet.aventus.io',
+    dataSource: {
+      chain: 'wss://avn.testnet.aventus.io',
+      archive: 'https://solo-archive-explorer.public-testnet.aventus.io/graphql'
+    },
     prefix: NetworkPrefix.substrate
   },
   {
     name: 'solochain-mainnet',
-    endpoint: 'wss://avn.aventus.io',
+    dataSource: {
+      chain: 'wss://avn.aventus.io',
+      archive: 'https://solo-archive-explorer.mainnet.aventus.io/graphql'
+    },
     prefix: NetworkPrefix.substrate
   },
   {
     name: 'parachain-dev',
-    endpoint: 'wss://avn-parachain.dev.aventus.io',
+    dataSource: {
+      chain: 'wss://avn-parachain.dev.aventus.io',
+      archive: 'https://archive-explorer.dev.aventus.io/graphql'
+    },
     prefix: NetworkPrefix.substrate
   },
   {
     name: 'parachain-testnet',
-    endpoint: 'wss://avn-parachain.public-testnet.aventus.io',
+    dataSource: {
+      chain: 'wss://avn-parachain.public-testnet.aventus.io',
+      archive: 'https://archive-explorer.public-testnet.aventus.io/graphql'
+    },
     prefix: NetworkPrefix.substrate
   },
   {
     name: 'parachain-mainnet',
-    endpoint: 'wss://avn-parachain.mainnet.aventus.io',
+    dataSource: {
+      chain: 'wss://avn-parachain.mainnet.aventus.io',
+      archive: 'https://archive-explorer.mainnet.aventus.io/graphql'
+    },
     prefix: NetworkPrefix.substrate
   }
 ]
@@ -37,7 +55,7 @@ const getAvnEnvironment = (): AvnEnvironment => {
   const envName = process.env.AVN_ENV
   if (!envName) throw new Error('missing AVN_ENV env var')
   const env = environments.find(e => e.name === envName)
-  if (!env) throw new Error('invalid AVN_ENV env var')
+  if (!env) throw new Error(`invalid AVN_ENV env var "${envName}"`)
   return env
 }
 

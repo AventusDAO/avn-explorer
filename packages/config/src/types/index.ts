@@ -3,14 +3,6 @@ export enum NetworkPrefix {
   substrate = 42
 }
 
-export interface AvnEnvironment {
-  name: string
-  endpoint: string
-  prefix: NetworkPrefix
-  /** name of the types bundle file (if they're needed) */
-  typesBundle?: string
-}
-
 interface DataSource {
   /**
    * Subsquid substrate archive endpoint URL
@@ -20,6 +12,14 @@ interface DataSource {
    * Chain node RPC websocket URL
    */
   chain?: string
+}
+
+export interface AvnEnvironment {
+  name: string
+  dataSource: Required<DataSource>
+  prefix: NetworkPrefix
+  /** name of the types bundle file (if they're needed) */
+  typesBundle?: string
 }
 
 export interface ProcessorConfig {
