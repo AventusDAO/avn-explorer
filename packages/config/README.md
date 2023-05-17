@@ -7,15 +7,15 @@ Package containing configuration utilities for apps.
 Add these variable to the app using this package:
 
 ```
-DB_NAME=explorer_fees_db
+DB_NAME=explorer_<processor_name>_db
 DB_PASS=postgres
 DB_USER=postgres
 DB_PORT=5432
 DB_HOST=localhost
 GQL_PORT=4350
 
-AVN_ENV=parachain-dev
-ARCHIVE_URL=http://localhost:8888/graphql
+AVN_ENV=parachain-testnet
+ARCHIVE_URL=https://archive-explorer.public-testnet.aventus.io/graphql
 
 PROCESSOR_PROMETHEUS_PORT=3000
 # PROCESSOR_RANGE_FROM=0
