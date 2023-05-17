@@ -18,7 +18,7 @@ AVN_ENV=parachain-testnet
 
 # optionally override archive (gateway) url:
 # ARCHIVE_URL=http://localhost:8888/graphql
-# ARCHIVE_URL=https://archive-explorer.public-testnet.aventus.io/graphql
+# ARCHIVE_URL=https://archive-gateway.public-testnet.aventus.io/graphql
 
 PROCESSOR_PROMETHEUS_PORT=3000
 # PROCESSOR_RANGE_FROM=0
