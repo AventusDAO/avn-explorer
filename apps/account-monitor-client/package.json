@@ -5,7 +5,7 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "build": "rm -rf lib && tsc",
+    "build": "rm -rf lib && tsc -w",
     "start": "nodemon lib/index.js",
     "dev": "yarn build && yarn start"
   },
