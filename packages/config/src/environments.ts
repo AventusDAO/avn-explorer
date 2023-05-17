@@ -5,7 +5,7 @@ export const environments: AvnEnvironment[] = [
     name: 'solochain-dev',
     dataSource: {
       chain: 'wss://avn.uat.aventus.io',
-      archive: 'https://solo-archive-explorer.dev.aventus.io/graphql'
+      archive: 'https://solo-archive-gateway.dev.aventus.io/graphql'
     },
     prefix: NetworkPrefix.substrate
   },
@@ -13,7 +13,7 @@ export const environments: AvnEnvironment[] = [
     name: 'solochain-testnet',
     dataSource: {
       chain: 'wss://avn.testnet.aventus.io',
-      archive: 'https://solo-archive-explorer.public-testnet.aventus.io/graphql'
+      archive: 'https://solo-archive-gateway.public-testnet.aventus.io/graphql'
     },
     prefix: NetworkPrefix.substrate
   },
@@ -21,7 +21,7 @@ export const environments: AvnEnvironment[] = [
     name: 'solochain-mainnet',
     dataSource: {
       chain: 'wss://avn.aventus.io',
-      archive: 'https://solo-archive-explorer.mainnet.aventus.io/graphql'
+      archive: 'https://solo-archive-gateway.mainnet.aventus.io/graphql'
     },
     prefix: NetworkPrefix.substrate
   },
@@ -29,7 +29,7 @@ export const environments: AvnEnvironment[] = [
     name: 'parachain-dev',
     dataSource: {
       chain: 'wss://avn-parachain.dev.aventus.io',
-      archive: 'https://archive-explorer.dev.aventus.io/graphql'
+      archive: 'https://archive-gateway.dev.aventus.io/graphql'
     },
     prefix: NetworkPrefix.substrate
   },
@@ -37,7 +37,7 @@ export const environments: AvnEnvironment[] = [
     name: 'parachain-testnet',
     dataSource: {
       chain: 'wss://avn-parachain.public-testnet.aventus.io',
-      archive: 'https://archive-explorer.public-testnet.aventus.io/graphql'
+      archive: 'https://archive-gateway.public-testnet.aventus.io/graphql'
     },
     prefix: NetworkPrefix.substrate
   },
@@ -45,7 +45,7 @@ export const environments: AvnEnvironment[] = [
     name: 'parachain-mainnet',
     dataSource: {
       chain: 'wss://avn-parachain.mainnet.aventus.io',
-      archive: 'https://archive-explorer.mainnet.aventus.io/graphql'
+      archive: 'https://archive-gateway.mainnet.aventus.io/graphql'
     },
     prefix: NetworkPrefix.substrate
   }
