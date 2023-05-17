@@ -4,10 +4,10 @@ import { ParachainStakingRewardedEvent } from '../types/generated/parachain-dev/
 
 export const handleRewarded: IEventHandler = (ctx, event): IRewardedData => {
   const data = new ParachainStakingRewardedEvent(ctx, event)
-  if (data.isV12) {
+  if (data.isV21) {
     return {
-      id: data.asV12.account,
-      amount: data.asV12.rewards
+      id: data.asV21.account,
+      amount: data.asV21.rewards
     }
   } else {
     throw new UnknownVersionError(event.name)
