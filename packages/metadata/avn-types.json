@@ -5,6 +5,7 @@
         {
           "minmax": [0, 264],
           "types": {
+            "EthKey": "H512",
             "CheckResult": {
               "_enum": ["Ok", "Invalid", "HttpErrorCheckingEvent", "Unknown"]
             },
@@ -589,6 +590,7 @@
         {
           "minmax": [270, 271],
           "types": {
+            "EthKey": "H512",
             "CheckResult": {
               "_enum": ["Ok", "Invalid", "HttpErrorCheckingEvent", "Unknown"]
             },
@@ -795,7 +797,6 @@
               "reserved_eth_transaction": "EthTransactionType"
             },
             "Public": "[u8;33]",
-            "EthKey": "H512",
             "ValidatorsActionType": {
               "_enum": ["Voluntary", "Slashed", "Activation", "Unknown"]
             },
@@ -883,6 +884,7 @@
         {
           "minmax": [271, null],
           "types": {
+            "EthKey": "H512",
             "CheckResult": {
               "_enum": ["Ok", "Invalid", "HttpErrorCheckingEvent", "Unknown"]
             },
