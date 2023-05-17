@@ -162,6 +162,7 @@ function normalizeTokenTransferEvent(
     const { sender, recipient, tokenBalance, tokenId } = e.asV4
     return { from: sender, to: recipient, amount: tokenBalance, tokenId }
   } else {
+    console.log("ERROR?")
     throw new UknownVersionError()
   }
 }

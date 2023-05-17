@@ -1,0 +1,7 @@
+{
+  "outDir": "../src/types/generated/parachain-testnet",
+  "specVersions": "../../../packages/metadata/versions-parachain.testnet.jsonl",
+  "events": ["NftManager.SingleNftMinted", "NftManager.BatchNftMinted"],
+  "calls": [],
+  "storage": []
+}
