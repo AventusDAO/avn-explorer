@@ -21,9 +21,7 @@ export const getConfig = (): ProcessorConfig => {
 
   const archive = process.env.ARCHIVE_URL ?? dataSource.archive
   if (!process.env.ARCHIVE_URL) {
-    console.warn(
-      `missing ARCHIVE_URL env var, using deployed parachain public-testnet as a default`
-    )
+    console.warn(`missing ARCHIVE_URL env var, using the deployed ${archive} as default`)
   }
 
   return {
