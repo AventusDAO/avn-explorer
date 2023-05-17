@@ -1,0 +1,5 @@
+type Nft @entity {
+    id: ID! @index
+    nftId: BigInt! @index
+    owner: String! @index
+}
