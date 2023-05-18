@@ -2,11 +2,14 @@
 
 ## Documentation
 
-Confluence Documentation with overview, architecture and app links: [https://aventus-network-services.atlassian.net/wiki/spaces/EX/overview](https://aventus-network-services.atlassian.net/wiki/spaces/EX/overview)
+### Confluence spaces:
+
+- [AvnExplorer](https://aventus-network-services.atlassian.net/wiki/spaces/EX/overview) (overview, architecture and links to the deployed apps)
+- [Infra](https://aventus-network-services.atlassian.net/wiki/spaces/INFRA/pages/2235400199/USER+AvN+Explorer) (instructions of the deployment using ArgoCD)
 
 ### Apps:
 
-For more info refer to their READMEs:
+For more developer tips refer to their READMEs:
 
 - [archive](/apps/archive/README.md)
 - [account-monitor](/apps/account-monitor/README.md)
