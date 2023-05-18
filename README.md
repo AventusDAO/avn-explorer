@@ -4,10 +4,10 @@
 
 Confluence Documentation with overview, architecture and app links: [https://aventus-network-services.atlassian.net/wiki/spaces/EX/overview](https://aventus-network-services.atlassian.net/wiki/spaces/EX/overview)
 
-
 ### Apps:
 
 For more info refer to their READMEs:
+
 - [archive](/apps/archive/README.md)
 - [account-monitor](/apps/account-monitor/README.md)
 - [balances](/apps/balances/README.md)
