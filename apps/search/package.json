@@ -7,7 +7,7 @@
     "build": "rm -rf lib && tsc",
     "build:watch": "tsc -w",
     "dev": "nodemon",
-    "processor:start": "yarn db:migrate && node lib/processor.js",
+    "processor:start": "node lib/processor.js",
     "processor:debug": "node --inspect --enable-source-maps -r dotenv/config lib/processor.js",
     "db:reset": "node ./scripts/reset-db.js"
   },
