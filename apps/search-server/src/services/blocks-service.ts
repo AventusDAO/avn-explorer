@@ -1,6 +1,13 @@
 import { AxiosError } from 'axios'
 import { ApiError, isAxiosError } from '../utils'
-import { JsonMap, EsSortItem, EsRequestPayload, EsSortDirection, EsQuery, Block } from '../types'
+import {
+  JsonMap,
+  EsSortItem,
+  EsRequestPayload,
+  EsSortDirection,
+  EsQuery,
+  SearchBlock
+} from '../types'
 import { getLogger } from '../utils/logger'
 import { config } from '../config'
 import { processSortParam } from '../utils/paramHelpers'
@@ -20,45 +27,33 @@ const processError = (err: any): Error => {
   return err
 }
 
-interface EsBlocksQuery extends EsQuery {
+interface SearchBlocksQuery extends EsQuery {
   bool: {
-    must?: JsonMap | JsonMap[]
-    must_not?: JsonMap | JsonMap[]
-    should?: JsonMap | JsonMap[]
-    minimum_should_match?: number
+    must?: JsonMap[]
   }
 }
-
-export const timestampRangeSubQuery = (minTimestamp: number): EsQuery => ({
-  range: { timestamp: { gte: minTimestamp } }
-})
 
 /**
  * Gets query for fetching blocks within given timestamp range
  * @param {number} minTimestamp optional min timestamp of the block
- * @param {boolean} withSystemBlocks whether to include blocks that contain system extrinsics only (with 0 AVT block rewards)
+ * @param {boolean} withSystemBlocks whether to include blocks that contain system extrinsics only
  * @returns {EsQuery} query object for ElasticSearch
  */
 const getBlocksQuery = (minTimestamp?: number, withSystemBlocks = true): EsQuery => {
-  const query: EsBlocksQuery = {
-    bool: {}
+  const query: SearchBlocksQuery = {
+    bool: {
+      must: []
+    }
   }
   if (minTimestamp !== undefined) {
-    query.bool.must = timestampRangeSubQuery(minTimestamp)
+    query.bool.must?.push({
+      range: { timestamp: { gte: minTimestamp } }
+    })
   }
   if (!withSystemBlocks) {
-    // NOTE: using `noSignedTransactions > 0` instead of using the "estimated reward" is more appropriate,
-    // but this property was added after initial launch, so not all of the blocks contain it.
-    // To avoid data reindexing and migration we're fetching rewardToken > 0 OR noSignedTransactions >= 1.
-    query.bool.minimum_should_match = 1
-    query.bool.should = [
-      {
-        range: { rewardToken: { gt: 0 } }
-      },
-      {
-        range: { noSignedTransactions: { gte: 1 } }
-      }
-    ]
+    query.bool.must?.push({
+      range: { noSignedTransactions: { gte: 1 } }
+    })
   }
   return query
 }
@@ -68,7 +63,7 @@ export const getBlocks = async (
   from = 0,
   skipSystemBlocks = false,
   sortCsv?: string
-): Promise<Block[]> => {
+): Promise<SearchBlock[]> => {
   const query = getBlocksQuery(undefined, !skipSystemBlocks)
   const sort: EsSortItem[] = []
 
@@ -96,7 +91,10 @@ export const getBlocks = async (
 
   const payload: EsRequestPayload = { size, from, sort, query }
   try {
-    const { data } = await elasticSearch.post<Block>(`${config.db.blocksIndex}/_search`, payload)
+    const { data } = await elasticSearch.post<SearchBlock>(
+      `${config.db.blocksIndex}/_search`,
+      payload
+    )
     return data.hits.hits.map(hit => hit._source)
   } catch (err) {
     throw processError(err)

@@ -5,6 +5,7 @@ const { Console } = transports
 
 const output = printf(
   o =>
+    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
     `${o.timestamp} (${o.ms?.padEnd(7) ?? ''}) [${o.level.padEnd(7)}] ${o.obj.padEnd(11)}:` +
     (o.message as string)
 )

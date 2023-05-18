@@ -8,7 +8,8 @@
     "build:watch": "tsc -w",
     "dev": "nodemon",
     "processor:start": "yarn db:migrate && node lib/processor.js",
-    "processor:debug": "node --inspect --enable-source-maps -r dotenv/config lib/processor.js"
+    "processor:debug": "node --inspect --enable-source-maps -r dotenv/config lib/processor.js",
+    "db:reset": "node ./scripts/reset-db.js"
   },
   "dependencies": {
     "@avn/config": "^1.0.0",

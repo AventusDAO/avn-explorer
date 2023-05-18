@@ -1,7 +1,7 @@
 import { Router } from 'express'
-import { getBlocks } from '../services/blocks-service'
-import { SearchBlock, DataResponse } from '../types'
-import { asyncCatch, processBooleanParam, processIntegerParam, processStringParam } from '../utils'
+import { getEvents } from '../services/events'
+import { SearchEvent, DataResponse } from '../types'
+import { asyncCatch, processIntegerParam, processStringParam } from '../utils'
 const router = Router()
 
 router.get(
@@ -12,9 +12,8 @@ router.get(
     const size = processIntegerParam(req.query.size, 'size')
     const from = processIntegerParam(req.query.from, 'from')
     const sort = processStringParam(req.query.sort, 'sort')
-    const skipSystemBlocks = processBooleanParam(req.query.skipSystemBlocks, 'skipSystemBlocks')
-    const data = await getBlocks(size, from, skipSystemBlocks, sort)
-    const response: DataResponse<SearchBlock[]> = {
+    const data = await getEvents(size, from, sort)
+    const response: DataResponse<SearchEvent[]> = {
       data
     }
     res.status(200).json(response)

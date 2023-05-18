@@ -40,6 +40,7 @@ const corsOptions = {
     }
     // else block CORS access
     callback(
+      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
       new BaseError('cors_not_allowed', 401, `Not allowed by CORS. Origin:  ${origin}`, true)
     )
   }

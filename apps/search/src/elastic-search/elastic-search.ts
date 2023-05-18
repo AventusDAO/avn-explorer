@@ -1,5 +1,5 @@
 import { blocksSchema, extrinsicsSchema, eventsSchema } from './schema'
-import { EsBlock, EsEvent, EsExtrinsic, IndexMapping, MappingsResponse } from './types'
+import { SearchBlock, SearchEvent, SearchExtrinsic, IndexMapping, MappingsResponse } from './types'
 import { get, post, put } from './utils'
 
 export interface EsOptions {
@@ -68,7 +68,11 @@ export class ElasticSearch {
   /**
    * Store a batches of blocks, extrinsics and events in ElasticSearch
    */
-  async storeBatch(blocks: EsBlock[], extrinsics: EsExtrinsic[], events: EsEvent[]): Promise<void> {
+  async storeBatch(
+    blocks: SearchBlock[],
+    extrinsics: SearchExtrinsic[],
+    events: SearchEvent[]
+  ): Promise<void> {
     await Promise.all([
       this.storeBulk(blocks, this.blocksIndex, '_doc', 'refId'),
       this.storeBulk(extrinsics, this.extrinsicsIndex, '_doc', 'refId'),
