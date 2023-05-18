@@ -1,7 +1,21 @@
 # AvN Explorer
 
-[Balances readme](/balances/README.md)
-[Archive readme](/archive//README.md)
+## Documentation
+
+Confluence Documentation with overview, architecture and app links: [https://aventus-network-services.atlassian.net/wiki/spaces/EX/overview](https://aventus-network-services.atlassian.net/wiki/spaces/EX/overview)
+
+
+### Apps:
+
+For more info refer to their READMEs:
+- [archive](/apps/archive/README.md)
+- [account-monitor](/apps/account-monitor/README.md)
+- [balances](/apps/balances/README.md)
+- [fees](/apps/fees/README.md)
+- [search](/apps/search/README.md)
+- [staking](/apps/staking/README.md)
+- [summary](/apps/summary/README.md)
+- [tokens](/apps/tokens/README.md)
 
 ## Setup
 

@@ -1,6 +1,6 @@
-# Balances
+# Tokens
 
-This is a Squid based processor listing accounts and their AVT balance changes.
+This is a Squid based processor listing accounts and changes in their (non AVT) token  balances.
 
 ## How to run
 
