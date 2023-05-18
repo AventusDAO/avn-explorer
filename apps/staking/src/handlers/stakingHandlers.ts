@@ -14,8 +14,8 @@ type INominatorEventHandler = IEventHandler<Address>
 
 const handleNominationIncreased: INominatorEventHandler = (ctx, event): Address => {
   const data = new ParachainStakingNominationIncreasedEvent(ctx, event)
-  if (data.isV12) {
-    return data.asV12.nominator
+  if (data.isV21) {
+    return data.asV21.nominator
   } else {
     throw new UnknownVersionError(event.name)
   }
@@ -23,8 +23,8 @@ const handleNominationIncreased: INominatorEventHandler = (ctx, event): Address 
 
 const handleNominationDecreased: INominatorEventHandler = (ctx, event): Address => {
   const data = new ParachainStakingNominationDecreasedEvent(ctx, event)
-  if (data.isV12) {
-    return data.asV12.nominator
+  if (data.isV21) {
+    return data.asV21.nominator
   } else {
     throw new UnknownVersionError(event.name)
   }
@@ -32,16 +32,16 @@ const handleNominationDecreased: INominatorEventHandler = (ctx, event): Address 
 
 const handleNominatorLeft: INominatorEventHandler = (ctx, event): Address => {
   const data = new ParachainStakingNominatorLeftEvent(ctx, event)
-  if (data.isV12) {
-    return data.asV12.nominator
+  if (data.isV21) {
+    return data.asV21.nominator
   } else {
     throw new UnknownVersionError(event.name)
   }
 }
 const handleNominationRevoked: INominatorEventHandler = (ctx, event): Address => {
   const data = new ParachainStakingNominationRevokedEvent(ctx, event)
-  if (data.isV12) {
-    return data.asV12.nominator
+  if (data.isV21) {
+    return data.asV21.nominator
   } else {
     throw new UnknownVersionError(event.name)
   }
@@ -49,8 +49,8 @@ const handleNominationRevoked: INominatorEventHandler = (ctx, event): Address =>
 
 const handleNominationKicked: INominatorEventHandler = (ctx, event): Address => {
   const data = new ParachainStakingNominationKickedEvent(ctx, event)
-  if (data.isV12) {
-    return data.asV12.nominator
+  if (data.isV21) {
+    return data.asV21.nominator
   } else {
     throw new UnknownVersionError(event.name)
   }
@@ -58,8 +58,8 @@ const handleNominationKicked: INominatorEventHandler = (ctx, event): Address => 
 
 const handleNomination: INominatorEventHandler = (ctx, event): Address => {
   const data = new ParachainStakingNominationEvent(ctx, event)
-  if (data.isV12) {
-    return data.asV12.nominator
+  if (data.isV21) {
+    return data.asV21.nominator
   } else {
     throw new UnknownVersionError(event.name)
   }
@@ -67,8 +67,8 @@ const handleNomination: INominatorEventHandler = (ctx, event): Address => {
 
 const handleNominatorLeftCandidate: INominatorEventHandler = (ctx, event): Address => {
   const data = new ParachainStakingNominatorLeftCandidateEvent(ctx, event)
-  if (data.isV12) {
-    return data.asV12.nominator
+  if (data.isV21) {
+    return data.asV21.nominator
   } else {
     throw new UnknownVersionError(event.name)
   }

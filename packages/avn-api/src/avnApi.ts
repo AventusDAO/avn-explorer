@@ -29,8 +29,9 @@ const updateSubstrateV2Types = (typesBundle: OverrideBundleType): OverrideBundle
 }
 
 export const getApi = async (): Promise<ApiPromise> => {
-  const { typesBundle: typesBundleFile, endpoint } = environment
-  const wsProvider = new WsProvider(endpoint)
+  const { typesBundle: typesBundleFile, dataSource } = environment
+  const { chain } = dataSource
+  const wsProvider = new WsProvider(chain)
 
   const typesBundle = typesBundleFile ? updateSubstrateV2Types(solochainTypes) : undefined
   const api = await ApiPromise.create({

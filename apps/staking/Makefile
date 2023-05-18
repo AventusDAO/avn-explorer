@@ -27,8 +27,8 @@ migration:
 codegen:
 	@yarn squid-typeorm-codegen
 
-typegen-testnet:
-	@yarn squid-substrate-typegen ./typegen/typegen.testnet.json
+typegen-parachain-testnet:
+	@yarn squid-substrate-typegen ./typegen/typegen-parachain.testnet.json
 
 typegen-parachain-dev:
 	@yarn squid-substrate-typegen ./typegen/typegen-parachain.dev.json

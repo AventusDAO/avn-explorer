@@ -24,6 +24,12 @@ To update a dependency use `yarn up dotenv` - it will update all `dotenv` depend
 
 1. Copy any processor folder and rename it
 2. Clean up processors logic
-3. Define events and calls in the `typegen` folder and `make typegen-parachain-dev` to generate types for parachain (make sure you have up to date archive and its ingested metadata)
+3. Define events and calls in the `typegen` folder and `make typegen-parachain-testnet` to generate types for parachain (make sure metadata are up to date)
 4. Define GraphQL schema and `make codegen` to generate models
 5. Add processor to the `nuke` app config
+
+## Updating versions metadata
+
+1. Make sure archive is fully ingested / up to date
+2. `cd packages/metadata`
+3. `make versions-parachain-testnet` (or for any other environment, see the [Makefile](packages/metadata/Makefile))

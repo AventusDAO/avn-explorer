@@ -6,7 +6,7 @@ import { encodeId } from '@avn/utils'
 import { INominationData, IStakingAccountUpdate } from '../types/custom'
 import { Block } from '../types/generated/parachain-dev/support'
 import { ParachainStakingNominatorStateStorage } from '../types/generated/parachain-dev/storage'
-import { Nominator as NominatorV12 } from '../types/generated/parachain-dev/v12'
+import { Nominator as NominatorV21 } from '../types/generated/parachain-dev/v21'
 import { In } from 'typeorm'
 
 export async function saveAccounts(
@@ -56,11 +56,11 @@ export async function getNominations(
 ): Promise<INominationData[]> {
   const storage = new ParachainStakingNominatorStateStorage(ctx, block)
   if (!storage.isExists) ctx.log.error(`Missing ParachainStakingNominatorStateStorage`)
-  if (storage.isV12) {
-    const nominatorsRes = await storage.getManyAsV12(accounts)
+  if (storage.isV21) {
+    const nominatorsRes = await storage.getManyAsV21(accounts)
 
     // if (nominatorsRes.find(n => !n)) throw new Error(`Nominator is undefined`)
-    const nominators = nominatorsRes.filter(Boolean) as NominatorV12[]
+    const nominators = nominatorsRes.filter(Boolean) as NominatorV21[]
     return nominators.filter(Boolean).map(n => ({
       id: n.id,
       total: n.total

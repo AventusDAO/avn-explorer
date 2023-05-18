@@ -1,6 +1,6 @@
 import assert from 'assert'
 import {Block, Chain, ChainContext, BlockContext, Result, Option} from './support'
-import * as v12 from './v12'
+import * as v21 from './v21'
 
 export class ParachainStakingNominatorStateStorage {
     private readonly _chain: Chain
@@ -17,25 +17,25 @@ export class ParachainStakingNominatorStateStorage {
     /**
      *  Get nominator state associated with an account if account is nominating else None
      */
-    get isV12() {
+    get isV21() {
         return this._chain.getStorageItemTypeHash('ParachainStaking', 'NominatorState') === '1c202ee2b387e76b12a61cfe4a3f557431cd1902af95841b0b3ee6ab3747befe'
     }
 
     /**
      *  Get nominator state associated with an account if account is nominating else None
      */
-    async getAsV12(key: Uint8Array): Promise<v12.Nominator | undefined> {
-        assert(this.isV12)
+    async getAsV21(key: Uint8Array): Promise<v21.Nominator | undefined> {
+        assert(this.isV21)
         return this._chain.getStorage(this.blockHash, 'ParachainStaking', 'NominatorState', key)
     }
 
-    async getManyAsV12(keys: Uint8Array[]): Promise<(v12.Nominator | undefined)[]> {
-        assert(this.isV12)
+    async getManyAsV21(keys: Uint8Array[]): Promise<(v21.Nominator | undefined)[]> {
+        assert(this.isV21)
         return this._chain.queryStorage(this.blockHash, 'ParachainStaking', 'NominatorState', keys.map(k => [k]))
     }
 
-    async getAllAsV12(): Promise<(v12.Nominator)[]> {
-        assert(this.isV12)
+    async getAllAsV21(): Promise<(v21.Nominator)[]> {
+        assert(this.isV21)
         return this._chain.queryStorage(this.blockHash, 'ParachainStaking', 'NominatorState')
     }
 

@@ -1,8 +1,0 @@
-{
-  "outDir": "../src/types/generated/testnet",
-  "specVersions": "../../../packages/metadata/versions.testnet.jsonl",
-  "typesBundle": "../../../packages/metadata/avn-types.json",
-  "events": [],
-  "calls": [],
-  "storage": []
-}

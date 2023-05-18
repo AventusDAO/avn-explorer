@@ -18,7 +18,7 @@ Additional environment variables used:
 ```bash
 DB_BLOCKS_INDEX=blocks
 DB_EXTRINSICS_INDEX=extrinsics
-DB_EVENTS_INDE=events
+DB_EVENTS_INDEX=events
 
 # the port to listen for the incoming requests, by default it's 3000
 PORT=3000
