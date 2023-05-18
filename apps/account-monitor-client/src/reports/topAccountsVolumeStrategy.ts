@@ -30,7 +30,7 @@ export class TopVolumeMoveReport implements ReportStrategy {
       `
   }
 
-  generateReport = async (params: IReportParams) => {
+  generateReport = async (params: IReportParams): Promise<void> => {
     const { dbClient, messageSender } = this.dependencies
     const query = this.constructQuery(params)
 
@@ -47,7 +47,7 @@ export class TopVolumeMoveReport implements ReportStrategy {
     await messageSender(report)
   }
 
-  start = (params?: IReportParams) => {
+  start = (params?: IReportParams): void => {
     if (this.cronJob) {
       throw new Error('Report is already running. Call stop() first.')
     }
@@ -55,12 +55,12 @@ export class TopVolumeMoveReport implements ReportStrategy {
     if (!params) {
       throw new Error('Cannot start a new job missing parameters')
     }
-
-    this.cronJob = new CronJob(params.frequency, () => this.generateReport(params))
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+    this.cronJob = new CronJob(params.frequency, async () => await this.generateReport(params))
     this.cronJob.start()
   }
 
-  stop = () => {
+  stop = (): void => {
     if (!this.cronJob) {
       throw new Error('Report is not running. Call start() first.')
     }

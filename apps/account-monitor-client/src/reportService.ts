@@ -24,7 +24,7 @@ export interface IReportParams {
 }
 
 export interface ReportStrategy {
-  generateReport: (params: IReportParams) => Promise<void | any>
+  generateReport: (params: IReportParams) => Promise<void>
   start: (params?: IReportParams) => void
   stop: () => void
 }
@@ -34,11 +34,11 @@ class ReportService {
 
   constructor(public readonly dependencies: IServiceDependencies) {}
 
-  getReportStrategy() {
+  getReportStrategy(): ReportStrategy | null {
     return this.reportStrategy
   }
 
-  setReportStrategy(reportStrategy: ReportStrategyEnum) {
+  setReportStrategy(reportStrategy: ReportStrategyEnum): void {
     if (reportStrategy === ReportStrategyEnum.TopVolumeMoveReport) {
       this.reportStrategy = new TopVolumeMoveReport(this.dependencies)
     }
@@ -48,7 +48,7 @@ class ReportService {
     }
   }
 
-  generateReport = async (params: IReportParams) => {
+  generateReport = async (params: IReportParams): Promise<void> => {
     if (!this.reportStrategy) {
       throw new Error('Report strategy not set')
     }
@@ -56,7 +56,7 @@ class ReportService {
     await this.reportStrategy.generateReport(params)
   }
 
-  startReport() {
+  startReport(): void {
     if (!this.reportStrategy) {
       throw new Error('Report strategy not set')
     }
@@ -64,7 +64,7 @@ class ReportService {
     this.reportStrategy.start()
   }
 
-  stopReport() {
+  stopReport(): void {
     if (!this.reportStrategy) {
       throw new Error('Report strategy not set')
     }

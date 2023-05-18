@@ -1,15 +1,30 @@
+import DbClient, { DbEvents } from '../dbClient'
 import { IServiceDependencies, IReportParams, ReportStrategy } from '../reportService'
 
+interface IRecord {
+  token_id?: string
+  amount: bigint
+  from: string
+  to: string
+}
+
+interface ITransactions {
+  count: number
+  sum: bigint
+  token_id: string
+  amount: bigint
+}
+
 export class LiveReport implements ReportStrategy {
-  private listener: ((record: any) => Promise<void>) | null = null
+  private listener: ((record: IRecord) => Promise<void>) | null = null
 
   constructor(private readonly dependencies: IServiceDependencies) {}
 
-  async generateReport(params: IReportParams) {
+  async generateReport(params: IReportParams): Promise<void> {
     const { dbClient, messageSender } = this.dependencies
     const { token, minAmount, interestingAccounts, minVolume, minTransactions } = params
 
-    this.listener = async (record: any) => {
+    this.listener = async (record: IRecord): Promise<void> => {
       try {
         if (token && record.token_id === token && record.amount >= minAmount) {
           await this.sendMessage(
@@ -18,7 +33,7 @@ export class LiveReport implements ReportStrategy {
           )
         }
 
-        if (interestingAccounts.includes(record.from)) {
+        if (interestingAccounts.includes(record.from) || interestingAccounts.includes(record.to)) {
           const transactions = await this.getTransactions(record.from, dbClient)
 
           if (transactions.count >= minTransactions) {
@@ -30,7 +45,9 @@ export class LiveReport implements ReportStrategy {
 
           if (transactions.sum >= minVolume) {
             await this.sendMessage(
-              `Account ${record.from} has transferred ${transactions.amount}`,
+              `Account ${record.from} has traded ${transactions.amount} of token: ${
+                transactions.token_id ?? 'AVT'
+              }`,
               messageSender
             )
           }
@@ -39,31 +56,29 @@ export class LiveReport implements ReportStrategy {
         console.error(`Error generating live report: ${error}`)
       }
     }
-
-    dbClient.on('new-record', this.listener)
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+    dbClient.on(DbEvents.NEW_RECORD, this.listener)
   }
 
-  start = () => {
+  start = async () => {
     if (!this.listener) {
       throw new Error('Report not initialized. Call generateReport() first.')
     }
-
-    this.dependencies.dbClient.on('new-record', this.listener)
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+    this.dependencies.dbClient.on(DbEvents.NEW_RECORD, this.listener)
   }
 
-  stop = () => {
+  stop = async () => {
     if (!this.listener) {
       throw new Error('Report not initialized. Call generateReport() first.')
     }
-
-    this.dependencies.dbClient.removeListener('new-record', this.listener)
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+    this.dependencies.dbClient.removeListener(DbEvents.NEW_RECORD, this.listener)
   }
 
-  private async getTransactions(account: string, dbClient: any) {
-    const query = {
-      text: 'SELECT COUNT(*), SUM(amount) FROM transfer WHERE "from" = $1',
-      values: [account]
-    }
+  private async getTransactions(account: string, dbClient: DbClient): Promise<ITransactions> {
+    const query = `SELECT COUNT(*), SUM(amount), token_id FROM transfer WHERE "from" = ${account} OR "to" = ${account}`
+
     const result = await dbClient.query(query)
 
     return result.rows[0]

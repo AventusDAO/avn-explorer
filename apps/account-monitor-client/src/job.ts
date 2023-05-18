@@ -1,5 +1,4 @@
-import { IReportParams } from './reportService'
-import { ReportStrategy } from './reportService'
+import { IReportParams, ReportStrategy } from './reportService'
 
 enum JobStatusEnum {
   RUNNING = 'running',
@@ -12,16 +11,15 @@ export class Job {
 
   constructor(reportParams: IReportParams, reportStrategy: ReportStrategy) {
     this.reportStrategy = reportStrategy
-    this.start(reportParams)
   }
 
-  start(reportParams: IReportParams) {
-    this.reportStrategy.generateReport(reportParams)
+  async start(reportParams: IReportParams): Promise<void> {
+    await this.reportStrategy.generateReport(reportParams)
     this.reportStrategy.start(reportParams)
     this.status = JobStatusEnum.RUNNING
   }
 
-  stop() {
+  stop(): void {
     this.reportStrategy.stop()
     this.status = JobStatusEnum.STOPPED
   }
@@ -30,24 +28,26 @@ export class Job {
 export class JobManager {
   private readonly jobs = new Map<number, Job>()
 
-  createNewJob(reportParams: IReportParams, reportStrategy: ReportStrategy) {
+  async createNewJob(reportParams: IReportParams, reportStrategy: ReportStrategy): void {
     const jobIndex = this.jobs.size
-    this.jobs.set(jobIndex, new Job(reportParams, reportStrategy))
+    const job = new Job(reportParams, reportStrategy)
+    await job.start(reportParams)
+    this.jobs.set(jobIndex, job)
   }
 
-  stopJob(id: number) {
+  stopJob(id: number): void {
     const job = this.jobs.get(id)
     if (job) {
       job.stop()
     }
   }
 
-  removeJob(id: number) {
+  removeJob(id: number): void {
     this.stopJob(id)
     this.jobs.delete(id)
   }
 
-  listJobs() {
+  listJobs(): Job[] {
     return Array.from(this.jobs.values())
   }
 }

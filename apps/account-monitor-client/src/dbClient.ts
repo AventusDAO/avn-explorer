@@ -10,12 +10,16 @@ export interface IDbConfig {
   ssl?: boolean
 }
 
+export enum DbEvents {
+  NEW_RECORD = 'new-record'
+}
+
 export class DbClient extends EventEmitter {
   private readonly pool: Pool
   private client: PoolClient | null = null
 
   constructor(config: IDbConfig) {
-    super() // Call the EventEmitter constructor
+    super()
     this.pool = new Pool(config)
 
     this.initialize().catch(error => {
@@ -27,20 +31,17 @@ export class DbClient extends EventEmitter {
   private async initialize() {
     this.client = await this.pool.connect()
 
-    // Listen for 'new_transfer' notifications
     await this.client.query('LISTEN new_transfer')
-
-    // When we receive a notification, emit a 'new-record' event
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
     this.client.on('notification', async (msg: any) => {
       if (!msg.payload) return
       const id = msg.payload
 
-      // Fetch the record from the database using parameterized query
       try {
         const res = await this.query('SELECT * FROM transfer WHERE id = $1', [id])
         if (res.rows.length > 0) {
           const record = res.rows[0]
-          this.emit('new-record', record)
+          this.emit(DbEvents.NEW_RECORD, record)
         }
       } catch (err) {
         console.error('Failed to fetch new record', err)
