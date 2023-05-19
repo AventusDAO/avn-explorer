@@ -33,7 +33,7 @@ export async function runCli(
         }
         break
       }
-
+      case 'Stop report':
       case 'Remove report': {
         const jobId = await handleJobAction(reportManager)
         if (jobId !== null) {

@@ -28,7 +28,7 @@ export class Job {
 export class JobManager {
   private readonly jobs = new Map<number, Job>()
 
-  async createNewJob(reportParams: IReportParams, reportStrategy: ReportStrategy): void {
+  async createNewJob(reportParams: IReportParams, reportStrategy: ReportStrategy): Promise<void> {
     const jobIndex = this.jobs.size
     const job = new Job(reportParams, reportStrategy)
     await job.start(reportParams)
