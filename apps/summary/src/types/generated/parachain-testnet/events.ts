@@ -1,6 +1,6 @@
 import assert from 'assert'
 import {Chain, ChainContext, EventContext, Event, Result, Option} from './support'
-import * as v21 from './v21'
+import * as v4 from './v4'
 
 export class SummarySummaryCalculatedEvent {
     private readonly _chain: Chain
@@ -16,19 +16,17 @@ export class SummarySummaryCalculatedEvent {
     }
 
     /**
-     * Root hash of summary between from block number and to block number is calculated by a
-     * validator
+     * Root hash of summary between from block number and to block number is calculated by a validator
      */
-    get isV21(): boolean {
+    get isV4(): boolean {
         return this._chain.getEventHash('Summary.SummaryCalculated') === 'd1cf622a2d4f0c9130bb329e159dbcd0de92f74598f25f1ab36f28ba39c26d02'
     }
 
     /**
-     * Root hash of summary between from block number and to block number is calculated by a
-     * validator
+     * Root hash of summary between from block number and to block number is calculated by a validator
      */
-    get asV21(): {from: number, to: number, rootHash: Uint8Array, submitter: Uint8Array} {
-        assert(this.isV21)
+    get asV4(): {from: number, to: number, rootHash: Uint8Array, submitter: Uint8Array} {
+        assert(this.isV4)
         return this._chain.decodeEvent(this.event)
     }
 }
@@ -49,15 +47,15 @@ export class SummaryVotingEndedEvent {
     /**
      * Voting for the root id is finished, true means the root is approved
      */
-    get isV21(): boolean {
+    get isV4(): boolean {
         return this._chain.getEventHash('Summary.VotingEnded') === '2a4efe74aab1ffd5fcafc5f773bdd4dc53c70f2abd2cfb39fec0b244681c1ab3'
     }
 
     /**
      * Voting for the root id is finished, true means the root is approved
      */
-    get asV21(): {rootId: v21.RootId, voteApproved: boolean} {
-        assert(this.isV21)
+    get asV4(): {rootId: v4.RootId, voteApproved: boolean} {
+        assert(this.isV4)
         return this._chain.decodeEvent(this.event)
     }
 }
