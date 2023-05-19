@@ -16,6 +16,7 @@ For more developer tips refer to their READMEs:
 - [balances](/apps/balances/README.md)
 - [fees](/apps/fees/README.md)
 - [search](/apps/search/README.md)
+- [search-server](/apps/search-server/README.md)
 - [staking](/apps/staking/README.md)
 - [summary](/apps/summary/README.md)
 - [tokens](/apps/tokens/README.md)
