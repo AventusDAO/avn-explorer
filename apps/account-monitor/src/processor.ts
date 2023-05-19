@@ -145,8 +145,8 @@ function normalizeBalancesTransferEvent(
   item: EventItem<'Balances.Transfer', { event: { args: true } }>
 ): { from: Uint8Array; to: Uint8Array; amount: bigint; tokenId: undefined } {
   const e = new BalancesTransferEvent(ctx, item.event)
-  if (e.isV4) {
-    const { from, to, amount } = e.asV4
+  if (e.isV21) {
+    const { from, to, amount } = e.asV21
     return { from, to, amount, tokenId: undefined }
   } else {
     throw new UknownVersionError()
@@ -158,8 +158,8 @@ function normalizeTokenTransferEvent(
   item: EventItem<'TokenManager.TokenTransferred', { event: { args: true } }>
 ): { from: Uint8Array; to: Uint8Array; amount: bigint; tokenId: Uint8Array } {
   const e = new TokenManagerTokenTransferredEvent(ctx, item.event)
-  if (e.isV4) {
-    const { sender, recipient, tokenBalance, tokenId } = e.asV4
+  if (e.isV21) {
+    const { sender, recipient, tokenBalance, tokenId } = e.asV21
     return { from: sender, to: recipient, amount: tokenBalance, tokenId }
   } else {
     throw new UknownVersionError()
