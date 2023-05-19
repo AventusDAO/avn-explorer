@@ -1,0 +1,11 @@
+{
+  "outDir": "../src/types/generated/parachain-dev",
+  "specVersions": "../../../packages/metadata/versions-parachain.dev.jsonl",
+  "events": [
+    "TokenManager.TokenLifted",
+    "TokenManager.TokenTransferred",
+    "TokenManager.TokenLowered"
+  ],
+  "calls": [],
+  "storage": ["TokenManager.Balances"]
+}
