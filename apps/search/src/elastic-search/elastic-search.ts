@@ -74,9 +74,9 @@ export class ElasticSearch {
     events: SearchEvent[]
   ): Promise<void> {
     await Promise.all([
-      this.storeBulk(blocks, this.blocksIndex, '_doc', 'refId'),
-      this.storeBulk(extrinsics, this.extrinsicsIndex, '_doc', 'refId'),
-      this.storeBulk(events, this.eventsIndex, '_doc', 'refId')
+      this.storeBulk(blocks, this.blocksIndex, 'refId'),
+      this.storeBulk(extrinsics, this.extrinsicsIndex, 'refId'),
+      this.storeBulk(events, this.eventsIndex, 'refId')
     ])
   }
 
@@ -86,14 +86,9 @@ export class ElasticSearch {
    *
    * @returns {Promise<ElasticSearchBulkResult>} Promise of the ES bulk operation
    */
-  async storeBulk(
-    objects: any[],
-    indexName: string,
-    objectType = '_doc',
-    idAccessor = 'refId'
-  ): Promise<void> {
+  async storeBulk(objects: any[], indexName: string, idAccessor = 'refId'): Promise<void> {
     const url = `${this.baseUrl}/_bulk`
-    const payload = this.getBulkPayload(objects, indexName, objectType, idAccessor)
+    const payload = this.getBulkPayload(objects, indexName, idAccessor)
     await post<any>(url, payload, 'application/x-ndjson')
   }
 
@@ -104,14 +99,20 @@ export class ElasticSearch {
    * @param {string} type - Name of the object type in ES
    * @param {string} idAccessor - Name of the object's property to use as the _id in ES
    */
-  getBulkPayload(objects: any[], indexName: string, type = '_doc', idAccessor: string): string {
-    function getAction(indexName: string, type: string, id: string): string {
-      return `{"index":{"_index":"${indexName}","_type":"${type}","_id":"${id}"}}`
+  getBulkPayload(objects: any[], indexName: string, idAccessor: string): string {
+    function getAction(indexName: string, id: string): string {
+      const actionObj = {
+        index: {
+          _index: indexName,
+          _id: id
+        }
+      }
+      return JSON.stringify(actionObj)
     }
     return objects.reduce((prev, curr) => {
       return (
         // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-        prev + getAction(indexName, type, curr[idAccessor]) + '\n' + JSON.stringify(curr) + '\n'
+        prev + getAction(indexName, curr[idAccessor]) + '\n' + JSON.stringify(curr) + '\n'
       )
     }, '')
   }
