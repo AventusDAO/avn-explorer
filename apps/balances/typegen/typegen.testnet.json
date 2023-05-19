@@ -1,7 +1,7 @@
 {
   "outDir": "../src/types/generated/testnet",
-  "specVersions": "../../packages/metadata/versions.testnet.jsonl",
-  "typesBundle": "../../packages/metadata/avn-types.json",
+  "specVersions": "../../../packages/metadata/versions-parachain.testnet.jsonl",
+  "typesBundle": "../../../packages/metadata/avn-types.json",
   "events": [
     "Balances.Transfer",
     "Balances.Endowed",

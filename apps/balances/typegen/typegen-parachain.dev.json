@@ -18,7 +18,6 @@
   "storage": [
     "System.Account",
     "Balances.Account",
-    "Balances.TotalIssuance",
-    "Migration.migrate_system_account"
+    "Balances.TotalIssuance"
   ]
 }
