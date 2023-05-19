@@ -1,6 +1,6 @@
-import { TopVolumeMoveReport } from './reports/topAccountsVolumeStrategy.js'
-import { LiveReport } from './reports/liveReportStrategy.js'
-import DbClient from './dbClient.js'
+import { TopVolumeMoveReport } from './reports/topAccountsVolumeStrategy'
+import { LiveReport } from './reports/liveReportStrategy'
+import DbClient from './dbClient'
 
 export interface IServiceDependencies {
   dbClient: DbClient
@@ -11,6 +11,7 @@ export enum ReportStrategyEnum {
   TopVolumeMoveReport = 'TopVolumeMoveReport',
   LiveReport = 'LiveReport'
 }
+
 export interface IReportParams {
   period: string
   frequency: string
@@ -24,18 +25,20 @@ export interface IReportParams {
 
 export interface ReportStrategy {
   generateReport: (params: IReportParams) => Promise<void>
+  start: (params?: IReportParams) => void
+  stop: () => void
 }
 
 class ReportService {
   private reportStrategy: ReportStrategy | null = null
 
-  constructor(private readonly dependencies: IServiceDependencies) {}
+  constructor(public readonly dependencies: IServiceDependencies) {}
 
-  getReportStrategy() {
+  getReportStrategy(): ReportStrategy | null {
     return this.reportStrategy
   }
 
-  setReportStrategy(reportStrategy: ReportStrategyEnum) {
+  setReportStrategy(reportStrategy: ReportStrategyEnum): void {
     if (reportStrategy === ReportStrategyEnum.TopVolumeMoveReport) {
       this.reportStrategy = new TopVolumeMoveReport(this.dependencies)
     }
@@ -45,12 +48,28 @@ class ReportService {
     }
   }
 
-  generateReport = async (params: IReportParams) => {
+  generateReport = async (params: IReportParams): Promise<void> => {
     if (!this.reportStrategy) {
       throw new Error('Report strategy not set')
     }
 
     await this.reportStrategy.generateReport(params)
+  }
+
+  startReport(): void {
+    if (!this.reportStrategy) {
+      throw new Error('Report strategy not set')
+    }
+
+    this.reportStrategy.start()
+  }
+
+  stopReport(): void {
+    if (!this.reportStrategy) {
+      throw new Error('Report strategy not set')
+    }
+
+    this.reportStrategy.stop()
   }
 }
 

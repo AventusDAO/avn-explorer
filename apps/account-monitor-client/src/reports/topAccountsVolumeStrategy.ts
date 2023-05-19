@@ -1,6 +1,9 @@
+import { CronJob } from 'cron'
 import { IReportParams, IServiceDependencies, ReportStrategy } from '../reportService'
 
 export class TopVolumeMoveReport implements ReportStrategy {
+  private cronJob: CronJob | null = null
+
   constructor(private readonly dependencies: IServiceDependencies) {}
 
   private constructQuery(params: IReportParams): string {
@@ -27,7 +30,7 @@ export class TopVolumeMoveReport implements ReportStrategy {
       `
   }
 
-  async generateReport(params: IReportParams) {
+  generateReport = async (params: IReportParams): Promise<void> => {
     const { dbClient, messageSender } = this.dependencies
     const query = this.constructQuery(params)
 
@@ -42,5 +45,27 @@ export class TopVolumeMoveReport implements ReportStrategy {
     )
 
     await messageSender(report)
+  }
+
+  start = (params?: IReportParams): void => {
+    if (this.cronJob) {
+      throw new Error('Report is already running. Call stop() first.')
+    }
+
+    if (!params) {
+      throw new Error('Cannot start a new job missing parameters')
+    }
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+    this.cronJob = new CronJob(params.frequency, async () => await this.generateReport(params))
+    this.cronJob.start()
+  }
+
+  stop = (): void => {
+    if (!this.cronJob) {
+      throw new Error('Report is not running. Call start() first.')
+    }
+
+    this.cronJob.stop()
+    this.cronJob = null
   }
 }

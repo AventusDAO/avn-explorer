@@ -1,104 +1,189 @@
 import { JobManager } from './job.js'
 import ReportService, { ReportStrategyEnum } from './reportService.js'
 import readline from 'readline'
+import { TopVolumeMoveReport } from './reports/topAccountsVolumeStrategy.js'
+import { LiveReport } from './reports/liveReportStrategy.js'
 
 const rl = readline.createInterface({
   input: process.stdin,
   output: process.stdout
 })
 
-export async function runCli(reportService: ReportService, reportManager: JobManager) {
+export async function runCli(
+  reportService: ReportService,
+  reportManager: JobManager
+): Promise<void> {
   while (true) {
-    console.log('What do you want to do?\n')
-    const reportAction = await askQuestion([
+    const reportAction = await askQuestion('What do you want to do?', [
       'Create new report',
       'List reports',
       'Stop report',
       'Remove report'
     ])
 
-    if (reportAction === 'Create new report') {
-      console.log('Which type of report would you like to generate?\n')
-      const reportType = await askQuestion(['Top Volume Moves Report', 'Live Report'])
-      if (reportType === 'Top Volume Moves Report') {
-        await createTopVolumeMovesReport(reportService, reportManager)
-      } else if (reportType === 'Live Report') {
-        await createLiveReport(reportService)
+    switch (reportAction) {
+      case 'Create new report': {
+        await handleCreateNewReport(reportService, reportManager)
+        break
       }
-    } else if (reportAction === 'List reports') {
-      const list = reportManager.listJobs()
-      if (!Object.keys(list).length) {
-        continue
+      case 'List reports': {
+        const list = reportManager.listJobs()
+        if (Object.keys(list).length) {
+          console.log(list)
+        }
+        break
       }
-      console.log(list)
-    } else if (reportAction === 'Stop report') {
-      const list = reportManager.listJobs()
-      if (!Object.keys(list).length) {
-        continue
+
+      case 'Remove report': {
+        const jobId = await handleJobAction(reportManager)
+        if (jobId !== null) {
+          reportAction === 'Stop report'
+            ? reportManager.stopJob(jobId)
+            : reportManager.removeJob(jobId)
+        }
+        break
       }
-      console.log('\nWhich job do you want to stop?\n')
-      const jobId = await askQuestion(Object.keys(list))
-      reportManager.stopJob(parseInt(jobId))
-    } else if (reportAction === 'Remove report') {
-      const list = reportManager.listJobs()
-      if (!Object.keys(list).length) {
-        continue
-      }
-      console.log('\nWhich job do you want to stop?\n')
-      const jobId = await askQuestion(Object.keys(list))
-      reportManager.removeJob(parseInt(jobId))
+      default:
+        console.log('Invalid action selected.')
     }
   }
 }
 
-async function createTopVolumeMovesReport(reportService: ReportService, reportManager: JobManager) {
+async function createTopVolumeMovesReport(
+  reportService: ReportService,
+  reportManager: JobManager
+): Promise<void> {
   reportService.setReportStrategy(ReportStrategyEnum.TopVolumeMoveReport)
   const reportParams: any = {}
 
   reportService.setReportStrategy(ReportStrategyEnum.TopVolumeMoveReport)
-  console.log('\nSelect the period for the report:\n')
-  const period = await askQuestion(['Last 24 hours', 'Last 7 days', 'Last 30 days'])
+  const period = await askQuestion('Select the period for the report:', [
+    'Last 24 hours',
+    'Last 7 days',
+    'Last 30 days'
+  ])
   reportParams.period = period
 
-  console.log('\nSelect the frequency for the report:\n')
-  const frequency = await askQuestion(['Hourly', 'Daily', 'Weekly', 'Monthly', 'Every minute'])
+  const frequency = await askQuestion('Select the frequency for the report:', [
+    'Hourly',
+    'Daily',
+    'Weekly',
+    'Monthly',
+    'Every minute'
+  ])
   reportParams.frequency = getCronExpression(frequency)
 
-  console.log('\nSelect the filter for the report:\n')
-  const filterType = await askQuestion(['By Block Number', 'By Timestamp', 'No Filter'])
+  const filterType = await askQuestion('Select the filter for the report:', [
+    'By Block Number',
+    'By Timestamp',
+    'No Filter'
+  ])
 
   if (filterType === 'By Block Number') {
-    console.log('\nEnter the block number:\n')
-    const blockNumber = await askQuestion([], true)
+    const blockNumber = await askQuestion('Enter the block number:', [], true)
     reportParams.filter = { type: 'block_number', value: blockNumber }
   } else if (filterType === 'By Timestamp') {
-    console.log('\nEnter the timestamp (YYYY-MM-DDTHH:MM:SS.SSSSSSZ):\n')
-    const timestamp = await askQuestion([], true)
+    console.log()
+    const timestamp = await askQuestion(
+      'Enter the timestamp (YYYY-MM-DDTHH:MM:SS.SSSSSSZ):',
+      [],
+      true
+    )
     reportParams.filter = { type: 'timestamp', value: timestamp }
   }
 
-  console.log('\nDo you want to monitor a specific token?\n')
-  const tokenChoice = await askQuestion(['Yes', 'No'])
+  const tokenChoice = await askQuestion('Do you want to monitor a specific token?', ['Yes', 'No'])
 
   if (tokenChoice === 'Yes') {
-    console.log('\nEnter the token ID:\n')
-    const token = await askQuestion([], true)
+    console.log()
+    const token = await askQuestion('Enter the token ID:', [], true)
     reportParams.token = token
   }
 
-  reportManager.createNewJob(reportParams, reportService.generateReport)
+  const reportStrategy = new TopVolumeMoveReport(reportService.dependencies)
+  await reportManager.createNewJob(reportParams, reportStrategy)
 }
 
-// New function for Live Report
-async function createLiveReport(reportService: ReportService) {
+async function handleCreateNewReport(
+  reportService: ReportService,
+  reportManager: JobManager
+): Promise<void> {
+  const reportType = await askQuestion('Which type of report do you want:', [
+    'Top Volume Moves Report',
+    'Live Report'
+  ])
+  switch (reportType) {
+    case 'Top Volume Moves Report':
+      await createTopVolumeMovesReport(reportService, reportManager)
+      break
+    case 'Live Report':
+      await createLiveReport(reportService, reportManager)
+      break
+    default:
+      console.log('Invalid report type selected.')
+  }
+}
+
+async function createLiveReport(
+  reportService: ReportService,
+  reportManager: JobManager
+): Promise<void> {
   reportService.setReportStrategy(ReportStrategyEnum.LiveReport)
   const reportParams: any = {}
 
   reportService.setReportStrategy(ReportStrategyEnum.LiveReport)
-  await reportService.generateReport(reportParams)
+
+  const tokenChoice = await askQuestion('Do you want to monitor a specific token?', ['Yes', 'No'])
+  let token = null
+  if (tokenChoice === 'Yes') {
+    token = await askQuestion('Enter the token ID:', [], true)
+  }
+  reportParams.token = token
+
+  console.log()
+  const minAmount = await askQuestion(
+    'Enter the minimum amount for a significant transaction:',
+    [],
+    true
+  )
+  reportParams.minAmount = Number(minAmount)
+
+  const interestingAccounts = await askQuestion(
+    'Enter the accounts you are interested in (separated by commas):',
+    [],
+    true
+  )
+  reportParams.interestingAccounts = interestingAccounts.split(',')
+
+  const minVolume = await askQuestion('Enter the minimum volume for account monitoring:', [], true)
+  reportParams.minVolume = Number(minVolume)
+
+  const minTransactions = await askQuestion(
+    'Enter the minimum number of transactions for account monitoring:',
+    [],
+    true
+  )
+  reportParams.minTransactions = Number(minTransactions)
+
+  const reportStrategy = new LiveReport(reportService.dependencies)
+  await reportManager.createNewJob(reportParams, reportStrategy)
 }
 
-async function askQuestion(choices: string[], freeText: boolean = false): Promise<string> {
+async function handleJobAction(reportManager: JobManager) {
+  const list = reportManager.listJobs()
+  if (!Object.keys(list).length) {
+    return null
+  }
+  const jobId = await askQuestion('Which job do you want to action?', Object.keys(list))
+  return parseInt(jobId)
+}
+
+async function askQuestion(
+  question: string,
+  choices: string[],
+  freeText: boolean = false
+): Promise<string> {
+  console.log(`\n${question}\n`)
   const choicesMessage = choices.length
     ? choices.map((choice, index) => `${index + 1}. ${choice}`).join('\n') + '\n'
     : ''
@@ -115,8 +200,11 @@ async function askQuestion(choices: string[], freeText: boolean = false): Promis
         } else if (choices.includes(answer)) {
           resolve(answer)
         } else {
-          console.log(`Invalid choice. Please choose one of: ${choices.join(', ')}\n`)
-          const newAnswer = askQuestion(choices)
+          console.log()
+          const newAnswer = askQuestion(
+            `Invalid choice. Please choose one of: ${choices.join(', ')}\n`,
+            choices
+          )
           resolve(newAnswer)
         }
       }
