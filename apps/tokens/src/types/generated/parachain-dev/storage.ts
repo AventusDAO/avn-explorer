@@ -16,25 +16,25 @@ export class TokenManagerBalancesStorage {
     /**
      *  The number of units of tokens held by any given account.
      */
-    get isV4() {
+    get isV21() {
         return this._chain.getStorageItemTypeHash('TokenManager', 'Balances') === '70874cd5f158184b9b398819cb71b85684c5adb4e5cc9e1065d1115dac23d5f2'
     }
 
     /**
      *  The number of units of tokens held by any given account.
      */
-    async getAsV4(key: [Uint8Array, Uint8Array]): Promise<bigint> {
-        assert(this.isV4)
+    async getAsV21(key: [Uint8Array, Uint8Array]): Promise<bigint> {
+        assert(this.isV21)
         return this._chain.getStorage(this.blockHash, 'TokenManager', 'Balances', key)
     }
 
-    async getManyAsV4(keys: [Uint8Array, Uint8Array][]): Promise<(bigint)[]> {
-        assert(this.isV4)
+    async getManyAsV21(keys: [Uint8Array, Uint8Array][]): Promise<(bigint)[]> {
+        assert(this.isV21)
         return this._chain.queryStorage(this.blockHash, 'TokenManager', 'Balances', keys.map(k => [k]))
     }
 
-    async getAllAsV4(): Promise<(bigint)[]> {
-        assert(this.isV4)
+    async getAllAsV21(): Promise<(bigint)[]> {
+        assert(this.isV21)
         return this._chain.queryStorage(this.blockHash, 'TokenManager', 'Balances')
     }
 
