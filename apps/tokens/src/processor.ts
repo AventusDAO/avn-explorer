@@ -116,7 +116,7 @@ async function getTokenManagerData(
   accountIds: Uint8Array[]
 ): Promise<bigint[] | undefined> {
   const storage = new TokenManagerBalancesStorage(ctx, block)
-  if (!storage.isExists || !storage.isV4) {
+  if (!storage.isExists || !storage.isV21) {
     return
   }
 
@@ -134,7 +134,7 @@ async function getTokenManagerData(
     }
   }
 
-  return await storage.getManyAsV4(v10InputArray)
+  return await storage.getManyAsV21(v10InputArray)
 }
 
 export function extractPublicKey(tuple: string): string {

@@ -17,8 +17,8 @@ type ReturnedData = {
 export const getTokenLowerData = (ctx: ChainContext, event: Event): ReturnedData => {
   const data = new TokenManagerTokenLoweredEvent(ctx, event)
 
-  if (data.isV4) {
-    const v10Data = data.asV4
+  if (data.isV21) {
+    const v10Data = data.asV21
     return {
       tokenId: toHex(v10Data.tokenId),
       accounts: [toHex(v10Data.sender), toHex(v10Data.recipient)]
@@ -31,8 +31,8 @@ export const getTokenLowerData = (ctx: ChainContext, event: Event): ReturnedData
 export const getTokenTransferredData = (ctx: ChainContext, event: Event): ReturnedData => {
   const data = new TokenManagerTokenTransferredEvent(ctx, event)
 
-  if (data.isV4) {
-    const v10Data = data.asV4
+  if (data.isV21) {
+    const v10Data = data.asV21
     return {
       tokenId: toHex(v10Data.tokenId),
       accounts: [toHex(v10Data.sender), toHex(v10Data.recipient)]
@@ -45,8 +45,8 @@ export const getTokenTransferredData = (ctx: ChainContext, event: Event): Return
 export const getTokenLiftedData = (ctx: ChainContext, event: Event): ReturnedData => {
   const data = new TokenManagerTokenLiftedEvent(ctx, event)
 
-  if (data.isV4) {
-    const v10Data = data.asV4
+  if (data.isV21) {
+    const v10Data = data.asV21
     return {
       tokenId: toHex(v10Data.tokenId),
       accounts: [toHex(v10Data.recipient)]

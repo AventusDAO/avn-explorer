@@ -15,9 +15,5 @@
     "Migration.MigratedTotalIssuance"
   ],
   "calls": [],
-  "storage": [
-    "System.Account",
-    "Balances.Account",
-    "Balances.TotalIssuance"
-  ]
+  "storage": ["System.Account", "Balances.Account", "Balances.TotalIssuance"]
 }
