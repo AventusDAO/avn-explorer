@@ -15,8 +15,8 @@ export type EsSortScriptItem = {
 }
 export type EsSortItem = Record<string, EsSortDirection> | EsSortScriptItem
 export enum EsSortDirection {
-  Asc = 'asc',
-  Desc = 'desc'
+  Asc = 'ASC',
+  Desc = 'DESC'
 }
 
 export interface EsRequestPayload {
