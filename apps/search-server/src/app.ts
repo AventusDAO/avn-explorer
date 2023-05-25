@@ -45,7 +45,12 @@ const corsOptions = {
     }
     // else block CORS access
     callback(
-      new BaseError('cors_not_allowed', 401, `Not allowed by CORS. Origin:  ${origin}`, true)
+      new BaseError(
+        'cors_not_allowed',
+        401,
+        `Not allowed by CORS. Origin:  ${origin as string}`,
+        true
+      )
     )
   }
 }
