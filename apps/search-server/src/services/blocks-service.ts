@@ -77,7 +77,7 @@ export const getBlocks = async (
     if (sortItem.height) {
       // if sorting by blockHeight.Asc then also sort by chainType .Asc here
       const chainTypeSortDirection: EsSortDirection = sortItem.height
-      const chainTypeSort = processSortParam(`chainGen,${chainTypeSortDirection}`, ['chainGen'])
+      const chainTypeSort = processSortParam(`chainGen_${chainTypeSortDirection}`, ['chainGen'])
       sort.push(chainTypeSort)
     }
 
