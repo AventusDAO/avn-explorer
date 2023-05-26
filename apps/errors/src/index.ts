@@ -1,0 +1,79 @@
+import { getProcessor } from '@avn/config'
+import { BatchContext, BatchProcessorItem } from '@subsquid/substrate-processor'
+import { Store, TypeormDatabase } from '@subsquid/typeorm-store'
+import { saveErrors } from './services/errors'
+import { getLastChainState, setChainState } from './services/chainState'
+import { ExtrinsicError } from './model'
+
+type Item = BatchProcessorItem<typeof processor>
+export type Context = BatchContext<Store, Item>
+
+const SAVE_PERIOD = 12 * 60 * 60 * 1000
+let lastStateTimestamp: number
+
+const processor = getProcessor()
+  .addEvent('AvnProxy.InnerCallFailed', {
+    data: {
+      event: {
+        args: true,
+        extrinsic: true,
+        call: false
+      }
+    }
+  })
+  .addEvent('System.ExtrinsicFailed', {
+    data: {
+      event: {
+        args: true,
+        extrinsic: true,
+        call: false
+      }
+    }
+  })
+
+const processErrors = async (ctx: Context): Promise<void> => {
+  const pendingUpdates = new Map<string, ExtrinsicError>()
+
+  for (const block of ctx.blocks) {
+    // get the accounts and the fees paid
+    block.items
+      .filter(item => item.kind === 'event')
+      .filter(item => item.name !== '*')
+      .map(item => {
+        if (item.kind !== 'event') throw new Error(`item must be of 'event' kind`)
+        if (item.name === '*') throw new Error('unexpected wildcard name')
+        // const args = item.event.args
+        const extrinsic = item.event.extrinsic
+        if (!extrinsic) throw new Error('extrinsic is not defined')
+        return {
+          id: extrinsic.id,
+          extrinsicHash: extrinsic.hash,
+          message: `${item.name as string} Error Name`
+        }
+      })
+      .forEach(item => {
+        pendingUpdates.set(item.id, item)
+      }, pendingUpdates)
+
+    if (lastStateTimestamp == null) {
+      lastStateTimestamp = (await getLastChainState(ctx.store))?.timestamp.getTime() ?? 0
+    }
+
+    if (block.header.timestamp - lastStateTimestamp >= SAVE_PERIOD) {
+      const updatesData = [...pendingUpdates.values()]
+      await saveErrors(ctx, updatesData)
+      await setChainState(ctx, block.header)
+
+      lastStateTimestamp = block.header.timestamp
+      pendingUpdates.clear()
+    }
+  }
+
+  const block = ctx.blocks[ctx.blocks.length - 1]
+  const updatesData = [...pendingUpdates.values()]
+  await saveErrors(ctx, updatesData)
+  await setChainState(ctx, block.header)
+  pendingUpdates.clear()
+}
+
+processor.run(new TypeormDatabase(), processErrors)

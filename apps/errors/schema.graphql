@@ -1,0 +1,11 @@
+type ExtrinsicError @entity {
+  id: ID!
+  extrinsicHash: String! @index
+  message: String!
+}
+
+type ChainState @entity {
+  id: ID!
+  timestamp: DateTime! @index
+  blockNumber: Int! @index
+}
