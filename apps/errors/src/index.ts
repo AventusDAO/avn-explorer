@@ -17,7 +17,7 @@ const SAVE_PERIOD = 12 * 60 * 60 * 1000
 let lastStateTimestamp: number
 
 getMetadata()
-throw new Error('test')
+process.exit(0)
 
 const processor = getProcessor()
   .addEvent('AvnProxy.InnerCallFailed', {

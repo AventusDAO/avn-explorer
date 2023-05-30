@@ -1,8 +1,8 @@
-import { decodeMetadata } from '@avn/metadata'
+// import { decodeMetadata } from '@avn/metadata'
 
 export const getMetadata = () => {
-  const meta = decodeMetadata(metadata)
-  console.log(meta.value.pallets[0].errors)
+  // const meta = decodeMetadata(metadata)
+  // console.log(meta.value.pallets[0].errors)
 }
 
 const metadata =
