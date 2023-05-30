@@ -1,0 +1,32 @@
+name: Build Errors
+
+on:
+  workflow_dispatch:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    branches:
+      - main
+    paths:
+      - 'apps/errors/**'
+      - 'packages/types/**'
+      - 'packages/config/**'
+      - 'packages/utils/**'
+  push:
+    branches:
+      - main
+    paths:
+      - 'apps/errors/**'
+      - 'packages/types/**'
+      - 'packages/config/**'
+      - 'packages/utils/**'
+
+jobs:
+  build:
+    name: AvN Explorer Errors
+    uses: ./.github/workflows/docker-build.yml
+    secrets: inherit
+    with:
+      short_image_name: errors
+      ecr_repository_prefix: avn-explorer
+      aws_region: eu-west-2
+      dockerfile: apps/errors/Dockerfile
