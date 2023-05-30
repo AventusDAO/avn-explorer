@@ -38,6 +38,7 @@ export const getMetadata = (env: AvnEnvironmentName): Metadata => {
   const filePath = path.join(__dirname, '..', fileName)
   const versions = readJsonLines(filePath)
 
+  // TODO: use specVersion to get appropriate metadata version
   const meta = decodeMetadata(versions[0].metadata)
   return meta
 }
