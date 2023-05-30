@@ -56,15 +56,14 @@ const processErrors = async (ctx: Context): Promise<void> => {
             index = args.dispatchError.value.index
           }
         }
-        if (!index || !error) throw new Error('index is not defined')
-        const errorName = decodeError(index, error)
-        const message = errorName
         const extrinsic = item.event.extrinsic
         if (!extrinsic) throw new Error('extrinsic is not defined')
+        if (!index || !error) throw new Error('index is not defined')
+        const errorName = decodeError(index, error)
         return new ExtrinsicError({
           id: extrinsic.id,
           extrinsicHash: extrinsic.hash,
-          message
+          errorName
         })
       })
       .forEach(item => {
