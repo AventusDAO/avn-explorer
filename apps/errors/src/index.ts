@@ -8,7 +8,7 @@ import {
   saveCurrentChainState,
   saveRegularChainState
 } from './services/chainState'
-import { getMetadata } from './services/scaleDecoder'
+import { decodeError } from './services/metadata'
 
 type Item = BatchProcessorItem<typeof processor>
 export type Context = BatchContext<Store, Item>
@@ -16,7 +16,8 @@ export type Context = BatchContext<Store, Item>
 const SAVE_PERIOD = 12 * 60 * 60 * 1000
 let lastStateTimestamp: number
 
-getMetadata()
+// TODO: remove this after it's integrated with the processor
+decodeError()
 process.exit(0)
 
 const processor = getProcessor()

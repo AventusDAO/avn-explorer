@@ -386,9 +386,11 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@avn/metadata@workspace:packages/metadata"
   dependencies:
+    "@avn/config": ^1.0.0
     "@subsquid/cli": ^0.7.2
     "@subsquid/substrate-metadata": ^2.3.0
     "@subsquid/substrate-metadata-explorer": ^1.0.8
+    "@subsquid/util-internal-read-lines": ^0.0.2
     "@types/node": ^18.11.9
     typescript: ^4.9.3
   languageName: unknown
@@ -2934,6 +2936,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@subsquid/logger@npm:^0.3.1":
+  version: 0.3.1
+  resolution: "@subsquid/logger@npm:0.3.1"
+  dependencies:
+    "@subsquid/util-internal-hex": ^0.0.2
+    "@subsquid/util-internal-json": ^0.2.1
+    supports-color: ^8.1.1
+  checksum: 95ef78c607332b8b8adb2396a5089fe15172dd95461db9b63305c91e8c9fdc029f9ee6c74603bf283681a1f7ab9edebf8d7bb266f2b0e318417bba51fcd1bdb1
+  languageName: node
+  linkType: hard
+
 "@subsquid/openreader@npm:^1.0.1":
   version: 1.0.3
   resolution: "@subsquid/openreader@npm:1.0.3"
@@ -3000,6 +3013,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@subsquid/rpc-client@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "@subsquid/rpc-client@npm:2.0.0"
+  dependencies:
+    "@subsquid/util-timeout": ^1.0.0
+    websocket: ^1.0.34
+  checksum: 1b1a11d4beb35b1eeea604b0ea81c56e2549a6bb8fda64769911013d93f74b8551f9aa2c77fdef2ecf888a9b21d178f8e779047247975ad08ad0b28d3b37fed7
+  languageName: node
+  linkType: hard
+
 "@subsquid/scale-codec@npm:^1.0.5, @subsquid/scale-codec@npm:^1.1.0":
   version: 1.1.0
   resolution: "@subsquid/scale-codec@npm:1.1.0"
@@ -3039,7 +3062,25 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@subsquid/substrate-metadata-explorer@npm:^1.0.8, @subsquid/substrate-metadata-explorer@npm:^1.0.9":
+"@subsquid/substrate-metadata-explorer@npm:^1.0.8":
+  version: 1.1.2
+  resolution: "@subsquid/substrate-metadata-explorer@npm:1.1.2"
+  dependencies:
+    "@subsquid/logger": ^0.3.1
+    "@subsquid/util-internal": ^1.1.0
+    "@subsquid/util-internal-commander": ^0.0.2
+    "@subsquid/util-internal-hex": ^0.0.2
+    "@subsquid/util-internal-http-client": ^0.1.0
+    "@subsquid/util-internal-read-lines": ^0.0.2
+    "@subsquid/util-internal-resilient-rpc": ^0.0.3
+    commander: ^10.0.0
+  bin:
+    squid-substrate-metadata-explorer: bin/run.js
+  checksum: 15bc3f3dbfa07b15ebaca4d97445beb3a43bb24780a90bb2c73dd817799b881925f5d1550d634e4c50c9f0a1caefa2e6cebcd5fb1ecfc1d8a4eefe6b0fcb3564
+  languageName: node
+  linkType: hard
+
+"@subsquid/substrate-metadata-explorer@npm:^1.0.9":
   version: 1.0.9
   resolution: "@subsquid/substrate-metadata-explorer@npm:1.0.9"
   dependencies:
@@ -3245,10 +3286,26 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@subsquid/util-internal-commander@npm:^0.0.2":
+  version: 0.0.2
+  resolution: "@subsquid/util-internal-commander@npm:0.0.2"
+  peerDependencies:
+    commander: ^10.0.0
+  checksum: 0401ee8431fad9feb46c01aea3f9d0c82c31fd8cfbeb887319abe57ef911f4facb609856fdd5ac2748e62dc6eef60bf6942d4f043b6a08bd19cf0023f1ac3904
+  languageName: node
+  linkType: hard
+
 "@subsquid/util-internal-counters@npm:^0.0.1":
   version: 0.0.1
   resolution: "@subsquid/util-internal-counters@npm:0.0.1"
   checksum: 4e161b7b0ef25b38d066462e786231cdfd3ad22ad9af5aed5ab5b3caf390f7100c70d7cb34790b77dee048eb1dda4448130aa949d397c94af246d0c5b46f4635
+  languageName: node
+  linkType: hard
+
+"@subsquid/util-internal-counters@npm:^0.0.2":
+  version: 0.0.2
+  resolution: "@subsquid/util-internal-counters@npm:0.0.2"
+  checksum: 320b61fa46995426f608093e1e3255891a2aa11c53f5209ab83b1d02aa4b3923424c18a03e6fe8ebdf39ce4bd1736f8083426c2799bbfd5cf7bce5b6f0f3fe0a
   languageName: node
   linkType: hard
 
@@ -3272,6 +3329,17 @@ __metadata:
   version: 0.0.2
   resolution: "@subsquid/util-internal-hex@npm:0.0.2"
   checksum: 6dff15384dead458788b9d00733df1a31e2641bb45aa639cce6dacbf36e3013d51dc24c6c683ec6cefa85545e494701472ae08c5f41b6990b6baca202a1ddc7c
+  languageName: node
+  linkType: hard
+
+"@subsquid/util-internal-http-client@npm:^0.1.0":
+  version: 0.1.0
+  resolution: "@subsquid/util-internal-http-client@npm:0.1.0"
+  dependencies:
+    "@subsquid/logger": ^0.3.1
+    "@subsquid/util-internal": ^1.1.0
+    node-fetch: ^3.3.0
+  checksum: 75184609784b04a2a7c27eea34c5925e7f0e1c1eb846e7ad811f69e27c467883e3db391670664ae3f1ce9977956018fc77087ab1840f880054745de9acc31492
   languageName: node
   linkType: hard
 
@@ -3320,6 +3388,27 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@subsquid/util-internal-read-lines@npm:^0.0.2":
+  version: 0.0.2
+  resolution: "@subsquid/util-internal-read-lines@npm:0.0.2"
+  checksum: d0bd1a2d375dc84fcc7a89b12b9c4e6842c3239fcd46f0a83f8f68566085276a1a18cc06b6d4392a8038dd72d164a7e86b35e0b3cf6d0a89ee84e0cdeb876fbd
+  languageName: node
+  linkType: hard
+
+"@subsquid/util-internal-resilient-rpc@npm:^0.0.3":
+  version: 0.0.3
+  resolution: "@subsquid/util-internal-resilient-rpc@npm:0.0.3"
+  dependencies:
+    "@subsquid/logger": ^0.3.1
+    "@subsquid/rpc-client": ^2.0.0
+    "@subsquid/util-internal": ^1.1.0
+    "@subsquid/util-internal-counters": ^0.0.2
+    "@subsquid/util-internal-http-client": ^0.1.0
+    "@subsquid/util-timeout": ^1.0.0
+  checksum: 8bac8331e91deab6e73db29b0f026a4cbe5f21de74f7d144ee9123784bccd6e73a84c4e57437b0f454894024f4ea16908229b4245144cd569d2b5c2fd140df6a
+  languageName: node
+  linkType: hard
+
 "@subsquid/util-internal@npm:^0.0.1":
   version: 0.0.1
   resolution: "@subsquid/util-internal@npm:0.0.1"
@@ -3365,6 +3454,13 @@ __metadata:
   version: 0.0.0
   resolution: "@subsquid/util-timeout@npm:0.0.0"
   checksum: 07957a8ccc0b19731a7b86b9156281d06e26094215f83081352eca6559f61136187a79774929a43b627a1e6b03b94e046515e0b7baf1c506e6567deaada97bf1
+  languageName: node
+  linkType: hard
+
+"@subsquid/util-timeout@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "@subsquid/util-timeout@npm:1.0.0"
+  checksum: 6824dc401a8396e422dd2397ad5163a2853bfb2ccce31676ea0536bc17cbb51fd2aee1934283da0048ef588d787d5308baadeff3eeed3f64f23179776c5f0ec3
   languageName: node
   linkType: hard
 
@@ -5384,6 +5480,13 @@ __metadata:
   version: 7.1.0
   resolution: "commander@npm:7.1.0"
   checksum: 99c120b939b610b1fb4a14424b48dc6431643ec46836f251a26434ad77b1eed22577a36378cfd66ed4b56fc69f98553f7dcb30f1539e3685874fd77cfb6e52fb
+  languageName: node
+  linkType: hard
+
+"commander@npm:^10.0.0":
+  version: 10.0.1
+  resolution: "commander@npm:10.0.1"
+  checksum: 436901d64a818295803c1996cd856621a74f30b9f9e28a588e726b2b1670665bccd7c1a77007ebf328729f0139838a88a19265858a0fa7a8728c4656796db948
   languageName: node
   linkType: hard
 
