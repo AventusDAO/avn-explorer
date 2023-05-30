@@ -49,11 +49,11 @@ const processErrors = async (ctx: Context): Promise<void> => {
         // const args = item.event.args
         const extrinsic = item.event.extrinsic
         if (!extrinsic) throw new Error('extrinsic is not defined')
-        return {
+        return new ExtrinsicError({
           id: extrinsic.id,
           extrinsicHash: extrinsic.hash,
           message: `${item.name} Error Name`
-        }
+        })
       })
       .forEach(item => {
         pendingUpdates.set(item.id, item)

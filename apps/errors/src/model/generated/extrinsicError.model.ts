@@ -10,9 +10,9 @@ export class ExtrinsicError {
   id!: string
 
   @Index_()
-  @Column_("text", {nullable: false})
-  extrinsicHash!: string
+  @Column_("text", {nullable: true})
+  extrinsicHash!: string | undefined | null
 
-  @Column_("text", {nullable: false})
-  message!: string
+  @Column_("text", {nullable: true})
+  message!: string | undefined | null
 }

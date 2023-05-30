@@ -1,7 +1,7 @@
 type ExtrinsicError @entity {
   id: ID!
-  extrinsicHash: String! @index
-  message: String!
+  extrinsicHash: String @index
+  message: String
 }
 
 type ChainState @entity {
