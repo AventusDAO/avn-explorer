@@ -16,10 +16,6 @@ export type Context = BatchContext<Store, Item>
 const SAVE_PERIOD = 12 * 60 * 60 * 1000
 let lastStateTimestamp: number
 
-// TODO: remove this after it's integrated with the processor
-decodeError()
-process.exit(0)
-
 const processor = getProcessor()
   .addEvent('AvnProxy.InnerCallFailed', {
     data: {
@@ -55,16 +51,14 @@ const processErrors = async (ctx: Context): Promise<void> => {
         let error: string | undefined
         let index: number | undefined
         if (item.name === 'System.ExtrinsicFailed' || item.name === 'AvnProxy.InnerCallFailed') {
-          console.log(item.name)
-          console.log(args)
           if (args.dispatchError.__kind === 'Module' && args.dispatchError.value) {
             error = args.dispatchError.value.error
             index = args.dispatchError.value.index
           }
         }
-        const message = `${item.name} ${index}.${error}`
-        console.log(message)
-        // todo: decode the index.error and generate a message string
+        if (!index || !error) throw new Error('index is not defined')
+        const errorName = decodeError(index, error)
+        const message = errorName
         const extrinsic = item.event.extrinsic
         if (!extrinsic) throw new Error('extrinsic is not defined')
         return new ExtrinsicError({
