@@ -11,6 +11,7 @@ on:
       - 'packages/types/**'
       - 'packages/config/**'
       - 'packages/utils/**'
+      - 'packages/metadata/**'
   push:
     branches:
       - main
@@ -19,6 +20,7 @@ on:
       - 'packages/types/**'
       - 'packages/config/**'
       - 'packages/utils/**'
+      - 'packages/metadata/**'
 
 jobs:
   build:
