@@ -1,0 +1,42 @@
+{
+  "name": "@avn/errors",
+  "private": true,
+  "packageManager": "yarn@3.3.0",
+  "scripts": {
+    "types:check": "tsc --pretty --noEmit",
+    "build": "rm -rf lib && tsc",
+    "build:watch": "tsc -w",
+    "dev": "nodemon",
+    "processor:start": "yarn db:migrate && node lib/index.js",
+    "processor:debug": "node --inspect --enable-source-maps -r dotenv/config lib/index.js",
+    "server:start": "squid-graphql-server",
+    "db:reset": "node ./scripts/reset-db.js",
+    "db:migrate": "yarn squid-typeorm-migration-apply"
+  },
+  "dependencies": {
+    "@avn/config": "^1.0.0",
+    "@avn/metadata": "workspace:^",
+    "@avn/types": "^1.0.0",
+    "@avn/utils": "^1.0.0",
+    "@subsquid/graphql-server": "^1.1.0",
+    "@subsquid/logger": "^0.3.0",
+    "@subsquid/ss58": "^0.1.1",
+    "@subsquid/substrate-processor": "^1.2.0",
+    "@subsquid/typeorm-store": "^0.1.5",
+    "class-validator": "^0.13.2",
+    "dotenv": "^10.0.0",
+    "graphql": "^15.5.0",
+    "pg": "^8.7.1",
+    "type-graphql": "^1.2.0-rc.1",
+    "typeorm": "^0.3.10"
+  },
+  "devDependencies": {
+    "@subsquid/cli": "^0.7.2",
+    "@subsquid/substrate-typegen": "^1.5.0",
+    "@subsquid/typeorm-codegen": "^0.2.3",
+    "@subsquid/typeorm-migration": "^0.1.3",
+    "@types/node": "^18.11.9",
+    "nodemon": "^2.0.20",
+    "typescript": "^4.9.3"
+  }
+}

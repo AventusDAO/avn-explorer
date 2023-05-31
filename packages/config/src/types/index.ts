@@ -14,8 +14,16 @@ interface DataSource {
   chain?: string
 }
 
+export type AvnEnvironmentName =
+  | 'solochain-dev'
+  | 'solochain-testnet'
+  | 'solochain-mainnet'
+  | 'parachain-dev'
+  | 'parachain-testnet'
+  | 'parachain-mainnet'
+
 export interface AvnEnvironment {
-  name: string
+  name: AvnEnvironmentName
   dataSource: Required<DataSource>
   prefix: NetworkPrefix
   /** name of the types bundle file (if they're needed) */
