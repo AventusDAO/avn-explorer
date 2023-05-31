@@ -1,8 +1,8 @@
 import { environment } from '@avn/config'
 import { getMetadata } from '@avn/metadata'
 
-export const decodeError = (index: number, error: string): string => {
-  const meta = getMetadata(environment.name)
+export const decodeError = (index: number, error: string, specId: string): string => {
+  const meta = getMetadata(environment.name, specId)
   if (meta.__kind !== 'V14') throw new Error('Unsupported Metadata version')
 
   const { pallets } = meta.value

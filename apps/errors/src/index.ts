@@ -59,7 +59,7 @@ const processErrors = async (ctx: Context): Promise<void> => {
         const extrinsic = item.event.extrinsic
         if (!extrinsic) throw new Error('extrinsic is not defined')
         if (!index || !error) throw new Error('index is not defined')
-        const errorName = decodeError(index, error)
+        const errorName = decodeError(index, error, block.header.specId)
         return new ExtrinsicError({
           id: extrinsic.id,
           extrinsicHash: extrinsic.hash,
