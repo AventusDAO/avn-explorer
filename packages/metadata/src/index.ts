@@ -31,25 +31,20 @@ const VersionsFileNames: Record<AvnEnvironmentName, string | undefined> = {
   'solochain-mainnet': undefined
 }
 
-export const getMetadata = (env: AvnEnvironmentName, blockHeight: number): Metadata => {
+export const getMetadata = (env: AvnEnvironmentName, specId: string): Metadata => {
   const fileName = VersionsFileNames[env]
   if (!fileName) throw new Error(`Metadata for ${env} is not supported`)
 
   const filePath = path.join(__dirname, '..', fileName)
   const versions = readJsonLines(filePath)
 
-  const version = versions.find((ver, i) => {
-    const nextVersion = versions[i + 1]
-    if (nextVersion === undefined) {
-      return blockHeight >= ver.blockNumber
-    } else {
-      return blockHeight >= ver.blockNumber && blockHeight < nextVersion.blockNumber
-    }
-  })
+  const specVersion = parseInt(specId.split('@')[1])
+  if (isNaN(specVersion)) throw new Error('Could not decode spec version')
 
+  const version = versions.find(ver => ver.specVersion === specVersion)
   if (version === undefined) {
     throw new Error(
-      `Metadata version not found for block number ${blockHeight} on ${env}. Please update the metadata files.`
+      `Metadata version not found for specVersion=${specVersion} on ${env}. Please update the metadata files.`
     )
   }
 
