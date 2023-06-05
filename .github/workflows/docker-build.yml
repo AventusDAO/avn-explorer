@@ -3,6 +3,10 @@ name: Docker Build
 on:
   workflow_call:
     inputs:
+      runner:
+        required: false
+        type: string
+        default: ubuntu-latest
       short_image_name:
         required: true
         type: string
@@ -12,27 +16,43 @@ on:
       aws_region:
         required: true
         type: string
+      aws_account_id:
+        required: true
+        type: string
       dockerfile:
         required: true
         type: string
+      config_creds:
+        required: false
+        type: boolean
+        default: true
+    secrets:
+      aws_access_key:
+        required: false
+      aws_secret_key:
+        required: false
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ${{ inputs.runner }}
     name: Build docker
     steps:
       - uses: actions/checkout@v3
 
       - name: Configure AWS credentials
+        if: ${{ inputs.config_creds }}
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          aws-access-key-id: ${{ secrets.TESTNET_AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.TESTNET_AWS_SECRET_ACCESS_KEY }}
+          aws-access-key-id: ${{ secrets.aws_access_key }}
+          aws-secret-access-key: ${{ secrets.aws_secret_key }}
           aws-region: ${{ inputs.aws_region }}
 
       - name: AWS ECR login
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
+        with:
+          registries: ${{ inputs.aws_account_id }}
+          aws-region: ${{ inputs.aws_region }}
 
       - name: Create tag for PR
         if: github.ref != 'refs/heads/main'
