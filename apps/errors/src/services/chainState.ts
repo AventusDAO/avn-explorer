@@ -14,22 +14,12 @@ export async function getChainState(
   return state
 }
 
-export async function saveRegularChainState(
+export async function saveChainState(
   ctx: BatchContext<Store, unknown>,
   block: SubstrateBlock
 ): Promise<void> {
   const state = await getChainState(ctx, block)
-  await ctx.store.insert(state)
-
-  ctx.log.child('state').info(`updated at block ${block.height}`)
-}
-
-export async function saveCurrentChainState(
-  ctx: BatchContext<Store, unknown>,
-  block: SubstrateBlock
-): Promise<void> {
-  const state = await getChainState(ctx, block)
-  await ctx.store.save(new ChainState({ ...state, id: '0' }))
+  await ctx.store.save(new ChainState({ ...state }))
 }
 
 export async function getLastChainState(store: Store): Promise<ChainState | undefined> {
