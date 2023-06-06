@@ -116,10 +116,8 @@ export class ElasticSearch {
     const payloadStr = payload.map(([action, obj]) => `${action}\n${obj}`).join('\n')
     const payloadSize = Buffer.byteLength(payloadStr, 'utf8')
 
-    const payloadChunks: BulkItemActionChunk[][] = []
     if (payloadSize < this.maxPayloadBytes) {
-      payloadChunks.push(payload)
-      return payloadChunks
+      return [payload]
     }
 
     const halfIdx = Math.ceil(payload.length / 2)
