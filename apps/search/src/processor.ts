@@ -34,10 +34,11 @@ const processor = getProcessor()
       }
     }
   } as const)
+  // NOTE: keep the data as small as possible for wildcard '*' queries.
+  // otherwise you might overload the archive gateway and see pool timeouts
   .addCall('*', {
     data: {
       call: {
-        // keep the data as small as possible for wildcard call queries
         args: false,
         error: true,
         origin: false,

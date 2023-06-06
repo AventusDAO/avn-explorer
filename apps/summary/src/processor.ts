@@ -20,7 +20,6 @@ const processor = getProcessor()
   .addEvent('Summary.VotingEnded', {
     data: { event: { args: true } }
   } as const)
-  .includeAllBlocks()
 
 const processSummary = async (ctx: Context): Promise<void> => {
   const pendingUpdates: BatchUpdates = new BatchUpdates(ctx)

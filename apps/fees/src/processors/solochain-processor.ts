@@ -13,6 +13,8 @@ export type Context = BatchContext<Store, Item>
 const SAVE_PERIOD = 12 * 60 * 60 * 1000
 let lastStateTimestamp: number | undefined
 
+// NOTE: keep the data as small as possible for wildcard '*' queries.
+// otherwise you might overload the archive gateway and see pool timeouts
 const processor = getProcessor().addCall('*', {
   data: {
     call: {
