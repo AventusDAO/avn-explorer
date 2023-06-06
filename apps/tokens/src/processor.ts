@@ -32,10 +32,6 @@ const processor = getProcessor()
   .addCall('Migration.migrate_token_manager_balances', {
     data: { call: { origin: true }, extrinsic: { call: { args: true } } }
   } as const)
-  .addCall('*', {
-    data: { call: { origin: true } }
-  } as const)
-  .includeAllBlocks()
 
 type Item = BatchProcessorItem<typeof processor>
 type EventItem = BatchProcessorEventItem<typeof processor>
@@ -145,7 +141,11 @@ function extractTokenId(input: string): string {
   return '0x' + input.slice(98, 138)
 }
 
-async function processData(ctx: Context, item: CallItem, block: SubstrateBlock): Promise<void> {
+async function processMigrationCall(
+  ctx: Context,
+  item: CallItem,
+  block: SubstrateBlock
+): Promise<void> {
   if (item.name !== 'Migration.migrate_token_manager_balances') return
   const chunkSize = 1000
   let chunk: TokenBalanceForAccount[] = []
@@ -207,8 +207,7 @@ async function processTokensCallItem(
 ): Promise<void> {
   switch (item.name) {
     case 'Migration.migrate_token_manager_balances': {
-      await processData(ctx, item, block)
-
+      await processMigrationCall(ctx, item, block)
       break
     }
     default: {

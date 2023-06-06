@@ -37,6 +37,7 @@ const processor = getProcessor()
   .addCall('*', {
     data: {
       call: {
+        // keep the data as small as possible for wildcard call queries
         args: false,
         error: true,
         origin: false,

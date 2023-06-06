@@ -6,6 +6,6 @@
     "TokenManager.TokenTransferred",
     "TokenManager.TokenLowered"
   ],
-  "calls": [],
+  "calls": ["Migration.migrate_token_manager_balances"],
   "storage": ["TokenManager.Balances"]
 }
