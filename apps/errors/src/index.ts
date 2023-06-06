@@ -17,7 +17,9 @@ const processor = getProcessor()
     data: {
       event: {
         args: true,
-        extrinsic: true,
+        extrinsic: {
+          hash: true
+        },
         call: false
       }
     }
@@ -26,7 +28,9 @@ const processor = getProcessor()
     data: {
       event: {
         args: true,
-        extrinsic: true,
+        extrinsic: {
+          hash: true
+        },
         call: false
       }
     }
