@@ -75,8 +75,8 @@ services:
       DB_USER: ${DB_USER}
       DB_PASS: ${DB_PASS}
       # setup sensible limits for production
-      # GQL_DB_STATEMENT_TIMEOUT_MS: 2000
-      # GQL_MAX_ROOT_FIELDS: 200
+      GQL_DB_STATEMENT_TIMEOUT_MS: 5000
+      GQL_MAX_ROOT_FIELDS: 10
       # GQL_MAX_RESPONSE_NODES: 300000
     ports:
       - '${EXPLORER_PORT}:3000'
