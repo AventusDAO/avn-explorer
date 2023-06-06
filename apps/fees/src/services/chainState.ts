@@ -19,7 +19,7 @@ export async function setChainState(
   block: SubstrateBlock
 ): Promise<void> {
   const state = await getChainState(ctx, block)
-  await ctx.store.insert(state)
+  await ctx.store.save(state)
 
   ctx.log.child('state').info(`updated at block ${block.height}`)
 }
