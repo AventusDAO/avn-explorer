@@ -1,5 +1,5 @@
 {
-  "outDir": "../src/types/generated/testnet",
+  "outDir": "../src/types/generated/parachain-testnet",
   "specVersions": "../../../packages/metadata/versions-parachain.testnet.jsonl",
   "typesBundle": "../../../packages/metadata/avn-types.json",
   "events": [
@@ -15,11 +15,6 @@
     "Migration.MigratedSystemAccounts",
     "Migration.MigratedTotalIssuance"
   ],
-  "calls": [],
-  "storage": [
-    "System.Account",
-    "Balances.Account",
-    "Balances.TotalIssuance",
-    "Migration.MigratedSystemAccounts"
-  ]
+  "calls": ["Migration.migrate_system_account"],
+  "storage": ["System.Account", "Balances.Account", "Balances.TotalIssuance"]
 }
