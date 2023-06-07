@@ -3,11 +3,7 @@ import { BatchContext, BatchProcessorItem } from '@subsquid/substrate-processor'
 import { Store, TypeormDatabase } from '@subsquid/typeorm-store'
 import { saveErrors } from './services/errors'
 import { ExtrinsicError } from './model'
-import {
-  getLastChainState,
-  saveCurrentChainState,
-  saveRegularChainState
-} from './services/chainState'
+import { getLastChainState, saveChainState } from './services/chainState'
 import { decodeError } from './services/metadata'
 
 type Item = BatchProcessorItem<typeof processor>
@@ -21,7 +17,9 @@ const processor = getProcessor()
     data: {
       event: {
         args: true,
-        extrinsic: true,
+        extrinsic: {
+          hash: true
+        },
         call: false
       }
     }
@@ -30,7 +28,9 @@ const processor = getProcessor()
     data: {
       event: {
         args: true,
-        extrinsic: true,
+        extrinsic: {
+          hash: true
+        },
         call: false
       }
     }
@@ -77,7 +77,7 @@ const processErrors = async (ctx: Context): Promise<void> => {
     if (block.header.timestamp - lastStateTimestamp >= SAVE_PERIOD) {
       const updatesData = [...pendingUpdates.values()]
       await saveErrors(ctx, updatesData)
-      await saveRegularChainState(ctx, block.header)
+      await saveChainState(ctx, block.header)
 
       lastStateTimestamp = block.header.timestamp
       pendingUpdates.clear()
@@ -87,7 +87,7 @@ const processErrors = async (ctx: Context): Promise<void> => {
   const block = ctx.blocks[ctx.blocks.length - 1]
   const updatesData = [...pendingUpdates.values()]
   await saveErrors(ctx, updatesData)
-  await saveCurrentChainState(ctx, block.header)
+  await saveChainState(ctx, block.header)
   pendingUpdates.clear()
 }
 

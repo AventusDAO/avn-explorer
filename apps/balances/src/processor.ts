@@ -71,10 +71,6 @@ const processor = getProcessor()
   .addCall('Migration.migrate_system_account', {
     data: { call: { origin: true }, extrinsic: { call: { args: true } } }
   } as const)
-  .addCall('*', {
-    data: { call: { origin: true } }
-  } as const)
-  .includeAllBlocks()
 
 type Item = BatchProcessorItem<typeof processor>
 type EventItem = BatchProcessorEventItem<typeof processor>
