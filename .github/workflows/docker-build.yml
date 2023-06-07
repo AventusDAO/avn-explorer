@@ -47,12 +47,17 @@ jobs:
           aws-secret-access-key: ${{ secrets.aws_secret_key }}
           aws-region: ${{ inputs.aws_region }}
 
+      - name: Configure AWS credentials Role
+        if: ${{ !inputs.config_creds }}
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: ${{ inputs.aws_region }}
+
       - name: AWS ECR login
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
         with:
           registries: ${{ inputs.aws_account_id }}
-          aws-region: ${{ inputs.aws_region }}
 
       - name: Create tag for PR
         if: github.ref != 'refs/heads/main'
