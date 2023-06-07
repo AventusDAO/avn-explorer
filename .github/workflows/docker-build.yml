@@ -19,9 +19,6 @@ on:
       aws_account_id:
         required: true
         type: string
-      gh_event_number:
-        required: false
-        type: string
       dockerfile:
         required: true
         type: string
@@ -64,7 +61,7 @@ jobs:
 
       - name: Create tag for PR
         if: github.ref != 'refs/heads/main'
-        run: echo "DOCKER_TAG=${{ steps.login-ecr.outputs.registry }}/${{ inputs.ecr_repository_prefix }}/${{ inputs.short_image_name }}:pr-${{ inputs.gh_event_number }}" >> $GITHUB_ENV
+        run: echo "DOCKER_TAG=${{ steps.login-ecr.outputs.registry }}/${{ inputs.ecr_repository_prefix }}/${{ inputs.short_image_name }}:pr-${{ github.event.number }}" >> $GITHUB_ENV
 
       - name: Create tag for merge
         if: github.ref == 'refs/heads/main'
