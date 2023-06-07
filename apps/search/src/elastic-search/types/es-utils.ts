@@ -7,3 +7,7 @@ export interface IndexMapping {
 export interface MappingsResponse {
   [index: string]: IndexMapping
 }
+
+export type BulkAction = string
+export type BulkItem = string
+export type BulkItemActionChunk = [BulkAction, BulkItem]
