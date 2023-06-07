@@ -29,6 +29,7 @@ jobs:
       ecr_repository_prefix: avn-explorer
       aws_region: eu-west-2
       aws_account_id: 189013141504
+      gh_event_number: ${{ github.event.number }}
       dockerfile: apps/balances/Dockerfile
     secrets:
       aws_access_key: ${{ secrets.TESTNET_AWS_ACCESS_KEY_ID }}
@@ -44,4 +45,5 @@ jobs:
       ecr_repository_prefix: explorer
       aws_region: us-east-1
       aws_account_id: 541507968610
+      gh_event_number: ${{ github.event.number }}
       dockerfile: apps/balances/Dockerfile
