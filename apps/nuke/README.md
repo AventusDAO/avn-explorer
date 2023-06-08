@@ -21,11 +21,6 @@ DB_USER_BALANCES=balances
 DB_SCHEMA_BALANCES=explorer_balances_db
 DB_PASS_BALANCES=
 
-RESET_ERRORS=true
-DB_SCHEMA_ERRORS=explorer_errors_db
-DB_USER_ERRORS=postgres
-DB_PASS_ERRORS=
-
 RESET_FEES=true
 DB_USER_FEES=fees
 DB_SCHEMA_FEES=explorer_fees_db
