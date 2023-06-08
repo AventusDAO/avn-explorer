@@ -7,13 +7,23 @@ Raw archives of the chain data
 - Configure `.env`
 
 ```
-DB_NAME=parachain-dev
+# -- database config --
 DB_PASS=postgres
 DB_USER=postgres
 DB_PORT=5432
-GATEWAY_PORT=8888
-EXPLORER_PORT=4444
+DB_HOST=host.docker.internal
+
+DB_NAME=parachain_dev
+
 AVN_NODE=wss://avn-parachain.dev.aventus.io
+
+# -- explorer config --
+EXPLORER_PORT=4444
+
+# -- gateway config --
+GATEWAY_PORT=8888
+DATABASE_STATEMENT_TIMEOUT=60000
+DATABASE_MAX_CONNECTIONS=100
 ```
 
 - Start archive and ingestion: `make up`

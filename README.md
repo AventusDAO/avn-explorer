@@ -41,7 +41,23 @@ For more developer tips refer to their READMEs:
 - Allow VSCode to use Workspace installed Typscript version when it asks you
 - To support features like go-to-definition with Yarn v3, a plugin like ZipFS is needed. They're listed in [VSCode extension recommendation](/.vscode/extensions.json).
 - Install dependencies: run `$ yarn` anywhere in the repository
+- Add environment variables (see below)
 - Build all apps and (their local dependencies): `$ yarn build` in the root
+
+## Environment Variables
+
+Root `.env` for the docker database:
+```
+DB_PASS=postgres
+DB_USER=postgres
+DB_HOST=host.docker.internal
+DB_PORT=5432
+DB_NAME=parachain_dev
+```
+
+Archive `.env` refer to the [Archive README](/apps/archive/README.md)
+
+Processors `.env` refer to the [Config README](/packages/config/README.md)
 
 ## Dependencies
 
