@@ -1,6 +1,6 @@
 # Config
 
-Package containing configuration utilities for apps.
+Package containing configuration utilities for processor apps.
 
 ## Environment variables
 

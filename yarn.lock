@@ -245,6 +245,15 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@avn/archive@workspace:apps/archive":
+  version: 0.0.0-use.local
+  resolution: "@avn/archive@workspace:apps/archive"
+  dependencies:
+    dotenv: ^10.0.0
+    pg: ^8.7.1
+  languageName: unknown
+  linkType: soft
+
 "@avn/avn-api@workspace:packages/avn-api":
   version: 0.0.0-use.local
   resolution: "@avn/avn-api@workspace:packages/avn-api"

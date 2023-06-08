@@ -1,6 +1,9 @@
 up:
 	@docker-compose up -d gateway explorer
 
+init:
+	@yarn db:init
+
 ingest:
 	@docker-compose up -d ingest 
 

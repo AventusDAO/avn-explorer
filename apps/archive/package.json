@@ -1,0 +1,13 @@
+{
+  "name": "@avn/archive",
+  "private": true,
+  "version": "1.0.0",
+  "packageManager": "yarn@3.3.0",
+  "scripts": {
+    "db:init": "node -r dotenv/config ../../packages/utils/scripts/init-db.js"
+  },
+  "dependencies": {
+    "dotenv": "^10.0.0",
+    "pg": "^8.7.1"
+  }
+}

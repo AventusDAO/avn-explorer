@@ -7,6 +7,9 @@ build:
 up:
 	@docker-compose up -d db && cd apps/archive && make up
 
+init:
+	@cd apps/archive && make init
+
 ingest:
 	@cd apps/archive && make ingest
 

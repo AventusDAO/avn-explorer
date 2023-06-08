@@ -41,23 +41,32 @@ For more developer tips refer to their READMEs:
 - Allow VSCode to use Workspace installed Typscript version when it asks you
 - To support features like go-to-definition with Yarn v3, a plugin like ZipFS is needed. They're listed in [VSCode extension recommendation](/.vscode/extensions.json).
 - Install dependencies: run `$ yarn` anywhere in the repository
-- Add environment variables (see below)
+- Add environment variables [see chapter below](/README.md#environment-variables)
 - Build all apps and (their local dependencies): `$ yarn build` in the root
+- Init the database for specified environment: `make init`
 
 ## Environment Variables
 
-Root `.env` for the docker database:
+Root `.env` is for the docker database:
 ```
+DB_NAME=postgres
 DB_PASS=postgres
 DB_USER=postgres
 DB_HOST=host.docker.internal
 DB_PORT=5432
-DB_NAME=parachain_dev
 ```
 
-Archive `.env` refer to the [Archive README](/apps/archive/README.md)
+To configure archive `.env` refer to the [Archive README](/apps/archive/README.md)
 
-Processors `.env` refer to the [Config README](/packages/config/README.md)
+To configure processors `.env` refer to the [Config README](/packages/config/README.md#environment-variables)
+
+### Using different chains
+
+To use a different chain locally without erasing the archive data change the following env vars: 
+- `DB_NAME`, `AVN_NODE` in the [archive .env](/apps/archive/.env)
+- `AVN_ENV` in the processor
+
+> Note: `make init` if you're trying to run a new environment for the first time
 
 ## Dependencies
 
