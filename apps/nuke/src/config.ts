@@ -1,6 +1,7 @@
 export interface DatabaseConfig {
   name:
     | 'archive'
+    | 'errors'
     | 'fees'
     | 'balances'
     | 'staking'
@@ -27,6 +28,13 @@ export const getDbConfigs: () => Readonly<DatabaseConfig[]> = () =>
       db: process.env.DB_SCHEMA_ARCHIVE,
       user: process.env.DB_USER_ARCHIVE,
       pass: process.env.DB_PASS_ARCHIVE
+    },
+    {
+      name: 'errors',
+      reset: process.env.RESET_ERRORS === 'true',
+      db: process.env.DB_SCHEMA_ERRORS,
+      user: process.env.DB_USER_ERRORS,
+      pass: process.env.DB_PASS_ERRORS
     },
     {
       name: 'fees',
