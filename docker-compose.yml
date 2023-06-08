@@ -1,0 +1,32 @@
+version: '3'
+
+volumes:
+  db-data:
+  pgadmin-data:
+
+services:
+  db:
+    image: postgres:14 # CockroachDB cluster might be a better fit for production deployment
+    restart: always
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASS}
+      POSTGRES_DB: ${DB_NAME}
+    ports:
+      - '${DB_PORT}:5432'
+
+  # PG Admin is optional.
+  pgadmin:
+    container_name: pgadmin_container
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: pgadmin4@pgadmin.org
+      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+    volumes:
+       - pgadmin-data:/var/lib/pgadmin
+    ports:
+      - "5544:80"
+    restart: unless-stopped

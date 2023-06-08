@@ -1,24 +1,9 @@
 version: '3'
 
 volumes:
-  db-data:
   os-data:
 
 services:
-  db:
-    image: postgres:14
-    environment:
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_DB: ${DB_NAME}
-      POSTGRES_PASSWORD: ${DB_PASS}
-    volumes:
-      - db-data:/var/lib/postgresql/data
-    ports:
-      - '${DB_PORT}:5432'
-      # command: ["postgres", "-c", "log_statement=all"]
-    networks:
-      - search
-
   opensearch:
     image: opensearchproject/opensearch:2.3.0
     environment:

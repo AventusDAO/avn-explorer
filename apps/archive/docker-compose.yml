@@ -1,27 +1,7 @@
 version: '3'
 
-volumes:
-  db-data:
-  # pgadmin-data:
-
 services:
-  db:
-    image: postgres:14 # CockroachDB cluster might be a better fit for production deployment
-    restart: always
-    volumes:
-      - db-data:/var/lib/postgresql/data
-    environment:
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASS}
-      POSTGRES_DB: ${DB_NAME}
-    networks:
-      - avn-archive
-    ports:
-      - '${DB_PORT}:5432'
-
   ingest:
-    depends_on:
-      - db
     restart: on-failure
     image: subsquid/substrate-ingest:firesquid
     volumes:
@@ -36,7 +16,7 @@ services:
 
         '10', # allow up to 10 pending requests for the above endpoint (default is 5)
         '--out',
-        'postgres://${DB_USER}:${DB_PASS}@db:5432/${DB_NAME}',
+        'postgres://${DB_USER}:${DB_PASS}@${DB_HOST}:${DB_PORT}/${DB_NAME}',
         # custom types for the solochain
         '--types-bundle',
         '/app/avn-types.json'
@@ -45,15 +25,14 @@ services:
       - avn-archive
 
   gateway:
-    depends_on:
-      - db
     image: subsquid/substrate-gateway:firesquid
     environment:
-      DATABASE_MAX_CONNECTIONS: 5
+      DATABASE_MAX_CONNECTIONS: ${DATABASE_MAX_CONNECTIONS}
+      DATABASE_STATEMENT_TIMEOUT: ${DATABASE_STATEMENT_TIMEOUT}
       RUST_LOG: 'actix_web=info,actix_server=info'
     command: [
         '--database-url',
-        'postgres://${DB_USER}:${DB_PASS}@db:5432/${DB_NAME}'
+        'postgres://${DB_USER}:${DB_PASS}@${DB_HOST}:${DB_PORT}/${DB_NAME}'
         # "--evm-support" # uncomment for chains with Frontier EVM pallet
         # (e.g. Moonbeam/Moonriver or Astar/Shiden)
       ]
@@ -69,8 +48,8 @@ services:
     image: subsquid/substrate-explorer:firesquid
     environment:
       DB_TYPE: postgres # set to `cockroach` for Cockroach DB
-      DB_HOST: db
-      DB_PORT: 5432
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
       DB_NAME: ${DB_NAME}
       DB_USER: ${DB_USER}
       DB_PASS: ${DB_PASS}
@@ -82,22 +61,6 @@ services:
       - '${EXPLORER_PORT}:3000'
     networks:
       - avn-archive
-
-  # PG Admin is optional.
-  # pgadmin:
-  #   container_name: pgadmin_container
-  #   image: dpage/pgadmin4
-  #   environment:
-  #     PGADMIN_DEFAULT_EMAIL: pgadmin4@pgadmin.org
-  #     PGADMIN_DEFAULT_PASSWORD: admin
-  #     PGADMIN_CONFIG_SERVER_MODE: 'False'
-  #   volumes:
-  #      - pgadmin-data:/var/lib/pgadmin
-  #   ports:
-  #     - "5544:80"
-  #   networks:
-  #     - avn-archive
-  #   restart: unless-stopped
 
 networks:
   avn-archive:

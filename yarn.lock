@@ -531,6 +531,7 @@ __metadata:
     "@subsquid/ss58": ^0.1.1
     "@types/node": ^18.11.9
     dotenv: ^10.0.0
+    pg: ^8.7.1
     typescript: ^4.9.3
   languageName: unknown
   linkType: soft

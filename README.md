@@ -12,14 +12,25 @@
 For more developer tips refer to their READMEs:
 
 - [archive](/apps/archive/README.md)
-- [account-monitor](/apps/account-monitor/README.md)
+- account-monitor
+- account-monitor-client
 - [balances](/apps/balances/README.md)
+- [errors](/apps/errors/README.md)
 - [fees](/apps/fees/README.md)
+- [nuke](/apps/nuke/README.md)
 - [search](/apps/search/README.md)
 - [search-server](/apps/search-server/README.md)
 - [staking](/apps/staking/README.md)
 - [summary](/apps/summary/README.md)
 - [tokens](/apps/tokens/README.md)
+
+## Packages:
+
+- [avn-api](/packages/avn-api/README.md)
+- [config](/packages/config/README.md)
+- [metadata](/packages/metadata/README.md)
+- [types](/packages/types/README.md)
+- [utils](/packages/utils/README.md)
 
 ## Setup
 

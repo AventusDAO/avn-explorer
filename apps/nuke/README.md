@@ -1,10 +1,10 @@
 # nuke
 
-Package to clear data in the multitenant DB configuration.
+Utility app / script to clear data in the multitenant DB configuration.
 
 ## Configuration
 
-Package requires following environment variables.
+App requires following environment variables.
 Note that the env var on devops side for database name is DB_SCHEMA.
 
 ```
