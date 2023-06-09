@@ -32,9 +32,14 @@ services:
       RUST_LOG: 'actix_web=info,actix_server=info'
     command: [
         '--database-url',
-        'postgres://${DB_USER}:${DB_PASS}@${DB_HOST}:${DB_PORT}/${DB_NAME}'
-        # "--evm-support" # uncomment for chains with Frontier EVM pallet
-        # (e.g. Moonbeam/Moonriver or Astar/Shiden)
+        'postgres://${DB_USER}:${DB_PASS}@${DB_HOST}:${DB_PORT}/${DB_NAME}',
+        '--database-max-connections',
+        '20',
+        '--database-statement-timeout',
+        '30000',
+        '--scan-max-value',
+        # default
+        '100000'
       ]
     ports:
       - '${GATEWAY_PORT}:8000'
