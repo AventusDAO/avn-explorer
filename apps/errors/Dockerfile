@@ -7,8 +7,8 @@ WORKDIR /app
 COPY yarn.lock package.json .yarnrc.yml tsconfig.json ./
 COPY .yarn .yarn
 COPY packages packages
-COPY apps/fees apps/fees
+COPY apps/errors apps/errors
 
 RUN yarn install && \
     yarn build:packages && \
-    yarn workspace @avn/fees run build
+    yarn workspace @avn/errors run build
