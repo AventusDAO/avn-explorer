@@ -47,19 +47,24 @@ const processErrors = async (ctx: Context): Promise<void> => {
       .map(item => {
         if (item.kind !== 'event') throw new Error(`item must be of 'event' kind`)
         if (item.name === '*') throw new Error('unexpected wildcard name')
-        const args = item.event.args
-        let error: string | undefined
-        let index: number | undefined
-        if (item.name === 'System.ExtrinsicFailed' || item.name === 'AvnProxy.InnerCallFailed') {
-          if (args.dispatchError.__kind === 'Module' && args.dispatchError.value) {
-            error = args.dispatchError.value.error
-            index = args.dispatchError.value.index
-          }
-        }
         const extrinsic = item.event.extrinsic
         if (!extrinsic) throw new Error('extrinsic is not defined')
-        if (!index || !error) throw new Error('index is not defined')
-        const errorName = decodeError(index, error, block.header.specId)
+
+        const args = item.event.args
+        let errorName: string = ''
+
+        if (item.name === 'System.ExtrinsicFailed' || item.name === 'AvnProxy.InnerCallFailed') {
+          if (args.dispatchError.__kind === 'Module' && args.dispatchError.value) {
+            const error = args.dispatchError.value.error
+            const index = args.dispatchError.value.index
+            if (error === undefined) throw new Error('error is not defined')
+            if (index === undefined) throw new Error('index is not defined')
+            errorName = decodeError(index, error, block.header.specId)
+          } else {
+            errorName = args.dispatchError.__kind
+          }
+        }
+
         return new ExtrinsicError({
           id: extrinsic.id,
           extrinsicHash: extrinsic.hash,
