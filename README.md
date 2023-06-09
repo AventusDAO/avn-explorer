@@ -48,6 +48,7 @@ For more developer tips refer to their READMEs:
 ## Environment Variables
 
 Root `.env` is for the docker database:
+
 ```
 DB_NAME=postgres
 DB_PASS=postgres
@@ -62,7 +63,8 @@ To configure processors `.env` refer to the [Config README](/packages/config/REA
 
 ### Using different chains
 
-To use a different chain locally without erasing the archive data change the following env vars: 
+To use a different chain locally without erasing the archive data change the following env vars:
+
 - `DB_NAME`, `AVN_NODE` in the [archive .env](/apps/archive/.env)
 - `AVN_ENV` in the processor
 

@@ -32,7 +32,6 @@ DATABASE_STATEMENT_TIMEOUT=60000
 DATABASE_MAX_CONNECTIONS=100
 ```
 
-
 # Solochain Archive
 
 Solochain is based on an older Substrate runtime that requires external custom types.
