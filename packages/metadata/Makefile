@@ -12,10 +12,10 @@ versions-solochain-mainnet:
 # parachain
 
 versions-parachain-dev:
-	@yarn squid-substrate-metadata-explorer --chain wss://avn-parachain.dev.aventus.io --archive https://archive-explorer.dev.aventus.io/graphql --out ./versions-parachain.dev.jsonl
+	@yarn squid-substrate-metadata-explorer --chain wss://avn-parachain.dev.aventus.io --archive https://archive-explorer.dev.aventus.io/graphql --out ./versions.avn-parachain.dev.jsonl
 
 versions-parachain-testnet:
-	@yarn squid-substrate-metadata-explorer --chain wss://avn-parachain.test.aventus.io --archive https://archive-explorer.public-testnet.aventus.io/graphql --out ./versions-parachain.testnet.jsonl
+	@yarn squid-substrate-metadata-explorer --chain wss://avn-parachain.test.aventus.io --archive https://archive-explorer.public-testnet.aventus.io/graphql --out ./versions.avn-parachain.testnet.jsonl
 
 versions-parachain-mainnet:
-	@yarn squid-substrate-metadata-explorer --chain wss://avn-parachain.mainnet.aventus.io --archive https://archive-explorer.mainnet.aventus.io/graphql --out ./versions-parachain.mainnet.jsonl
+	@yarn squid-substrate-metadata-explorer --chain wss://avn-parachain.mainnet.aventus.io --archive https://archive-explorer.mainnet.aventus.io/graphql --out ./versions.avn-parachain.mainnet.jsonl

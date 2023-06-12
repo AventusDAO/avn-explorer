@@ -1,6 +1,5 @@
 import { decodeMetadata, Metadata } from '@subsquid/substrate-metadata'
 import { readLines } from '@subsquid/util-internal-read-lines'
-import { AvnEnvironmentName } from '@avn/config'
 import path from 'path'
 
 export interface SpecVersionRecord {
@@ -22,20 +21,9 @@ export interface SpecVersion extends SpecVersionRecord {
    */
   metadata: string
 }
-const VersionsFileNames: Record<AvnEnvironmentName, string | undefined> = {
-  'parachain-dev': 'versions-parachain.dev.jsonl',
-  'parachain-testnet': 'versions-parachain.testnet.jsonl',
-  'parachain-mainnet': 'versions-parachain.mainnet.jsonl',
-  'solochain-dev': undefined,
-  'solochain-testnet': undefined,
-  'solochain-mainnet': undefined
-}
 
-export const getMetadata = (env: AvnEnvironmentName, specId: string): Metadata => {
-  const fileName = VersionsFileNames[env]
-  if (!fileName) throw new Error(`Metadata for ${env} is not supported`)
-
-  const filePath = path.join(__dirname, '..', fileName)
+export const getMetadata = (versionsFileName: string, specId: string): Metadata => {
+  const filePath = path.join(__dirname, '..', versionsFileName)
   const versions = readJsonLines(filePath)
 
   const specVersion = parseInt(specId.split('@')[1])
@@ -44,7 +32,8 @@ export const getMetadata = (env: AvnEnvironmentName, specId: string): Metadata =
   const version = versions.find(ver => ver.specVersion === specVersion)
   if (version === undefined) {
     throw new Error(
-      `Metadata version not found for specVersion=${specVersion} on ${env}. Please update the metadata files.`
+      `Metadata version not found for specVersion=${specVersion} in ${versionsFileName}. 
+      Please update the metadata files.`
     )
   }
 

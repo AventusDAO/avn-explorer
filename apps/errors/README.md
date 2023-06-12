@@ -21,3 +21,9 @@ This is a Squid based processor processing transaction errors.
 ## Environment variables
 
 Add `.env` file with required environment variables. Consult [config package README.md](../../packages/config/README.md).
+
+Additionally following env vars are required:
+
+```
+VERSIONS_FILE_NAME=versions.avn-parachain.dev.jsonl
+```
