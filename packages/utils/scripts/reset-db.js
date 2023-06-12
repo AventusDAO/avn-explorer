@@ -14,14 +14,14 @@ const client = new Client({
 
 const dropDb = async () => {
   console.log(`Dropping ${process.env.DB_NAME}...`)
-  const _res = await client.query(`DROP DATABASE "${process.env.DB_NAME}"`)
-  console.log(`Dropped.`)
+  const _res = await client.query(`DROP DATABASE IF EXISTS "${process.env.DB_NAME}"`)
+  console.log(`Dropped ${process.env.DB_NAME}.`)
 }
 
 const createDb = async () => {
   console.log(`Creating ${process.env.DB_NAME}...`)
   const _res = await client.query(`CREATE DATABASE "${process.env.DB_NAME}"`)
-  console.log(`Created.`)
+  console.log(`Created ${process.env.DB_NAME}.`)
 }
 
 ;(async () => {

@@ -10,7 +10,7 @@
     "processor:start": "yarn db:migrate && node lib/processor.js",
     "processor:debug": "node --inspect --enable-source-maps -r dotenv/config lib/processor.js",
     "server:start": "squid-graphql-server",
-    "db:reset": "node ./scripts/reset-db.js",
+    "db:reset": "node ../../packages/utils/scripts/reset-db.js",
     "db:migrate": "yarn squid-typeorm-migration-apply",
     "test": "jest",
     "test:watch": "jest --watch"

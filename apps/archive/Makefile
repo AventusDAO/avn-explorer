@@ -1,14 +1,14 @@
 up:
-	@docker-compose up -d
+	@docker-compose up -d gateway explorer
 
-explorer:
-	@docker-compose up -d db gateway explorer
+init:
+	@yarn db:init
 
 ingest:
-	@docker-compose up db ingest 
+	@docker-compose up -d ingest 
 
 pgadmin:
-	@docker-compose up -d db pgadmin
+	@docker-compose up -d pgadmin
 
 down:
 	@docker-compose down
