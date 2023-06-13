@@ -1,6 +1,6 @@
 {
   "outDir": "../src/types/generated/parachain-dev",
-  "specVersions": "../../../packages/metadata/versions-parachain.dev.jsonl",
+  "specVersions": "../../../packages/metadata/versions.avn-parachain.dev.jsonl",
   "events": ["Summary.SummaryCalculated", "Summary.VotingEnded"],
   "calls": [],
   "storage": []

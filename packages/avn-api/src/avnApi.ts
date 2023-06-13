@@ -1,4 +1,4 @@
-import { environment } from '@avn/config'
+import { getEnvironment } from '@avn/config'
 import { ApiPromise, WsProvider } from '@polkadot/api'
 import { OverrideVersionedType, OverrideBundleType } from '@polkadot/types/types'
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -29,7 +29,7 @@ const updateSubstrateV2Types = (typesBundle: OverrideBundleType): OverrideBundle
 }
 
 export const getApi = async (): Promise<ApiPromise> => {
-  const { typesBundle: typesBundleFile, dataSource } = environment
+  const { typesBundle: typesBundleFile, dataSource } = getEnvironment()
   const { chain } = dataSource
   const wsProvider = new WsProvider(chain)
 

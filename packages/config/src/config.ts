@@ -1,4 +1,4 @@
-import environment from './environments'
+import environment from './environment'
 import { ProcessorConfig } from './types'
 
 export const getConfig = (): ProcessorConfig => {
@@ -17,19 +17,9 @@ export const getConfig = (): ProcessorConfig => {
     : undefined
 
   const { prefix, dataSource, typesBundle } = environment
-  const { chain } = dataSource
-
-  const archive = process.env.ARCHIVE_URL ?? dataSource.archive
-  if (!process.env.ARCHIVE_URL) {
-    console.warn(`missing ARCHIVE_URL env var, using the deployed ${archive} as default`)
-  }
-
   return {
     prefix,
-    dataSource: {
-      archive,
-      chain
-    },
+    dataSource,
     typesBundle,
     batchSize,
     blockRange,

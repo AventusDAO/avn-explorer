@@ -22,7 +22,7 @@ on:
       - 'packages/utils/**'
       - 'packages/metadata/**'
 
-jobs:  
+jobs:
   avn-docker-build:
     name: AvN Explorer Errors
     uses: ./.github/workflows/docker-build.yml
