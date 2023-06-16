@@ -66,7 +66,7 @@ To configure processors `.env` refer to the [Config README](/packages/config/REA
 To use a different chain locally without erasing the archive data change the following env vars:
 
 - `DB_NAME`, `AVN_NODE` in the [archive .env](/apps/archive/.env)
-- `AVN_ENV` in the processor
+- `CHAIN_URL`, `ARCHIVE_GATEWAY_URL` in each processor you want to run
 
 > Note: `make init` if you're trying to run a new environment for the first time
 

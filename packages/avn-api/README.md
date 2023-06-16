@@ -6,9 +6,6 @@ API package making it possible to interact with the chain.
 
 Add these variable to the app using this package:
 
-```
-AVN_ENV=parachain-dev
-```
 
 ## Preconfigured repl tool for exploring data programmatically
 
