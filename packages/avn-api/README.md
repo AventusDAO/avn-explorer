@@ -6,7 +6,6 @@ API package making it possible to interact with the chain.
 
 Add these variable to the app using this package:
 
-
 ## Preconfigured repl tool for exploring data programmatically
 
 ```
