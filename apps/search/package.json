@@ -7,10 +7,9 @@
     "build": "rm -rf lib && tsc",
     "build:watch": "tsc -w",
     "dev": "nodemon",
-    "processor:start": "node -r dotenv/config lib/processor.js",
+    "processor:start": "node lib/processor.js",
     "processor:debug": "node --inspect --enable-source-maps -r dotenv/config lib/processor.js",
-    "es:reset": "node ./scripts/reset-es.js",
-    "db:reset": "node ../../packages/utils/scripts/reset-db.js"
+    "db:reset": "node ./scripts/reset-es.js && node ../../packages/utils/scripts/reset-db.js"
   },
   "dependencies": {
     "@avn/config": "^1.0.0",
