@@ -17,6 +17,7 @@ GQL_PORT=4350
 CHAIN_URL=wss://avn-parachain.dev.aventus.io
 ARCHIVE_GATEWAY_URL=http://localhost:8888/graphql
 # ARCHIVE_GATEWAY_URL=https://archive-gateway.dev.aventus.io/graphql
+TYPES_BUNDLE_FILE_NAME=avn-types.json
 
 # PROCESSOR_PROMETHEUS_PORT=3456
 # PROCESSOR_RANGE_FROM=0
