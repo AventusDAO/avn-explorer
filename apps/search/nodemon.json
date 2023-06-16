@@ -1,6 +1,6 @@
 {
   "ignore": ["**/*.test.ts", "**/*.spec.ts", "**/*.test.js", "**/*.spec.js", ".git"],
-  "watch": ["lib", ".env", "../../packages/config/lib"],
+  "watch": ["lib", ".env", "../../packages/config/lib", "../../packages/metadata/lib"],
   "delay": "2000",
   "env": {
     "TS_NODE_FILES": "true",
