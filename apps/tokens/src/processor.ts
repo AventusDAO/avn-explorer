@@ -43,66 +43,51 @@ processor.run(db, processTokens)
 const SAVE_PERIOD = 12 * 60 * 60 * 1000
 let lastStateTimestamp: number | undefined
 
+export interface TokenTransferData {
+  amount: bigint
+  tokenId: string
+  accountId: string
+}
+
 async function processTokens(ctx: Context): Promise<void> {
   const accountIdsHex = new Set<string>()
   const tokenIdsHex = new Set<string>()
+  const tokenTransferData: TokenBalanceForAccount[] = []
 
   for (const block of ctx.blocks) {
     for (const item of block.items) {
       if (item.kind === 'call') {
-        await processTokensCallItem(ctx, item, accountIdsHex, tokenIdsHex, block.header)
+        await processTokensCallItem(
+          ctx,
+          item,
+          accountIdsHex,
+          tokenIdsHex,
+          block.header,
+          tokenTransferData
+        )
       } else if (item.kind === 'event') {
-        processTokensEventItem(ctx, item, accountIdsHex, tokenIdsHex)
+        processTokensEventItem(ctx, item, tokenTransferData, block.header)
       }
     }
 
     if (lastStateTimestamp == null) {
       lastStateTimestamp = (await getLastChainState(ctx.store))?.timestamp.getTime() ?? 0
     }
-
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    if (block.header.timestamp - lastStateTimestamp! >= SAVE_PERIOD) {
-      const accountIds = [...accountIdsHex].map(id => decodeHex(id))
-      const tokenIds = [...tokenIdsHex].map(id => decodeHex(id))
-    }
   }
 
   const block = ctx.blocks[ctx.blocks.length - 1]
-  const accountIds = [...accountIdsHex].map(id => decodeHex(id))
-  const tokenIds = [...tokenIdsHex].map(id => decodeHex(id))
-  const tokenManagerData = await getTokenManagerData(ctx, block.header, tokenIds, accountIds)
-  ctx.log
-    .child('tokens')
-    .debug(
-      `tokenManagerData ${tokenManagerData}, accountIds ${[...accountIdsHex]} tokenIds ${[
-        ...tokenIdsHex
-      ]}`
-    )
+  ctx.log.child('tokens').debug(`tokenManagerData ${tokenTransferData}`)
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  await saveTokenBalanceForAccount(ctx, block.header, tokenIds, accountIds, tokenManagerData!)
+  await saveTokenBalanceForAccount(ctx, tokenTransferData)
   await setChainState(ctx, block.header)
 }
 
 async function saveTokenBalanceForAccount(
   ctx: Context,
-  block: SubstrateBlock,
-  tokenIds: Uint8Array[],
-  accountIds: Uint8Array[],
-  balance: bigint[]
+  tokenTransferData: TokenBalanceForAccount[]
 ): Promise<void> {
-  if (tokenIds.length && accountIds.length) {
-    const balancesToBeSaved = accountIds.map((aid, index) => {
-      return new TokenBalanceForAccount({
-        id: randomUUID(),
-        tokenId: toHex(tokenIds[0]),
-        accountId: encodeId(aid),
-        amount: balance[index] ?? 0,
-        updatedAt: block.height
-      })
-    })
-    await ctx.store.save(balancesToBeSaved)
-    ctx.log.child('tokens').info(`updated balances: ${balancesToBeSaved.length}`)
-  }
+  await ctx.store.save(tokenTransferData)
+  ctx.log.child('tokens').info(`updated balances: ${tokenTransferData.length}`)
 }
 
 async function getTokenManagerData(
@@ -161,7 +146,8 @@ async function processMigrationCall(
           tokenId: extractTokenId(migratedData[0]),
           accountId: encodeId(decodeHex(extractPublicKey(migratedData[0]))),
           amount: migratedData[1],
-          updatedAt: block.height
+          updatedAt: block.height,
+          timestamp: new Date(block.timestamp)
         })
       )
       if (chunk.length === chunkSize) {
@@ -203,7 +189,8 @@ async function processTokensCallItem(
   item: CallItem,
   accountIds: Set<string>,
   tokenIds: Set<string>,
-  block: SubstrateBlock
+  block: SubstrateBlock,
+  tokenTransferData: TokenTransferData[]
 ): Promise<void> {
   switch (item.name) {
     case 'Migration.migrate_token_manager_balances': {
@@ -225,29 +212,26 @@ async function processTokensCallItem(
 function processTokensEventItem(
   ctx: Context,
   item: EventItem,
-  accountIds: Set<string>,
-  tokenIds: Set<string>
+  tokenTransferData: TokenTransferData[],
+  block: SubstrateBlock
 ): void {
-  switch (item.name) {
-    case 'TokenManager.TokenTransferred': {
-      const { tokenId, accounts } = getTokenTransferredData(ctx, item.event)
-      accounts?.forEach(acc => accountIds.add(acc))
-      tokenIds.add(tokenId)
-      break
-    }
-    case 'TokenManager.TokenLowered': {
-      const { tokenId, accounts } = getTokenLowerData(ctx, item.event)
-      accounts?.forEach(acc => accountIds.add(acc))
-      tokenIds.add(tokenId)
-      break
-    }
-    case 'TokenManager.TokenLifted': {
-      const { tokenId, accounts } = getTokenLiftedData(ctx, item.event)
-      accounts?.forEach(acc => accountIds.add(acc))
-      tokenIds.add(tokenId)
-      break
-    }
+  // eslint-disable-next-line
+  let tokenTransferResponse = {} as TokenTransferData
+  if (item.name === 'TokenManager.TokenTransferred') {
+    tokenTransferResponse = getTokenTransferredData(ctx, item.event)
+  } else if (item.name === 'TokenManager.TokenLowered') {
+    tokenTransferResponse = getTokenLowerData(ctx, item.event)
+  } else if (item.name === 'TokenManager.TokenLifted') {
+    tokenTransferResponse = getTokenLiftedData(ctx, item.event)
   }
+  const normalizedTokenData = new TokenBalanceForAccount({
+    ...tokenTransferResponse,
+    reason: `${item.name} ${block.height}`,
+    id: item.event.id,
+    updatedAt: block.height,
+    timestamp: new Date(block.timestamp)
+  })
+  tokenTransferData.push(normalizedTokenData)
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

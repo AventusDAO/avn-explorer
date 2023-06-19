@@ -6,6 +6,7 @@ import {
 } from '../types/generated/parachain-dev/events'
 import { toHex } from '@subsquid/substrate-processor'
 import { UnknownVersionError } from '@avn/types'
+import { TokenTransferData } from '../processor'
 
 type AccountData = string[]
 
@@ -14,42 +15,45 @@ type ReturnedData = {
   accounts?: AccountData
 }
 
-export const getTokenLowerData = (ctx: ChainContext, event: Event): ReturnedData => {
+export const getTokenLowerData = (ctx: ChainContext, event: Event): TokenTransferData => {
   const data = new TokenManagerTokenLoweredEvent(ctx, event)
 
   if (data.isV21) {
     const v10Data = data.asV21
     return {
       tokenId: toHex(v10Data.tokenId),
-      accounts: [toHex(v10Data.sender), toHex(v10Data.recipient)]
+      accountId: toHex(v10Data.recipient),
+      amount: v10Data.amount
     }
   } else {
     throw new UnknownVersionError(data.constructor.name)
   }
 }
 
-export const getTokenTransferredData = (ctx: ChainContext, event: Event): ReturnedData => {
+export const getTokenTransferredData = (ctx: ChainContext, event: Event): TokenTransferData => {
   const data = new TokenManagerTokenTransferredEvent(ctx, event)
 
   if (data.isV21) {
     const v10Data = data.asV21
     return {
       tokenId: toHex(v10Data.tokenId),
-      accounts: [toHex(v10Data.sender), toHex(v10Data.recipient)]
+      accountId: toHex(v10Data.recipient),
+      amount: v10Data.tokenBalance
     }
   } else {
     throw new UnknownVersionError(data.constructor.name)
   }
 }
 
-export const getTokenLiftedData = (ctx: ChainContext, event: Event): ReturnedData => {
+export const getTokenLiftedData = (ctx: ChainContext, event: Event): TokenTransferData => {
   const data = new TokenManagerTokenLiftedEvent(ctx, event)
 
   if (data.isV21) {
     const v10Data = data.asV21
     return {
       tokenId: toHex(v10Data.tokenId),
-      accounts: [toHex(v10Data.recipient)]
+      accountId: toHex(v10Data.recipient),
+      amount: v10Data.tokenBalance
     }
   } else {
     throw new UnknownVersionError(data.constructor.name)

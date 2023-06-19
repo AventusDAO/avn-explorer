@@ -4,6 +4,8 @@ type TokenBalanceForAccount @entity {
   tokenId: String! @index
   accountId: String! @index
   updatedAt: Int @index
+  reason: String! @index
+  timestamp: DateTime @index
 }
 
 type ChainState @entity {
