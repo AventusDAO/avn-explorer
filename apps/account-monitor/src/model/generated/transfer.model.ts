@@ -1,6 +1,5 @@
 import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, Index as Index_} from "typeorm"
 import * as marshal from "./marshal"
-import {TransferType} from "./_transferType"
 
 @Entity_()
 export class Transfer {
@@ -30,20 +29,24 @@ export class Transfer {
   @Index_()
   @Column_("text", {nullable: true})
   to!: string | undefined | null
-  
+
   @Index_()
-  @Column_('numeric', {
-    transformer: marshal.bigintTransformer,
-    nullable: false,
-    precision: 80,
-    scale: 0
-  })
+  @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})
   amount!: bigint
 
   @Index_()
   @Column_("text", {nullable: true})
-  tokenId!: string | undefined | null
+  tokenName!: string | undefined | null
 
-  @Column_("varchar", {length: 20, nullable: false})
-  transferType!: TransferType
+  @Index_()
+  @Column_("text", {nullable: false})
+  tokenId!: string
+
+  @Index_()
+  @Column_("text", {nullable: false})
+  pallet!: string
+
+  @Index_()
+  @Column_("text", {nullable: false})
+  method!: string
 }

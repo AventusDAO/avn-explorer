@@ -7,7 +7,7 @@ import {
 import { encodeId } from '@avn/utils'
 import { EventItem } from '@subsquid/substrate-processor/lib/interfaces/dataSelection'
 import { Store, TypeormDatabase } from '@subsquid/typeorm-store'
-import { Transfer, TransferType } from './model'
+import { Transfer, TokenLookup } from './model'
 import {
   BalancesTransferEvent,
   TokenManagerTokenTransferredEvent
@@ -23,8 +23,10 @@ interface TransferEventData {
   from: string
   to: string
   amount: bigint
+  tokenName: string | undefined
   tokenId: string | undefined
-  transferType: TransferType
+  pallet: string
+  method: string
 }
 
 const processor = getProcessor()
@@ -61,15 +63,33 @@ type TransfersEventItem =
       { event: { args: true; extrinsic: { hash: true }; call: {} } }
     >
 
-processor.run(new TypeormDatabase(), processEvents)
+async function createTokenLookupMap(ctx: Ctx): Promise<Map<any, any>> {
+  const tokenLookupData = await ctx.store.find(TokenLookup, { where: {} })
+  const tokenLookupMap = new Map<string, string>()
 
-async function processEvents(ctx: Ctx): Promise<void> {
+  tokenLookupData.forEach((token: any) => {
+    tokenLookupMap.set(token.tokenId, token.tokenName)
+  })
+  return tokenLookupMap
+}
+
+let tokenLookupMap: Map<string, string> | null = null
+
+async function processEvents(ctx: Ctx) {
   const transfersData: TransferEventData[] = []
+
+  if (!tokenLookupMap) {
+    tokenLookupMap = await createTokenLookupMap(ctx)
+  }
+
+  const avtHash = getKeyByValue(tokenLookupMap, 'AVT')
 
   for (const block of ctx.blocks) {
     for (const item of block.items) {
       if (item.name === 'Balances.Transfer' || item.name === 'TokenManager.TokenTransferred') {
-        transfersData.push(handleTransfer(ctx, block.header, item))
+        transfersData.push(
+          handleTransfer(ctx, block.header, item as TransfersEventItem, tokenLookupMap, avtHash)
+        )
       }
     }
   }
@@ -80,12 +100,19 @@ async function processEvents(ctx: Ctx): Promise<void> {
 function handleTransfer(
   ctx: Ctx,
   block: SubstrateBlock,
-  item: TransfersEventItem
+  item: TransfersEventItem,
+  tokensMap: Map<string, string>,
+  avtHash: string
 ): TransferEventData {
   const event =
     item.name === 'Balances.Transfer'
-      ? normalizeBalancesTransferEvent(ctx, item)
+      ? normalizeBalancesTransferEvent(ctx, item, avtHash)
       : normalizeTokenTransferEvent(ctx, item)
+  const palletInfoArray = item.name.split('.')
+
+  const tokenId = event.tokenId ? handleTokenId(event.tokenId) : ''
+  const tokenName = tokensMap.has(tokenId) ? tokensMap.get(tokenId) : ''
+
   return {
     id: item.event.id,
     blockNumber: block.height,
@@ -94,11 +121,18 @@ function handleTransfer(
     from: encodeId(event.from),
     to: encodeId(event.to),
     amount: event.amount,
-    tokenId: event.tokenId ? toHex(event.tokenId) : undefined,
-    transferType:
-      item.name === 'Balances.Transfer'
-        ? TransferType.BALANCES_TRANSFER
-        : TransferType.TOKEN_PROXY_TRANSFER
+    tokenName,
+    tokenId,
+    pallet: palletInfoArray[0],
+    method: palletInfoArray[1]
+  }
+}
+
+function handleTokenId(tokenId: string | Uint8Array) {
+  if (typeof tokenId === 'string') {
+    return tokenId
+  } else {
+    return toHex(tokenId)
   }
 }
 
@@ -116,7 +150,7 @@ async function saveTransfers(ctx: Ctx, transfersData: TransferEventData[]): Prom
   const transfers: Transfer[] = []
 
   for (const t of transfersData) {
-    const { id, blockNumber, timestamp, extrinsicHash, amount, tokenId, transferType } = t
+    const { id, blockNumber, timestamp, extrinsicHash, amount, tokenId, method, pallet } = t
 
     const from = getAccount(accounts, t.from)
     const to = getAccount(accounts, t.to)
@@ -131,7 +165,8 @@ async function saveTransfers(ctx: Ctx, transfersData: TransferEventData[]): Prom
         to,
         amount,
         tokenId,
-        transferType
+        method,
+        pallet
       })
     )
   }
@@ -140,14 +175,25 @@ async function saveTransfers(ctx: Ctx, transfersData: TransferEventData[]): Prom
   await ctx.store.insert(transfers)
 }
 
+function getKeyByValue(map: Map<any, any>, searchValue: any): any | undefined {
+  for (const [key, value] of map.entries()) {
+    // console.log(key, value)
+    if (value === searchValue) {
+      return key
+    }
+  }
+  return undefined
+}
+
 function normalizeBalancesTransferEvent(
   ctx: Ctx,
-  item: EventItem<'Balances.Transfer', { event: { args: true } }>
-): { from: Uint8Array; to: Uint8Array; amount: bigint; tokenId: undefined } {
+  item: EventItem<'Balances.Transfer', { event: { args: true } }>,
+  avtHash: string
+): { from: Uint8Array; to: Uint8Array; amount: bigint; tokenId: string } {
   const e = new BalancesTransferEvent(ctx, item.event)
   if (e.isV21) {
     const { from, to, amount } = e.asV21
-    return { from, to, amount, tokenId: undefined }
+    return { from, to, amount, tokenId: avtHash }
   } else {
     throw new UknownVersionError()
   }
@@ -179,3 +225,5 @@ class UknownVersionError extends Error {
     super('Uknown verson')
   }
 }
+
+processor.run(new TypeormDatabase(), processEvents)
