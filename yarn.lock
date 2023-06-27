@@ -224,6 +224,7 @@ __metadata:
     "@avn/config": ^1.0.0
     "@avn/types": ^1.0.0
     "@avn/utils": ^1.0.0
+    "@polkadot/api": ^10.6.1
     "@subsquid/cli": ^0.7.2
     "@subsquid/graphql-server": ^1.1.0
     "@subsquid/logger": ^0.3.0

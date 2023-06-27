@@ -9,6 +9,7 @@
     "dev": "nodemon",
     "processor:start": "yarn db:migrate && node lib/processor.js",
     "processor:debug": "node --inspect --enable-source-maps -r dotenv/config lib/processor.js",
+    "seedCoins": "node --inspect --enable-source-maps -r dotenv/config lib/insertCurrenciesInLookupTable.js",
     "server:start": "squid-graphql-server",
     "db:reset": "node ../../packages/utils/scripts/reset-db.js",
     "db:migrate": "yarn squid-typeorm-migration-apply"
@@ -17,6 +18,7 @@
     "@avn/config": "^1.0.0",
     "@avn/types": "^1.0.0",
     "@avn/utils": "^1.0.0",
+    "@polkadot/api": "^10.6.1",
     "@subsquid/graphql-server": "^1.1.0",
     "@subsquid/logger": "^0.3.0",
     "@subsquid/ss58": "^0.1.1",
