@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { getExtrinsics } from '../services/extrinsics'
-import { asyncCatch, processIntegerParam, processStringParam } from '../utils'
+import { asyncCatch, processBooleanParam, processIntegerParam, processStringParam } from '../utils'
 
 const router = Router()
 
@@ -19,8 +19,9 @@ router.get(
     const blockHeightTo = processIntegerParam(req.query.blockHeightTo, 'blockHeightTo')
     const timestampStart = processIntegerParam(req.query.timestampStart, 'timestampStart')
     const timestampEnd = processIntegerParam(req.query.timestampEnd, 'timestampEnd')
+    const systemOnly = processBooleanParam(req.query.systemOnly, 'systemOnly')
 
-    const data = await getExtrinsics(size, from, sort, address, undefined, {
+    const data = await getExtrinsics(size, from, sort, address, undefined, systemOnly, {
       section,
       method,
       blockHeightFrom,

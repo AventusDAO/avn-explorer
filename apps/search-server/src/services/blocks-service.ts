@@ -30,6 +30,8 @@ const processError = (err: any): Error => {
 interface SearchBlocksQuery extends EsQuery {
   bool: {
     must?: JsonMap[]
+    must_not?: JsonMap[]
+    should?: JsonMap | JsonMap[]
   }
 }
 
@@ -39,7 +41,11 @@ interface SearchBlocksQuery extends EsQuery {
  * @param {boolean} withSystemBlocks whether to include blocks that contain system extrinsics only
  * @returns {EsQuery} query object for ElasticSearch
  */
-const getBlocksQuery = (minTimestamp?: number, withSystemBlocks = true): EsQuery => {
+const getBlocksQuery = (
+  minTimestamp?: number,
+  withSystemBlocks = true,
+  systemOnly = false
+): EsQuery => {
   const query: SearchBlocksQuery = {
     bool: {
       must: []
@@ -55,6 +61,12 @@ const getBlocksQuery = (minTimestamp?: number, withSystemBlocks = true): EsQuery
       range: { noSignedTransactions: { gte: 1 } }
     })
   }
+
+  if (systemOnly) {
+    query.bool.must_not?.push({
+      range: { noSignedTransactions: { gte: 1 } }
+    })
+  }
   return query
 }
 
@@ -62,9 +74,10 @@ export const getBlocks = async (
   size = 50,
   from = 0,
   skipSystemBlocks = false,
+  systemOnly = false,
   sortCsv?: string
 ): Promise<SearchBlock[]> => {
-  const query = getBlocksQuery(undefined, !skipSystemBlocks)
+  const query = getBlocksQuery(undefined, !skipSystemBlocks, systemOnly)
   const sort: EsSortItem[] = []
 
   const defaultSort: EsSortItem = { height: EsSortDirection.Desc }
