@@ -40,6 +40,10 @@ export const isFailedSubQuery = (isFailed: boolean): EsQuery => ({
   match: { isSuccess: !isFailed }
 })
 
+export const systemOnlyQuery = (): EsQuery => ({
+  match: { isSigned: false }
+})
+
 interface BlockRangeQuery extends JsonMap {
   range: {
     blockHeight: {
@@ -117,6 +121,7 @@ const extrinsicDataQuery = (dataQuery: ExtrinsicDataQuery): JsonMap[] => {
 export const getExtrinsicsQuery = (
   minTimestamp?: number,
   isFailed?: boolean,
+  systemOnly?: boolean,
   dataQuery?: ExtrinsicDataQuery
 ): EsQuery => {
   const mustItems: JsonMap[] = []
@@ -125,7 +130,7 @@ export const getExtrinsicsQuery = (
 
   const filters: AnyJson[] = []
   if (isFailed !== undefined) filters.push(isFailedSubQuery(isFailed))
-
+  if (systemOnly) filters.push(systemOnlyQuery())
   return {
     bool: {
       must: mustItems,
