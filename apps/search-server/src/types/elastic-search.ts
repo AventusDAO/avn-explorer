@@ -2,6 +2,7 @@ import { JsonMap } from './json'
 
 export type EsQuery = JsonMap
 export type EsAggregation = JsonMap
+export type EsSearchFields = string[]
 
 export type EsSortScriptItem = {
   _script: {
