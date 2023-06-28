@@ -13,7 +13,8 @@ router.get(
     const from = processIntegerParam(req.query.from, 'from')
     const sort = processStringParam(req.query.sort, 'sort')
     const skipSystemBlocks = processBooleanParam(req.query.skipSystemBlocks, 'skipSystemBlocks')
-    const data = await getBlocks(size, from, skipSystemBlocks, sort)
+    const systemOnly = processBooleanParam(req.query.systemOnly, 'systemOnly')
+    const data = await getBlocks(size, from, skipSystemBlocks, systemOnly, sort)
     const response: DataResponse<SearchBlock[]> = {
       data
     }
