@@ -1,7 +1,11 @@
 {
   "outDir": "../src/types/generated/parachain-dev",
   "specVersions": "../../../packages/metadata/versions.avn-parachain.dev.jsonl",
-  "events": ["Balances.Transfer", "TokenManager.TokenTransferred"],
+  "events": [
+    "TokenManager.TokenLifted",
+    "TokenManager.TokenTransferred",
+    "TokenManager.TokenLowered"
+  ],
   "calls": [],
-  "storage": []
+  "storage": ["TokenManager.Balances", "NftManager.OwnedNfts", "Balances.Account"]
 }

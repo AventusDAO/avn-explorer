@@ -1,13 +1,12 @@
-type Transfer @entity {
+type TokenTransfer @entity {
   id: ID!
   blockNumber: Int! @index
   timestamp: DateTime! @index
   extrinsicHash: String @index
-  from: String @index
-  to: String @index
+  from: Account!
+  to: Account!
   amount: BigInt! @index
-  tokenName: String @index
-  tokenId: String! @index
+  token: Token!
   pallet: String! @index
   method: String! @index
 }
@@ -15,4 +14,16 @@ type Transfer @entity {
 type TokenLookup @entity {
   tokenId: String! @index
   tokenName: String! @index
+}
+
+type Account @entity {
+  id: ID!
+  tokens: [Token!]! @derivedFrom(field: "account")
+}
+
+type Token @entity {
+  id: ID!
+  account: Account!
+  name: String
+  transfers: [TokenTransfer!]! @derivedFrom(field: "token")
 }

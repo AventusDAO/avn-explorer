@@ -1,7 +1,12 @@
 {
   "outDir": "../src/types/generated/parachain-testnet",
   "specVersions": "../../../packages/metadata/versions.avn-parachain.testnet.jsonl",
-  "events": ["Balances.Transfer", "TokenManager.TokenTransferred"],
+  "events": [
+    "Balances.Transfer",
+    "TokenManager.TokenLifted",
+    "TokenManager.TokenTransferred",
+    "TokenManager.TokenLowered"
+  ],
   "calls": [],
-  "storage": []
+  "storage": ["TokenManager.Balances", "Balances.Account"]
 }
