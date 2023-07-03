@@ -1,6 +1,5 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, ManyToOne as ManyToOne_, Index as Index_, OneToMany as OneToMany_} from "typeorm"
-import {Account} from "./account.model"
-import {TokenTransfer} from "./tokenTransfer.model"
+import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, OneToMany as OneToMany_} from "typeorm"
+import {AccountToken} from "./accountToken.model"
 
 @Entity_()
 export class Token {
@@ -11,13 +10,9 @@ export class Token {
   @PrimaryColumn_()
   id!: string
 
-  @Index_()
-  @ManyToOne_(() => Account, {nullable: true})
-  account!: Account
+  @OneToMany_(() => AccountToken, e => e.token)
+  accounts!: Promise<AccountToken[]>
 
   @Column_("text", {nullable: true})
   name!: string | undefined | null
-
-  @OneToMany_(() => TokenTransfer, e => e.token)
-  transfers!: TokenTransfer[]
 }

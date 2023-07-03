@@ -1,3 +1,21 @@
+type Account @entity {
+  id: ID!
+  tokens: [AccountToken!]! @derivedFrom(field: "account")
+}
+
+type AccountToken @entity {
+  id: ID!
+  account: Account
+  token: Token
+  balance: BigInt! @index
+}
+
+type Token @entity {
+  id: ID!
+  accounts: [AccountToken!]! @derivedFrom(field: "token")
+  name: String
+}
+
 type TokenTransfer @entity {
   id: ID!
   blockNumber: Int! @index
@@ -14,16 +32,4 @@ type TokenTransfer @entity {
 type TokenLookup @entity {
   tokenId: String! @index
   tokenName: String! @index
-}
-
-type Account @entity {
-  id: ID!
-  tokens: [Token!]! @derivedFrom(field: "account")
-}
-
-type Token @entity {
-  id: ID!
-  account: Account!
-  name: String
-  transfers: [TokenTransfer!]! @derivedFrom(field: "token")
 }

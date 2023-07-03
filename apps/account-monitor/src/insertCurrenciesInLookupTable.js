@@ -1,4 +1,4 @@
-// @ts-ignore next-line
+// @ts-expect-error @ts-ignore next-line
 import { Client } from 'pg'
 import { ApiPromise, WsProvider } from '@polkadot/api'
 

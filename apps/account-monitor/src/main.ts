@@ -2,30 +2,33 @@ import {
   BatchContext,
   BatchProcessorItem,
   SubstrateBlock,
-  toHex
+  toHex,
+  decodeHex
 } from '@subsquid/substrate-processor'
 import { encodeId } from '@avn/utils'
 import { EventItem } from '@subsquid/substrate-processor/lib/interfaces/dataSelection'
 import { Store, TypeormDatabase } from '@subsquid/typeorm-store'
-import { TokenTransfer, TokenLookup, Account, Token } from './model'
+import { TokenTransfer, TokenLookup, Account, Token, AccountToken } from './model'
 import {
   BalancesTransferEvent,
   TokenManagerTokenLiftedEvent,
   TokenManagerTokenLoweredEvent,
   TokenManagerTokenTransferredEvent
 } from './types/generated/parachain-testnet/events'
+import { TokenManagerBalancesStorage } from './types/generated/parachain-testnet/storage'
 import processor from './processor'
+import { Block } from './types/generated/parachain-testnet/support'
 
 interface TransferEventData {
   id: string
   blockNumber: number
   timestamp: Date
   extrinsicHash?: string
-  from: string
+  from: string | undefined
   to: string
   amount: bigint
   tokenName: string | undefined
-  tokenId: string | undefined
+  tokenId: string
   pallet: string
   method: string
 }
@@ -59,7 +62,7 @@ async function createTokenLookupMap(ctx: Ctx): Promise<Map<any, any>> {
 }
 
 async function getTokenLookupData(ctx: Ctx) {
-  return ctx.store.find(TokenLookup, { where: {} })
+  return await ctx.store.find(TokenLookup, { where: {} })
 }
 
 let tokenLookupMap: Map<string, string> | null = null
@@ -70,91 +73,122 @@ async function processEvents(ctx: Ctx) {
   }
 
   const avtHash = getKeyByValue(tokenLookupMap, 'AVT')
-  const transfersData: TransferEventData[] = await getTransfers(ctx, tokenLookupMap, avtHash)
+  const { accounts, tokens, accountTokens, transfers } = await getTransfers(
+    ctx,
+    tokenLookupMap,
+    avtHash
+  )
 
-  const accounts: Map<string, Account> = createAccounts(transfersData)
-  const tokens: Map<string, Token> = createTokens(transfersData, accounts)
-  const transfers: TokenTransfer[] = createTransfers(transfersData, accounts, tokens)
-
-  await upsertEntities(ctx, accounts)
-  await upsertEntities(ctx, tokens)
+  await ctx.store.save([...tokens.values()])
+  await ctx.store.save([...accounts.values()])
+  await ctx.store.save([...accountTokens.values()])
   await ctx.store.insert(transfers)
 }
 
-async function upsertEntities<T extends { id: string }>(
-  ctx: Ctx,
-  entities: Map<string, T>
-): Promise<void> {
-  for (const [id, entity] of entities.entries()) {
-    let storedEntity = await ctx.store.get(entity.constructor as any, { where: { id } })
-
-    if (!storedEntity) {
-      await ctx.store.save(entity)
-    } else {
-      storedEntity = Object.assign(storedEntity, entity)
-      await ctx.store.save(storedEntity)
-    }
-  }
-}
-
-function createAccounts(transfers: TransferEventData[]): Map<string, Account> {
-  const accounts: Map<string, Account> = new Map()
-  for (let t of transfers) {
-    accounts.set(t.from, new Account({ id: t.from }))
-    accounts.set(t.to, new Account({ id: t.to }))
-  }
-  return accounts
-}
-
-function createTokens(
-  transfers: TransferEventData[],
-  accounts: Map<string, Account>
-): Map<string, Token> {
-  const tokenMap = new Map<string, Token>()
-
-  for (const transfer of transfers) {
-    if (transfer.tokenId && !tokenMap.has(transfer.tokenId)) {
-      let tokenAccount = accounts.get(transfer.to)
-      tokenMap.set(
-        transfer.tokenId,
-        new Token({ id: transfer.tokenId, name: transfer.tokenName, account: tokenAccount })
+function mapAccountEntities(data: TransferEventData[], accounts: Map<string, Account>) {
+  for (const item of data) {
+    if (item.from && item.to) {
+      accounts.set(
+        item.from,
+        new Account({
+          id: item.from
+        })
+      )
+      accounts.set(
+        item.to,
+        new Account({
+          id: item.to
+        })
       )
     }
   }
+}
 
-  return tokenMap
+function mapTokenEntities(data: TransferEventData[], tokens: Map<string, Token>) {
+  for (const item of data) {
+    if (item.tokenId && item.tokenName) {
+      tokens.set(
+        item.tokenId,
+        new Token({
+          id: item.tokenId,
+          name: item.tokenName
+        })
+      )
+    }
+  }
+}
+
+async function mapAccountTokenEntities(
+  ctx: Ctx,
+  block: Block,
+  data: TransferEventData[],
+  accountTokens: Map<string, AccountToken>
+) {
+  for (const item of data) {
+    if (item.to && item.tokenId) {
+      // const tokenManagerBalance = new TokenManagerBalancesStorage(ctx, block)
+      // const tokenBalance = await tokenManagerBalance.getAsV4([item.to, item.tokenId])
+      accountTokens.set(
+        `${item.to}-${item.tokenId}`,
+        new AccountToken({
+          accountId: item.to,
+          tokenId: item.tokenId
+          // balance: tokenBalance
+        })
+      )
+    }
+  }
 }
 
 function createTransfers(
   transfers: TransferEventData[],
+  tokenTransfers: TokenTransfer[],
   accounts: Map<string, Account>,
   tokens: Map<string, Token>
-): TokenTransfer[] {
-  return transfers.map(transfer => {
-    return new TokenTransfer({
-      id: transfer.id,
-      blockNumber: transfer.blockNumber,
-      timestamp: transfer.timestamp,
-      extrinsicHash: transfer.extrinsicHash,
-      from: accounts.get(transfer.from),
-      to: accounts.get(transfer.to),
-      amount: transfer.amount,
-      token: tokens.get(transfer.tokenId ?? ''),
-      pallet: transfer.pallet,
-      method: transfer.method
-    })
+): void {
+  transfers.forEach(transfer => {
+    tokenTransfers.push(
+      new TokenTransfer({
+        blockNumber: transfer.blockNumber,
+        timestamp: transfer.timestamp,
+        extrinsicHash: transfer.extrinsicHash,
+        from: accounts.get(transfer.from ?? ''),
+        to: accounts.get(transfer.to),
+        amount: transfer.amount,
+        token: tokens.get(transfer.tokenId ?? ''),
+        pallet: transfer.pallet,
+        method: transfer.method
+      })
+    )
   })
 }
-async function getTransfers(ctx: Ctx, tokenLookupMap: Map<string, string>, avtHash: string) {
+async function getTransfers(
+  ctx: Ctx,
+  tokenLookupMap: Map<string, string>,
+  avtHash: string
+): Promise<{
+  accounts: Map<string, Account>
+  tokens: Map<string, Token>
+  accountTokens: Map<string, AccountToken>
+  transfers: TokenTransfer[]
+}> {
   const transfersData: TransferEventData[] = []
+  const accounts: Map<string, Account> = new Map()
+  const tokens: Map<string, Token> = new Map()
+  const accountTokens: Map<string, AccountToken> = new Map()
+  const transfers: TokenTransfer[] = []
   for (const block of ctx.blocks) {
     for (const item of block.items) {
       transfersData.push(
         handleTransfer(ctx, block.header, item as TransfersEventItem, tokenLookupMap, avtHash)
       )
+      await mapAccountEntities(transfersData, accounts)
+      await mapTokenEntities(transfersData, tokens)
+      await mapAccountTokenEntities(ctx, block.header, transfersData, accountTokens)
+      createTransfers(transfersData, transfers, accounts, tokens)
     }
   }
-  return transfersData
+  return { accounts, tokens, accountTokens, transfers }
 }
 
 function getEvent(ctx: Ctx, item: TransfersEventItem, avtHash: string) {
@@ -201,7 +235,7 @@ function handleTransfer(
   }
 }
 
-function handleTokenId(tokenId: string | Uint8Array) {
+function handleTokenId(tokenId: Uint8Array) {
   if (typeof tokenId === 'string') {
     return tokenId
   } else {
@@ -222,13 +256,13 @@ function normalizeBalancesTransferEvent(
   ctx: Ctx,
   item: EventItem<'Balances.Transfer', { event: { args: true } }>,
   avtHash: string
-): { from: Uint8Array; to: Uint8Array; amount: bigint; tokenId: string } {
+): { from: Uint8Array; to: Uint8Array; amount: bigint; tokenId: Uint8Array } {
   const e = new BalancesTransferEvent(ctx, item.event)
   if (e.isV4) {
     const { from, to, amount } = e.asV4
-    return { from, to, amount, tokenId: avtHash }
+    return { from, to, amount, tokenId: decodeHex(avtHash) }
   } else {
-    throw new UknownVersionError()
+    throw new UnknownVersionError()
   }
 }
 
@@ -241,38 +275,48 @@ function normalizeTokenTransferEvent(
     const { sender, recipient, tokenBalance, tokenId } = e.asV4
     return { from: sender, to: recipient, amount: tokenBalance, tokenId }
   } else {
-    throw new UknownVersionError()
+    throw new UnknownVersionError()
   }
 }
 
 function normalizeTokenLiftedEvent(
   ctx: Ctx,
   item: EventItem<'TokenManager.TokenLifted', { event: { args: true } }>
-) {
+): {
+  from: undefined
+  to: Uint8Array
+  amount: bigint
+  tokenId: Uint8Array
+} {
   const e = new TokenManagerTokenLiftedEvent(ctx, item.event)
   if (e.isV4) {
     const { tokenId, recipient, tokenBalance, ethTxHash } = e.asV4
     return { from: undefined, to: recipient, amount: tokenBalance, tokenId }
   } else {
-    throw new UknownVersionError()
+    throw new UnknownVersionError()
   }
 }
 function normalizeTokenLoweredEvent(
   ctx: Ctx,
   item: EventItem<'TokenManager.TokenLowered', { event: { args: true } }>
-) {
+): {
+  from: Uint8Array
+  to: Uint8Array
+  amount: bigint
+  tokenId: Uint8Array
+} {
   const e = new TokenManagerTokenLoweredEvent(ctx, item.event)
   if (e.isV4) {
     const { tokenId, recipient, sender, amount, t1Recipient } = e.asV4
     return { from: sender, to: recipient, amount, tokenId }
   } else {
-    throw new UknownVersionError()
+    throw new UnknownVersionError()
   }
 }
 
-class UknownVersionError extends Error {
+class UnknownVersionError extends Error {
   constructor() {
-    super('Uknown verson')
+    super('Unknown version')
   }
 }
 

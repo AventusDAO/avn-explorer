@@ -1,5 +1,5 @@
 import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, OneToMany as OneToMany_} from "typeorm"
-import {Token} from "./token.model"
+import {AccountToken} from "./accountToken.model"
 
 @Entity_()
 export class Account {
@@ -10,6 +10,6 @@ export class Account {
   @PrimaryColumn_()
   id!: string
 
-  @OneToMany_(() => Token, e => e.account)
-  tokens!: Token[]
+  @OneToMany_(() => AccountToken, e => e.account)
+  tokens!: Promise<AccountToken[]>
 }
