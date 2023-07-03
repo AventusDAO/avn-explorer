@@ -1,0 +1,37 @@
+name: Build Account Moinitor
+
+on:
+  workflow_dispatch:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    branches:
+      - main
+    paths:
+      - 'apps/account-monitor/**'
+      - 'packages/types/**'
+      - 'packages/config/**'
+      - 'packages/utils/**'
+      - 'packages/metadata/**'
+  push:
+    branches:
+      - main
+    paths:
+      - 'apps/account-monitor/**'
+      - 'packages/types/**'
+      - 'packages/config/**'
+      - 'packages/utils/**'
+      - 'packages/metadata/**'
+
+jobs:
+  avn-docker-build:
+    name: AvN Explorer Account Moinitor
+    uses: ./.github/workflows/docker-build.yml
+    with:
+      short_image_name: account-monitor
+      ecr_repository_prefix: avn-explorer
+      aws_region: eu-west-2
+      aws_account_id: 189013141504
+      dockerfile: apps/account-monitor/Dockerfile
+    secrets:
+      aws_access_key: ${{ secrets.TESTNET_AWS_ACCESS_KEY_ID }}
+      aws_secret_key: ${{ secrets.TESTNET_AWS_SECRET_ACCESS_KEY }}
