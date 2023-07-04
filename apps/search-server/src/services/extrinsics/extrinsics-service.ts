@@ -42,7 +42,7 @@ export const getExtrinsics = async (
   sortCsv?: string,
   address?: string,
   isFailed?: boolean,
-  systemOnly?: boolean,
+  signedOnly?: boolean,
   dataQuery?: ExtrinsicDataQuery
 ): Promise<SearchExtrinsic[]> => {
   let query: EsQuery
@@ -67,7 +67,7 @@ export const getExtrinsics = async (
       }
     }
   } else {
-    query = getExtrinsicsQuery(undefined, isFailed, systemOnly, dataQuery)
+    query = getExtrinsicsQuery(undefined, isFailed, signedOnly, dataQuery)
   }
 
   const sort: EsSortItem[] = []

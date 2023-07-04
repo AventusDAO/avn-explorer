@@ -12,9 +12,8 @@ router.get(
     const size = processIntegerParam(req.query.size, 'size')
     const from = processIntegerParam(req.query.from, 'from')
     const sort = processStringParam(req.query.sort, 'sort')
-    const skipSystemBlocks = processBooleanParam(req.query.skipSystemBlocks, 'skipSystemBlocks')
-    const systemOnly = processBooleanParam(req.query.systemOnly, 'systemOnly')
-    const data = await getBlocks(size, from, skipSystemBlocks, systemOnly, sort)
+    const signedOnly = processBooleanParam(req.query.signedOnly, 'signedOnly')
+    const data = await getBlocks(size, from, signedOnly, sort)
     const response: DataResponse<SearchBlock[]> = {
       data
     }
