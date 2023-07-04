@@ -4,16 +4,16 @@ import { getLogger } from '../utils/logger'
 import {
   EsQuery,
   EsRequestPayload,
-  EsResponse,
   EsSearchFields,
   EsSortDirection,
   EsSortItem,
-  JsonMap
+  JsonMap,
+  SearchBlock,
+  SearchExtrinsic
 } from '../types'
 import { ApiError, avnHashRegex, isAxiosError } from '../utils'
-import { sanitizeElasticSearchResponse } from '../utils/sanitizer'
 import { elasticSearch } from './elastic-search'
-import { encodeAccountHex } from './user-service'
+import { SearchResultBlock, SearchResultExtrinsic } from '@avn/types/src/search'
 
 const logger = getLogger('search-controller')
 
@@ -23,8 +23,7 @@ const defaultSort: EsSortItem = { timestamp: EsSortDirection.Desc }
  * Predefined search fields used for search so far
  */
 const searchFields: Record<string, EsSearchFields> = {
-  address: ['transaction.to', 'transaction.from', 'events.__dataSearch'],
-  hash: ['hash', 'rootHash', 'events.__dataSearch']
+  hash: ['hash']
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -44,24 +43,33 @@ export const searchForHexAddress = async (value: string) => {
   if (isHash) return await searchForHash(value)
 }
 
-export const searchForHash = async (value: string): Promise<EsResponse<JsonMap>> => {
+export const searchForHash = async (
+  value: string
+): Promise<Array<SearchResultBlock | SearchResultExtrinsic>> => {
   const size = 1
-  // note: user can enter decoded `0x...` value or the encoded ss58 string representation but in ES the address in in ss58 string rep
-  // - if `value` is in hex, `ss58Value` is in ss58
-  // - if `value` is in ss58, `ss58Value` still will be in ss58
-  const ss58Value = encodeAccountHex(value)
-  const query = getMultiSearchHashQuery([value, ss58Value])
+  const query = getMultiSearchHashQuery([value])
   const payload: EsRequestPayload = { size, query, sort: [defaultSort] }
   const path = `${config.db.blocksIndex},${config.db.extrinsicsIndex}/_search`
 
   try {
-    const response = await elasticSearch.post<JsonMap>(path, payload)
-    const data = sanitizeElasticSearchResponse(response.data)
-    const hits = data.hits.hits
-    // note: replace `ss58Value` with the search value to return to user values that are in the same format he used in search
-    const jsonHits = JSON.stringify(hits)
-    data.hits.hits = JSON.parse(jsonHits.replaceAll(ss58Value, value))
-    return data as EsResponse<JsonMap>
+    const { data } = await elasticSearch.post<JsonMap>(path, payload)
+    const items = data.hits.hits.map(hit => {
+      const isBlock = hit._index === config.db.blocksIndex
+      const isExtrinsic = hit._index === config.db.extrinsicsIndex
+
+      if (isBlock) {
+        return {
+          type: 'block' as 'block',
+          ...(hit._source as unknown as SearchBlock)
+        }
+      } else if (isExtrinsic) {
+        return {
+          type: 'extrinsic' as 'extrinsic',
+          ...(hit._source as unknown as SearchExtrinsic)
+        }
+      } else throw new Error('Search item index not found')
+    })
+    return items
   } catch (err) {
     throw processError(err)
   }

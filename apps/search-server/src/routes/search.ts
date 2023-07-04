@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { asyncCatch, requireStringParam } from '../utils'
-import { searchForHashAddress } from '../services/search-service'
+import { searchForHash } from '../services/search-service'
 
 const router = Router()
 router.get(
@@ -9,7 +9,7 @@ router.get(
   asyncCatch(async (req, res, _next) => {
     const q = requireStringParam(req.query.q, 'q')
 
-    const data = await searchForHashAddress(q)
+    const data = await searchForHash(q)
     res.status(200).json({
       data
     })
