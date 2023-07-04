@@ -1,4 +1,4 @@
-name: Build Account Moinitor
+name: Build Account Monitor
 
 on:
   workflow_dispatch:
@@ -24,7 +24,7 @@ on:
 
 jobs:
   avn-docker-build:
-    name: AvN Explorer Account Moinitor
+    name: AvN Explorer Account Monitor
     uses: ./.github/workflows/docker-build.yml
     with:
       short_image_name: account-monitor
