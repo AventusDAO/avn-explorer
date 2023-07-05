@@ -19,9 +19,9 @@ router.get(
     const blockHeightTo = processIntegerParam(req.query.blockHeightTo, 'blockHeightTo')
     const timestampStart = processIntegerParam(req.query.timestampStart, 'timestampStart')
     const timestampEnd = processIntegerParam(req.query.timestampEnd, 'timestampEnd')
-    const systemOnly = processBooleanParam(req.query.systemOnly, 'systemOnly')
+    const signedOnly = processBooleanParam(req.query.signedOnly, 'signedOnly')
 
-    const data = await getExtrinsics(size, from, sort, address, undefined, systemOnly, {
+    const data = await getExtrinsics(size, from, sort, address, undefined, signedOnly, {
       section,
       method,
       blockHeightFrom,

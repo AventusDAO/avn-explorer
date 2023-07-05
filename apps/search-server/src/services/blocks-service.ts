@@ -38,14 +38,10 @@ interface SearchBlocksQuery extends EsQuery {
 /**
  * Gets query for fetching blocks within given timestamp range
  * @param {number} minTimestamp optional min timestamp of the block
- * @param {boolean} withSystemBlocks whether to include blocks that contain system extrinsics only
+ * @param {boolean} signedOnly whether to return only blocks that contain at least one signed extrinsic
  * @returns {EsQuery} query object for ElasticSearch
  */
-const getBlocksQuery = (
-  minTimestamp?: number,
-  withSystemBlocks = true,
-  systemOnly = false
-): EsQuery => {
+const getBlocksQuery = (minTimestamp?: number, signedOnly?: boolean): EsQuery => {
   const query: SearchBlocksQuery = {
     bool: {
       must: []
@@ -56,28 +52,22 @@ const getBlocksQuery = (
       range: { timestamp: { gte: minTimestamp } }
     })
   }
-  if (!withSystemBlocks) {
+  if (signedOnly) {
     query.bool.must?.push({
       range: { noSignedTransactions: { gte: 1 } }
     })
   }
 
-  if (systemOnly) {
-    query.bool.must_not?.push({
-      range: { noSignedTransactions: { gte: 1 } }
-    })
-  }
   return query
 }
 
 export const getBlocks = async (
   size = 50,
   from = 0,
-  skipSystemBlocks = false,
-  systemOnly = false,
+  signedOnly = false,
   sortCsv?: string
 ): Promise<SearchBlock[]> => {
-  const query = getBlocksQuery(undefined, !skipSystemBlocks, systemOnly)
+  const query = getBlocksQuery(undefined, signedOnly)
   const sort: EsSortItem[] = []
 
   const defaultSort: EsSortItem = { height: EsSortDirection.Desc }
