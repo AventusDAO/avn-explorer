@@ -1,13 +1,30 @@
-type Transfer @entity {
+type Account @entity {
+  id: ID!
+  tokens: [AccountToken!]! @derivedFrom(field: "account")
+}
+
+type AccountToken @entity {
+  id: ID!
+  account: Account
+  token: Token
+  balance: BigInt! @index
+}
+
+type Token @entity {
+  id: ID!
+  accounts: [AccountToken!]! @derivedFrom(field: "token")
+  name: String
+}
+
+type TokenTransfer @entity {
   id: ID!
   blockNumber: Int! @index
   timestamp: DateTime! @index
   extrinsicHash: String @index
-  from: String @index
-  to: String @index
+  from: Account!
+  to: Account!
   amount: BigInt! @index
-  tokenName: String @index
-  tokenId: String! @index
+  token: Token!
   pallet: String! @index
   method: String! @index
 }
