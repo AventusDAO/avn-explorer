@@ -1,17 +1,14 @@
 import assert from 'assert'
-import { Block, Chain, ChainContext, BlockContext, Result, Option } from './support'
+import { Block, BlockContext, Chain, ChainContext, Option, Result, StorageBase } from './support'
 import * as v4 from './v4'
 
-export class BalancesAccountStorage {
-  private readonly _chain: Chain
-  private readonly blockHash: string
+export class BalancesAccountStorage extends StorageBase {
+  protected getPrefix() {
+    return 'Balances'
+  }
 
-  constructor(ctx: BlockContext)
-  constructor(ctx: ChainContext, block: Block)
-  constructor(ctx: BlockContext, block?: Block) {
-    block = block || ctx.block
-    this.blockHash = block.hash
-    this._chain = ctx._chain
+  protected getName() {
+    return 'Account'
   }
 
   /**
@@ -40,11 +37,8 @@ export class BalancesAccountStorage {
    *  `Balances` pallet, which uses a `StorageMap` to store balances data only.
    *  NOTE: This is only used in the case that this pallet is used to store balances.
    */
-  get isV4() {
-    return (
-      this._chain.getStorageItemTypeHash('Balances', 'Account') ===
-      '0b3b4bf0dd7388459eba461bc7c3226bf58608c941710a714e02f33ec0f91e78'
-    )
+  get isV4(): boolean {
+    return this.getTypeHash() === '0b3b4bf0dd7388459eba461bc7c3226bf58608c941710a714e02f33ec0f91e78'
   }
 
   /**
@@ -73,121 +67,128 @@ export class BalancesAccountStorage {
    *  `Balances` pallet, which uses a `StorageMap` to store balances data only.
    *  NOTE: This is only used in the case that this pallet is used to store balances.
    */
-  async getAsV4(key: Uint8Array): Promise<v4.AccountData> {
+  get asV4(): BalancesAccountStorageV4 {
     assert(this.isV4)
-    return this._chain.getStorage(this.blockHash, 'Balances', 'Account', key)
-  }
-
-  async getManyAsV4(keys: Uint8Array[]): Promise<v4.AccountData[]> {
-    assert(this.isV4)
-    return this._chain.queryStorage(
-      this.blockHash,
-      'Balances',
-      'Account',
-      keys.map(k => [k])
-    )
-  }
-
-  async getAllAsV4(): Promise<v4.AccountData[]> {
-    assert(this.isV4)
-    return this._chain.queryStorage(this.blockHash, 'Balances', 'Account')
-  }
-
-  /**
-   * Checks whether the storage item is defined for the current chain version.
-   */
-  get isExists(): boolean {
-    return this._chain.getStorageItemTypeHash('Balances', 'Account') != null
+    return this as any
   }
 }
 
-export class BalancesTotalIssuanceStorage {
-  private readonly _chain: Chain
-  private readonly blockHash: string
+/**
+ *  The Balances pallet example of storing the balance of an account.
+ * 
+ *  # Example
+ * 
+ *  ```nocompile
+ *   impl pallet_balances::Config for Runtime {
+ *     type AccountStore = StorageMapShim<Self::Account<Runtime>, frame_system::Provider<Runtime>, AccountId, Self::AccountData<Balance>>
+ *   }
+ *  ```
+ * 
+ *  You can also store the balance of an account in the `System` pallet.
+ * 
+ *  # Example
+ * 
+ *  ```nocompile
+ *   impl pallet_balances::Config for Runtime {
+ *    type AccountStore = System
+ *   }
+ *  ```
+ * 
+ *  But this comes with tradeoffs, storing account balances in the system pallet stores
+ *  `frame_system` data alongside the account data contrary to storing account balances in the
+ *  `Balances` pallet, which uses a `StorageMap` to store balances data only.
+ *  NOTE: This is only used in the case that this pallet is used to store balances.
+ */
+export interface BalancesAccountStorageV4 {
+  get(key: Uint8Array): Promise<v4.AccountData>
+  getAll(): Promise<v4.AccountData[]>
+  getMany(keys: Uint8Array[]): Promise<v4.AccountData[]>
+  getKeys(): Promise<Uint8Array[]>
+  getKeys(key: Uint8Array): Promise<Uint8Array[]>
+  getKeysPaged(pageSize: number): AsyncIterable<Uint8Array[]>
+  getKeysPaged(pageSize: number, key: Uint8Array): AsyncIterable<Uint8Array[]>
+  getPairs(): Promise<[k: Uint8Array, v: v4.AccountData][]>
+  getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: v4.AccountData][]>
+  getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: v4.AccountData][]>
+  getPairsPaged(
+    pageSize: number,
+    key: Uint8Array
+  ): AsyncIterable<[k: Uint8Array, v: v4.AccountData][]>
+}
 
-  constructor(ctx: BlockContext)
-  constructor(ctx: ChainContext, block: Block)
-  constructor(ctx: BlockContext, block?: Block) {
-    block = block || ctx.block
-    this.blockHash = block.hash
-    this._chain = ctx._chain
+export class BalancesTotalIssuanceStorage extends StorageBase {
+  protected getPrefix() {
+    return 'Balances'
+  }
+
+  protected getName() {
+    return 'TotalIssuance'
   }
 
   /**
    *  The total units issued in the system.
    */
-  get isV4() {
-    return (
-      this._chain.getStorageItemTypeHash('Balances', 'TotalIssuance') ===
-      'f8ebe28eb30158172c0ccf672f7747c46a244f892d08ef2ebcbaadde34a26bc0'
-    )
+  get isV4(): boolean {
+    return this.getTypeHash() === 'f8ebe28eb30158172c0ccf672f7747c46a244f892d08ef2ebcbaadde34a26bc0'
   }
 
   /**
    *  The total units issued in the system.
    */
-  async getAsV4(): Promise<bigint> {
+  get asV4(): BalancesTotalIssuanceStorageV4 {
     assert(this.isV4)
-    return this._chain.getStorage(this.blockHash, 'Balances', 'TotalIssuance')
-  }
-
-  /**
-   * Checks whether the storage item is defined for the current chain version.
-   */
-  get isExists(): boolean {
-    return this._chain.getStorageItemTypeHash('Balances', 'TotalIssuance') != null
+    return this as any
   }
 }
 
-export class SystemAccountStorage {
-  private readonly _chain: Chain
-  private readonly blockHash: string
+/**
+ *  The total units issued in the system.
+ */
+export interface BalancesTotalIssuanceStorageV4 {
+  get(): Promise<bigint>
+}
 
-  constructor(ctx: BlockContext)
-  constructor(ctx: ChainContext, block: Block)
-  constructor(ctx: BlockContext, block?: Block) {
-    block = block || ctx.block
-    this.blockHash = block.hash
-    this._chain = ctx._chain
+export class SystemAccountStorage extends StorageBase {
+  protected getPrefix() {
+    return 'System'
+  }
+
+  protected getName() {
+    return 'Account'
   }
 
   /**
    *  The full account information for a particular account ID.
    */
-  get isV4() {
-    return (
-      this._chain.getStorageItemTypeHash('System', 'Account') ===
-      '1ddc7ade926221442c388ee4405a71c9428e548fab037445aaf4b3a78f4735c1'
-    )
+  get isV4(): boolean {
+    return this.getTypeHash() === '1ddc7ade926221442c388ee4405a71c9428e548fab037445aaf4b3a78f4735c1'
   }
 
   /**
    *  The full account information for a particular account ID.
    */
-  async getAsV4(key: Uint8Array): Promise<v4.AccountInfo> {
+  get asV4(): SystemAccountStorageV4 {
     assert(this.isV4)
-    return this._chain.getStorage(this.blockHash, 'System', 'Account', key)
+    return this as any
   }
+}
 
-  async getManyAsV4(keys: Uint8Array[]): Promise<v4.AccountInfo[]> {
-    assert(this.isV4)
-    return this._chain.queryStorage(
-      this.blockHash,
-      'System',
-      'Account',
-      keys.map(k => [k])
-    )
-  }
-
-  async getAllAsV4(): Promise<v4.AccountInfo[]> {
-    assert(this.isV4)
-    return this._chain.queryStorage(this.blockHash, 'System', 'Account')
-  }
-
-  /**
-   * Checks whether the storage item is defined for the current chain version.
-   */
-  get isExists(): boolean {
-    return this._chain.getStorageItemTypeHash('System', 'Account') != null
-  }
+/**
+ *  The full account information for a particular account ID.
+ */
+export interface SystemAccountStorageV4 {
+  get(key: Uint8Array): Promise<v4.AccountInfo>
+  getAll(): Promise<v4.AccountInfo[]>
+  getMany(keys: Uint8Array[]): Promise<v4.AccountInfo[]>
+  getKeys(): Promise<Uint8Array[]>
+  getKeys(key: Uint8Array): Promise<Uint8Array[]>
+  getKeysPaged(pageSize: number): AsyncIterable<Uint8Array[]>
+  getKeysPaged(pageSize: number, key: Uint8Array): AsyncIterable<Uint8Array[]>
+  getPairs(): Promise<[k: Uint8Array, v: v4.AccountInfo][]>
+  getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: v4.AccountInfo][]>
+  getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: v4.AccountInfo][]>
+  getPairsPaged(
+    pageSize: number,
+    key: Uint8Array
+  ): AsyncIterable<[k: Uint8Array, v: v4.AccountInfo][]>
 }
