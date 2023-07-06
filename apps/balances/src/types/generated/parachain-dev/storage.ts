@@ -1,174 +1,194 @@
 import assert from 'assert'
-import {Block, Chain, ChainContext, BlockContext, Result, Option} from './support'
+import { Block, BlockContext, Chain, ChainContext, Option, Result, StorageBase } from './support'
 import * as v21 from './v21'
 
-export class BalancesAccountStorage {
-    private readonly _chain: Chain
-    private readonly blockHash: string
+export class BalancesAccountStorage extends StorageBase {
+  protected getPrefix() {
+    return 'Balances'
+  }
 
-    constructor(ctx: BlockContext)
-    constructor(ctx: ChainContext, block: Block)
-    constructor(ctx: BlockContext, block?: Block) {
-        block = block || ctx.block
-        this.blockHash = block.hash
-        this._chain = ctx._chain
-    }
+  protected getName() {
+    return 'Account'
+  }
 
-    /**
-     *  The Balances pallet example of storing the balance of an account.
-     * 
-     *  # Example
-     * 
-     *  ```nocompile
-     *   impl pallet_balances::Config for Runtime {
-     *     type AccountStore = StorageMapShim<Self::Account<Runtime>, frame_system::Provider<Runtime>, AccountId, Self::AccountData<Balance>>
-     *   }
-     *  ```
-     * 
-     *  You can also store the balance of an account in the `System` pallet.
-     * 
-     *  # Example
-     * 
-     *  ```nocompile
-     *   impl pallet_balances::Config for Runtime {
-     *    type AccountStore = System
-     *   }
-     *  ```
-     * 
-     *  But this comes with tradeoffs, storing account balances in the system pallet stores
-     *  `frame_system` data alongside the account data contrary to storing account balances in the
-     *  `Balances` pallet, which uses a `StorageMap` to store balances data only.
-     *  NOTE: This is only used in the case that this pallet is used to store balances.
-     */
-    get isV21() {
-        return this._chain.getStorageItemTypeHash('Balances', 'Account') === '0b3b4bf0dd7388459eba461bc7c3226bf58608c941710a714e02f33ec0f91e78'
-    }
+  /**
+   *  The Balances pallet example of storing the balance of an account.
+   *
+   *  # Example
+   *
+   *  ```nocompile
+   *   impl pallet_balances::Config for Runtime {
+   *     type AccountStore = StorageMapShim<Self::Account<Runtime>, frame_system::Provider<Runtime>, AccountId, Self::AccountData<Balance>>
+   *   }
+   *  ```
+   *
+   *  You can also store the balance of an account in the `System` pallet.
+   *
+   *  # Example
+   *
+   *  ```nocompile
+   *   impl pallet_balances::Config for Runtime {
+   *    type AccountStore = System
+   *   }
+   *  ```
+   *
+   *  But this comes with tradeoffs, storing account balances in the system pallet stores
+   *  `frame_system` data alongside the account data contrary to storing account balances in the
+   *  `Balances` pallet, which uses a `StorageMap` to store balances data only.
+   *  NOTE: This is only used in the case that this pallet is used to store balances.
+   */
+  get isV21(): boolean {
+    return this.getTypeHash() === '0b3b4bf0dd7388459eba461bc7c3226bf58608c941710a714e02f33ec0f91e78'
+  }
 
-    /**
-     *  The Balances pallet example of storing the balance of an account.
-     * 
-     *  # Example
-     * 
-     *  ```nocompile
-     *   impl pallet_balances::Config for Runtime {
-     *     type AccountStore = StorageMapShim<Self::Account<Runtime>, frame_system::Provider<Runtime>, AccountId, Self::AccountData<Balance>>
-     *   }
-     *  ```
-     * 
-     *  You can also store the balance of an account in the `System` pallet.
-     * 
-     *  # Example
-     * 
-     *  ```nocompile
-     *   impl pallet_balances::Config for Runtime {
-     *    type AccountStore = System
-     *   }
-     *  ```
-     * 
-     *  But this comes with tradeoffs, storing account balances in the system pallet stores
-     *  `frame_system` data alongside the account data contrary to storing account balances in the
-     *  `Balances` pallet, which uses a `StorageMap` to store balances data only.
-     *  NOTE: This is only used in the case that this pallet is used to store balances.
-     */
-    async getAsV21(key: Uint8Array): Promise<v21.AccountData> {
-        assert(this.isV21)
-        return this._chain.getStorage(this.blockHash, 'Balances', 'Account', key)
-    }
-
-    async getManyAsV21(keys: Uint8Array[]): Promise<(v21.AccountData)[]> {
-        assert(this.isV21)
-        return this._chain.queryStorage(this.blockHash, 'Balances', 'Account', keys.map(k => [k]))
-    }
-
-    async getAllAsV21(): Promise<(v21.AccountData)[]> {
-        assert(this.isV21)
-        return this._chain.queryStorage(this.blockHash, 'Balances', 'Account')
-    }
-
-    /**
-     * Checks whether the storage item is defined for the current chain version.
-     */
-    get isExists(): boolean {
-        return this._chain.getStorageItemTypeHash('Balances', 'Account') != null
-    }
+  /**
+   *  The Balances pallet example of storing the balance of an account.
+   *
+   *  # Example
+   *
+   *  ```nocompile
+   *   impl pallet_balances::Config for Runtime {
+   *     type AccountStore = StorageMapShim<Self::Account<Runtime>, frame_system::Provider<Runtime>, AccountId, Self::AccountData<Balance>>
+   *   }
+   *  ```
+   *
+   *  You can also store the balance of an account in the `System` pallet.
+   *
+   *  # Example
+   *
+   *  ```nocompile
+   *   impl pallet_balances::Config for Runtime {
+   *    type AccountStore = System
+   *   }
+   *  ```
+   *
+   *  But this comes with tradeoffs, storing account balances in the system pallet stores
+   *  `frame_system` data alongside the account data contrary to storing account balances in the
+   *  `Balances` pallet, which uses a `StorageMap` to store balances data only.
+   *  NOTE: This is only used in the case that this pallet is used to store balances.
+   */
+  get asV21(): BalancesAccountStorageV21 {
+    assert(this.isV21)
+    return this as any
+  }
 }
 
-export class BalancesTotalIssuanceStorage {
-    private readonly _chain: Chain
-    private readonly blockHash: string
-
-    constructor(ctx: BlockContext)
-    constructor(ctx: ChainContext, block: Block)
-    constructor(ctx: BlockContext, block?: Block) {
-        block = block || ctx.block
-        this.blockHash = block.hash
-        this._chain = ctx._chain
-    }
-
-    /**
-     *  The total units issued in the system.
-     */
-    get isV21() {
-        return this._chain.getStorageItemTypeHash('Balances', 'TotalIssuance') === 'f8ebe28eb30158172c0ccf672f7747c46a244f892d08ef2ebcbaadde34a26bc0'
-    }
-
-    /**
-     *  The total units issued in the system.
-     */
-    async getAsV21(): Promise<bigint> {
-        assert(this.isV21)
-        return this._chain.getStorage(this.blockHash, 'Balances', 'TotalIssuance')
-    }
-
-    /**
-     * Checks whether the storage item is defined for the current chain version.
-     */
-    get isExists(): boolean {
-        return this._chain.getStorageItemTypeHash('Balances', 'TotalIssuance') != null
-    }
+/**
+ *  The Balances pallet example of storing the balance of an account.
+ * 
+ *  # Example
+ * 
+ *  ```nocompile
+ *   impl pallet_balances::Config for Runtime {
+ *     type AccountStore = StorageMapShim<Self::Account<Runtime>, frame_system::Provider<Runtime>, AccountId, Self::AccountData<Balance>>
+ *   }
+ *  ```
+ * 
+ *  You can also store the balance of an account in the `System` pallet.
+ * 
+ *  # Example
+ * 
+ *  ```nocompile
+ *   impl pallet_balances::Config for Runtime {
+ *    type AccountStore = System
+ *   }
+ *  ```
+ * 
+ *  But this comes with tradeoffs, storing account balances in the system pallet stores
+ *  `frame_system` data alongside the account data contrary to storing account balances in the
+ *  `Balances` pallet, which uses a `StorageMap` to store balances data only.
+ *  NOTE: This is only used in the case that this pallet is used to store balances.
+ */
+export interface BalancesAccountStorageV21 {
+  get(key: Uint8Array): Promise<v21.AccountData>
+  getAll(): Promise<v21.AccountData[]>
+  getMany(keys: Uint8Array[]): Promise<v21.AccountData[]>
+  getKeys(): Promise<Uint8Array[]>
+  getKeys(key: Uint8Array): Promise<Uint8Array[]>
+  getKeysPaged(pageSize: number): AsyncIterable<Uint8Array[]>
+  getKeysPaged(pageSize: number, key: Uint8Array): AsyncIterable<Uint8Array[]>
+  getPairs(): Promise<[k: Uint8Array, v: v21.AccountData][]>
+  getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: v21.AccountData][]>
+  getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: v21.AccountData][]>
+  getPairsPaged(
+    pageSize: number,
+    key: Uint8Array
+  ): AsyncIterable<[k: Uint8Array, v: v21.AccountData][]>
 }
 
-export class SystemAccountStorage {
-    private readonly _chain: Chain
-    private readonly blockHash: string
+export class BalancesTotalIssuanceStorage extends StorageBase {
+  protected getPrefix() {
+    return 'Balances'
+  }
 
-    constructor(ctx: BlockContext)
-    constructor(ctx: ChainContext, block: Block)
-    constructor(ctx: BlockContext, block?: Block) {
-        block = block || ctx.block
-        this.blockHash = block.hash
-        this._chain = ctx._chain
-    }
+  protected getName() {
+    return 'TotalIssuance'
+  }
 
-    /**
-     *  The full account information for a particular account ID.
-     */
-    get isV21() {
-        return this._chain.getStorageItemTypeHash('System', 'Account') === '1ddc7ade926221442c388ee4405a71c9428e548fab037445aaf4b3a78f4735c1'
-    }
+  /**
+   *  The total units issued in the system.
+   */
+  get isV21(): boolean {
+    return this.getTypeHash() === 'f8ebe28eb30158172c0ccf672f7747c46a244f892d08ef2ebcbaadde34a26bc0'
+  }
 
-    /**
-     *  The full account information for a particular account ID.
-     */
-    async getAsV21(key: Uint8Array): Promise<v21.AccountInfo> {
-        assert(this.isV21)
-        return this._chain.getStorage(this.blockHash, 'System', 'Account', key)
-    }
+  /**
+   *  The total units issued in the system.
+   */
+  get asV21(): BalancesTotalIssuanceStorageV21 {
+    assert(this.isV21)
+    return this as any
+  }
+}
 
-    async getManyAsV21(keys: Uint8Array[]): Promise<(v21.AccountInfo)[]> {
-        assert(this.isV21)
-        return this._chain.queryStorage(this.blockHash, 'System', 'Account', keys.map(k => [k]))
-    }
+/**
+ *  The total units issued in the system.
+ */
+export interface BalancesTotalIssuanceStorageV21 {
+  get(): Promise<bigint>
+}
 
-    async getAllAsV21(): Promise<(v21.AccountInfo)[]> {
-        assert(this.isV21)
-        return this._chain.queryStorage(this.blockHash, 'System', 'Account')
-    }
+export class SystemAccountStorage extends StorageBase {
+  protected getPrefix() {
+    return 'System'
+  }
 
-    /**
-     * Checks whether the storage item is defined for the current chain version.
-     */
-    get isExists(): boolean {
-        return this._chain.getStorageItemTypeHash('System', 'Account') != null
-    }
+  protected getName() {
+    return 'Account'
+  }
+
+  /**
+   *  The full account information for a particular account ID.
+   */
+  get isV21(): boolean {
+    return this.getTypeHash() === '1ddc7ade926221442c388ee4405a71c9428e548fab037445aaf4b3a78f4735c1'
+  }
+
+  /**
+   *  The full account information for a particular account ID.
+   */
+  get asV21(): SystemAccountStorageV21 {
+    assert(this.isV21)
+    return this as any
+  }
+}
+
+/**
+ *  The full account information for a particular account ID.
+ */
+export interface SystemAccountStorageV21 {
+  get(key: Uint8Array): Promise<v21.AccountInfo>
+  getAll(): Promise<v21.AccountInfo[]>
+  getMany(keys: Uint8Array[]): Promise<v21.AccountInfo[]>
+  getKeys(): Promise<Uint8Array[]>
+  getKeys(key: Uint8Array): Promise<Uint8Array[]>
+  getKeysPaged(pageSize: number): AsyncIterable<Uint8Array[]>
+  getKeysPaged(pageSize: number, key: Uint8Array): AsyncIterable<Uint8Array[]>
+  getPairs(): Promise<[k: Uint8Array, v: v21.AccountInfo][]>
+  getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: v21.AccountInfo][]>
+  getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: v21.AccountInfo][]>
+  getPairsPaged(
+    pageSize: number,
+    key: Uint8Array
+  ): AsyncIterable<[k: Uint8Array, v: v21.AccountInfo][]>
 }
