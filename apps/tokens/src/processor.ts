@@ -115,7 +115,7 @@ async function getTokenManagerData(
     }
   }
 
-  return await storage.getManyAsV21(v10InputArray)
+  return await storage.asV21.getMany(v10InputArray)
 }
 
 export function extractPublicKey(tuple: string): string {
