@@ -1,6 +1,8 @@
 // @ts-expect-error @ts-ignore next-line
-import { Client } from 'pg'
+import * as pg from 'pg'
 import { ApiPromise, WsProvider } from '@polkadot/api'
+
+const Client = pg.Client
 
 async function getApi() {
   const wsProvider = new WsProvider(process.env.CHAIN_URL)
