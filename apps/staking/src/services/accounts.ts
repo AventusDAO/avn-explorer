@@ -57,7 +57,7 @@ export async function getNominations(
   const storage = new ParachainStakingNominatorStateStorage(ctx, block)
   if (!storage.isExists) ctx.log.error(`Missing ParachainStakingNominatorStateStorage`)
   if (storage.isV21) {
-    const nominatorsRes = await storage.getManyAsV21(accounts)
+    const nominatorsRes = await storage.asV21.getMany(accounts)
 
     // if (nominatorsRes.find(n => !n)) throw new Error(`Nominator is undefined`)
     const nominators = nominatorsRes.filter(Boolean) as NominatorV21[]

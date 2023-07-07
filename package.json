@@ -5,7 +5,8 @@
   "workspaces": [
     "apps/*",
     "packages/*",
-    "!apps/balances-client"
+    "!apps/balances-client",
+    "!apps/account-monitor-client"
   ],
   "scripts": {
     "prettier:check": "prettier -c .",

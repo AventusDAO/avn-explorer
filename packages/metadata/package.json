@@ -12,12 +12,12 @@
   "dependencies": {
     "@avn/config": "^1.0.0",
     "@subsquid/substrate-metadata": "^2.3.0",
-    "@subsquid/substrate-metadata-explorer": "^1.0.8",
-    "@subsquid/util-internal-read-lines": "^0.0.2",
+    "@subsquid/substrate-metadata-explorer": "^1.1.2",
+    "@subsquid/util-internal-read-lines": "^1.2.0",
     "@types/node": "^18.11.9",
     "typescript": "^4.9.3"
   },
   "devDependencies": {
-    "@subsquid/cli": "^0.7.2"
+    "@subsquid/cli": "^2.4.3"
   }
 }

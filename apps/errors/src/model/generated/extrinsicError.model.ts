@@ -1,4 +1,9 @@
-import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, Index as Index_} from "typeorm"
+import {
+  Entity as Entity_,
+  Column as Column_,
+  PrimaryColumn as PrimaryColumn_,
+  Index as Index_
+} from 'typeorm'
 
 @Entity_()
 export class ExtrinsicError {
@@ -10,9 +15,9 @@ export class ExtrinsicError {
   id!: string
 
   @Index_()
-  @Column_("text", {nullable: false})
+  @Column_('text', { nullable: false })
   extrinsicHash!: string
 
-  @Column_("text", {nullable: false})
+  @Column_('text', { nullable: false })
   errorName!: string
 }

@@ -10,6 +10,6 @@ export class Account {
   id!: string
 
   @Index_()
-  @Column_("int4", {nullable: true})
+  @Column_('int4', { nullable: true })
   updatedAt!: number | undefined | null
 }

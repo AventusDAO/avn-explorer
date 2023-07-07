@@ -1,56 +1,48 @@
 import assert from 'assert'
-import { Block, Chain, ChainContext, BlockContext, Result, Option } from './support'
+import { Block, BlockContext, Chain, ChainContext, Option, Result, StorageBase } from './support'
 import * as v12 from './v12'
 
-export class ParachainStakingNominatorStateStorage {
-  private readonly _chain: Chain
-  private readonly blockHash: string
+export class ParachainStakingNominatorStateStorage extends StorageBase {
+  protected getPrefix() {
+    return 'ParachainStaking'
+  }
 
-  constructor(ctx: BlockContext)
-  constructor(ctx: ChainContext, block: Block)
-  constructor(ctx: BlockContext, block?: Block) {
-    block = block || ctx.block
-    this.blockHash = block.hash
-    this._chain = ctx._chain
+  protected getName() {
+    return 'NominatorState'
   }
 
   /**
    *  Get nominator state associated with an account if account is nominating else None
    */
-  get isV12() {
-    return (
-      this._chain.getStorageItemTypeHash('ParachainStaking', 'NominatorState') ===
-      '1c202ee2b387e76b12a61cfe4a3f557431cd1902af95841b0b3ee6ab3747befe'
-    )
+  get isV12(): boolean {
+    return this.getTypeHash() === '1c202ee2b387e76b12a61cfe4a3f557431cd1902af95841b0b3ee6ab3747befe'
   }
 
   /**
    *  Get nominator state associated with an account if account is nominating else None
    */
-  async getAsV12(key: Uint8Array): Promise<v12.Nominator | undefined> {
+  get asV12(): ParachainStakingNominatorStateStorageV12 {
     assert(this.isV12)
-    return this._chain.getStorage(this.blockHash, 'ParachainStaking', 'NominatorState', key)
+    return this as any
   }
+}
 
-  async getManyAsV12(keys: Uint8Array[]): Promise<(v12.Nominator | undefined)[]> {
-    assert(this.isV12)
-    return this._chain.queryStorage(
-      this.blockHash,
-      'ParachainStaking',
-      'NominatorState',
-      keys.map(k => [k])
-    )
-  }
-
-  async getAllAsV12(): Promise<v12.Nominator[]> {
-    assert(this.isV12)
-    return this._chain.queryStorage(this.blockHash, 'ParachainStaking', 'NominatorState')
-  }
-
-  /**
-   * Checks whether the storage item is defined for the current chain version.
-   */
-  get isExists(): boolean {
-    return this._chain.getStorageItemTypeHash('ParachainStaking', 'NominatorState') != null
-  }
+/**
+ *  Get nominator state associated with an account if account is nominating else None
+ */
+export interface ParachainStakingNominatorStateStorageV12 {
+  get(key: Uint8Array): Promise<v12.Nominator | undefined>
+  getAll(): Promise<v12.Nominator[]>
+  getMany(keys: Uint8Array[]): Promise<(v12.Nominator | undefined)[]>
+  getKeys(): Promise<Uint8Array[]>
+  getKeys(key: Uint8Array): Promise<Uint8Array[]>
+  getKeysPaged(pageSize: number): AsyncIterable<Uint8Array[]>
+  getKeysPaged(pageSize: number, key: Uint8Array): AsyncIterable<Uint8Array[]>
+  getPairs(): Promise<[k: Uint8Array, v: v12.Nominator][]>
+  getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: v12.Nominator][]>
+  getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: v12.Nominator][]>
+  getPairsPaged(
+    pageSize: number,
+    key: Uint8Array
+  ): AsyncIterable<[k: Uint8Array, v: v12.Nominator][]>
 }
