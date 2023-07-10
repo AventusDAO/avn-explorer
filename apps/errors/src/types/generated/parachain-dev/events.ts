@@ -1,5 +1,5 @@
 import assert from 'assert'
-import {Chain, ChainContext, EventContext, Event, Result, Option} from './support'
+import { Chain, ChainContext, EventContext, Event, Result, Option } from './support'
 import * as v21 from './v21'
 import * as v24 from './v24'
 

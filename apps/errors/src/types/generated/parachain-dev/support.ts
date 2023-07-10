@@ -1,20 +1,21 @@
+export type Result<T, E> =
+  | {
+      __kind: 'Ok'
+      value: T
+    }
+  | {
+      __kind: 'Err'
+      value: E
+    }
 
-export type Result<T, E> = {
-    __kind: 'Ok'
-    value: T
-} | {
-    __kind: 'Err'
-    value: E
-}
-
-
-export type Option<T> = {
-    __kind: 'Some',
-    value: T
-} | {
-    __kind: 'None'
-}
-
+export type Option<T> =
+  | {
+      __kind: 'Some'
+      value: T
+    }
+  | {
+      __kind: 'None'
+    }
 
 export interface Chain {
   getEventHash(eventName: string): string
@@ -44,43 +45,35 @@ export interface Chain {
   getConstant(pallet: string, name: string): any
 }
 
-
 export interface ChainContext {
-    _chain: Chain
+  _chain: Chain
 }
-
 
 export interface Event {
-    name: string
-    args: any
+  name: string
+  args: any
 }
-
 
 export interface EventContext extends ChainContext {
-    event: Event
+  event: Event
 }
-
 
 export interface Call {
-    name: string
-    args: any
+  name: string
+  args: any
 }
-
 
 export interface CallContext extends ChainContext {
-    call: Call
+  call: Call
 }
-
 
 export interface BlockContext extends ChainContext {
-    block: Block
+  block: Block
 }
-
 
 export interface Block {
-    hash: string
+  hash: string
 }
-
 
 export class StorageBase {
   protected readonly _chain: Chain
