@@ -146,7 +146,8 @@ async function processMigrationCall(
           accountId: encodeId(decodeHex(extractPublicKey(migratedData[0]))),
           amount: migratedData[1],
           updatedAt: block.height,
-          timestamp: new Date(block.timestamp)
+          timestamp: new Date(block.timestamp),
+          reason: `${item.name} ${block.height}`
         })
       )
       if (chunk.length === chunkSize) {
