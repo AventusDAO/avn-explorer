@@ -1,7 +1,7 @@
 import {
   Entity as Entity_,
   Column as Column_,
-  PrimaryColumn as PrimaryColumn_,
+  PrimaryGeneratedColumn as PrimaryColumn_,
   Index as Index_
 } from 'typeorm'
 import * as marshal from '../generated/marshal'
