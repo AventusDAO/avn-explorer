@@ -142,7 +142,6 @@ async function processMigrationCall(
     for (const migratedData of batch) {
       chunk.push(
         new TokenBalanceForAccount({
-          id: randomUUID(),
           tokenId: extractTokenId(migratedData[0]),
           accountId: encodeId(decodeHex(extractPublicKey(migratedData[0]))),
           amount: migratedData[1],
