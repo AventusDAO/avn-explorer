@@ -1,4 +1,9 @@
-import {Entity as Entity_, Column as Column_, PrimaryGeneratedColumn as PrimaryColumn_, Index as Index_} from "typeorm"
+import {
+  Entity as Entity_,
+  Column as Column_,
+  PrimaryGeneratedColumn as PrimaryColumn_,
+  Index as Index_
+} from 'typeorm'
 
 @Entity_()
 export class TokenLookup {
@@ -10,10 +15,10 @@ export class TokenLookup {
   id!: string
 
   @Index_()
-  @Column_("text", {nullable: false})
+  @Column_('text', { nullable: false })
   tokenId!: string
 
   @Index_()
-  @Column_("text", {nullable: false})
+  @Column_('text', { nullable: false })
   tokenName!: string
 }

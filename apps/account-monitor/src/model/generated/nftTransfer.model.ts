@@ -7,11 +7,11 @@ import {
 } from 'typeorm'
 import * as marshal from './marshal'
 import { Account } from './account.model'
-import { Token } from './token.model'
+import { Nft } from './nft.model'
 
 @Entity_()
-export class TokenTransfer {
-  constructor(props?: Partial<TokenTransfer>) {
+export class NftTransfer {
+  constructor(props?: Partial<NftTransfer>) {
     Object.assign(this, props)
   }
 
@@ -39,12 +39,8 @@ export class TokenTransfer {
   to!: Account
 
   @Index_()
-  @Column_('numeric', { transformer: marshal.bigintTransformer, nullable: false })
-  amount!: bigint
-
-  @Index_()
-  @ManyToOne_(() => Token, { nullable: true })
-  token!: Token
+  @ManyToOne_(() => Nft, { nullable: true })
+  nft!: Nft
 
   @Index_()
   @Column_('text', { nullable: false })

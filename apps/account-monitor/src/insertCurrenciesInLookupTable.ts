@@ -11,7 +11,6 @@ async function getApi() {
 }
 
 async function getData() {
-  // The data to be inserted
   const coins = [
     {
       tokenId: '0x1bbf25e71ec48b84d773809b4ba55b6f4be946fb',
@@ -56,6 +55,12 @@ async function getData() {
   return [...coins, { tokenId: avtContractId.toString(), tokenName: 'AVT' }]
 }
 
+async function checkIfDataExists(client: pg.Client, tokenId: string): Promise<boolean> {
+  const query = 'SELECT EXISTS(SELECT 1 FROM token_lookup WHERE token_id = $1 LIMIT 1)'
+  const result = await client.query(query, [tokenId])
+  return result.rows[0].exists
+}
+
 async function connectToDatabase() {
   const client = new Client({
     user: process.env.DB_USER,
@@ -74,8 +79,13 @@ async function insertData() {
   try {
     const query = 'INSERT INTO token_lookup (token_id, token_name) VALUES ($1, $2)'
     for (const item of data) {
-      const values = [item.tokenId, item.tokenName]
-      await client.query(query, values)
+      const { tokenId, tokenName } = item
+      const exists = await checkIfDataExists(client, tokenId)
+
+      if (!exists) {
+        const values = [tokenId, tokenName]
+        await client.query(query, values)
+      }
     }
     console.log('Data inserted successfully!')
     process.exit(0)

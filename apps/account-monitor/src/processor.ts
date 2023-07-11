@@ -44,5 +44,49 @@ const processor = getProcessor()
       }
     }
   } as const)
+  .addEvent('NftManager.BatchCreated', {
+    data: {
+      event: {
+        args: true,
+        extrinsic: {
+          hash: true
+        },
+        call: {}
+      }
+    }
+  } as const)
+  .addEvent('NftManager.SingleNftMinted', {
+    data: {
+      event: {
+        args: true,
+        extrinsic: {
+          hash: true
+        },
+        call: {}
+      }
+    }
+  } as const)
+  .addEvent('NftManager.BatchNftMinted', {
+    data: {
+      event: {
+        args: true,
+        extrinsic: {
+          hash: true
+        },
+        call: {}
+      }
+    }
+  } as const)
+  .addEvent('NftManager.FiatNftTransfer', {
+    data: {
+      event: {
+        args: true,
+        extrinsic: {
+          hash: true
+        },
+        call: {}
+      }
+    }
+  } as const)
 
 export default processor

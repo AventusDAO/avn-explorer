@@ -5,8 +5,12 @@
     "Balances.Transfer",
     "TokenManager.TokenLifted",
     "TokenManager.TokenTransferred",
-    "TokenManager.TokenLowered"
+    "TokenManager.TokenLowered",
+    "NftManager.BatchCreated",
+    "NftManager.SingleNftMinted",
+    "NftManager.BatchNftMinted",
+    "NftManager.FiatNftTransfer"
   ],
   "calls": [],
-  "storage": ["TokenManager.Balances", "Balances.Account"]
+  "storage": ["TokenManager.Balances", "NftManager.OwnedNfts", "System.Account", "Balances.Account"]
 }
