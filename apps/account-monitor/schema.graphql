@@ -1,6 +1,14 @@
 type Account @entity {
   id: ID!
+  avtBalance: BigInt! @index
   tokens: [AccountToken!]! @derivedFrom(field: "account")
+  nfts: [AccountNft!]! @derivedFrom(field: "account")
+}
+
+type AccountNft @entity {
+  id: ID!
+  account: Account
+  nft: Nft
 }
 
 type AccountToken @entity {
@@ -10,21 +18,39 @@ type AccountToken @entity {
   balance: BigInt! @index
 }
 
+type Nft @entity {
+  id: ID!
+  totalSupply: Int!
+  accounts: [AccountNft!]! @derivedFrom(field: "nft")
+}
+
 type Token @entity {
   id: ID!
   accounts: [AccountToken!]! @derivedFrom(field: "token")
   name: String
 }
 
+type NftTransfer @entity {
+  id: ID!
+  blockNumber: BigInt! @index
+  timestamp: DateTime! @index
+  extrinsicHash: String! @index
+  from: Account
+  to: Account
+  nft: Nft
+  pallet: String! @index
+  method: String! @index
+}
+
 type TokenTransfer @entity {
   id: ID!
-  blockNumber: Int! @index
+  blockNumber: BigInt! @index
   timestamp: DateTime! @index
   extrinsicHash: String @index
-  from: Account!
-  to: Account!
+  from: Account
+  to: Account
   amount: BigInt! @index
-  token: Token!
+  token: Token
   pallet: String! @index
   method: String! @index
 }

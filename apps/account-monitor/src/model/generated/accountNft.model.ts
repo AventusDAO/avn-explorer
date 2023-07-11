@@ -7,13 +7,12 @@ import {
   Index as Index_,
   JoinColumn as JoinColumn_
 } from 'typeorm'
-import * as marshal from './marshal'
 import { Account } from './account.model'
-import { Token } from './token.model'
+import { Nft } from './nft.model'
 
 @Entity_()
-export class AccountToken {
-  constructor(props?: Partial<AccountToken>) {
+export class AccountNft {
+  constructor(props?: Partial<AccountNft>) {
     Object.assign(this, props)
   }
 
@@ -24,7 +23,7 @@ export class AccountToken {
   accountId!: string
 
   @Column_('text', { nullable: true })
-  tokenId!: string
+  nftId!: string
 
   @Index_()
   @ManyToOne_(() => Account, { nullable: true })
@@ -32,11 +31,7 @@ export class AccountToken {
   account!: Account
 
   @Index_()
-  @ManyToOne_(() => Token, { nullable: true })
-  @JoinColumn_({ name: 'tokenId' })
-  token!: Token
-
-  @Index_()
-  @Column_('numeric', { transformer: marshal.bigintTransformer, nullable: true })
-  balance!: bigint
+  @ManyToOne_(() => Nft, { nullable: true })
+  @JoinColumn_({ name: 'nftId' })
+  nft!: Nft | undefined | null
 }
