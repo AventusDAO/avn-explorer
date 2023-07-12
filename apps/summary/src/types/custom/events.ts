@@ -1,4 +1,5 @@
 export enum ParachainSummaryEventName {
   SummaryCalculated = 'Summary.SummaryCalculated',
-  VotingEndedEvent = 'Summary.VotingEnded'
+  VotingEndedEvent = 'Summary.VotingEnded',
+  SummaryRootValidated = 'Summary.SummaryRootValidated'
 }
