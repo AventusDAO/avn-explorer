@@ -33,6 +33,35 @@ export class SummarySummaryCalculatedEvent {
     }
 }
 
+export class SummarySummaryRootValidatedEvent {
+    private readonly _chain: Chain
+    private readonly event: Event
+
+    constructor(ctx: EventContext)
+    constructor(ctx: ChainContext, event: Event)
+    constructor(ctx: EventContext, event?: Event) {
+        event = event || ctx.event
+        assert(event.name === 'Summary.SummaryRootValidated')
+        this._chain = ctx._chain
+        this.event = event
+    }
+
+    /**
+     * A summary root validated
+     */
+    get isV21(): boolean {
+        return this._chain.getEventHash('Summary.SummaryRootValidated') === 'd2eff693e9f79beb22137134c316f5c46d6a78dac1631d8b18cfa08977c40c17'
+    }
+
+    /**
+     * A summary root validated
+     */
+    get asV21(): {rootHash: Uint8Array, ingressCounter: bigint, blockRange: v21.RootRange} {
+        assert(this.isV21)
+        return this._chain.decodeEvent(this.event)
+    }
+}
+
 export class SummaryVotingEndedEvent {
     private readonly _chain: Chain
     private readonly event: Event
