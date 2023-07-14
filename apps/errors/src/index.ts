@@ -76,11 +76,11 @@ const processErrors = async (ctx: Context): Promise<void> => {
       .forEach(item => {
         pendingUpdates.set(item.id, item)
       }, pendingUpdates)
-  }
 
-  const updatesData = [...pendingUpdates.values()]
-  await saveErrors(ctx, updatesData)
-  pendingUpdates.clear()
+    const updatesData = [...pendingUpdates.values()]
+    await saveErrors(ctx, updatesData)
+    pendingUpdates.clear()
+  }
 }
 
 processor.run(new TypeormDatabase(), processErrors)
