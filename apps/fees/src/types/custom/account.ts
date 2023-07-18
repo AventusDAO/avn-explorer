@@ -7,6 +7,19 @@ export interface IFeePaidData {
   actualFee: bigint
   /** tip alone */
   tip: bigint
+  extrinsic?: {
+    hash: string
+  }
+}
+
+export interface IFeePaidAdjustedData {
+  /** address id that paid */
+  who: Address
+  /** adjusted fee */
+  fee: bigint
+  extrinsic?: {
+    hash: string
+  }
 }
 
 export interface IFeesAccountUpdate {

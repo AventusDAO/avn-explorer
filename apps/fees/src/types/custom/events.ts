@@ -1,3 +1,4 @@
 export enum TransactionPaymentFeesEventName {
-  Rewarded = 'TransactionPayment.TransactionFeePaid'
+  FeePaid = 'TransactionPayment.TransactionFeePaid',
+  FeeAdjusted = 'AvnTransactionPayment.AdjustedTransactionFeePaid'
 }
