@@ -29,55 +29,25 @@ export type Item = BatchProcessorItem<typeof processor>
 export type Ctx = BatchContext<Store, Item>
 
 export type TransfersEventItem =
-  | EventItem<'Balances.Transfer', { event: { args: true; extrinsic: { hash: true }; call?: {} } }>
-  | EventItem<'Balances.Endowed', { event: { args: true; extrinsic: { hash: true }; call?: {} } }>
-  | EventItem<
-      'Balances.BalanceSet',
-      { event: { args: true; extrinsic: { hash: true }; call?: {} } }
-    >
-  | EventItem<'Balances.Reserved', { event: { args: true; extrinsic: { hash: true }; call?: {} } }>
-  | EventItem<
-      'Balances.Unreserved',
-      { event: { args: true; extrinsic: { hash: true }; call?: {} } }
-    >
-  | EventItem<
-      'Balances.ReserveRepatriated',
-      { event: { args: true; extrinsic: { hash: true }; call?: {} } }
-    >
-  | EventItem<'Balances.Deposit', { event: { args: true; extrinsic: { hash: true }; call?: {} } }>
-  | EventItem<'Balances.Withdraw', { event: { args: true; extrinsic: { hash: true }; call?: {} } }>
-  | EventItem<'Balances.Slashed', { event: { args: true; extrinsic: { hash: true }; call?: {} } }>
-  | EventItem<
-      'TokenManager.TokenTransferred',
-      { event: { args: true; extrinsic: { hash: true }; call?: {} } }
-    >
-  | EventItem<
-      'TokenManager.TokenLifted',
-      { event: { args: true; extrinsic: { hash: true }; call?: {} } }
-    >
-  | EventItem<
-      'TokenManager.TokenLowered',
-      { event: { args: true; extrinsic: { hash: true }; call?: {} } }
-    >
-  | EventItem<
-      'NftManager.BatchCreated',
-      { event: { args: true; extrinsic: { hash: true }; call?: {} } }
-    >
-  | EventItem<
-      'NftManager.SingleNftMinted',
-      { event: { args: true; extrinsic: { hash: true }; call?: {} } }
-    >
-  | EventItem<
-      'NftManager.BatchNftMinted',
-      { event: { args: true; extrinsic: { hash: true }; call?: {} } }
-    >
-  | EventItem<
-      'NftManager.FiatNftTransfer',
-      { event: { args: true; extrinsic: { hash: true }; call?: {} } }
-    >
+  | EventItem<'Balances.Transfer', { event: { args: true; extrinsic: { hash: true } } }>
+  | EventItem<'Balances.Endowed', { event: { args: true; extrinsic: { hash: true } } }>
+  | EventItem<'Balances.BalanceSet', { event: { args: true; extrinsic: { hash: true } } }>
+  | EventItem<'Balances.Reserved', { event: { args: true; extrinsic: { hash: true } } }>
+  | EventItem<'Balances.Unreserved', { event: { args: true; extrinsic: { hash: true } } }>
+  | EventItem<'Balances.ReserveRepatriated', { event: { args: true; extrinsic: { hash: true } } }>
+  | EventItem<'Balances.Deposit', { event: { args: true; extrinsic: { hash: true } } }>
+  | EventItem<'Balances.Withdraw', { event: { args: true; extrinsic: { hash: true } } }>
+  | EventItem<'Balances.Slashed', { event: { args: true; extrinsic: { hash: true } } }>
+  | EventItem<'TokenManager.TokenTransferred', { event: { args: true; extrinsic: { hash: true } } }>
+  | EventItem<'TokenManager.TokenLifted', { event: { args: true; extrinsic: { hash: true } } }>
+  | EventItem<'TokenManager.TokenLowered', { event: { args: true; extrinsic: { hash: true } } }>
+  | EventItem<'NftManager.BatchCreated', { event: { args: true; extrinsic: { hash: true } } }>
+  | EventItem<'NftManager.SingleNftMinted', { event: { args: true; extrinsic: { hash: true } } }>
+  | EventItem<'NftManager.BatchNftMinted', { event: { args: true; extrinsic: { hash: true } } }>
+  | EventItem<'NftManager.FiatNftTransfer', { event: { args: true; extrinsic: { hash: true } } }>
 
 export type EventNormalizers = {
-  [K in TransfersEventItem['name']]: EventNormalizer<EventItem<K, { event: { args: true } }>>
+  [K in TransfersEventItem['name']]: EventNormalizer<Extract<TransfersEventItem, { name: K }>>
 }
 
 export type EventName =
@@ -98,11 +68,14 @@ export type EventName =
   | 'NftManager.BatchNftMinted'
   | 'NftManager.FiatNftTransfer'
 
-export type EventNormalizer<T extends TransfersEventItem & { call?: {} }> = (
+export type EventNormalizer<T extends TransfersEventItem> = (
   ctx: Ctx,
   item: T,
   avtHash?: string
-) => T
+) =>
+  | { from: Uint8Array | undefined; to: Uint8Array; amount: bigint; tokenId: Uint8Array }
+  | { from: Uint8Array | undefined; to: Uint8Array; nftId: bigint; totalSupply: number | bigint }
+  
 
 
 

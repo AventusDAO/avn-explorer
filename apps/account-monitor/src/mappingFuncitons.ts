@@ -1,10 +1,55 @@
 import { getBalances } from './chainEventHandlers'
-import { Account, AccountNft, AccountToken, Nft, Token } from './model'
+import { Account, AccountNft, AccountToken, Nft, NftTransfer, Token, TokenTransfer } from './model'
 import { Ctx, NftTransferEventData, TokenTransferEventData } from './types'
 import { TokenManagerBalancesStorage } from './types/generated/parachain-testnet/storage'
 import { Block } from './types/generated/parachain-testnet/support'
 import { encodeId } from '@avn/utils'
 import { toHex } from '@subsquid/substrate-processor'
+
+export function createTransfers(
+  transfers: TokenTransferEventData[],
+  tokenTransfers: TokenTransfer[],
+  accounts: Map<string, Account>,
+  tokens: Map<string, Token>
+): void {
+  transfers.forEach(transfer => {
+    tokenTransfers.push(
+      new TokenTransfer({
+        blockNumber: transfer.blockNumber,
+        timestamp: transfer.timestamp,
+        extrinsicHash: transfer.extrinsicHash,
+        from: transfer.from ? accounts.get(encodeId(transfer.from)) : undefined,
+        to: accounts.get(encodeId(transfer.to)),
+        amount: transfer.amount,
+        token: tokens.get(toHex(transfer.tokenId) ?? ''),
+        pallet: transfer.pallet,
+        method: transfer.method
+      })
+    )
+  })
+}
+
+export function createNftTransfers(
+  transfers: NftTransferEventData[],
+  nftTransfers: NftTransfer[],
+  accounts: Map<string, Account>,
+  nfts: Map<string, Nft>
+): void {
+  transfers.forEach(transfer => {
+    nftTransfers.push(
+      new NftTransfer({
+        blockNumber: transfer.blockNumber,
+        timestamp: transfer.timestamp,
+        extrinsicHash: transfer.extrinsicHash,
+        from: transfer.from && accounts.get(encodeId(transfer.from)),
+        to: accounts.get(encodeId(transfer.to)),
+        nft: nfts.get(transfer.nftId ?? ''),
+        pallet: transfer.pallet,
+        method: transfer.method
+      })
+    )
+  })
+}
 
 export function mapTokenEntities(
   ctx: Ctx,

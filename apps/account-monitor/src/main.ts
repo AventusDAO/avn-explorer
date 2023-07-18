@@ -22,6 +22,8 @@ import {
 } from './types'
 import { getEvent } from './chainEventHandlers'
 import {
+  createNftTransfers,
+  createTransfers,
   mapAccountEntities,
   mapAccountNftEntities,
   mapAccountTokenEntities,
@@ -111,50 +113,6 @@ async function recordNftTransferData(
   await ctx.store.insert(nftTransfers)
 }
 
-function createTransfers(
-  transfers: TokenTransferEventData[],
-  tokenTransfers: TokenTransfer[],
-  accounts: Map<string, Account>,
-  tokens: Map<string, Token>
-): void {
-  transfers.forEach(transfer => {
-    tokenTransfers.push(
-      new TokenTransfer({
-        blockNumber: transfer.blockNumber,
-        timestamp: transfer.timestamp,
-        extrinsicHash: transfer.extrinsicHash,
-        from: transfer.from ? accounts.get(encodeId(transfer.from)) : undefined,
-        to: accounts.get(encodeId(transfer.to)),
-        amount: transfer.amount,
-        token: tokens.get(toHex(transfer.tokenId) ?? ''),
-        pallet: transfer.pallet,
-        method: transfer.method
-      })
-    )
-  })
-}
-
-function createNftTransfers(
-  transfers: NftTransferEventData[],
-  nftTransfers: NftTransfer[],
-  accounts: Map<string, Account>,
-  nfts: Map<string, Nft>
-): void {
-  transfers.forEach(transfer => {
-    nftTransfers.push(
-      new NftTransfer({
-        blockNumber: transfer.blockNumber,
-        timestamp: transfer.timestamp,
-        extrinsicHash: transfer.extrinsicHash,
-        from: transfer.from && accounts.get(encodeId(transfer.from)),
-        to: accounts.get(encodeId(transfer.to)),
-        nft: nfts.get(transfer.nftId ?? ''),
-        pallet: transfer.pallet,
-        method: transfer.method
-      })
-    )
-  })
-}
 async function getTransfers(ctx: Ctx, tokenLookupMap: Map<string, string>, avtHash: string) {
   for (const block of ctx.blocks) {
     const transfersData: TokenTransferEventData[] = []

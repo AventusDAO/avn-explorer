@@ -33,7 +33,7 @@ export function normalizeBalancesTransferEvent(
   const e = new BalancesTransferEvent(ctx, item.event)
   if (e.isV4) {
     const { from, to, amount } = e.asV4
-    return { from, to, amount, tokenId: decodeHex(avtHash) }
+    return { from, to, amount, tokenId: avtHash ? decodeHex(avtHash) : new Uint8Array() }
   } else {
     throw new UnknownVersionError()
   }
@@ -47,7 +47,12 @@ export function normalizeBalancesEndowedEvent(
   const e = new BalancesEndowedEvent(ctx, item.event)
   if (e.isV4) {
     const { account, freeBalance } = e.asV4
-    return { from: account, to: account, amount: freeBalance, tokenId: decodeHex(avtHash) }
+    return {
+      from: account,
+      to: account,
+      amount: freeBalance,
+      tokenId: avtHash ? decodeHex(avtHash) : new Uint8Array()
+    }
   } else {
     throw new UnknownVersionError()
   }
@@ -57,11 +62,16 @@ export function normalizeBalancesBalanceSetEvent(
   ctx: Ctx,
   item: EventItem<'Balances.BalanceSet', { event: { args: true } }>,
   avtHash?: string
-): { from: undefined; to: Uint8Array; amount: bigint; tokenId: Uint8Array } {
+): { from: Uint8Array; to: Uint8Array; amount: bigint; tokenId: Uint8Array } {
   const e = new BalancesBalanceSetEvent(ctx, item.event)
   if (e.isV4) {
     const { free, reserved, who } = e.asV4
-    return { from: undefined, to: who, amount: free + reserved, tokenId: decodeHex(avtHash) }
+    return {
+      from: new Uint8Array(),
+      to: who,
+      amount: free + reserved,
+      tokenId: avtHash ? decodeHex(avtHash) : new Uint8Array()
+    }
   } else {
     throw new UnknownVersionError()
   }
@@ -75,7 +85,7 @@ export function normalizeBalancesReservedEvent(
   const e = new BalancesReservedEvent(ctx, item.event)
   if (e.isV4) {
     const { amount, who } = e.asV4
-    return { from: who, to: who, amount, tokenId: decodeHex(avtHash) }
+    return { from: who, to: who, amount, tokenId: avtHash ? decodeHex(avtHash) : new Uint8Array() }
   } else {
     throw new UnknownVersionError()
   }
@@ -89,7 +99,7 @@ export function normalizeBalancesUnreservedEvent(
   const e = new BalancesUnreservedEvent(ctx, item.event)
   if (e.isV4) {
     const { amount, who } = e.asV4
-    return { from: who, to: who, amount, tokenId: decodeHex(avtHash) }
+    return { from: who, to: who, amount, tokenId: avtHash ? decodeHex(avtHash) : new Uint8Array() }
   } else {
     throw new UnknownVersionError()
   }
@@ -103,7 +113,7 @@ export function normalizeBalancesReserveRepatriatedEvent(
   const e = new BalancesReserveRepatriatedEvent(ctx, item.event)
   if (e.isV4) {
     const { amount, destinationStatus, from, to } = e.asV4
-    return { from, to, amount, tokenId: decodeHex(avtHash) }
+    return { from, to, amount, tokenId: avtHash ? decodeHex(avtHash) : new Uint8Array() }
   } else {
     throw new UnknownVersionError()
   }
@@ -117,7 +127,7 @@ export function normalizeBalancesDepositEvent(
   const e = new BalancesDepositEvent(ctx, item.event)
   if (e.isV4) {
     const { amount, who } = e.asV4
-    return { from: who, to: who, amount, tokenId: decodeHex(avtHash) }
+    return { from: who, to: who, amount, tokenId: avtHash ? decodeHex(avtHash) : new Uint8Array() }
   } else {
     throw new UnknownVersionError()
   }
@@ -131,7 +141,7 @@ export function normalizeBalancesWithdrawEvent(
   const e = new BalancesWithdrawEvent(ctx, item.event)
   if (e.isV4) {
     const { amount, who } = e.asV4
-    return { from: who, to: who, amount, tokenId: decodeHex(avtHash) }
+    return { from: who, to: who, amount, tokenId: avtHash ? decodeHex(avtHash) : new Uint8Array() }
   } else {
     throw new UnknownVersionError()
   }
@@ -145,7 +155,7 @@ export function normalizeBalancesSlashedEvent(
   const e = new BalancesSlashedEvent(ctx, item.event)
   if (e.isV4) {
     const { amount, who } = e.asV4
-    return { from: who, to: who, amount, tokenId: decodeHex(avtHash) }
+    return { from: who, to: who, amount, tokenId: avtHash ? decodeHex(avtHash) : new Uint8Array() }
   } else {
     throw new UnknownVersionError()
   }
@@ -278,16 +288,15 @@ const eventNormalizers: EventNormalizers = {
 
 export function getEvent<T extends EventName>(
   ctx: Ctx,
-  item: TransfersEventItem,
-  avtHash: string
-): ReturnType<EventNormalizers[T]> | undefined {
-  const normalizer = eventNormalizers[item.name as EventName]
+  item: Extract<TransfersEventItem, { name: T }>,
+  avtHash?: string
+): ReturnType<EventNormalizers[T]> {
+  const normalizer = eventNormalizers[item.name as T]
   if (normalizer) {
     return normalizer(ctx, item, avtHash) as ReturnType<EventNormalizers[T]>
   }
-  return undefined
+  throw new Error()
 }
-
 export async function getBalances(ctx: Ctx, block: Block, accounts: Uint8Array[]) {
   ctx.log.child('state').info(`getting accounts balance`)
   return (
