@@ -75,8 +75,8 @@ export type EventNormalizer<T extends TransfersEventItem> = (
 ) =>
   | { from: Uint8Array | undefined; to: Uint8Array; amount: bigint; tokenId: Uint8Array }
   | { from: Uint8Array | undefined; to: Uint8Array; nftId: bigint; totalSupply: number | bigint }
-  
 
-
-
-  
+export type BalanceType = {
+  free: bigint
+  reserved: bigint
+}

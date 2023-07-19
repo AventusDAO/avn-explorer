@@ -1,4 +1,4 @@
-import { Ctx, EventName, EventNormalizers, TransfersEventItem } from './types'
+import { BalanceType, Ctx, EventName, EventNormalizers, TransfersEventItem } from './types'
 import {
   BalancesBalanceSetEvent,
   BalancesDepositEvent,
@@ -24,6 +24,7 @@ import {
   SystemAccountStorage
 } from './types/generated/parachain-testnet/storage'
 import { Block } from './types/generated/parachain-testnet/support'
+import { AccountInfo } from './types/generated/parachain-testnet/v4'
 
 export function normalizeBalancesTransferEvent(
   ctx: Ctx,
@@ -297,7 +298,11 @@ export function getEvent<T extends EventName>(
   }
   throw new Error()
 }
-export async function getBalances(ctx: Ctx, block: Block, accounts: Uint8Array[]) {
+export async function getBalances(
+  ctx: Ctx,
+  block: Block,
+  accounts: Uint8Array[]
+): Promise<BalanceType[] | undefined> {
   ctx.log.child('state').info(`getting accounts balance`)
   return (
     (await getSystemAccountBalances(ctx, block, accounts)) ??
@@ -305,21 +310,29 @@ export async function getBalances(ctx: Ctx, block: Block, accounts: Uint8Array[]
   )
 }
 
-export async function getBalancesAccountBalances(ctx: Ctx, block: Block, accounts: Uint8Array[]) {
+export async function getBalancesAccountBalances(
+  ctx: Ctx,
+  block: Block,
+  accounts: Uint8Array[]
+): Promise<BalanceType[] | undefined> {
   const storage = new BalancesAccountStorage(ctx, block)
   if (!storage.isExists) return undefined
 
   const data = await storage.asV4.getMany(accounts.filter(Boolean))
 
-  return data.map((d: any) => ({ free: d.free, reserved: d.reserved }))
+  return data.map((d: BalanceType) => ({ free: d.free, reserved: d.reserved }))
 }
 
-export async function getSystemAccountBalances(ctx: Ctx, block: Block, accounts: Uint8Array[]) {
+export async function getSystemAccountBalances(
+  ctx: Ctx,
+  block: Block,
+  accounts: Uint8Array[]
+): Promise<BalanceType[] | undefined> {
   const storage = new SystemAccountStorage(ctx, block)
   if (!storage.isExists) return undefined
-  const data = await storage.asV4.getMany(accounts.filter(Boolean))
+  const data = (await storage.asV4.getMany(accounts.filter(Boolean))) as AccountInfo[]
 
-  return data.map((d: any) => ({
+  return data.map(d => ({
     free: d.data.free,
     reserved: d.data.reserved
   }))
