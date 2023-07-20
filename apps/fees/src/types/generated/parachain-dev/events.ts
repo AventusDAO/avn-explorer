@@ -1,6 +1,38 @@
 import assert from 'assert'
 import {Chain, ChainContext, EventContext, Event, Result, Option} from './support'
 
+export class AvnTransactionPaymentAdjustedTransactionFeePaidEvent {
+  private readonly _chain: Chain
+  private readonly event: Event
+
+  constructor(ctx: EventContext)
+  constructor(ctx: ChainContext, event: Event)
+  constructor(ctx: EventContext, event?: Event) {
+    event = event || ctx.event
+    assert(event.name === 'AvnTransactionPayment.AdjustedTransactionFeePaid')
+    this._chain = ctx._chain
+    this.event = event
+  }
+
+  /**
+   * An adjusted transaction fee of `fee` has been paid by `who`
+   */
+  get isV30(): boolean {
+    return (
+      this._chain.getEventHash('AvnTransactionPayment.AdjustedTransactionFeePaid') ===
+      'cbc2cea47d8d68f4ae7e005449b51d0fee4fa8a65fcd3f3f05db03dd96949c81'
+    )
+  }
+
+  /**
+   * An adjusted transaction fee of `fee` has been paid by `who`
+   */
+  get asV30(): { who: Uint8Array; fee: bigint } {
+    assert(this.isV30)
+    return this._chain.decodeEvent(this.event)
+  }
+}
+
 export class TransactionPaymentTransactionFeePaidEvent {
   private readonly _chain: Chain
   private readonly event: Event
