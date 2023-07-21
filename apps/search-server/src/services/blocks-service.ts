@@ -54,7 +54,7 @@ const getBlocksQuery = (minTimestamp?: number, signedOnly?: boolean): EsQuery =>
   }
   if (signedOnly) {
     query.bool.must?.push({
-      range: { noSignedTransactions: { gte: 1 } }
+      range: { signedExtrCount: { gte: 1 } }
     })
   }
 
