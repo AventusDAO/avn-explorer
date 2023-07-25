@@ -7,7 +7,8 @@
   "scripts": {
     "types:check": "tsc --pretty --noEmit",
     "build": "rm -rf lib && tsc",
-    "build:watch": "rm -rf lib && tsc -w"
+    "build:watch": "rm -rf lib && tsc -w",
+    "read-metadata": "ts-node scripts/read-metadata.ts"
   },
   "dependencies": {
     "@avn/config": "^1.0.0",
@@ -18,6 +19,7 @@
     "typescript": "^4.9.3"
   },
   "devDependencies": {
-    "@subsquid/cli": "^2.4.3"
+    "@subsquid/cli": "^2.4.3",
+    "ts-node": "^10.9.1"
   }
 }
