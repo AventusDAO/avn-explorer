@@ -58,7 +58,7 @@ const extrinsicDataQuery = (dataQuery: ExtrinsicDataQuery): JsonMap[] => {
  * Gets ElasticSearch/OpenSearch query for fetching extrinsics
  * @param {boolean} isFailed optional whether to query failed extrinsic
  * @param {boolean} signedOnly optional whether to query signed only extrinsics
- * @returns {EsQuery} query object for ElasticSearch
+ * @returns {ExtrinsicDataQuery} query object for ElasticSearch
  */
 export const getExtrinsicsQuery = (
   isFailed?: boolean,

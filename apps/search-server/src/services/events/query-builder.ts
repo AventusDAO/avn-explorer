@@ -39,16 +39,10 @@ export const getEventsQuery = (dataQuery: EventsDataQuery = {}): EsQuery | undef
   }
 }
 /**
- * Gets ElasticSearch/OpenSearch query for fetching extrinsics
- * @param {boolean} isFailed optional whether to query failed extrinsic
- * @param {boolean} signedOnly optional whether to query signed only extrinsics
- * @returns {EsQuery} query object for ElasticSearch
+ * Gets ElasticSearch/OpenSearch query for fetching events
+ * @returns {EventsDataQuery} query object for ElasticSearch
  */
-export const getExtrinsicsQuery = (
-  isFailed?: boolean,
-  signedOnly?: boolean,
-  dataQuery?: EventsDataQuery
-): EsQuery => {
+export const getExtrinsicsQuery = (dataQuery?: EventsDataQuery): EsQuery => {
   const mustItems: JsonMap[] = []
   if (dataQuery) mustItems.push(...extrinsicDataQuery(dataQuery))
   return {
