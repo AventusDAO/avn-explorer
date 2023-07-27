@@ -67,7 +67,7 @@ export const getExtrinsics = async (
       }
     }
   } else {
-    query = getExtrinsicsQuery(undefined, isFailed, signedOnly, dataQuery)
+    query = getExtrinsicsQuery(isFailed, signedOnly, dataQuery)
   }
 
   const sort: EsSortItem[] = []

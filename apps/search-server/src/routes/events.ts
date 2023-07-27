@@ -12,7 +12,21 @@ router.get(
     const size = processIntegerParam(req.query.size, 'size')
     const from = processIntegerParam(req.query.from, 'from')
     const sort = processStringParam(req.query.sort, 'sort')
-    const data = await getEvents(size, from, sort)
+    const section = processStringParam(req.query.section, 'section')
+    const name = processStringParam(req.query.name, 'name')
+    const blockHeightFrom = processIntegerParam(req.query.blockHeightFrom, 'blockHeightFrom')
+    const blockHeightTo = processIntegerParam(req.query.blockHeightTo, 'blockHeightTo')
+    const timestampStart = processIntegerParam(req.query.timestampStart, 'timestampStart')
+    const timestampEnd = processIntegerParam(req.query.timestampEnd, 'timestampEnd')
+
+    const data = await getEvents(size, from, sort, {
+      section,
+      name,
+      blockHeightFrom,
+      blockHeightTo,
+      timestampStart,
+      timestampEnd
+    })
     const response: DataResponse<SearchEvent[]> = {
       data
     }
