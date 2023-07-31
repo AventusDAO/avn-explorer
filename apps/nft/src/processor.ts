@@ -9,12 +9,7 @@ import {
 } from './types/generated/parachain-dev/events'
 import { getProcessor } from '@avn/config'
 import { In } from 'typeorm'
-
-interface MintedNftEventData {
-  id: string
-  nftId: bigint
-  owner: string
-}
+import { MintedNftEventData } from './types/custom'
 
 const processor = getProcessor()
   .addEvent('NftManager.SingleNftMinted', {
