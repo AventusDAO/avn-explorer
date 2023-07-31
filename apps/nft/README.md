@@ -1,6 +1,6 @@
 # NFT
 
-This is a Squid based processor processing fee paid by given accounts.
+This is a Squid based processor processing NFTs.
 
 ## How to run
 
