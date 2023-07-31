@@ -1,0 +1,7 @@
+{
+  "outDir": "../src/types/generated/parachain-testnet",
+  "specVersions": "../../../packages/metadata/versions.avn-parachain.testnet.jsonl",
+  "events": ["Summary.SummaryCalculated", "Summary.VotingEnded", "Summary.SummaryRootValidated"],
+  "calls": [],
+  "storage": []
+}

@@ -1,6 +1,6 @@
 {
   "outDir": "../src/types/generated/parachain-dev",
-  "specVersions": "../../../packages/metadata/versions-parachain.dev.jsonl",
+  "specVersions": "../../../packages/metadata/versions.avn-parachain.dev.jsonl",
   "events": [
     "Balances.Transfer",
     "Balances.Endowed",
@@ -14,11 +14,6 @@
     "Migration.MigratedSystemAccounts",
     "Migration.MigratedTotalIssuance"
   ],
-  "calls": [],
-  "storage": [
-    "System.Account",
-    "Balances.Account",
-    "Balances.TotalIssuance",
-    "Migration.migrate_system_account"
-  ]
+  "calls": ["Migration.migrate_system_account"],
+  "storage": ["System.Account", "Balances.Account", "Balances.TotalIssuance"]
 }

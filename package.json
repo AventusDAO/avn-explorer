@@ -5,15 +5,16 @@
   "workspaces": [
     "apps/*",
     "packages/*",
-    "!apps/balances-client"
+    "!apps/balances-client",
+    "!apps/account-monitor-client"
   ],
   "scripts": {
     "prettier:check": "prettier -c .",
     "prettier:fix": "prettier -w .",
     "lint:check": "eslint '*/**/*.{js,ts,tsx}'",
     "types:check": "yarn workspaces foreach run types:check",
-    "build:packages": "yarn workspaces foreach -ptR --from '{@avn/config,@avn/types,@avn/utils}' run build",
-    "build": "yarn workspaces foreach run build",
+    "build:packages": "yarn workspaces foreach -ptR --from '{@avn/config,@avn/types,@avn/utils,@avn/metadata}' run build",
+    "build": "yarn build:packages && yarn workspaces foreach run build",
     "test": "yarn workspaces foreach run test"
   },
   "devDependencies": {

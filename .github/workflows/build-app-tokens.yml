@@ -21,12 +21,15 @@ on:
       - 'packages/utils/**'
 
 jobs:
-  build:
+  avn-docker-build:
     name: AvN Explorer Tokens
     uses: ./.github/workflows/docker-build.yml
-    secrets: inherit
     with:
       short_image_name: tokens
       ecr_repository_prefix: avn-explorer
       aws_region: eu-west-2
+      aws_account_id: 189013141504
       dockerfile: apps/tokens/Dockerfile
+    secrets:
+      aws_access_key: ${{ secrets.TESTNET_AWS_ACCESS_KEY_ID }}
+      aws_secret_key: ${{ secrets.TESTNET_AWS_SECRET_ACCESS_KEY }}

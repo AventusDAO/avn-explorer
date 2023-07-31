@@ -10,6 +10,8 @@ import cors from 'cors'
 import statusApp from './status-app'
 import blocks from './routes/blocks'
 import extrinsics from './routes/extrinsics'
+import events from './routes/events'
+import search from './routes/search'
 
 import { BaseError } from './utils'
 
@@ -35,7 +37,7 @@ if (!originsList)
 const corsOptions = {
   origin: (origin: any, callback: any) => {
     if (originsList) {
-      const whitelist = originsList.split(',,,')
+      const whitelist = originsList.split(',')
       // if origin is on the allowed list let it go through
       if (!origin || whitelist.includes(origin)) {
         callback(null, true)
@@ -44,7 +46,12 @@ const corsOptions = {
     }
     // else block CORS access
     callback(
-      new BaseError('cors_not_allowed', 401, `Not allowed by CORS. Origin:  ${origin}`, true)
+      new BaseError(
+        'cors_not_allowed',
+        401,
+        `Not allowed by CORS. Origin:  ${origin as string}`,
+        true
+      )
     )
   }
 }
@@ -53,6 +60,9 @@ app.use(cors(corsOptions))
 // add routes
 app.use('/blocks', blocks)
 app.use('/extrinsics', extrinsics)
+app.use('/events', events)
+
+app.use('/search', search)
 
 const port = config.server.port
 app.listen(port)

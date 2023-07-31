@@ -1,4 +1,4 @@
-import { CronJob } from 'cron'
+import { IReportParams, ReportStrategy } from './reportService'
 
 enum JobStatusEnum {
   RUNNING = 'running',
@@ -7,43 +7,47 @@ enum JobStatusEnum {
 
 export class Job {
   status: JobStatusEnum = JobStatusEnum.STOPPED
-  job: CronJob
+  reportStrategy: ReportStrategy
 
-  constructor(reportParams: any, generateReportFunction: any) {
-    this.job = new CronJob(reportParams.frequency, () => {
-      generateReportFunction(reportParams)
-    })
-    this.status = JobStatusEnum.RUNNING
-    this.job.start()
+  constructor(reportParams: IReportParams, reportStrategy: ReportStrategy) {
+    this.reportStrategy = reportStrategy
   }
 
-  stop() {
+  async start(reportParams: IReportParams): Promise<void> {
+    await this.reportStrategy.generateReport(reportParams)
+    this.reportStrategy.start(reportParams)
+    this.status = JobStatusEnum.RUNNING
+  }
+
+  stop(): void {
+    this.reportStrategy.stop()
     this.status = JobStatusEnum.STOPPED
-    this.job.stop()
   }
 }
 
 export class JobManager {
   private readonly jobs = new Map<number, Job>()
 
-  createNewJob(reportParams: any, generateReportFunction: any) {
+  async createNewJob(reportParams: IReportParams, reportStrategy: ReportStrategy): Promise<void> {
     const jobIndex = this.jobs.size
-    this.jobs.set(jobIndex, new Job(reportParams, generateReportFunction))
+    const job = new Job(reportParams, reportStrategy)
+    await job.start(reportParams)
+    this.jobs.set(jobIndex, job)
   }
 
-  stopJob(id: number) {
+  stopJob(id: number): void {
     const job = this.jobs.get(id)
     if (job) {
       job.stop()
     }
   }
 
-  removeJob(id: number) {
+  removeJob(id: number): void {
     this.stopJob(id)
     this.jobs.delete(id)
   }
 
-  listJobs() {
+  listJobs(): Job[] {
     return Array.from(this.jobs.values())
   }
 }

@@ -13,7 +13,7 @@ class ErrorHandler {
     return await Promise.resolve()
   }
 
-  public isTrustedError(error: Error) {
+  public isTrustedError(error: Error): boolean {
     if (error instanceof BaseError) {
       return error.isOperational
     }

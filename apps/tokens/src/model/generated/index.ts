@@ -1,1 +1,1 @@
-export * from './chainState.model'
+export * from "./chainState.model"

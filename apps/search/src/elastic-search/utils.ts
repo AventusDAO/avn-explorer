@@ -4,6 +4,9 @@ export const put = async <T>(url: string, obj: any): Promise<T> => {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(obj)
   })
+  if (res.status >= 400 && res.status < 600) {
+    throw new Error(`PUT /${url} returned ${res.status}. Response: ${await res.text()}`)
+  }
   return await res.json()
 }
 
@@ -12,6 +15,9 @@ export const get = async <T>(url: string): Promise<T> => {
     method: 'GET',
     headers: { 'Content-Type': 'application/json' }
   })
+  if (res.status >= 400 && res.status < 600) {
+    throw new Error(`GET /${url} returned ${res.status}. Response: ${await res.text()}`)
+  }
   return await res.json()
 }
 
@@ -26,5 +32,8 @@ export const post = async <T>(
     // ES bulk does not accept JSON stringified format
     body: contentType === 'application/json' ? JSON.stringify(obj) : obj
   })
+  if (res.status >= 400 && res.status < 600) {
+    throw new Error(`POST /${url} returned ${res.status}. Response: ${await res.text()}`)
+  }
   return await res.json()
 }

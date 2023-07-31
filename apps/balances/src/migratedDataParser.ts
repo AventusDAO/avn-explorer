@@ -24,7 +24,7 @@ export function processEncodedMigratedAccountData(
   const reserved = decodeBalance(cleanBalanceData.slice(64, 96))
 
   return {
-    publicKey: publicKey,
+    publicKey,
     balance: {
       free,
       reserved

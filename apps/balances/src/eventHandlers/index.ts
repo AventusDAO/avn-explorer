@@ -12,9 +12,9 @@ import {
   BalancesWithdrawEvent,
   MigrationMigratedSystemAccountsEvent,
   MigrationMigratedTotalIssuanceEvent
-} from '../types/generated/parachain-dev/events'
-import { BalancesTotalIssuanceStorage } from '../types/generated/parachain-dev/storage'
-import { Block, ChainContext, Event } from '../types/generated/parachain-dev/support'
+} from '../types/generated/parachain-testnet/events'
+import { BalancesTotalIssuanceStorage } from '../types/generated/parachain-testnet/storage'
+import { Block, ChainContext, Event } from '../types/generated/parachain-testnet/support'
 
 export function getAccountFromBalanceSetEvent(ctx: ChainContext, event: Event): string {
   const data = new BalancesBalanceSetEvent(ctx, event)
@@ -114,7 +114,7 @@ export async function getTotalIssuance(
   if (!storage.isExists) return undefined
 
   if (storage.isV4) {
-    return await storage.getAsV4()
+    return await storage.asV4.get()
   }
 
   throw new UnknownVersionError(storage.constructor.name)

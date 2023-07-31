@@ -1,7 +1,16 @@
 {
   "outDir": "../src/types/generated/parachain-dev",
-  "specVersions": "../../../packages/metadata/versions-parachain.dev.jsonl",
-  "events": ["Balances.Transfer", "TokenManager.TokenTransferred"],
+  "specVersions": "../../../packages/metadata/versions.avn-parachain.dev.jsonl",
+  "events": [
+    "Balances.Transfer",
+    "TokenManager.TokenLifted",
+    "TokenManager.TokenTransferred",
+    "TokenManager.TokenLowered",
+    "NftManager.BatchCreated",
+    "NftManager.SingleNftMinted",
+    "NftManager.BatchNftMinted",
+    "NftManager.FiatNftTransfer"
+  ],
   "calls": [],
-  "storage": []
+  "storage": ["TokenManager.Balances", "NftManager.OwnedNfts", "System.Account", "Balances.Account"]
 }

@@ -20,7 +20,9 @@ const processor = getProcessor()
   .addEvent('Summary.VotingEnded', {
     data: { event: { args: true } }
   } as const)
-  .includeAllBlocks()
+  .addEvent('Summary.SummaryRootValidated', {
+    data: { event: { args: true } }
+  })
 
 const processSummary = async (ctx: Context): Promise<void> => {
   const pendingUpdates: BatchUpdates = new BatchUpdates(ctx)
@@ -46,6 +48,18 @@ const processSummary = async (ctx: Context): Promise<void> => {
             isValidated,
             toBlock,
             fromBlock
+          })
+
+          pendingUpdates.addSummaryRootFromEvent(summary)
+        } else if (item.name === ParachainSummaryEventName.SummaryRootValidated) {
+          const fromBlock = item.event.args.from
+          const toBlock = item.event.args.to
+          const rootHash = item.event.args.rootHash
+          const summary = new SummaryRoot({
+            fromBlock,
+            toBlock,
+            rootHash,
+            isValidated: true
           })
 
           pendingUpdates.addSummaryRootFromEvent(summary)

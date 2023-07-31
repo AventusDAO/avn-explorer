@@ -1,0 +1,16 @@
+{
+  "outDir": "../src/types/generated/parachain-testnet",
+  "specVersions": "../../../packages/metadata/versions.avn-parachain.testnet.jsonl",
+  "events": [
+    "ParachainStaking.NominationIncreased",
+    "ParachainStaking.NominationDecreased",
+    "ParachainStaking.NominatorLeft",
+    "ParachainStaking.NominationRevoked",
+    "ParachainStaking.NominationKicked",
+    "ParachainStaking.Nomination",
+    "ParachainStaking.NominatorLeftCandidate",
+    "ParachainStaking.Rewarded"
+  ],
+  "calls": [],
+  "storage": ["ParachainStaking.NominatorState"]
+}

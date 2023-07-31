@@ -2,7 +2,7 @@ up:
 	@docker-compose up -d
 
 down:
-	@docker-compose down -v
+	@docker-compose down
 
 build:
 	@yarn build
@@ -13,10 +13,10 @@ process: migrate
 serve:
 	@yarn server:start
 
-typegen-testnet:
-	@yarn squid-substrate-typegen ./typegen/typegen.testnet.json
+typegen-parachain-testnet:
+	@yarn squid-substrate-typegen ./typegen/typegen-parachain.testnet.json
 
-typegen-parachain:
+typegen-parachain-dev:
 	@yarn squid-substrate-typegen ./typegen/typegen-parachain.dev.json
 
 codegen:

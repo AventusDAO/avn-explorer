@@ -1,5 +1,13 @@
 import { blocksSchema, extrinsicsSchema, eventsSchema } from './schema'
-import { EsBlock, EsEvent, EsExtrinsic, IndexMapping, MappingsResponse } from './types'
+import {
+  SearchBlock,
+  SearchEvent,
+  SearchExtrinsic,
+  IndexMapping,
+  MappingsResponse,
+  BulkAction,
+  BulkItemActionChunk
+} from './types'
 import { get, post, put } from './utils'
 
 export interface EsOptions {
@@ -7,6 +15,7 @@ export interface EsOptions {
   blocksIndex: string
   extrinsicsIndex: string
   eventsIndex: string
+  maxPayloadBytes: number
 }
 
 export class ElasticSearch {
@@ -14,11 +23,14 @@ export class ElasticSearch {
   blocksIndex: string
   extrinsicsIndex: string
   eventsIndex: string
-  constructor({ baseUrl, blocksIndex, extrinsicsIndex, eventsIndex }: EsOptions) {
+  maxPayloadBytes: number
+
+  constructor({ baseUrl, blocksIndex, extrinsicsIndex, eventsIndex, maxPayloadBytes }: EsOptions) {
     this.baseUrl = baseUrl
     this.blocksIndex = blocksIndex
     this.extrinsicsIndex = extrinsicsIndex
     this.eventsIndex = eventsIndex
+    this.maxPayloadBytes = maxPayloadBytes
   }
 
   /**
@@ -68,11 +80,15 @@ export class ElasticSearch {
   /**
    * Store a batches of blocks, extrinsics and events in ElasticSearch
    */
-  async storeBatch(blocks: EsBlock[], extrinsics: EsExtrinsic[], events: EsEvent[]): Promise<void> {
+  async storeBatch(
+    blocks: SearchBlock[],
+    extrinsics: SearchExtrinsic[],
+    events: SearchEvent[]
+  ): Promise<void> {
     await Promise.all([
-      this.storeBulk(blocks, this.blocksIndex, '_doc', 'refId'),
-      this.storeBulk(extrinsics, this.extrinsicsIndex, '_doc', 'refId'),
-      this.storeBulk(events, this.eventsIndex, '_doc', 'refId')
+      this.storeBulk(blocks, this.blocksIndex, 'refId'),
+      this.storeBulk(extrinsics, this.extrinsicsIndex, 'refId'),
+      this.storeBulk(events, this.eventsIndex, 'refId')
     ])
   }
 
@@ -82,15 +98,33 @@ export class ElasticSearch {
    *
    * @returns {Promise<ElasticSearchBulkResult>} Promise of the ES bulk operation
    */
-  async storeBulk(
-    objects: any[],
-    indexName: string,
-    objectType = '_doc',
-    idAccessor = 'refId'
-  ): Promise<void> {
+  async storeBulk(objects: any[], indexName: string, idAccessor = 'refId'): Promise<void> {
     const url = `${this.baseUrl}/_bulk`
-    const payload = this.getBulkPayload(objects, indexName, objectType, idAccessor)
-    await post<any>(url, payload, 'application/x-ndjson')
+    const payloadChunks = this.getBulkPayloads(objects, indexName, idAccessor)
+    const splitPayloadChunks = this.splitPayloadToChunks(payloadChunks, this.maxPayloadBytes)
+    for (const payloadChunk of splitPayloadChunks) {
+      const payloadActions = payloadChunk.map(chunk => chunk.join('\n')).join('\n') + '\n'
+      await post<any>(url, payloadActions, 'application/x-ndjson')
+    }
+  }
+
+  /** Splits payload into chunks that fit into the specified size limit */
+  splitPayloadToChunks(
+    payload: BulkItemActionChunk[],
+    maxPayloadBytes: number
+  ): BulkItemActionChunk[][] {
+    const payloadStr = payload.map(([action, obj]) => `${action}\n${obj}`).join('\n')
+    const payloadSize = Buffer.byteLength(payloadStr, 'utf8')
+
+    if (payloadSize < this.maxPayloadBytes) {
+      return [payload]
+    }
+
+    const halfIdx = Math.ceil(payload.length / 2)
+    const firstHalfChunks = this.splitPayloadToChunks(payload.slice(0, halfIdx), maxPayloadBytes)
+    const secondHalfChunks = this.splitPayloadToChunks(payload.slice(halfIdx), maxPayloadBytes)
+
+    return [...firstHalfChunks, ...secondHalfChunks]
   }
 
   /**
@@ -100,15 +134,17 @@ export class ElasticSearch {
    * @param {string} type - Name of the object type in ES
    * @param {string} idAccessor - Name of the object's property to use as the _id in ES
    */
-  getBulkPayload(objects: any[], indexName: string, type = '_doc', idAccessor: string): string {
-    function getAction(indexName: string, type: string, id: string): string {
-      return `{"index":{"_index":"${indexName}","_type":"${type}","_id":"${id}"}}`
-    }
-    return objects.reduce((prev, curr) => {
-      return (
-        // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
-        prev + getAction(indexName, type, curr[idAccessor]) + '\n' + JSON.stringify(curr) + '\n'
-      )
-    }, '')
+  getBulkPayloads(objects: any[], indexName: string, idAccessor: string): BulkItemActionChunk[] {
+    const getBulkAction = (indexName: string, id: string): BulkAction =>
+      JSON.stringify({
+        index: {
+          _index: indexName,
+          _id: id
+        }
+      })
+
+    return objects.map(item => {
+      return [getBulkAction(indexName, item[idAccessor]), JSON.stringify(item)]
+    })
   }
 }

@@ -4,19 +4,33 @@ Raw archives of the chain data
 
 ## How to run
 
-- Configure `.env`
+- Configure `.env` (see below)
+- Start database (see root's docker compose)
+- On the first run (for each environment) init the DB: `make init`
+- Start Explorer and Gateway: `make up`
+- Start Ingester: `make ingest`
+
+## Environment Variables
 
 ```
-DB_NAME=parachain-dev
+# -- database config --
 DB_PASS=postgres
 DB_USER=postgres
 DB_PORT=5432
-GATEWAY_PORT=8888
-EXPLORER_PORT=4444
-AVN_NODE=wss://avn-parachain.dev.aventus.io
-```
+DB_HOST=host.docker.internal
 
-- Start archive and ingestion: `make up`
+DB_NAME=parachain_dev
+# -- ingester --
+AVN_NODE=wss://avn-parachain.dev.aventus.io
+
+# -- explorer config --
+EXPLORER_PORT=4444
+
+# -- gateway config --
+GATEWAY_PORT=8888
+DATABASE_STATEMENT_TIMEOUT=60000
+DATABASE_MAX_CONNECTIONS=100
+```
 
 # Solochain Archive
 

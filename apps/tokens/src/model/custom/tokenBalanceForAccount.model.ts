@@ -1,7 +1,7 @@
 import {
   Entity as Entity_,
   Column as Column_,
-  PrimaryColumn as PrimaryColumn_,
+  PrimaryGeneratedColumn as PrimaryColumn_,
   Index as Index_
 } from 'typeorm'
 import * as marshal from '../generated/marshal'
@@ -34,4 +34,12 @@ export class TokenBalanceForAccount {
   @Index_()
   @Column_('int4', { nullable: true })
   updatedAt!: number | undefined | null
+
+  @Index_()
+  @Column_('text', { nullable: false })
+  reason!: string
+
+  @Index_()
+  @Column_('timestamp with time zone', { nullable: true })
+  timestamp!: Date
 }

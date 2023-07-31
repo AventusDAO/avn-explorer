@@ -1,8 +1,9 @@
-import { environment } from '@avn/config'
+import { ChainGen, getEnvironment } from '@avn/config'
 import { createLogger } from '@subsquid/logger'
 const log = createLogger('sqd:processor')
 
-if (environment.name.includes('parachain')) {
+const environment = getEnvironment()
+if (environment.chainGen === ChainGen.parachain) {
   log.info('starting parachain processor')
   require('./processors/parachain-processor')
 } else {

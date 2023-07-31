@@ -1,0 +1,5 @@
+type ExtrinsicError @entity {
+  id: ID!
+  extrinsicHash: String! @index
+  errorName: String!
+}

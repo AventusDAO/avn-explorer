@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import { getBlocks } from '../services/blocks-service'
-import { Block, DataResponse } from '../types'
+import { SearchBlock, DataResponse } from '../types'
 import { asyncCatch, processBooleanParam, processIntegerParam, processStringParam } from '../utils'
 const router = Router()
 
@@ -12,9 +12,9 @@ router.get(
     const size = processIntegerParam(req.query.size, 'size')
     const from = processIntegerParam(req.query.from, 'from')
     const sort = processStringParam(req.query.sort, 'sort')
-    const skipSystemBlocks = processBooleanParam(req.query.skipSystemBlocks, 'skipSystemBlocks')
-    const data = await getBlocks(size, from, skipSystemBlocks, sort)
-    const response: DataResponse<Block[]> = {
+    const signedOnly = processBooleanParam(req.query.signedOnly, 'signedOnly')
+    const data = await getBlocks(size, from, signedOnly, sort)
+    const response: DataResponse<SearchBlock[]> = {
       data
     }
     res.status(200).json(response)

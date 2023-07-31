@@ -1,4 +1,5 @@
 import { AnyJson, EsQuery, JsonMap } from '../../types'
+import { numberRangeFilterSubQuery, timestampRangeFilterSubQuery } from '../../utils/query-builder'
 
 export interface ExtrinsicDataQuery {
   section?: string
@@ -32,68 +33,13 @@ export const getMultiTransactionsForAddressQuery = (values: string[]): EsQuery =
   }
 })
 
-export const timestampRangeSubQuery = (minTimestamp: number): EsQuery => ({
-  range: { timestamp: { gte: minTimestamp } }
-})
-
-export const isFailedSubQuery = (isFailed: boolean): EsQuery => ({
+const isFailedSubQuery = (isFailed: boolean): EsQuery => ({
   match: { isSuccess: !isFailed }
 })
 
-interface BlockRangeQuery extends JsonMap {
-  range: {
-    blockHeight: {
-      gte: number | null
-      lte: number | null
-    }
-  }
-}
-
-const blockHeightRangeFilterSubQuery = (
-  blockHeightFrom?: number,
-  blockHeightTo?: number
-): BlockRangeQuery | undefined => {
-  if (!blockHeightFrom && !blockHeightTo) return undefined
-  const rangeQuery: BlockRangeQuery = {
-    range: {
-      blockHeight: {
-        gte: null,
-        lte: null
-      }
-    }
-  }
-  if (blockHeightFrom) rangeQuery.range.blockHeight.gte = blockHeightFrom ?? null
-  if (blockHeightTo) rangeQuery.range.blockHeight.lte = blockHeightTo ?? null
-  return rangeQuery
-}
-
-interface TimestampQuery extends JsonMap {
-  range: {
-    timestamp: {
-      gte: number | null
-      lte: number | null
-      format: 'epoch_millis'
-    }
-  }
-}
-const extrinsicTimestampRangeFilterSubQuery = (
-  timestampStart?: number,
-  timestampEnd?: number
-): TimestampQuery | undefined => {
-  if (!timestampStart && !timestampEnd) return undefined
-  const rangeQuery: TimestampQuery = {
-    range: {
-      timestamp: {
-        gte: null,
-        lte: null,
-        format: 'epoch_millis'
-      }
-    }
-  }
-  if (timestampStart) rangeQuery.range.timestamp.gte = timestampStart
-  if (timestampEnd) rangeQuery.range.timestamp.lte = timestampEnd
-  return rangeQuery
-}
+const signedOnlyQuery = (): EsQuery => ({
+  match: { isSigned: true }
+})
 
 const extrinsicDataQuery = (dataQuery: ExtrinsicDataQuery): JsonMap[] => {
   const matches: JsonMap[] = []
@@ -101,31 +47,30 @@ const extrinsicDataQuery = (dataQuery: ExtrinsicDataQuery): JsonMap[] => {
     dataQuery
   if (section) matches.push({ match: { section } })
   if (method) matches.push({ match: { method } })
-  const blockRangeQuery = blockHeightRangeFilterSubQuery(blockHeightFrom, blockHeightTo)
+  const blockRangeQuery = numberRangeFilterSubQuery('blockHeight', blockHeightFrom, blockHeightTo)
   if (blockRangeQuery) matches.push(blockRangeQuery)
-  const timestampQuery = extrinsicTimestampRangeFilterSubQuery(timestampStart, timestampEnd)
+  const timestampQuery = timestampRangeFilterSubQuery('timestamp', timestampStart, timestampEnd)
   if (timestampQuery) matches.push(timestampQuery)
   return matches
 }
 
 /**
- * Gets query for fetching transfer extrinsics within given timestamp range
- * @param {number} minTimestamp optional min timestamp of the extrinsic
+ * Gets ElasticSearch/OpenSearch query for fetching extrinsics
  * @param {boolean} isFailed optional whether to query failed extrinsic
- * @returns {EsQuery} query object for ElasticSearch
+ * @param {boolean} signedOnly optional whether to query signed only extrinsics
+ * @returns {ExtrinsicDataQuery} query object for ElasticSearch
  */
 export const getExtrinsicsQuery = (
-  minTimestamp?: number,
   isFailed?: boolean,
+  signedOnly?: boolean,
   dataQuery?: ExtrinsicDataQuery
 ): EsQuery => {
   const mustItems: JsonMap[] = []
-  if (minTimestamp) mustItems.push(timestampRangeSubQuery(minTimestamp))
   if (dataQuery) mustItems.push(...extrinsicDataQuery(dataQuery))
 
   const filters: AnyJson[] = []
   if (isFailed !== undefined) filters.push(isFailedSubQuery(isFailed))
-
+  if (signedOnly) filters.push(signedOnlyQuery())
   return {
     bool: {
       must: mustItems,

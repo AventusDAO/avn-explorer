@@ -10,10 +10,10 @@ export class ChainState {
   id!: string
 
   @Index_()
-  @Column_("timestamp with time zone", {nullable: false})
+  @Column_('timestamp with time zone', { nullable: false })
   timestamp!: Date
 
   @Index_()
-  @Column_("int4", {nullable: false})
+  @Column_('int4', { nullable: false })
   blockNumber!: number
 }

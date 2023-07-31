@@ -1,0 +1,20 @@
+{
+  "outDir": "../src/types/generated/parachain-testnet",
+  "specVersions": "../../../packages/metadata/versions.avn-parachain.testnet.jsonl",
+  "typesBundle": "../../../packages/metadata/avn-types.json",
+  "events": [
+    "Balances.Transfer",
+    "Balances.Endowed",
+    "Balances.BalanceSet",
+    "Balances.Reserved",
+    "Balances.Unreserved",
+    "Balances.ReserveRepatriated",
+    "Balances.Deposit",
+    "Balances.Withdraw",
+    "Balances.Slashed",
+    "Migration.MigratedSystemAccounts",
+    "Migration.MigratedTotalIssuance"
+  ],
+  "calls": ["Migration.migrate_system_account"],
+  "storage": ["System.Account", "Balances.Account", "Balances.TotalIssuance"]
+}

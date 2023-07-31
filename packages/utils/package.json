@@ -13,8 +13,9 @@
   "dependencies": {
     "@avn/config": "^1.0.0",
     "@avn/types": "^1.0.0",
-    "@subsquid/ss58": "^0.1.1",
-    "dotenv": "^10.0.0"
+    "@subsquid/ss58": "^0.1.4",
+    "dotenv": "^10.0.0",
+    "pg": "^8.11.0"
   },
   "devDependencies": {
     "@types/node": "^18.11.9",

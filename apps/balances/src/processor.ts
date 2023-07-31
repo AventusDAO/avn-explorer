@@ -29,10 +29,11 @@ import { IBalance } from './types/custom/balance'
 import {
   BalancesAccountStorage,
   SystemAccountStorage
-} from './types/generated/parachain-dev/storage'
-import { Block, ChainContext } from './types/generated/parachain-dev/support'
+} from './types/generated/parachain-testnet/storage'
+import { Block, ChainContext } from './types/generated/parachain-testnet/support'
 import { encodeId } from '@avn/utils'
 import { processEncodedMigratedAccountData } from './migratedDataParser'
+import { UnknownVersionError } from '@avn/types'
 
 const processor = getProcessor()
   .addEvent('Balances.Endowed', {
@@ -71,10 +72,6 @@ const processor = getProcessor()
   .addCall('Migration.migrate_system_account', {
     data: { call: { origin: true }, extrinsic: { call: { args: true } } }
   } as const)
-  .addCall('*', {
-    data: { call: { origin: true } }
-  } as const)
-  .includeAllBlocks()
 
 type Item = BatchProcessorItem<typeof processor>
 type EventItem = BatchProcessorEventItem<typeof processor>
@@ -329,15 +326,12 @@ async function getBalancesAccountBalances(
 ): Promise<IBalance[] | undefined> {
   const storage = new BalancesAccountStorage(ctx, block)
   if (!storage.isExists) return undefined
-
-  const data = await ctx._chain.queryStorage(
-    block.hash,
-    'Balances',
-    'Account',
-    accounts.map(a => [a])
-  )
-
-  return data.map(d => ({ free: d.free, reserved: d.reserved }))
+  if (storage.isV4) {
+    const data = await storage.asV4.getMany(accounts)
+    return data.map(d => ({ free: d.free, reserved: d.reserved }))
+  } else {
+    throw new UnknownVersionError(`ParachainStakingNominatorStateStorage`)
+  }
 }
 
 async function getSystemAccountBalances(
@@ -347,18 +341,15 @@ async function getSystemAccountBalances(
 ): Promise<IBalance[] | undefined> {
   const storage = new SystemAccountStorage(ctx, block)
   if (!storage.isExists) return undefined
-
-  const data = await ctx._chain.queryStorage(
-    block.hash,
-    'System',
-    'Account',
-    accounts.map(a => [a])
-  )
-
-  return data.map(d => ({
-    free: d.data.free,
-    reserved: d.data.reserved
-  })) as IBalance[]
+  if (storage.isV4) {
+    const data = await storage.asV4.getMany(accounts)
+    return data.map(d => ({
+      free: d.data.free,
+      reserved: d.data.reserved
+    })) as IBalance[]
+  } else {
+    throw new UnknownVersionError(`ParachainStakingNominatorStateStorage`)
+  }
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any

@@ -8,7 +8,7 @@ import {
 } from '@subsquid/substrate-processor'
 import { Store, TypeormDatabase } from '@subsquid/typeorm-store'
 import { getElasticSearch } from './elastic-search'
-import { EsBlock, EsEvent, EsExtrinsic } from './elastic-search/types'
+import { SearchBlock, SearchEvent, SearchExtrinsic } from './elastic-search/types'
 
 type Item = BatchProcessorItem<typeof processor>
 export type Context = BatchContext<Store, Item>
@@ -34,6 +34,8 @@ const processor = getProcessor()
       }
     }
   } as const)
+  // NOTE: keep the data as small as possible for wildcard '*' queries.
+  // otherwise you might overload the archive gateway and see pool timeouts
   .addCall('*', {
     data: {
       call: {
@@ -69,7 +71,7 @@ const mapChainGen = (block: BatchBlock<Item>): ChainGen => {
   return getChainGen({ specName, specVersion: Number(specVersion) })
 }
 
-const mapBlockBatch = (block: BatchBlock<Item>, extrinsics: EsExtrinsic[]): EsBlock => {
+const mapBlockBatch = (block: BatchBlock<Item>, extrinsics: SearchExtrinsic[]): SearchBlock => {
   const blockHeader: SubstrateBlock = block.header
   const { id, height, hash, timestamp } = blockHeader
   const chainGen = mapChainGen(block)
@@ -85,7 +87,7 @@ const mapBlockBatch = (block: BatchBlock<Item>, extrinsics: EsExtrinsic[]): EsBl
   }
 }
 
-const mapExtrinsics = (block: BatchBlock<Item>): EsExtrinsic[] => {
+const mapExtrinsics = (block: BatchBlock<Item>): SearchExtrinsic[] => {
   const blockHeader: SubstrateBlock = block.header
   const { height, timestamp } = blockHeader
   const chainGen = mapChainGen(block)
@@ -149,7 +151,7 @@ const mapExtrinsics = (block: BatchBlock<Item>): EsExtrinsic[] => {
     })
 }
 
-const mapEvents = (block: BatchBlock<Item>): EsEvent[] => {
+const mapEvents = (block: BatchBlock<Item>): SearchEvent[] => {
   const blockHeader: SubstrateBlock = block.header
   const { height, timestamp } = blockHeader
   const chainGen = mapChainGen(block)
@@ -175,9 +177,9 @@ const mapEvents = (block: BatchBlock<Item>): EsEvent[] => {
 const handleBatch = async (ctx: Context): Promise<void> => {
   const elasticSearch = getElasticSearch()
 
-  const batchedBlocks: EsBlock[] = []
-  const batchedExtrinsics: EsExtrinsic[] = []
-  const batchedEvents: EsEvent[] = []
+  const batchedBlocks: SearchBlock[] = []
+  const batchedExtrinsics: SearchExtrinsic[] = []
+  const batchedEvents: SearchEvent[] = []
 
   ctx.blocks.forEach(batchBlock => {
     const events = mapEvents(batchBlock)

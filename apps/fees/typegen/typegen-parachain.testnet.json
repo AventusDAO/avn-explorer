@@ -1,0 +1,10 @@
+{
+  "outDir": "../src/types/generated/parachain-testnet",
+  "specVersions": "../../../packages/metadata/versions.avn-parachain.testnet.jsonl",
+  "events": [
+    "TransactionPayment.TransactionFeePaid",
+    "AvnTransactionPayment.AdjustedTransactionFeePaid"
+  ],
+  "calls": [],
+  "storage": []
+}

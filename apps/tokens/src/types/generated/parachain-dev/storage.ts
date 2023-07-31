@@ -1,47 +1,50 @@
 import assert from 'assert'
-import {Block, Chain, ChainContext, BlockContext, Result, Option} from './support'
+import { Block, BlockContext, Chain, ChainContext, Option, Result, StorageBase } from './support'
 
-export class TokenManagerBalancesStorage {
-    private readonly _chain: Chain
-    private readonly blockHash: string
+export class TokenManagerBalancesStorage extends StorageBase {
+  protected getPrefix() {
+    return 'TokenManager'
+  }
 
-    constructor(ctx: BlockContext)
-    constructor(ctx: ChainContext, block: Block)
-    constructor(ctx: BlockContext, block?: Block) {
-        block = block || ctx.block
-        this.blockHash = block.hash
-        this._chain = ctx._chain
-    }
+  protected getName() {
+    return 'Balances'
+  }
 
-    /**
-     *  The number of units of tokens held by any given account.
-     */
-    get isV4() {
-        return this._chain.getStorageItemTypeHash('TokenManager', 'Balances') === '70874cd5f158184b9b398819cb71b85684c5adb4e5cc9e1065d1115dac23d5f2'
-    }
+  /**
+   *  The number of units of tokens held by any given account.
+   */
+  get isV21(): boolean {
+    return this.getTypeHash() === '70874cd5f158184b9b398819cb71b85684c5adb4e5cc9e1065d1115dac23d5f2'
+  }
 
-    /**
-     *  The number of units of tokens held by any given account.
-     */
-    async getAsV4(key: [Uint8Array, Uint8Array]): Promise<bigint> {
-        assert(this.isV4)
-        return this._chain.getStorage(this.blockHash, 'TokenManager', 'Balances', key)
-    }
+  /**
+   *  The number of units of tokens held by any given account.
+   */
+  get asV21(): TokenManagerBalancesStorageV21 {
+    assert(this.isV21)
+    return this as any
+  }
+}
 
-    async getManyAsV4(keys: [Uint8Array, Uint8Array][]): Promise<(bigint)[]> {
-        assert(this.isV4)
-        return this._chain.queryStorage(this.blockHash, 'TokenManager', 'Balances', keys.map(k => [k]))
-    }
-
-    async getAllAsV4(): Promise<(bigint)[]> {
-        assert(this.isV4)
-        return this._chain.queryStorage(this.blockHash, 'TokenManager', 'Balances')
-    }
-
-    /**
-     * Checks whether the storage item is defined for the current chain version.
-     */
-    get isExists(): boolean {
-        return this._chain.getStorageItemTypeHash('TokenManager', 'Balances') != null
-    }
+/**
+ *  The number of units of tokens held by any given account.
+ */
+export interface TokenManagerBalancesStorageV21 {
+  get(key: [Uint8Array, Uint8Array]): Promise<bigint>
+  getAll(): Promise<bigint[]>
+  getMany(keys: [Uint8Array, Uint8Array][]): Promise<bigint[]>
+  getKeys(): Promise<[Uint8Array, Uint8Array][]>
+  getKeys(key: [Uint8Array, Uint8Array]): Promise<[Uint8Array, Uint8Array][]>
+  getKeysPaged(pageSize: number): AsyncIterable<[Uint8Array, Uint8Array][]>
+  getKeysPaged(
+    pageSize: number,
+    key: [Uint8Array, Uint8Array]
+  ): AsyncIterable<[Uint8Array, Uint8Array][]>
+  getPairs(): Promise<[k: [Uint8Array, Uint8Array], v: bigint][]>
+  getPairs(key: [Uint8Array, Uint8Array]): Promise<[k: [Uint8Array, Uint8Array], v: bigint][]>
+  getPairsPaged(pageSize: number): AsyncIterable<[k: [Uint8Array, Uint8Array], v: bigint][]>
+  getPairsPaged(
+    pageSize: number,
+    key: [Uint8Array, Uint8Array]
+  ): AsyncIterable<[k: [Uint8Array, Uint8Array], v: bigint][]>
 }

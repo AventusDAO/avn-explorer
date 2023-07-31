@@ -1,12 +1,11 @@
 import { AxiosError } from 'axios'
 import { ApiError, avnHashRegex, isAxiosError } from '../../utils'
 import {
-  JsonMap,
   EsSortItem,
   EsRequestPayload,
   EsSortDirection,
   EsQuery,
-  Extrinsic
+  SearchExtrinsic
 } from '../../types'
 import { getLogger } from '../../utils/logger'
 import { config } from '../../config'
@@ -18,6 +17,7 @@ import {
   getExtrinsicsQuery,
   getMultiTransactionsForAddressQuery
 } from './query-builder'
+
 const logger = getLogger('extrinsics-service')
 
 const supportedSortFields = ['timestamp', 'blockHeight']
@@ -42,8 +42,9 @@ export const getExtrinsics = async (
   sortCsv?: string,
   address?: string,
   isFailed?: boolean,
+  signedOnly?: boolean,
   dataQuery?: ExtrinsicDataQuery
-): Promise<Extrinsic[]> => {
+): Promise<SearchExtrinsic[]> => {
   let query: EsQuery
   let isHexAddress = false
   let ss58Value: string | undefined
@@ -66,7 +67,7 @@ export const getExtrinsics = async (
       }
     }
   } else {
-    query = getExtrinsicsQuery(undefined, isFailed, dataQuery)
+    query = getExtrinsicsQuery(isFailed, signedOnly, dataQuery)
   }
 
   const sort: EsSortItem[] = []
@@ -78,7 +79,7 @@ export const getExtrinsics = async (
 
   const payload: EsRequestPayload = { size, from, sort, query }
   try {
-    const response = await elasticSearch.post<JsonMap>(
+    const response = await elasticSearch.post<SearchExtrinsic>(
       `${config.db.extrinsicsIndex}/_search`,
       payload
     )

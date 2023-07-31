@@ -12,7 +12,7 @@ export function processSortParam(
   sortCsv: string,
   supportedSortFields: string[]
 ): Record<string, EsSortDirection> {
-  const splits = sortCsv.split(',')
+  const splits = sortCsv.split('_')
   if (splits.length !== 2) throw new ApiError('bad_request', 400, 'corrupted sort param', true)
   const [field, direction] = splits
   if (!supportedSortFields.includes(field))

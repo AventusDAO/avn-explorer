@@ -1,7 +1,10 @@
 {
   "outDir": "../src/types/generated/parachain-dev",
-  "specVersions": "../../../packages/metadata/versions-parachain.dev.jsonl",
-  "events": ["TransactionPayment.TransactionFeePaid"],
+  "specVersions": "../../../packages/metadata/versions.avn-parachain.dev.jsonl",
+  "events": [
+    "TransactionPayment.TransactionFeePaid",
+    "AvnTransactionPayment.AdjustedTransactionFeePaid"
+  ],
   "calls": [],
   "storage": []
 }

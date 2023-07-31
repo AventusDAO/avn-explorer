@@ -10,7 +10,7 @@ lib
 .pnp.cjs
 .pnp.loader.mjs
 # generated code
-**/types/generated/parachain-dev/**
+**/types/generated/**
 **/model/generated/**
 **/db/migrations/*.js
 # temporary app with errors
