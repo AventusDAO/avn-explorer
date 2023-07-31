@@ -1,13 +1,24 @@
 import { EventItem } from '@subsquid/substrate-processor/lib/interfaces/dataSelection'
-import { Ctx } from './processor'
+import { Ctx, MintedNftEventItem } from '.'
+import { MintedNftEventData } from './types/custom'
 import {
   NftManagerSingleNftMintedEvent,
   NftManagerBatchNftMintedEvent
 } from './types/generated/parachain-dev/events'
+import { encodeId } from '@avn/utils'
 
 class UknownVersionError extends Error {
   constructor() {
     super('Unknown verson')
+  }
+}
+
+export function handleMintedNfts(ctx: Ctx, item: MintedNftEventItem): MintedNftEventData {
+  const event = normalizeMintNftEvent(ctx, item)
+  return {
+    id: item.event.id,
+    nftId: event.nftId,
+    owner: encodeId(event.owner)
   }
 }
 
