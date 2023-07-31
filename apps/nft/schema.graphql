@@ -1,0 +1,5 @@
+type Account @entity {
+  id: ID!
+  feesTotal: BigInt! @index
+  updatedAt: Int @index
+}
