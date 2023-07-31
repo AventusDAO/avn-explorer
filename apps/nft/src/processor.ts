@@ -1,8 +1,12 @@
-import { TypeormDatabase } from '@subsquid/typeorm-store'
+import { BatchContext, BatchProcessorItem } from '@subsquid/substrate-processor'
+import { Store, TypeormDatabase } from '@subsquid/typeorm-store'
 import { getProcessor } from '@avn/config'
 
 const processor = getProcessor()
 
 processor.run(new TypeormDatabase(), processEvents)
 
-async function processEvents(ctx: Ctx): Promise<void> {}
+type Item = BatchProcessorItem<typeof processor>
+export type Context = BatchContext<Store, Item>
+
+async function processEvents(ctx: Context): Promise<void> {}
