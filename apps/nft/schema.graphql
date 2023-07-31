@@ -1,5 +1,5 @@
-type Account @entity {
-  id: ID!
-  feesTotal: BigInt! @index
-  updatedAt: Int @index
+type Nft @entity {
+  id: ID! @index
+  nftId: BigInt! @index
+  owner: String! @index
 }
