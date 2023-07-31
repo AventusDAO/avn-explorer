@@ -22,7 +22,7 @@
 
 # jobs:
 #   avn-docker-build:
-#     name: AvN Explorer nft
+#     name: AvN Explorer Nft
 #     uses: ./.github/workflows/docker-build.yml
 #     with:
 #       short_image_name: nft
