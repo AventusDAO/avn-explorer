@@ -1,6 +1,5 @@
-import { EventItem } from '@subsquid/substrate-processor/lib/interfaces/dataSelection'
-import { Ctx, MintedNftEventItem } from '.'
-import { MintedNftEventData } from './types/custom'
+import { Ctx } from '.'
+import { MintedNftEventData, NftEventItem } from './types/custom'
 import {
   NftManagerSingleNftMintedEvent,
   NftManagerBatchNftMintedEvent
@@ -13,7 +12,10 @@ class UknownVersionError extends Error {
   }
 }
 
-export function handleMintedNfts(ctx: Ctx, item: MintedNftEventItem): MintedNftEventData {
+export function handleMintedNfts(
+  ctx: Ctx,
+  item: NftEventItem<'NftManager.SingleNftMinted'> | NftEventItem<'NftManager.BatchNftMinted'>
+): MintedNftEventData {
   const event = normalizeMintNftEvent(ctx, item)
   return {
     id: item.event.id,
@@ -24,9 +26,7 @@ export function handleMintedNfts(ctx: Ctx, item: MintedNftEventItem): MintedNftE
 
 export function normalizeMintNftEvent(
   ctx: Ctx,
-  item:
-    | EventItem<'NftManager.SingleNftMinted', { event: { args: true } }>
-    | EventItem<'NftManager.BatchNftMinted', { event: { args: true } }>
+  item: NftEventItem<'NftManager.SingleNftMinted'> | NftEventItem<'NftManager.BatchNftMinted'>
 ): { nftId: bigint; owner: Uint8Array } {
   const e =
     item.name === 'NftManager.SingleNftMinted'

@@ -6,24 +6,14 @@ export interface MintedNftEventData {
   owner: string
 }
 
-export type NftEventItem =
-  | EventItem<
-      'NftManager.BatchCreated',
-      { event: { args: true; extrinsic: { hash: true }; call: {} } }
-    >
-  | EventItem<
-      'NftManager.SingleNftMinted',
-      { event: { args: true; extrinsic: { hash: true }; call: {} } }
-    >
-  | EventItem<
-      'NftManager.BatchNftMinted',
-      { event: { args: true; extrinsic: { hash: true }; call: {} } }
-    >
-  | EventItem<
-      'NftManager.FiatNftTransfer',
-      { event: { args: true; extrinsic: { hash: true }; call: {} } }
-    >
-  | EventItem<
-      'NftManager.EthNftTransfer',
-      { event: { args: true; extrinsic: { hash: true }; call: {} } }
-    >
+export type NftEventName =
+  | 'NftManager.BatchCreated'
+  | 'NftManager.SingleNftMinted'
+  | 'NftManager.BatchNftMinted'
+  | 'NftManager.FiatNftTransfer'
+  | 'NftManager.EthNftTransfer'
+
+export type NftEventItem<NftEventName> = EventItem<
+  NftEventName,
+  { event: { args: true; extrinsic: { hash: true }; call: {} } }
+>

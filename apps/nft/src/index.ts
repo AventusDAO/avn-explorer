@@ -5,19 +5,9 @@ import { In } from 'typeorm'
 import { MintedNftEventData } from './types/custom'
 import { handleMintedNfts } from './eventHandlers'
 import { processor } from './processor'
-import { EventItem } from '@subsquid/substrate-processor/lib/interfaces/dataSelection'
 
 export type Item = BatchProcessorItem<typeof processor>
 export type Ctx = BatchContext<Store, Item>
-export type MintedNftEventItem =
-  | EventItem<
-      'NftManager.SingleNftMinted',
-      { event: { args: true; extrinsic: { hash: true }; call: {} } }
-    >
-  | EventItem<
-      'NftManager.BatchNftMinted',
-      { event: { args: true; extrinsic: { hash: true }; call: {} } }
-    >
 
 processor.run(new TypeormDatabase(), processEvents)
 
