@@ -3,15 +3,23 @@ import { encodeId } from '@avn/utils'
 import { EventItem } from '@subsquid/substrate-processor/lib/interfaces/dataSelection'
 import { Store, TypeormDatabase } from '@subsquid/typeorm-store'
 import { Nft } from './model'
-import {
-  NftManagerSingleNftMintedEvent,
-  NftManagerBatchNftMintedEvent
-} from './types/generated/parachain-dev/events'
 import { getProcessor } from '@avn/config'
 import { In } from 'typeorm'
 import { MintedNftEventData } from './types/custom'
+import { normalizeMintNftEvent } from './eventHandlers'
 
 const processor = getProcessor()
+  .addEvent('NftManager.BatchCreated', {
+    data: {
+      event: {
+        args: true,
+        extrinsic: {
+          hash: true
+        },
+        call: {}
+      }
+    }
+  } as const)
   .addEvent('NftManager.SingleNftMinted', {
     data: {
       event: {
@@ -34,10 +42,32 @@ const processor = getProcessor()
       }
     }
   } as const)
+  .addEvent('NftManager.FiatNftTransfer', {
+    data: {
+      event: {
+        args: true,
+        extrinsic: {
+          hash: true
+        },
+        call: {}
+      }
+    }
+  } as const)
+  .addEvent('NftManager.EthNftTransfer', {
+    data: {
+      event: {
+        args: true,
+        extrinsic: {
+          hash: true
+        },
+        call: {}
+      }
+    }
+  } as const)
 
-type Item = BatchProcessorItem<typeof processor>
-type Ctx = BatchContext<Store, Item>
-type MintedNftEventItem =
+export type Item = BatchProcessorItem<typeof processor>
+export type Ctx = BatchContext<Store, Item>
+export type MintedNftEventItem =
   | EventItem<
       'NftManager.SingleNftMinted',
       { event: { args: true; extrinsic: { hash: true }; call: {} } }
@@ -67,24 +97,6 @@ function handleMintedNfts(ctx: Ctx, item: MintedNftEventItem): MintedNftEventDat
     id: item.event.id,
     nftId: event.nftId,
     owner: encodeId(event.owner)
-  }
-}
-
-function normalizeMintNftEvent(
-  ctx: Ctx,
-  item:
-    | EventItem<'NftManager.SingleNftMinted', { event: { args: true } }>
-    | EventItem<'NftManager.BatchNftMinted', { event: { args: true } }>
-): { nftId: bigint; owner: Uint8Array } {
-  const e =
-    item.name === 'NftManager.SingleNftMinted'
-      ? new NftManagerSingleNftMintedEvent(ctx, item.event)
-      : new NftManagerBatchNftMintedEvent(ctx, item.event)
-  if (e.isV21) {
-    const { nftId, owner } = e.asV21
-    return { nftId, owner }
-  } else {
-    throw new UknownVersionError()
   }
 }
 
@@ -119,10 +131,4 @@ function getAccount(m: string[], id: string): string {
     m.push(id, id)
   }
   return id
-}
-
-class UknownVersionError extends Error {
-  constructor() {
-    super('Unknown verson')
-  }
 }
