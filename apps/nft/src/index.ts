@@ -2,7 +2,7 @@ import { BatchContext, BatchProcessorItem } from '@subsquid/substrate-processor'
 import { Store, TypeormDatabase } from '@subsquid/typeorm-store'
 import { Nft } from './model'
 import { In } from 'typeorm'
-import { MintedNftEventData } from './types/custom'
+import { NftMintEventData } from './types/custom'
 import { handleMintedNfts } from './eventHandlers'
 import { processor } from './processor'
 
@@ -12,7 +12,7 @@ export type Ctx = BatchContext<Store, Item>
 processor.run(new TypeormDatabase(), processEvents)
 
 async function processEvents(ctx: Ctx): Promise<void> {
-  const nftData: MintedNftEventData[] = []
+  const nftData: NftMintEventData[] = []
   for (const block of ctx.blocks) {
     for (const item of block.items) {
       if (item.name === 'NftManager.SingleNftMinted' || item.name === 'NftManager.BatchNftMinted') {
@@ -20,10 +20,10 @@ async function processEvents(ctx: Ctx): Promise<void> {
       }
     }
   }
-  await saveTransfers(ctx, nftData)
+  await saveNfts(ctx, nftData)
 }
 
-async function saveTransfers(ctx: Ctx, mintedNftsData: MintedNftEventData[]): Promise<void> {
+async function saveNfts(ctx: Ctx, mintedNftsData: NftMintEventData[]): Promise<void> {
   const accountIds = new Set<string>()
   for (const t of mintedNftsData) {
     accountIds.add(t.owner)
@@ -35,12 +35,11 @@ async function saveTransfers(ctx: Ctx, mintedNftsData: MintedNftEventData[]): Pr
   const nfts: Nft[] = []
 
   for (const t of mintedNftsData) {
-    const { id, nftId } = t
+    const { id } = t
     const owner = getAccount(accounts, t.owner)
     nfts.push(
       new Nft({
         id,
-        nftId,
         owner
       })
     )

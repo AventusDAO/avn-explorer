@@ -1,5 +1,5 @@
 import { Ctx } from '.'
-import { MintedNftEventData, NftEventItem } from './types/custom'
+import { NftMintEventData, NftEventItem } from './types/custom'
 import {
   NftManagerSingleNftMintedEvent,
   NftManagerBatchNftMintedEvent
@@ -15,16 +15,15 @@ class UknownVersionError extends Error {
 export function handleMintedNfts(
   ctx: Ctx,
   item: NftEventItem<'NftManager.SingleNftMinted'> | NftEventItem<'NftManager.BatchNftMinted'>
-): MintedNftEventData {
+): NftMintEventData {
   const event = normalizeMintNftEvent(ctx, item)
   return {
-    id: item.event.id,
-    nftId: event.nftId,
+    id: event.nftId.toString(),
     owner: encodeId(event.owner)
   }
 }
 
-export function normalizeMintNftEvent(
+function normalizeMintNftEvent(
   ctx: Ctx,
   item: NftEventItem<'NftManager.SingleNftMinted'> | NftEventItem<'NftManager.BatchNftMinted'>
 ): { nftId: bigint; owner: Uint8Array } {

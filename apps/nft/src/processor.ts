@@ -19,7 +19,7 @@ export const processor = getProcessor()
         extrinsic: {
           hash: true
         },
-        call: {}
+        call: true
       }
     }
   } as const)
@@ -30,7 +30,7 @@ export const processor = getProcessor()
         extrinsic: {
           hash: true
         },
-        call: {}
+        call: true
       }
     }
   } as const)
