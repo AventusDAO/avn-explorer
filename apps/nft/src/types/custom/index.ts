@@ -1,16 +1,25 @@
 import { EventItem } from '@subsquid/substrate-processor/lib/interfaces/dataSelection'
 
 export type NftEventName =
-  | 'NftManager.BatchCreated'
   | 'NftManager.SingleNftMinted'
   | 'NftManager.BatchNftMinted'
+  | 'NftManager.BatchCreated'
   | 'NftManager.FiatNftTransfer'
   | 'NftManager.EthNftTransfer'
 
-export type NftEventItem<NftEventName> = EventItem<
-  NftEventName,
-  { event: { args: true; extrinsic: { hash: true }; call: {} } }
->
+export type NftEventItem<NftEventName> =
+  | EventItem<NftEventName, { event: { args: true; call: {} } }>
+  | EventItem<
+      'NftManager.SingleNftMinted' | 'NftManager.BatchNftMinted',
+      {
+        event: {
+          args: true
+          call: {
+            args: true
+          }
+        }
+      }
+    >
 
 export interface NftRoyalty {
   rate: {
@@ -29,4 +38,5 @@ export interface NftMetadata {
   uniqueExternalRef: string
 }
 
+// TODO: remove and use NftMetadata instead
 export type NftMintEventData = Pick<NftMetadata, 'id' | 'owner'>

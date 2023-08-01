@@ -12,6 +12,7 @@ class UknownVersionError extends Error {
   }
 }
 
+// TODO: add other properties from the call (use NftMetadata interface)
 export function handleMintedNfts(
   ctx: Ctx,
   item: NftEventItem<'NftManager.SingleNftMinted'> | NftEventItem<'NftManager.BatchNftMinted'>

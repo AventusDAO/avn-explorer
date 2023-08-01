@@ -1,25 +1,13 @@
 import { getProcessor } from '@avn/config'
 
 export const processor = getProcessor()
-  .addEvent('NftManager.BatchCreated', {
-    data: {
-      event: {
-        args: true,
-        extrinsic: {
-          hash: true
-        },
-        call: {}
-      }
-    }
-  } as const)
   .addEvent('NftManager.SingleNftMinted', {
     data: {
       event: {
         args: true,
-        extrinsic: {
-          hash: true
-        },
-        call: true
+        call: {
+          args: true
+        }
       }
     }
   } as const)
@@ -27,10 +15,17 @@ export const processor = getProcessor()
     data: {
       event: {
         args: true,
-        extrinsic: {
-          hash: true
-        },
-        call: true
+        call: {
+          args: true
+        }
+      }
+    }
+  } as const)
+  .addEvent('NftManager.BatchCreated', {
+    data: {
+      event: {
+        args: true,
+        call: {}
       }
     }
   } as const)
@@ -38,9 +33,6 @@ export const processor = getProcessor()
     data: {
       event: {
         args: true,
-        extrinsic: {
-          hash: true
-        },
         call: {}
       }
     }
@@ -49,9 +41,6 @@ export const processor = getProcessor()
     data: {
       event: {
         args: true,
-        extrinsic: {
-          hash: true
-        },
         call: {}
       }
     }
