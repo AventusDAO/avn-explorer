@@ -1,5 +1,4 @@
 import { SubstrateBlock, toHex } from '@subsquid/substrate-processor'
-import { encodeId } from '@avn/utils'
 import { TypeormDatabase } from '@subsquid/typeorm-store'
 import {
   TokenTransfer,
@@ -84,20 +83,6 @@ async function recordTokenTransferData(
   await ctx.store.save([...accountTokens.values()])
   await ctx.store.insert(transfers)
   ctx.log.child('state').info(`saved token transfers ${transfers.length}`)
-}
-
-async function saveAccountToken(ctx: Ctx, accountTokens: AccountToken[]) {
-  for (const accountToken of accountTokens) {
-    const existing = (await ctx.store.find(AccountToken, {
-      where: { accountId: accountToken.accountId, tokenId: accountToken.tokenId }
-    })) as unknown as AccountToken
-    if (existing) {
-      existing.balance = accountToken.balance
-      await ctx.store.save<AccountToken>(existing)
-    } else {
-      await ctx.store.save(accountToken)
-    }
-  }
 }
 
 async function recordNftTransferData(
@@ -214,7 +199,7 @@ function getTokenEventTransferData(
     ...getEventTransferData(block, item, event, palletInfoArray),
     amount: event.amount,
     tokenName,
-    tokenId: tokenId
+    tokenId
   }
 }
 

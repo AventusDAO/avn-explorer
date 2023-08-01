@@ -17,7 +17,7 @@ export class AccountToken {
     Object.assign(this, props)
   }
 
-  @PrimaryGeneratedColumn_()
+  @PrimaryColumn_()
   id!: string
 
   @Column_('text', { nullable: true })

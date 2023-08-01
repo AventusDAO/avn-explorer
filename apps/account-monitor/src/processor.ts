@@ -165,5 +165,16 @@ const processor = getProcessor()
       }
     }
   } as const)
+  .addEvent('NftManager.EthNftTransfer', {
+    data: {
+      event: {
+        args: true,
+        extrinsic: {
+          hash: true
+        },
+        call: {}
+      }
+    }
+  } as const)
 
 export default processor

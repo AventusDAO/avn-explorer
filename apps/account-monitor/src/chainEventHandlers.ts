@@ -11,6 +11,7 @@ import {
   BalancesWithdrawEvent,
   NftManagerBatchCreatedEvent,
   NftManagerBatchNftMintedEvent,
+  NftManagerEthNftTransferEvent,
   NftManagerFiatNftTransferEvent,
   NftManagerSingleNftMintedEvent,
   TokenManagerTokenLiftedEvent,
@@ -34,7 +35,12 @@ export function normalizeBalancesTransferEvent(
   const e = new BalancesTransferEvent(ctx, item.event)
   if (e.isV4) {
     const { from, to, amount } = e.asV4
-    return { from, to, amount, tokenId: avtHash ? decodeHex(avtHash) : new Uint8Array() }
+    return {
+      from,
+      to,
+      amount,
+      tokenId: avtHash ? decodeHex(avtHash) : /* this should not be reached */ new Uint8Array()
+    }
   } else {
     throw new UnknownVersionError()
   }
@@ -52,7 +58,7 @@ export function normalizeBalancesEndowedEvent(
       from: account,
       to: account,
       amount: freeBalance,
-      tokenId: avtHash ? decodeHex(avtHash) : new Uint8Array()
+      tokenId: avtHash ? decodeHex(avtHash) : /* this should not be reached */ new Uint8Array()
     }
   } else {
     throw new UnknownVersionError()
@@ -71,7 +77,7 @@ export function normalizeBalancesBalanceSetEvent(
       from: new Uint8Array(),
       to: who,
       amount: free + reserved,
-      tokenId: avtHash ? decodeHex(avtHash) : new Uint8Array()
+      tokenId: avtHash ? decodeHex(avtHash) : /* this should not be reached */ new Uint8Array()
     }
   } else {
     throw new UnknownVersionError()
@@ -86,7 +92,12 @@ export function normalizeBalancesReservedEvent(
   const e = new BalancesReservedEvent(ctx, item.event)
   if (e.isV4) {
     const { amount, who } = e.asV4
-    return { from: who, to: who, amount, tokenId: avtHash ? decodeHex(avtHash) : new Uint8Array() }
+    return {
+      from: who,
+      to: who,
+      amount,
+      tokenId: avtHash ? decodeHex(avtHash) : /* this should not be reached */ new Uint8Array()
+    }
   } else {
     throw new UnknownVersionError()
   }
@@ -100,7 +111,12 @@ export function normalizeBalancesUnreservedEvent(
   const e = new BalancesUnreservedEvent(ctx, item.event)
   if (e.isV4) {
     const { amount, who } = e.asV4
-    return { from: who, to: who, amount, tokenId: avtHash ? decodeHex(avtHash) : new Uint8Array() }
+    return {
+      from: who,
+      to: who,
+      amount,
+      tokenId: avtHash ? decodeHex(avtHash) : /* this should not be reached */ new Uint8Array()
+    }
   } else {
     throw new UnknownVersionError()
   }
@@ -114,7 +130,12 @@ export function normalizeBalancesReserveRepatriatedEvent(
   const e = new BalancesReserveRepatriatedEvent(ctx, item.event)
   if (e.isV4) {
     const { amount, destinationStatus, from, to } = e.asV4
-    return { from, to, amount, tokenId: avtHash ? decodeHex(avtHash) : new Uint8Array() }
+    return {
+      from,
+      to,
+      amount,
+      tokenId: avtHash ? decodeHex(avtHash) : /* this should not be reached */ new Uint8Array()
+    }
   } else {
     throw new UnknownVersionError()
   }
@@ -128,7 +149,12 @@ export function normalizeBalancesDepositEvent(
   const e = new BalancesDepositEvent(ctx, item.event)
   if (e.isV4) {
     const { amount, who } = e.asV4
-    return { from: who, to: who, amount, tokenId: avtHash ? decodeHex(avtHash) : new Uint8Array() }
+    return {
+      from: who,
+      to: who,
+      amount,
+      tokenId: avtHash ? decodeHex(avtHash) : /* this should not be reached */ new Uint8Array()
+    }
   } else {
     throw new UnknownVersionError()
   }
@@ -142,7 +168,12 @@ export function normalizeBalancesWithdrawEvent(
   const e = new BalancesWithdrawEvent(ctx, item.event)
   if (e.isV4) {
     const { amount, who } = e.asV4
-    return { from: who, to: who, amount, tokenId: avtHash ? decodeHex(avtHash) : new Uint8Array() }
+    return {
+      from: who,
+      to: who,
+      amount,
+      tokenId: avtHash ? decodeHex(avtHash) : /* this should not be reached */ new Uint8Array()
+    }
   } else {
     throw new UnknownVersionError()
   }
@@ -156,7 +187,12 @@ export function normalizeBalancesSlashedEvent(
   const e = new BalancesSlashedEvent(ctx, item.event)
   if (e.isV4) {
     const { amount, who } = e.asV4
-    return { from: who, to: who, amount, tokenId: avtHash ? decodeHex(avtHash) : new Uint8Array() }
+    return {
+      from: who,
+      to: who,
+      amount,
+      tokenId: avtHash ? decodeHex(avtHash) : /* this should not be reached */ new Uint8Array()
+    }
   } else {
     throw new UnknownVersionError()
   }
@@ -262,6 +298,19 @@ export function normalizeNftFiatNftTransfer(
   }
 }
 
+export function normalizeNftEthNftTransfer(
+  ctx: Ctx,
+  item: EventItem<'NftManager.EthNftTransfer', { event: { args: true } }>
+): { from: undefined; to: Uint8Array; nftId: bigint; totalSupply: number } {
+  const e = new NftManagerEthNftTransferEvent(ctx, item.event)
+  if (e.isV4) {
+    const { newOwner, nftId, ethEventId, opId, saleType } = e.asV4
+    return { from: undefined, to: newOwner, nftId, totalSupply: 1 }
+  } else {
+    throw new UnknownVersionError()
+  }
+}
+
 class UnknownVersionError extends Error {
   constructor() {
     super('Unknown version')
@@ -284,7 +333,8 @@ const eventNormalizers: EventNormalizers = {
   'NftManager.BatchCreated': normalizeNftBatchCreated,
   'NftManager.SingleNftMinted': normalizeNftSingleNftMinted,
   'NftManager.BatchNftMinted': normalizeNftBatchNftMinted,
-  'NftManager.FiatNftTransfer': normalizeNftFiatNftTransfer
+  'NftManager.FiatNftTransfer': normalizeNftFiatNftTransfer,
+  'NftManager.EthNftTransfer': normalizeNftEthNftTransfer
 }
 
 export function getEvent<T extends EventName>(

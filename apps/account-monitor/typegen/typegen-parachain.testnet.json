@@ -17,7 +17,8 @@
     "NftManager.BatchCreated",
     "NftManager.SingleNftMinted",
     "NftManager.BatchNftMinted",
-    "NftManager.FiatNftTransfer"
+    "NftManager.FiatNftTransfer",
+    "NftManager.EthNftTransfer"
   ],
   "calls": [],
   "storage": ["TokenManager.Balances", "NftManager.OwnedNfts", "System.Account", "Balances.Account"]

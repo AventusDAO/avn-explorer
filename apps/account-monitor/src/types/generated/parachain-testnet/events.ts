@@ -323,6 +323,35 @@ export class NftManagerBatchNftMintedEvent {
     }
 }
 
+export class NftManagerEthNftTransferEvent {
+    private readonly _chain: Chain
+    private readonly event: Event
+
+    constructor(ctx: EventContext)
+    constructor(ctx: ChainContext, event: Event)
+    constructor(ctx: EventContext, event?: Event) {
+        event = event || ctx.event
+        assert(event.name === 'NftManager.EthNftTransfer')
+        this._chain = ctx._chain
+        this.event = event
+    }
+
+    /**
+     * EthNftTransfer(NftId, NewOwnerAccountId, NftSaleType, u64, EthEventId),
+     */
+    get isV4(): boolean {
+        return this._chain.getEventHash('NftManager.EthNftTransfer') === 'dacd5568e1e613bf13bd61ec2a3dde12c269262c4e693508a6ba11a85c9626b5'
+    }
+
+    /**
+     * EthNftTransfer(NftId, NewOwnerAccountId, NftSaleType, u64, EthEventId),
+     */
+    get asV4(): {nftId: bigint, newOwner: Uint8Array, saleType: v4.NftSaleType, opId: bigint, ethEventId: v4.EthEventId} {
+        assert(this.isV4)
+        return this._chain.decodeEvent(this.event)
+    }
+}
+
 export class NftManagerFiatNftTransferEvent {
     private readonly _chain: Chain
     private readonly event: Event

@@ -24,6 +24,11 @@ export interface NftSaleType_Fiat {
     __kind: 'Fiat'
 }
 
+export interface EthEventId {
+    signature: Uint8Array
+    transactionHash: Uint8Array
+}
+
 export interface AccountData {
     free: bigint
     reserved: bigint

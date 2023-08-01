@@ -1,5 +1,15 @@
 import type {Result, Option} from './support'
 
+export type BalanceStatus = BalanceStatus_Free | BalanceStatus_Reserved
+
+export interface BalanceStatus_Free {
+    __kind: 'Free'
+}
+
+export interface BalanceStatus_Reserved {
+    __kind: 'Reserved'
+}
+
 export type NftSaleType = NftSaleType_Unknown | NftSaleType_Ethereum | NftSaleType_Fiat
 
 export interface NftSaleType_Unknown {
@@ -12,6 +22,11 @@ export interface NftSaleType_Ethereum {
 
 export interface NftSaleType_Fiat {
     __kind: 'Fiat'
+}
+
+export interface EthEventId {
+    signature: Uint8Array
+    transactionHash: Uint8Array
 }
 
 export interface AccountData {

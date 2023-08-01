@@ -41,7 +41,7 @@ export function createNftTransfers(
         blockNumber: transfer.blockNumber,
         timestamp: transfer.timestamp,
         extrinsicHash: transfer.extrinsicHash,
-        from: transfer.from && accounts.get(encodeId(transfer.from)),
+        from: transfer.from ? accounts.get(encodeId(transfer.from)) : undefined,
         to: accounts.get(encodeId(transfer.to)),
         nft: nfts.get(transfer.nftId ?? ''),
         pallet: transfer.pallet,
@@ -102,6 +102,7 @@ export async function mapAccountTokenEntities(
         accountTokens.set(
           `${accountId}-${tokenId}`,
           new AccountToken({
+            id: `${accountId}-${tokenId}`,
             accountId,
             tokenId,
             balance: tokenBalance
@@ -156,6 +157,7 @@ export async function mapAccountEntities(
   }
 
   const addresses = Array.from(addressSet)
+  // be aware of performance issues here as it relates to huge amounts of transactions. Maybe this should be called conditionally.
   const balances = await getBalances(ctx, block, addresses)
 
   if (balances) {

@@ -45,6 +45,7 @@ export type TransfersEventItem =
   | EventItem<'NftManager.SingleNftMinted', { event: { args: true; extrinsic: { hash: true } } }>
   | EventItem<'NftManager.BatchNftMinted', { event: { args: true; extrinsic: { hash: true } } }>
   | EventItem<'NftManager.FiatNftTransfer', { event: { args: true; extrinsic: { hash: true } } }>
+  | EventItem<'NftManager.EthNftTransfer', { event: { args: true; extrinsic: { hash: true } } }>
 
 export type EventNormalizers = {
   [K in TransfersEventItem['name']]: EventNormalizer<Extract<TransfersEventItem, { name: K }>>
@@ -67,6 +68,7 @@ export type EventName =
   | 'NftManager.SingleNftMinted'
   | 'NftManager.BatchNftMinted'
   | 'NftManager.FiatNftTransfer'
+  | 'NftManager.EthNftTransfer'
 
 export type EventNormalizer<T extends TransfersEventItem> = (
   ctx: Ctx,
