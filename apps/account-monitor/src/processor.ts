@@ -33,6 +33,83 @@ const processor = getProcessor()
       }
     }
   } as const)
+  .addEvent('Balances.Endowed', {
+    data: {
+      event: {
+        args: true,
+        extrinsic: {
+          hash: true
+        },
+        call: {}
+      }
+    }
+  } as const)
+  .addEvent('Balances.Reserved', {
+    data: {
+      event: {
+        args: true,
+        extrinsic: {
+          hash: true
+        },
+        call: {}
+      }
+    }
+  } as const)
+  .addEvent('Balances.Unreserved', {
+    data: {
+      event: {
+        args: true,
+        extrinsic: {
+          hash: true
+        },
+        call: {}
+      }
+    }
+  } as const)
+  .addEvent('Balances.ReserveRepatriated', {
+    data: {
+      event: {
+        args: true,
+        extrinsic: {
+          hash: true
+        },
+        call: {}
+      }
+    }
+  } as const)
+  .addEvent('Balances.Deposit', {
+    data: {
+      event: {
+        args: true,
+        extrinsic: {
+          hash: true
+        },
+        call: {}
+      }
+    }
+  } as const)
+  .addEvent('Balances.Withdraw', {
+    data: {
+      event: {
+        args: true,
+        extrinsic: {
+          hash: true
+        },
+        call: {}
+      }
+    }
+  } as const)
+  .addEvent('Balances.Slashed', {
+    data: {
+      event: {
+        args: true,
+        extrinsic: {
+          hash: true
+        },
+        call: {}
+      }
+    }
+  } as const)
   .addEvent('Balances.Transfer', {
     data: {
       event: {
@@ -78,6 +155,17 @@ const processor = getProcessor()
     }
   } as const)
   .addEvent('NftManager.FiatNftTransfer', {
+    data: {
+      event: {
+        args: true,
+        extrinsic: {
+          hash: true
+        },
+        call: {}
+      }
+    }
+  } as const)
+  .addEvent('NftManager.EthNftTransfer', {
     data: {
       event: {
         args: true,

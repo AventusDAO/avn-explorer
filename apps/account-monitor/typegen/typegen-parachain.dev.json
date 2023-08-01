@@ -3,13 +3,22 @@
   "specVersions": "../../../packages/metadata/versions.avn-parachain.dev.jsonl",
   "events": [
     "Balances.Transfer",
+    "Balances.Endowed",
+    "Balances.BalanceSet",
+    "Balances.Reserved",
+    "Balances.Unreserved",
+    "Balances.ReserveRepatriated",
+    "Balances.Deposit",
+    "Balances.Withdraw",
+    "Balances.Slashed",
     "TokenManager.TokenLifted",
     "TokenManager.TokenTransferred",
     "TokenManager.TokenLowered",
     "NftManager.BatchCreated",
     "NftManager.SingleNftMinted",
     "NftManager.BatchNftMinted",
-    "NftManager.FiatNftTransfer"
+    "NftManager.FiatNftTransfer",
+    "NftManager.EthNftTransfer"
   ],
   "calls": [],
   "storage": ["TokenManager.Balances", "NftManager.OwnedNfts", "System.Account", "Balances.Account"]
