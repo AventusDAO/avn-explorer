@@ -5,7 +5,8 @@ import {
   NftManagerBatchNftMintedEvent
 } from './types/generated/parachain-dev/events'
 import { encodeId } from '@avn/utils'
-import { MintCallItem } from './types/custom/call'
+import { normalizeCallArgs } from './callHandlers'
+import { BatchBlock } from '@subsquid/substrate-processor'
 
 class UknownVersionError extends Error {
   constructor() {
@@ -14,27 +15,32 @@ class UknownVersionError extends Error {
 }
 
 // TODO: add other properties from the call (use NftMetadata interface)
-export function handleMintedNfts(ctx: Ctx, item: NftMintEventItem): NftMetadata {
-  const event = normalizeMintNftEvent(ctx, item)
+export function handleMintedNfts(
+  item: NftMintEventItem,
+  // TODO:
+  // block: BatchBlock<any>,
+  ctx: Ctx
+): NftMetadata {
+  const event = normalizeMintNftEvent(item, ctx)
   const call = item.event.call
   if (!call) throw new Error(`missing related call data in ${item.name} event item`)
-  const args = normalizeCallArgs(call.args)
-  console.log(args)
+  const args = normalizeCallArgs(call, ctx)
+  const { t1Authority, royalties, uniqueExternalRef } = args
   return {
     id: event.nftId.toString(),
     owner: encodeId(event.owner),
     // TODO: process call args
-    mintBlock: 0,
-    mintDate: new Date(),
-    t1Authority: '',
-    royalties: [],
-    uniqueExternalRef: ''
+    mintBlock: 1, // block.header.height,
+    mintDate: new Date(), // new Date(block.header.timestamp),
+    t1Authority,
+    royalties,
+    uniqueExternalRef
   }
 }
 
 function normalizeMintNftEvent(
-  ctx: Ctx,
-  item: NftMintEventItem
+  item: NftMintEventItem,
+  ctx: Ctx
 ): { nftId: bigint; owner: Uint8Array } {
   const e =
     item.name === 'NftManager.SingleNftMinted'
@@ -46,10 +52,4 @@ function normalizeMintNftEvent(
   } else {
     throw new UknownVersionError()
   }
-}
-
-function normalizeCallArgs(callItem: MintCallItem) {
-  const { args } = callItem.call
-  // TODO: normalize args
-  return args
 }

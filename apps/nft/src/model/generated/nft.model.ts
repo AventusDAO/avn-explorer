@@ -24,8 +24,8 @@ export class Nft {
     @Column_("text", {nullable: true})
     t1Authority!: string | undefined | null
 
-    @Column_("jsonb", {transformer: {to: obj => obj == null ? undefined : obj.map((val: any) => val == null ? undefined : val.toJSON()), from: obj => obj == null ? undefined : marshal.fromList(obj, val => val == null ? undefined : new NftRoyalty(undefined, val))}, nullable: true})
-    royalties!: (NftRoyalty | undefined | null)[] | undefined | null
+    @Column_("jsonb", {transformer: {to: obj => obj == null ? undefined : obj.map((val: any) => val.toJSON()), from: obj => obj == null ? undefined : marshal.fromList(obj, val => new NftRoyalty(undefined, marshal.nonNull(val)))}, nullable: true})
+    royalties!: (NftRoyalty)[] | undefined | null
 
     @Column_("text", {nullable: true})
     uniqueExternalRef!: string | undefined | null

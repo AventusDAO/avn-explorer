@@ -2,26 +2,27 @@ import assert from "assert"
 import * as marshal from "./marshal"
 
 export class NftRoyaltyRate {
-    private _partsPerMillion!: bigint | undefined | null
+    private _partsPerMillion!: number
 
     constructor(props?: Partial<Omit<NftRoyaltyRate, 'toJSON'>>, json?: any) {
         Object.assign(this, props)
         if (json != null) {
-            this._partsPerMillion = json.partsPerMillion == null ? undefined : marshal.bigint.fromJSON(json.partsPerMillion)
+            this._partsPerMillion = marshal.int.fromJSON(json.partsPerMillion)
         }
     }
 
-    get partsPerMillion(): bigint | undefined | null {
+    get partsPerMillion(): number {
+        assert(this._partsPerMillion != null, 'uninitialized access')
         return this._partsPerMillion
     }
 
-    set partsPerMillion(value: bigint | undefined | null) {
+    set partsPerMillion(value: number) {
         this._partsPerMillion = value
     }
 
     toJSON(): object {
         return {
-            partsPerMillion: this.partsPerMillion == null ? undefined : marshal.bigint.toJSON(this.partsPerMillion),
+            partsPerMillion: this.partsPerMillion,
         }
     }
 }

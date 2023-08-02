@@ -4,15 +4,15 @@ type Nft @entity {
   mintBlock: Int!
   mintDate: DateTime!
   t1Authority: String
-  royalties: [NftRoyalty]
+  royalties: [NftRoyalty!]
   uniqueExternalRef: String
 }
 
 type NftRoyalty {
-  rate: NftRoyaltyRate
-  recipientT1Address: String
+  rate: NftRoyaltyRate!
+  recipientT1Address: String!
 }
 
 type NftRoyaltyRate {
-  partsPerMillion: BigInt
+  partsPerMillion: Int!
 }

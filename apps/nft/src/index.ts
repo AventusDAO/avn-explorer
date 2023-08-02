@@ -1,6 +1,6 @@
 import { BatchContext, BatchProcessorItem } from '@subsquid/substrate-processor'
 import { Store, TypeormDatabase } from '@subsquid/typeorm-store'
-import { Nft } from './model'
+import { Nft, NftRoyalty, NftRoyaltyRate } from './model'
 import { NftEventItem, NftMetadata, NftMintEventItem } from './types/custom'
 import { handleMintedNfts } from './eventHandlers'
 import { processor } from './processor'
@@ -29,20 +29,41 @@ async function processBatch(ctx: Ctx): Promise<void> {
         event.name === 'NftManager.SingleNftMinted' || event.name === 'NftManager.BatchNftMinted'
     )
     .map(event => {
-      return handleMintedNfts(ctx, event as NftMintEventItem)
+      // TODO: add block header
+      return handleMintedNfts(event as NftMintEventItem, ctx)
     })
 
   ctx.log.debug(mintedNftsData)
-  await saveMintedNfts(ctx, mintedNftsData)
+  await saveMintedNfts(mintedNftsData, ctx)
 
   // 2. TODO: get all other events and overwrite the owner
 }
 
-async function saveMintedNfts(ctx: Ctx, mintedNftsData: NftMetadata[]): Promise<void> {
-  const nfts: Nft[] = mintedNftsData.map(d => {
+async function saveMintedNfts(mintedNftsData: NftMetadata[], ctx: Ctx): Promise<void> {
+  const nfts: Nft[] = mintedNftsData.map(nftData => {
+    const {
+      id,
+      owner,
+      mintBlock,
+      mintDate,
+      royalties: _royalties,
+      t1Authority,
+      uniqueExternalRef
+    } = nftData
+    const royalties: NftRoyalty[] = _royalties.map(
+      r =>
+        new NftRoyalty(undefined, {
+          ...r
+        })
+    )
     return new Nft({
-      id: d.id,
-      owner: d.owner
+      id,
+      owner,
+      mintBlock,
+      mintDate,
+      t1Authority,
+      royalties,
+      uniqueExternalRef
     })
   })
 
