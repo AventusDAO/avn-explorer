@@ -25,6 +25,8 @@ codegen:
 typegen-parachain-testnet:
 	@yarn squid-substrate-typegen ./typegen/typegen-parachain.testnet.json
 
-
 typegen-parachain-dev:
 	@yarn squid-substrate-typegen ./typegen/typegen-parachain.dev.json
+
+typegen-solochain-mainnet:
+	@yarn squid-substrate-typegen ./typegen/typegen-solochain.mainnet.json

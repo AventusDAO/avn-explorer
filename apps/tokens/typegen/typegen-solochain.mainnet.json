@@ -1,0 +1,12 @@
+{
+  "outDir": "../src/types/generated/solochain-mainnet",
+  "specVersions": "../../../packages/metadata/versions.avn-solochain.mainnet.jsonl",
+  "typesBundle": "../../../packages/metadata/avn-types.json",
+  "events": [
+    "TokenManager.TokenLifted",
+    "TokenManager.TokenTransferred",
+    "TokenManager.TokenLowered"
+  ],
+  "calls": [],
+  "storage": ["TokenManager.Balances"]
+}
