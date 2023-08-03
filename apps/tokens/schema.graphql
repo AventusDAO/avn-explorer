@@ -1,6 +1,7 @@
 type TokenBalanceForAccount @entity {
   id: ID!
   amount: BigInt!
+  balance: BigInt!
   tokenId: String! @index
   accountId: String! @index
   updatedAt: Int @index

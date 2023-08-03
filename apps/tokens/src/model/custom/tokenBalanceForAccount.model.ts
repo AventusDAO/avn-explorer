@@ -23,6 +23,14 @@ export class TokenBalanceForAccount {
   })
   amount!: bigint
 
+  @Column_('numeric', {
+    transformer: marshal.bigintTransformer,
+    nullable: false,
+    precision: 80,
+    scale: 0
+  })
+  balance!: bigint
+
   @Index_()
   @Column_('text', { nullable: false })
   tokenId!: string

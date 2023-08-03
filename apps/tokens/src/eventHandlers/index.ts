@@ -4,25 +4,16 @@ import {
   TokenManagerTokenLoweredEvent,
   TokenManagerTokenTransferredEvent
 } from '../types/generated/parachain-dev/events'
-import { toHex } from '@subsquid/substrate-processor'
 import { UnknownVersionError } from '@avn/types'
-import { TokenTransferData } from '../processor'
 
-type AccountData = string[]
-
-type ReturnedData = {
-  tokenId: string
-  accounts?: AccountData
-}
-
-export const getTokenLowerData = (ctx: ChainContext, event: Event): TokenTransferData => {
+export const getTokenLowerData = (ctx: ChainContext, event: Event): RawTokenBalanceData => {
   const data = new TokenManagerTokenLoweredEvent(ctx, event)
 
   if (data.isV21) {
     const v10Data = data.asV21
     return {
-      tokenId: toHex(v10Data.tokenId),
-      accountId: toHex(v10Data.recipient),
+      tokenId: v10Data.tokenId,
+      accountId: v10Data.recipient,
       amount: v10Data.amount
     }
   } else {
@@ -30,14 +21,14 @@ export const getTokenLowerData = (ctx: ChainContext, event: Event): TokenTransfe
   }
 }
 
-export const getTokenTransferredData = (ctx: ChainContext, event: Event): TokenTransferData => {
+export const getTokenTransferredData = (ctx: ChainContext, event: Event): RawTokenBalanceData => {
   const data = new TokenManagerTokenTransferredEvent(ctx, event)
 
   if (data.isV21) {
     const v10Data = data.asV21
     return {
-      tokenId: toHex(v10Data.tokenId),
-      accountId: toHex(v10Data.recipient),
+      tokenId: v10Data.tokenId,
+      accountId: v10Data.recipient,
       amount: v10Data.tokenBalance
     }
   } else {
@@ -45,17 +36,19 @@ export const getTokenTransferredData = (ctx: ChainContext, event: Event): TokenT
   }
 }
 
-export const getTokenLiftedData = (ctx: ChainContext, event: Event): TokenTransferData => {
+export const getTokenLiftedData = (ctx: ChainContext, event: Event): RawTokenBalanceData => {
   const data = new TokenManagerTokenLiftedEvent(ctx, event)
 
   if (data.isV21) {
     const v10Data = data.asV21
     return {
-      tokenId: toHex(v10Data.tokenId),
-      accountId: toHex(v10Data.recipient),
+      tokenId: v10Data.tokenId,
+      accountId: v10Data.recipient,
       amount: v10Data.tokenBalance
     }
   } else {
     throw new UnknownVersionError(data.constructor.name)
   }
 }
+
+export type RawTokenBalanceData = { tokenId: Uint8Array; accountId: Uint8Array; amount: bigint }
