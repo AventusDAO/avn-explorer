@@ -71,7 +71,7 @@ async function processTokens(ctx: Context): Promise<void> {
           tokenTransferData
         )
       } else if (item.kind === 'event') {
-        processTokensEventItem(ctx, item, tokenTransferData, block.header)
+        await processTokensEventItem(ctx, item, tokenTransferData, block.header)
       }
     }
 
