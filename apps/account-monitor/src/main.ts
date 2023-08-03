@@ -192,14 +192,14 @@ function getTokenEventTransferData(
   tokensMap: Map<string, string>,
   palletInfoArray: string[]
 ): TokenTransferEventData {
-  const tokenId = event.tokenId
+  const tokenId = toHex(event.tokenId)
   const tokenName = tokensMap.has(tokenId) ? tokensMap.get(tokenId) : ''
 
   return {
     ...getEventTransferData(block, item, event, palletInfoArray),
     amount: event.amount,
     tokenName,
-    tokenId
+    tokenId: event.tokenId
   }
 }
 
