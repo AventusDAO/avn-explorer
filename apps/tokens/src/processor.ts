@@ -30,7 +30,7 @@ const processor = getProcessor()
     data: { event: { args: true } }
   } as const)
   .addCall('Migration.migrate_token_manager_balances', {
-    data: { call: { origin: true }, extrinsic: { call: { args: true } } }
+    data: { call: { origin: true, args: true }, extrinsic: { call: { args: true } } }
   } as const)
 
 type Item = BatchProcessorItem<typeof processor>
@@ -134,26 +134,24 @@ async function processMigrationCall(
   if (item.name !== 'Migration.migrate_token_manager_balances') return
   const chunkSize = 1000
   let chunk: TokenBalanceForAccount[] = []
-  const migratedTokenBalancesBatches = item.extrinsic.call.args.calls.map(
-    (c: any) => c.value.call.value.tokenAccountPairs
-  )
+  const batch = item.call.args.tokenAccountPairs
 
-  for (const batch of migratedTokenBalancesBatches) {
-    for (const migratedData of batch) {
-      chunk.push(
-        new TokenBalanceForAccount({
-          tokenId: extractTokenId(migratedData[0]),
-          accountId: encodeId(decodeHex(extractPublicKey(migratedData[0]))),
-          amount: migratedData[1],
-          updatedAt: block.height,
-          timestamp: new Date(block.timestamp),
-          reason: `${item.name} ${block.height}`
-        })
-      )
-      if (chunk.length === chunkSize) {
-        await processChunk(ctx, chunk)
-        chunk = []
-      }
+  for (const migratedData of batch) {
+    const tokenId = extractTokenId(migratedData[0])
+    const accountId = encodeId(decodeHex(extractPublicKey(migratedData[0])))
+    chunk.push(
+      new TokenBalanceForAccount({
+        tokenId,
+        accountId,
+        amount: migratedData[1],
+        updatedAt: block.height,
+        timestamp: new Date(block.timestamp),
+        reason: `${item.name} ${block.height}`
+      })
+    )
+    if (chunk.length === chunkSize) {
+      await processChunk(ctx, chunk)
+      chunk = []
     }
   }
   if (chunk.length > 0) {
@@ -164,24 +162,19 @@ async function processMigrationCall(
 
 async function processChunk(ctx: Context, chunk: TokenBalanceForAccount[]): Promise<void> {
   ctx.log.child('tokens').info(`Processing chunk of size ${chunk.length}`)
-  await retry(
-    async (bail: any) => {
-      try {
-        ctx.log.child('tokens').debug('Starting transaction')
-        await ctx.store.save<TokenBalanceForAccount>(chunk)
-        ctx.log.child('tokens').info('Transaction successful')
-      } catch (err: any) {
-        ctx.log.child('tokens').warn(`Transaction failed: ${err.message}`)
-        if (err.message === 'Transaction was already closed') {
-          ctx.log.child('tokens').error('Transaction closed, retrying...')
-          throw err
-        } else {
-          bail(err)
-        }
-      }
-    },
-    { retries: 3, minTimeout: 1000 }
-  )
+  try {
+    ctx.log.child('tokens').debug('Starting transaction')
+    await ctx.store.save<TokenBalanceForAccount>(chunk)
+    ctx.log.child('tokens').info('Transaction successful')
+  } catch (err: any) {
+    ctx.log.child('tokens').warn(`Transaction failed: ${err.message}`)
+    if (err.message === 'Transaction was already closed') {
+      ctx.log.child('tokens').error('Transaction closed, retrying...')
+      throw err
+    } else {
+      throw err
+    }
+  }
 }
 
 async function processTokensCallItem(
