@@ -1,8 +1,10 @@
 import { Ctx } from '.'
-import { NftMetadata, NftMintEventItem } from './types/custom'
+import { NftMetadata, NftMintEventItem, NftTransferEventItem } from './types/custom'
 import {
   NftManagerSingleNftMintedEvent,
-  NftManagerBatchNftMintedEvent
+  NftManagerBatchNftMintedEvent,
+  NftManagerFiatNftTransferEvent,
+  NftManagerEthNftTransferEvent
 } from './types/generated/parachain-dev/events'
 import { encodeId } from '@avn/utils'
 import { normalizeCallArgs } from './callHandlers'
@@ -14,7 +16,11 @@ class UknownVersionError extends Error {
   }
 }
 
-export function handleMintedNfts(item: NftMintEventItem, block: SubstrateBlock, ctx: Ctx): NftMetadata {
+export function handleMintedNfts(
+  item: NftMintEventItem,
+  block: SubstrateBlock,
+  ctx: Ctx
+): NftMetadata {
   const event = normalizeMintNftEvent(item, ctx)
   const call = item.event.call
   if (!call) throw new Error(`missing related call data in ${item.name} event item`)
@@ -45,4 +51,37 @@ function normalizeMintNftEvent(
   } else {
     throw new UknownVersionError()
   }
+}
+
+export function handleTransferredNfts(
+  item: NftTransferEventItem,
+  block: SubstrateBlock,
+  ctx: Ctx
+): Pick<NftMetadata, 'id' | 'owner'> {
+  const event = normalizeTransferNftEvent(item, ctx)
+  return {
+    id: event.nftId.toString(),
+    owner: encodeId(event.newOwner)
+  }
+}
+
+function normalizeTransferNftEvent(
+  item: NftTransferEventItem,
+  ctx: Ctx
+): { nftId: bigint; newOwner: Uint8Array } {
+  if (item.name === 'NftManager.FiatNftTransfer') {
+    const event = new NftManagerFiatNftTransferEvent(ctx, item.event)
+    if (event.isV21) {
+      const { nftId, newOwner } = event.asV21
+      return { nftId, newOwner }
+    }
+  } else if (item.name === 'NftManager.EthNftTransfer') {
+    const event = new NftManagerEthNftTransferEvent(ctx, item.event)
+    if (event.isV21) {
+      const { nftId, newOwner } = event.asV21
+      return { nftId, newOwner }
+    }
+  }
+
+  throw new UknownVersionError()
 }

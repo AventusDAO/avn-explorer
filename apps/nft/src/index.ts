@@ -1,9 +1,10 @@
 import { BatchContext, BatchProcessorItem, SubstrateBlock } from '@subsquid/substrate-processor'
 import { Store, TypeormDatabase } from '@subsquid/typeorm-store'
 import { Nft, NftRoyalty } from './model'
-import { NftEventItem, NftMetadata, NftMintEventItem } from './types/custom'
-import { handleMintedNfts } from './eventHandlers'
+import { NftEventItem, NftMetadata, NftMintEventItem, NftTransferEventItem } from './types/custom'
+import { handleMintedNfts, handleTransferredNfts } from './eventHandlers'
 import { processor } from './processor'
+import { In } from 'typeorm'
 // import { CallItem, EventItem } from '@subsquid/substrate-processor/lib/interfaces/dataSelection'
 
 // export type Item = Omit<
@@ -31,7 +32,7 @@ async function processBatch(ctx: Ctx): Promise<void> {
     )
     .flat()
 
-  // 1. get all newly minted NFTs and save in DB
+  // get all newly minted NFTs and save in DB
   const mintedNftsData = data
     .filter(
       item =>
@@ -42,10 +43,22 @@ async function processBatch(ctx: Ctx): Promise<void> {
       return handleMintedNfts(item.event as NftMintEventItem, item.block, ctx)
     })
 
-  ctx.log.debug(mintedNftsData)
+  // ctx.log.debug(mintedNftsData)
   await saveMintedNfts(mintedNftsData, ctx)
 
-  // 2. TODO: get all other events and overwrite the owner
+  // get all other events and overwrite the owner
+  const transferNftsData = data
+    .filter(
+      item =>
+        item.event.name === 'NftManager.FiatNftTransfer' ||
+        item.event.name === 'NftManager.EthNftTransfer'
+    )
+    .map(item => {
+      return handleTransferredNfts(item.event as NftTransferEventItem, item.block, ctx)
+    })
+
+  // ctx.log.debug(transferNftsData)
+  await updateTransferNfts(transferNftsData, ctx)
 }
 
 async function saveMintedNfts(mintedNftsData: NftMetadata[], ctx: Ctx): Promise<void> {
@@ -77,4 +90,27 @@ async function saveMintedNfts(mintedNftsData: NftMetadata[], ctx: Ctx): Promise<
   })
 
   await ctx.store.insert(nfts)
+}
+
+async function updateTransferNfts(
+  nftsMetadata: Array<Pick<NftMetadata, 'id' | 'owner'>>,
+  ctx: Ctx
+): Promise<void> {
+  const existingNfts = await ctx.store.find(Nft, {
+    where: {
+      id: In(nftsMetadata.map(nft => nft.id))
+    }
+  })
+
+  const nfts: Nft[] = nftsMetadata.map(nftData => {
+    const { id, owner } = nftData
+    const existingNft = existingNfts.find(nft => nft.id === id)
+    if (!existingNft) throw new Error('Transferred NFT does not exist in the DB')
+    return new Nft({
+      ...existingNft,
+      owner
+    })
+  })
+
+  await ctx.store.upsert(nfts)
 }

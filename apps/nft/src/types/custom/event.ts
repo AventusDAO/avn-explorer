@@ -20,7 +20,7 @@ export type NftMintEventItem = EventItem<
 >
 
 export type NftTransferEventItem = EventItem<
-  'NftManager.BatchCreated' | 'NftManager.FiatNftTransfer' | 'NftManager.EthNftTransfer',
+  'NftManager.FiatNftTransfer' | 'NftManager.EthNftTransfer',
   { event: { args: true; call: false } }
 >
 
