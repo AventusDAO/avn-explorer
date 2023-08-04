@@ -49,7 +49,7 @@ const SAVE_PERIOD = 12 * 60 * 60 * 1000
 let lastStateTimestamp: number | undefined
 
 export interface TokenTransferData {
-  amount: bigint
+  transferAmount: bigint
   tokenId: string
   accountId: string
 }
@@ -137,7 +137,7 @@ async function processMigrationCall(
       new TokenBalanceForAccount({
         tokenId,
         accountId,
-        amount: migratedData[1],
+        transferAmount: migratedData[1],
         updatedAt: block.height,
         timestamp: new Date(block.timestamp),
         reason: `${item.name} ${block.height}`,
@@ -226,7 +226,7 @@ async function processTokensEventItem(
     id: item.event.id,
     updatedAt: block.height,
     timestamp: new Date(block.timestamp),
-    amount: tokenTransferResponse.amount,
+    transferAmount: tokenTransferResponse.amount,
     balance
   })
   tokenTransferData.push(normalizedTokenData)
