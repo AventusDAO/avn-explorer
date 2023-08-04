@@ -1,6 +1,6 @@
-import { BatchContext, BatchProcessorItem } from '@subsquid/substrate-processor'
+import { BatchContext, BatchProcessorItem, SubstrateBlock } from '@subsquid/substrate-processor'
 import { Store, TypeormDatabase } from '@subsquid/typeorm-store'
-import { Nft, NftRoyalty, NftRoyaltyRate } from './model'
+import { Nft, NftRoyalty } from './model'
 import { NftEventItem, NftMetadata, NftMintEventItem } from './types/custom'
 import { handleMintedNfts } from './eventHandlers'
 import { processor } from './processor'
@@ -16,21 +16,30 @@ export type Ctx = BatchContext<Store, Item>
 processor.run(new TypeormDatabase(), processBatch)
 
 async function processBatch(ctx: Ctx): Promise<void> {
-  const events: NftEventItem[] = ctx.blocks
+  interface NftDataItem {
+    block: SubstrateBlock
+    event: NftEventItem
+  }
+  const data: NftDataItem[] = ctx.blocks
     .map(block =>
-      block.items.filter(item => item.kind === 'event').map(item => item as NftEventItem)
+      block.items
+        .filter(item => item.kind === 'event')
+        .map(item => ({
+          block: block.header,
+          event: item as NftEventItem
+        }))
     )
     .flat()
 
   // 1. get all newly minted NFTs and save in DB
-  const mintedNftsData = events
+  const mintedNftsData = data
     .filter(
-      event =>
-        event.name === 'NftManager.SingleNftMinted' || event.name === 'NftManager.BatchNftMinted'
+      item =>
+        item.event.name === 'NftManager.SingleNftMinted' ||
+        item.event.name === 'NftManager.BatchNftMinted'
     )
-    .map(event => {
-      // TODO: add block header
-      return handleMintedNfts(event as NftMintEventItem, ctx)
+    .map(item => {
+      return handleMintedNfts(item.event as NftMintEventItem, item.block, ctx)
     })
 
   ctx.log.debug(mintedNftsData)

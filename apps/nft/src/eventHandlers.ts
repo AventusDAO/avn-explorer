@@ -6,7 +6,7 @@ import {
 } from './types/generated/parachain-dev/events'
 import { encodeId } from '@avn/utils'
 import { normalizeCallArgs } from './callHandlers'
-import { BatchBlock } from '@subsquid/substrate-processor'
+import { SubstrateBlock } from '@subsquid/substrate-processor'
 
 class UknownVersionError extends Error {
   constructor() {
@@ -14,13 +14,7 @@ class UknownVersionError extends Error {
   }
 }
 
-// TODO: add other properties from the call (use NftMetadata interface)
-export function handleMintedNfts(
-  item: NftMintEventItem,
-  // TODO:
-  // block: BatchBlock<any>,
-  ctx: Ctx
-): NftMetadata {
+export function handleMintedNfts(item: NftMintEventItem, block: SubstrateBlock, ctx: Ctx): NftMetadata {
   const event = normalizeMintNftEvent(item, ctx)
   const call = item.event.call
   if (!call) throw new Error(`missing related call data in ${item.name} event item`)
@@ -29,9 +23,8 @@ export function handleMintedNfts(
   return {
     id: event.nftId.toString(),
     owner: encodeId(event.owner),
-    // TODO: process call args
-    mintBlock: 1, // block.header.height,
-    mintDate: new Date(), // new Date(block.header.timestamp),
+    mintBlock: block.height,
+    mintDate: new Date(block.timestamp),
     t1Authority,
     royalties,
     uniqueExternalRef
