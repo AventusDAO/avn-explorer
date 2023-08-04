@@ -21,7 +21,15 @@ export class TokenBalanceForAccount {
     precision: 80,
     scale: 0
   })
-  amount!: bigint
+  transferAmount!: bigint
+
+  @Column_('numeric', {
+    transformer: marshal.bigintTransformer,
+    nullable: false,
+    precision: 80,
+    scale: 0
+  })
+  balance!: bigint
 
   @Index_()
   @Column_('text', { nullable: false })

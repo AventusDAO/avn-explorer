@@ -12,7 +12,12 @@ import { randomUUID } from 'crypto'
 import { Store, TypeormDatabase } from '@subsquid/typeorm-store'
 import { getProcessor } from '@avn/config'
 import { encodeId } from '@avn/utils'
-import { getTokenLiftedData, getTokenLowerData, getTokenTransferredData } from './eventHandlers'
+import {
+  getTokenLiftedData,
+  getTokenLowerData,
+  getTokenTransferredData,
+  RawTokenBalanceData
+} from './eventHandlers'
 import { getLastChainState, setChainState } from './service/chainState.service'
 import { Block, ChainContext } from './types/generated/parachain-dev/support'
 import { TokenManagerBalancesStorage } from './types/generated/parachain-dev/storage'
@@ -44,7 +49,7 @@ const SAVE_PERIOD = 12 * 60 * 60 * 1000
 let lastStateTimestamp: number | undefined
 
 export interface TokenTransferData {
-  amount: bigint
+  transferAmount: bigint
   tokenId: string
   accountId: string
 }
@@ -66,7 +71,7 @@ async function processTokens(ctx: Context): Promise<void> {
           tokenTransferData
         )
       } else if (item.kind === 'event') {
-        processTokensEventItem(ctx, item, tokenTransferData, block.header)
+        await processTokensEventItem(ctx, item, tokenTransferData, block.header)
       }
     }
 
@@ -93,29 +98,12 @@ async function saveTokenBalanceForAccount(
 async function getTokenManagerData(
   ctx: ChainContext,
   block: Block,
-  tokenIds: Uint8Array[],
-  accountIds: Uint8Array[]
-): Promise<bigint[] | undefined> {
+  tokenId: Uint8Array,
+  accountId: Uint8Array
+): Promise<bigint> {
   const storage = new TokenManagerBalancesStorage(ctx, block)
-  if (!storage.isExists || !storage.isV21) {
-    return
-  }
 
-  let v10InputArray: Array<[Uint8Array, Uint8Array]> = []
-
-  if (tokenIds.length === 1) {
-    v10InputArray = accountIds.map(id => [tokenIds[0], id])
-  } else if (accountIds.length === 1) {
-    v10InputArray = tokenIds.map(id => [id, accountIds[0]])
-  } else {
-    for (const tokenId of tokenIds) {
-      for (const accountId of accountIds) {
-        v10InputArray.push([tokenId, accountId])
-      }
-    }
-  }
-
-  return await storage.asV21.getMany(v10InputArray)
+  return await storage.asV21.get([tokenId, accountId])
 }
 
 export function extractPublicKey(tuple: string): string {
@@ -139,14 +127,21 @@ async function processMigrationCall(
   for (const migratedData of batch) {
     const tokenId = extractTokenId(migratedData[0])
     const accountId = encodeId(decodeHex(extractPublicKey(migratedData[0])))
+    const balance = await getTokenManagerData(
+      ctx,
+      block,
+      decodeHex(extractTokenId(migratedData[0])),
+      decodeHex(extractPublicKey(migratedData[0]))
+    )
     chunk.push(
       new TokenBalanceForAccount({
         tokenId,
         accountId,
-        amount: migratedData[1],
+        transferAmount: migratedData[1],
         updatedAt: block.height,
         timestamp: new Date(block.timestamp),
-        reason: `${item.name} ${block.height}`
+        reason: `${item.name} ${block.height}`,
+        balance
       })
     )
     if (chunk.length === chunkSize) {
@@ -202,14 +197,14 @@ async function processTokensCallItem(
   }
 }
 
-function processTokensEventItem(
+async function processTokensEventItem(
   ctx: Context,
   item: EventItem,
   tokenTransferData: TokenTransferData[],
   block: SubstrateBlock
-): void {
+): Promise<void> {
   // eslint-disable-next-line
-  let tokenTransferResponse = {} as TokenTransferData
+  let tokenTransferResponse = {} as RawTokenBalanceData
   if (item.name === 'TokenManager.TokenTransferred') {
     tokenTransferResponse = getTokenTransferredData(ctx, item.event)
   } else if (item.name === 'TokenManager.TokenLowered') {
@@ -217,12 +212,22 @@ function processTokensEventItem(
   } else if (item.name === 'TokenManager.TokenLifted') {
     tokenTransferResponse = getTokenLiftedData(ctx, item.event)
   }
+
+  const balance = await getTokenManagerData(
+    ctx,
+    block,
+    tokenTransferResponse.tokenId,
+    tokenTransferResponse.accountId
+  )
   const normalizedTokenData = new TokenBalanceForAccount({
-    ...tokenTransferResponse,
+    tokenId: toHex(tokenTransferResponse.tokenId),
+    accountId: toHex(tokenTransferResponse.accountId),
     reason: `${item.name} ${block.height}`,
     id: item.event.id,
     updatedAt: block.height,
-    timestamp: new Date(block.timestamp)
+    timestamp: new Date(block.timestamp),
+    transferAmount: tokenTransferResponse.amount,
+    balance
   })
   tokenTransferData.push(normalizedTokenData)
 }
