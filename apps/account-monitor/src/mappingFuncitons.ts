@@ -1,10 +1,10 @@
 import { getBalances } from './chainEventHandlers'
 import { Account, AccountNft, AccountToken, Nft, NftTransfer, Token, TokenTransfer } from './model'
-import { Ctx, NftTransferEventData, TokenTransferEventData } from './types'
+import { BalanceType, Ctx, NftTransferEventData, TokenTransferEventData } from './types'
 import { TokenManagerBalancesStorage } from './types/generated/parachain-testnet/storage'
 import { Block } from './types/generated/parachain-testnet/support'
 import { encodeId } from '@avn/utils'
-import { toHex } from '@subsquid/substrate-processor'
+import { toHex, decodeHex } from '@subsquid/substrate-processor'
 
 export function createTransfers(
   transfers: TokenTransferEventData[],
@@ -20,6 +20,7 @@ export function createTransfers(
         extrinsicHash: transfer.extrinsicHash,
         from: transfer.from ? accounts.get(encodeId(transfer.from)) : undefined,
         to: accounts.get(encodeId(transfer.to)),
+        payer: transfer.payer ? accounts.get(encodeId(transfer.payer)) : undefined,
         amount: transfer.amount,
         token: tokens.get(toHex(transfer.tokenId) ?? ''),
         pallet: transfer.pallet,
@@ -43,6 +44,7 @@ export function createNftTransfers(
         extrinsicHash: transfer.extrinsicHash,
         from: transfer.from ? accounts.get(encodeId(transfer.from)) : undefined,
         to: accounts.get(encodeId(transfer.to)),
+        payer: transfer.payer ? accounts.get(encodeId(transfer.payer)) : undefined,
         nft: nfts.get(transfer.nftId ?? ''),
         pallet: transfer.pallet,
         method: transfer.method
@@ -134,58 +136,81 @@ export async function mapAccountNftEntities(
   ctx.log.child('state').info(`mapping account-nfts ${accountNfts.size}`)
 }
 
+function extractAddresses(
+  data: Array<TokenTransferEventData | NftTransferEventData>
+): Set<Uint8Array> {
+  const addressSet = new Set<Uint8Array>()
+
+  for (const item of data) {
+    addressSet.add(item.from)
+    addressSet.add(item.to)
+    addressSet.add(item.payer)
+  }
+
+  return addressSet
+}
+
+function createEncodeIdCache(addresses: Set<Uint8Array>): Map<Uint8Array, string> {
+  const encodeIdCache = new Map<Uint8Array, string>()
+
+  for (const address of addresses) {
+    const encodedId = encodeIdCache.get(address) ?? ''
+
+    if (!encodedId && address) {
+      const encoded = encodeId(address)
+      encodeIdCache.set(address, encoded)
+    }
+  }
+
+  return encodeIdCache
+}
+
+function updateAccounts(
+  accounts: Map<string, Account>,
+  encodeIdCache: Map<Uint8Array, string>,
+  balances: BalanceType[],
+  data: Array<TokenTransferEventData | NftTransferEventData>
+) {
+  for (const item of data) {
+    updateAccount(accounts, encodeIdCache, balances, item.from)
+    updateAccount(accounts, encodeIdCache, balances, item.to)
+    updateAccount(accounts, encodeIdCache, balances, item.payer)
+  }
+}
+
+function updateAccount(
+  accounts: Map<string, Account>,
+  encodeIdCache: Map<Uint8Array, string>,
+  balances: BalanceType[],
+  address: Uint8Array
+) {
+  const accountId = encodeIdCache.get(address)
+  const accountBalance: BalanceType | undefined = balances.shift()
+
+  if (accountId && accountBalance) {
+    const avtBalance: bigint | number = accountBalance.free + accountBalance.reserved
+    accounts.set(
+      accountId,
+      new Account({
+        id: accountId,
+        avtBalance
+      })
+    )
+  }
+}
+
 export async function mapAccountEntities(
   ctx: Ctx,
   block: Block,
   data: TokenTransferEventData[] | NftTransferEventData[],
   accounts: Map<string, Account>
-) {
-  const addressSet = new Set<Uint8Array>()
-  const encodeIdCache = new Map<Uint8Array, string>()
-
-  for (const item of data) {
-    addressSet.add(item.from)
-    addressSet.add(item.to)
-  }
-
-  for (const address of addressSet) {
-    let encodedId = encodeIdCache.get(address) ?? ''
-    if (!encodedId && address) {
-      encodedId = encodeId(address)
-      encodeIdCache.set(address, encodedId)
-    }
-  }
-
-  const addresses = Array.from(addressSet)
-  // be aware of performance issues here as it relates to huge amounts of transactions. Maybe this should be called conditionally.
-  const balances = await getBalances(ctx, block, addresses)
-
+): Promise<void> {
+  const addressSet = extractAddresses(data)
+  const encodeIdCache = createEncodeIdCache(addressSet)
+  const balances = await getBalances(ctx, block, [...addressSet])
   if (balances) {
-    for (const item of data) {
-      const fromId = encodeIdCache.get(item.from)
-      const accountBalanceFrom = balances.shift()
-      if (fromId && accountBalanceFrom) {
-        accounts.set(
-          fromId,
-          new Account({
-            id: fromId,
-            avtBalance: accountBalanceFrom.free + accountBalanceFrom.reserved
-          })
-        )
-      }
-
-      const toId = encodeIdCache.get(item.to)
-      const accountBalanceTo = balances.shift()
-      if (toId && accountBalanceTo) {
-        accounts.set(
-          toId,
-          new Account({
-            id: toId,
-            avtBalance: accountBalanceTo.free + accountBalanceTo.reserved
-          })
-        )
-      }
-    }
+    updateAccounts(accounts, encodeIdCache, balances, data)
   }
+
   ctx.log.child('state').info(`mapping accounts ${accounts.size}`)
 }

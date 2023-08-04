@@ -29,7 +29,7 @@ import { AccountInfo } from './types/generated/parachain-testnet/v4'
 
 export function normalizeBalancesTransferEvent(
   ctx: Ctx,
-  item: EventItem<'Balances.Transfer', { event: { args: true } }>,
+  item: EventItem<'Balances.Transfer', { event: { args: true }; call: { origin: true } }>,
   avtHash?: string
 ): { from: Uint8Array; to: Uint8Array; amount: bigint; tokenId: Uint8Array } {
   const e = new BalancesTransferEvent(ctx, item.event)
@@ -48,7 +48,7 @@ export function normalizeBalancesTransferEvent(
 
 export function normalizeBalancesEndowedEvent(
   ctx: Ctx,
-  item: EventItem<'Balances.Endowed', { event: { args: true } }>,
+  item: EventItem<'Balances.Endowed', { event: { args: true }; call: { origin: true } }>,
   avtHash?: string
 ): { from: Uint8Array; to: Uint8Array; amount: bigint; tokenId: Uint8Array } {
   const e = new BalancesEndowedEvent(ctx, item.event)
@@ -67,7 +67,7 @@ export function normalizeBalancesEndowedEvent(
 
 export function normalizeBalancesBalanceSetEvent(
   ctx: Ctx,
-  item: EventItem<'Balances.BalanceSet', { event: { args: true } }>,
+  item: EventItem<'Balances.BalanceSet', { event: { args: true }; call: { origin: true } }>,
   avtHash?: string
 ): { from: Uint8Array; to: Uint8Array; amount: bigint; tokenId: Uint8Array } {
   const e = new BalancesBalanceSetEvent(ctx, item.event)
@@ -86,7 +86,7 @@ export function normalizeBalancesBalanceSetEvent(
 
 export function normalizeBalancesReservedEvent(
   ctx: Ctx,
-  item: EventItem<'Balances.Reserved', { event: { args: true } }>,
+  item: EventItem<'Balances.Reserved', { event: { args: true }; call: { origin: true } }>,
   avtHash?: string
 ): { from: Uint8Array; to: Uint8Array; amount: bigint; tokenId: Uint8Array } {
   const e = new BalancesReservedEvent(ctx, item.event)
@@ -105,7 +105,7 @@ export function normalizeBalancesReservedEvent(
 
 export function normalizeBalancesUnreservedEvent(
   ctx: Ctx,
-  item: EventItem<'Balances.Unreserved', { event: { args: true } }>,
+  item: EventItem<'Balances.Unreserved', { event: { args: true }; call: { origin: true } }>,
   avtHash?: string
 ): { from: Uint8Array; to: Uint8Array; amount: bigint; tokenId: Uint8Array } {
   const e = new BalancesUnreservedEvent(ctx, item.event)
@@ -124,7 +124,7 @@ export function normalizeBalancesUnreservedEvent(
 
 export function normalizeBalancesReserveRepatriatedEvent(
   ctx: Ctx,
-  item: EventItem<'Balances.ReserveRepatriated', { event: { args: true } }>,
+  item: EventItem<'Balances.ReserveRepatriated', { event: { args: true }; call: { origin: true } }>,
   avtHash?: string
 ): { from: Uint8Array; to: Uint8Array; amount: bigint; tokenId: Uint8Array } {
   const e = new BalancesReserveRepatriatedEvent(ctx, item.event)
@@ -143,7 +143,7 @@ export function normalizeBalancesReserveRepatriatedEvent(
 
 export function normalizeBalancesDepositEvent(
   ctx: Ctx,
-  item: EventItem<'Balances.Deposit', { event: { args: true } }>,
+  item: EventItem<'Balances.Deposit', { event: { args: true }; call: { origin: true } }>,
   avtHash?: string
 ): { from: Uint8Array; to: Uint8Array; amount: bigint; tokenId: Uint8Array } {
   const e = new BalancesDepositEvent(ctx, item.event)
@@ -162,7 +162,7 @@ export function normalizeBalancesDepositEvent(
 
 export function normalizeBalancesWithdrawEvent(
   ctx: Ctx,
-  item: EventItem<'Balances.Withdraw', { event: { args: true } }>,
+  item: EventItem<'Balances.Withdraw', { event: { args: true }; call: { origin: true } }>,
   avtHash?: string
 ): { from: Uint8Array; to: Uint8Array; amount: bigint; tokenId: Uint8Array } {
   const e = new BalancesWithdrawEvent(ctx, item.event)
@@ -181,7 +181,7 @@ export function normalizeBalancesWithdrawEvent(
 
 export function normalizeBalancesSlashedEvent(
   ctx: Ctx,
-  item: EventItem<'Balances.Slashed', { event: { args: true } }>,
+  item: EventItem<'Balances.Slashed', { event: { args: true }; call: { origin: true } }>,
   avtHash?: string
 ): { from: Uint8Array; to: Uint8Array; amount: bigint; tokenId: Uint8Array } {
   const e = new BalancesSlashedEvent(ctx, item.event)
@@ -200,7 +200,10 @@ export function normalizeBalancesSlashedEvent(
 
 export function normalizeTokenTransferEvent(
   ctx: Ctx,
-  item: EventItem<'TokenManager.TokenTransferred', { event: { args: true } }>
+  item: EventItem<
+    'TokenManager.TokenTransferred',
+    { event: { args: true }; call: { origin: true } }
+  >
 ): { from: Uint8Array; to: Uint8Array; amount: bigint; tokenId: Uint8Array } {
   const e = new TokenManagerTokenTransferredEvent(ctx, item.event)
   if (e.isV4) {
@@ -213,7 +216,7 @@ export function normalizeTokenTransferEvent(
 
 export function normalizeTokenLiftedEvent(
   ctx: Ctx,
-  item: EventItem<'TokenManager.TokenLifted', { event: { args: true } }>
+  item: EventItem<'TokenManager.TokenLifted', { event: { args: true }; call: { origin: true } }>
 ): {
   from: undefined
   to: Uint8Array
@@ -230,7 +233,7 @@ export function normalizeTokenLiftedEvent(
 }
 export function normalizeTokenLoweredEvent(
   ctx: Ctx,
-  item: EventItem<'TokenManager.TokenLowered', { event: { args: true } }>
+  item: EventItem<'TokenManager.TokenLowered', { event: { args: true }; call: { origin: true } }>
 ): {
   from: Uint8Array
   to: Uint8Array
@@ -248,7 +251,7 @@ export function normalizeTokenLoweredEvent(
 
 export function normalizeNftBatchCreated(
   ctx: Ctx,
-  item: EventItem<'NftManager.BatchCreated', { event: { args: true } }>
+  item: EventItem<'NftManager.BatchCreated', { event: { args: true }; call: { origin: true } }>
 ) {
   const e = new NftManagerBatchCreatedEvent(ctx, item.event)
   if (e.isV4) {
@@ -261,7 +264,7 @@ export function normalizeNftBatchCreated(
 
 export function normalizeNftSingleNftMinted(
   ctx: Ctx,
-  item: EventItem<'NftManager.SingleNftMinted', { event: { args: true } }>
+  item: EventItem<'NftManager.SingleNftMinted', { event: { args: true }; call: { origin: true } }>
 ) {
   const e = new NftManagerSingleNftMintedEvent(ctx, item.event)
   if (e.isV4) {
@@ -274,7 +277,7 @@ export function normalizeNftSingleNftMinted(
 
 export function normalizeNftBatchNftMinted(
   ctx: Ctx,
-  item: EventItem<'NftManager.BatchNftMinted', { event: { args: true } }>
+  item: EventItem<'NftManager.BatchNftMinted', { event: { args: true }; call: { origin: true } }>
 ): { from: undefined; to: Uint8Array; nftId: bigint; totalSupply: number } {
   const e = new NftManagerBatchNftMintedEvent(ctx, item.event)
   if (e.isV4) {
@@ -287,7 +290,7 @@ export function normalizeNftBatchNftMinted(
 
 export function normalizeNftFiatNftTransfer(
   ctx: Ctx,
-  item: EventItem<'NftManager.FiatNftTransfer', { event: { args: true } }>
+  item: EventItem<'NftManager.FiatNftTransfer', { event: { args: true }; call: { origin: true } }>
 ): { from: Uint8Array; to: Uint8Array; nftId: bigint; totalSupply: number } {
   const e = new NftManagerFiatNftTransferEvent(ctx, item.event)
   if (e.isV4) {
@@ -300,7 +303,7 @@ export function normalizeNftFiatNftTransfer(
 
 export function normalizeNftEthNftTransfer(
   ctx: Ctx,
-  item: EventItem<'NftManager.EthNftTransfer', { event: { args: true } }>
+  item: EventItem<'NftManager.EthNftTransfer', { event: { args: true }; call: { origin: true } }>
 ): { from: undefined; to: Uint8Array; nftId: bigint; totalSupply: number } {
   const e = new NftManagerEthNftTransferEvent(ctx, item.event)
   if (e.isV4) {

@@ -39,6 +39,10 @@ export class NftTransfer {
   to!: Account
 
   @Index_()
+  @ManyToOne_(() => Account, { nullable: true })
+  payer!: Account
+
+  @Index_()
   @ManyToOne_(() => Nft, { nullable: true })
   nft!: Nft
 

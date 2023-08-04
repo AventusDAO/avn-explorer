@@ -7,7 +7,7 @@ const processor = getProcessor()
         extrinsic: {
           hash: true
         },
-        call: {}
+        call: { origin: true }
       }
     }
   } as const)
@@ -18,7 +18,7 @@ const processor = getProcessor()
         extrinsic: {
           hash: true
         },
-        call: {}
+        call: { origin: true }
       }
     }
   } as const)
@@ -29,7 +29,7 @@ const processor = getProcessor()
         extrinsic: {
           hash: true
         },
-        call: {}
+        call: { origin: true }
       }
     }
   } as const)
@@ -40,7 +40,7 @@ const processor = getProcessor()
         extrinsic: {
           hash: true
         },
-        call: {}
+        call: { origin: true }
       }
     }
   } as const)
@@ -51,7 +51,7 @@ const processor = getProcessor()
         extrinsic: {
           hash: true
         },
-        call: {}
+        call: { origin: true }
       }
     }
   } as const)
@@ -62,7 +62,7 @@ const processor = getProcessor()
         extrinsic: {
           hash: true
         },
-        call: {}
+        call: { origin: true }
       }
     }
   } as const)
@@ -73,7 +73,7 @@ const processor = getProcessor()
         extrinsic: {
           hash: true
         },
-        call: {}
+        call: { origin: true }
       }
     }
   } as const)
@@ -84,7 +84,7 @@ const processor = getProcessor()
         extrinsic: {
           hash: true
         },
-        call: {}
+        call: { origin: true }
       }
     }
   } as const)
@@ -95,7 +95,7 @@ const processor = getProcessor()
         extrinsic: {
           hash: true
         },
-        call: {}
+        call: { origin: true }
       }
     }
   } as const)
@@ -106,7 +106,7 @@ const processor = getProcessor()
         extrinsic: {
           hash: true
         },
-        call: {}
+        call: { origin: true }
       }
     }
   } as const)
@@ -117,7 +117,7 @@ const processor = getProcessor()
         extrinsic: {
           hash: true
         },
-        call: {}
+        call: { origin: true }
       }
     }
   } as const)
@@ -128,7 +128,7 @@ const processor = getProcessor()
         extrinsic: {
           hash: true
         },
-        call: {}
+        call: { origin: true }
       }
     }
   } as const)
@@ -139,7 +139,7 @@ const processor = getProcessor()
         extrinsic: {
           hash: true
         },
-        call: {}
+        call: { origin: true }
       }
     }
   } as const)
@@ -150,7 +150,7 @@ const processor = getProcessor()
         extrinsic: {
           hash: true
         },
-        call: {}
+        call: { origin: true }
       }
     }
   } as const)
@@ -161,7 +161,7 @@ const processor = getProcessor()
         extrinsic: {
           hash: true
         },
-        call: {}
+        call: { origin: true }
       }
     }
   } as const)
@@ -172,7 +172,7 @@ const processor = getProcessor()
         extrinsic: {
           hash: true
         },
-        call: {}
+        call: { origin: true }
       }
     }
   } as const)

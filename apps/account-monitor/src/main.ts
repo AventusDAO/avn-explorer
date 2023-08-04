@@ -1,4 +1,4 @@
-import { SubstrateBlock, toHex } from '@subsquid/substrate-processor'
+import { decodeHex, SubstrateBlock, toHex } from '@subsquid/substrate-processor'
 import { TypeormDatabase } from '@subsquid/typeorm-store'
 import {
   TokenTransfer,
@@ -13,6 +13,7 @@ import {
 import processor from './processor'
 import {
   Ctx,
+  eventNames,
   NftTransferEventData,
   TokenTransferEventData,
   TransferData,
@@ -110,37 +111,39 @@ async function getTransfers(ctx: Ctx, tokenLookupMap: Map<string, string>, avtHa
     const accountNfts: Map<string, AccountNft> = new Map()
     const nftTransfers: NftTransfer[] = []
     for (const item of block.items) {
-      const transfer = getTransferData(
-        ctx,
-        block.header,
-        item as TransfersEventItem,
-        tokenLookupMap,
-        avtHash
-      )
-      if (transfer?.pallet === 'TokenManager' && 'amount' in transfer) {
-        transfersData.push(transfer)
-      } else if (transfer?.pallet === 'NftManager' && 'nftId' in transfer) {
-        nftTransfersData.push(transfer)
+      if (item.kind === 'event' && eventNames.includes(item.name)) {
+        const transfer = getTransferData(
+          ctx,
+          block.header,
+          item as TransfersEventItem,
+          tokenLookupMap,
+          avtHash
+        )
+        if (transfer?.pallet === 'TokenManager' && 'amount' in transfer) {
+          transfersData.push(transfer)
+        } else if (transfer?.pallet === 'NftManager' && 'nftId' in transfer) {
+          nftTransfersData.push(transfer)
+        }
       }
+      await mapAccountEntities(ctx, block.header, transfersData, accounts)
+      await mapTokenEntities(ctx, transfersData, tokens)
+      await mapAccountTokenEntities(ctx, block.header, transfersData, accountTokens, avtHash)
+      createTransfers(transfersData, transfers, accounts, tokens)
+      await mapAccountEntities(ctx, block.header, nftTransfersData, accounts)
+      await mapNftEntities(ctx, nftTransfersData, nfts)
+      await mapAccountNftEntities(ctx, nftTransfersData, accountNfts)
+      createNftTransfers(nftTransfersData, nftTransfers, accounts, nfts)
+      await recordTransferData(
+        ctx,
+        accounts,
+        tokens,
+        accountTokens,
+        transfers,
+        nfts,
+        accountNfts,
+        nftTransfers
+      )
     }
-    await mapAccountEntities(ctx, block.header, transfersData, accounts)
-    await mapTokenEntities(ctx, transfersData, tokens)
-    await mapAccountTokenEntities(ctx, block.header, transfersData, accountTokens, avtHash)
-    createTransfers(transfersData, transfers, accounts, tokens)
-    await mapAccountEntities(ctx, block.header, nftTransfersData, accounts)
-    await mapNftEntities(ctx, nftTransfersData, nfts)
-    await mapAccountNftEntities(ctx, nftTransfersData, accountNfts)
-    createNftTransfers(nftTransfersData, nftTransfers, accounts, nfts)
-    await recordTransferData(
-      ctx,
-      accounts,
-      tokens,
-      accountTokens,
-      transfers,
-      nfts,
-      accountNfts,
-      nftTransfers
-    )
   }
 }
 
@@ -181,7 +184,12 @@ function getEventTransferData(
     from: event.from,
     to: event.to,
     pallet: palletInfoArray[0],
-    method: palletInfoArray[1]
+    method: palletInfoArray[1],
+    // @ts-expect-error
+    payer: item.event?.call?.origin?.value?.value
+      ? // @ts-expect-error
+        decodeHex(item.event.call?.origin.value.value)
+      : undefined
   }
 }
 
