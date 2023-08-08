@@ -1,8 +1,12 @@
 import { BatchContext, BatchProcessorItem, SubstrateBlock } from '@subsquid/substrate-processor'
 import { Store, TypeormDatabase } from '@subsquid/typeorm-store'
 import { Nft, NftRoyalty } from './model'
-import { NftEventItem, NftMetadata, NftMintEventItem, NftTransferEventItem } from './types/custom'
-import { handleMintedNfts, handleTransferredNfts } from './eventHandlers'
+import { NftEventItem, NftMetadata, NftTransferEventItem } from './types/custom'
+import {
+  handleBatchNftMintedEventItem,
+  handleSingleNftMintedEventItem,
+  handleTransferredNfts
+} from './eventHandlers'
 import { processor } from './processor'
 import { In } from 'typeorm'
 // import { CallItem, EventItem } from '@subsquid/substrate-processor/lib/interfaces/dataSelection'
@@ -32,19 +36,39 @@ async function processBatch(ctx: Ctx): Promise<void> {
     )
     .flat()
 
+  ctx.log.info(
+    `batch: #${data[0].block.height} - #${data[data.length - 1].block.height}, count: ${
+      data.length
+    }`
+  )
+
+  // TODO: 1. save batches primo
+
   // get all newly minted NFTs and save in DB
-  const mintedNftsData = data
+  const mintedNfts = data
     .filter(
       item =>
         item.event.name === 'NftManager.SingleNftMinted' ||
         item.event.name === 'NftManager.BatchNftMinted'
     )
     .map(item => {
-      return handleMintedNfts(item.event as NftMintEventItem, item.block, ctx)
+      if (item.event.name === 'NftManager.SingleNftMinted') {
+        const metadata = handleSingleNftMintedEventItem(item.event, item.block, ctx)
+        return new Nft({
+          ...metadata,
+          royalties: metadata.royalties.map(r => new NftRoyalty(undefined, r))
+        })
+      } else if (item.event.name === 'NftManager.BatchNftMinted') {
+        const metadata = handleBatchNftMintedEventItem(item.event, item.block, ctx)
+        return new Nft({
+          ...metadata
+        })
+      }
+      throw new Error('unexpected event item')
     })
 
-  // ctx.log.debug(mintedNftsData)
-  await saveMintedNfts(mintedNftsData, ctx)
+  // ctx.log.debug(mintedNfts)
+  await ctx.store.insert(mintedNfts)
 
   // get all other events and overwrite the owner
   const transferNftsData = data
@@ -59,37 +83,6 @@ async function processBatch(ctx: Ctx): Promise<void> {
 
   // ctx.log.debug(transferNftsData)
   await updateTransferNfts(transferNftsData, ctx)
-}
-
-async function saveMintedNfts(mintedNftsData: NftMetadata[], ctx: Ctx): Promise<void> {
-  const nfts: Nft[] = mintedNftsData.map(nftData => {
-    const {
-      id,
-      owner,
-      mintBlock,
-      mintDate,
-      royalties: _royalties,
-      t1Authority,
-      uniqueExternalRef
-    } = nftData
-    const royalties: NftRoyalty[] = _royalties.map(
-      r =>
-        new NftRoyalty(undefined, {
-          ...r
-        })
-    )
-    return new Nft({
-      id,
-      owner,
-      mintBlock,
-      mintDate,
-      t1Authority,
-      royalties,
-      uniqueExternalRef
-    })
-  })
-
-  await ctx.store.insert(nfts)
 }
 
 async function updateTransferNfts(

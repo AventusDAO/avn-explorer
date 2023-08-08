@@ -1,19 +1,61 @@
-import { Ctx } from '.'
-import { NftMintCallArgs, NftMintEventCall, ProxyCallArgs } from './types'
+import {
+  SingleNftMintedCallArgs,
+  ProxyCallArgs,
+  SingleNftMintedEventCallItem,
+  BatchNftMintedEventCallItem,
+  BatchNftMintedCallArgs,
+  BatchCreatedCallArgs,
+  BatchCreatedEventCallItem
+} from './types'
 
-export function normalizeCallArgs(callItem: NftMintEventCall, _ctx: Ctx): NftMintCallArgs {
+export const handleSignedMintSingleNft = (
+  callItem: SingleNftMintedEventCallItem
+): SingleNftMintedCallArgs => {
   const { args } = callItem
   if (!callItem.name.includes('proxy')) {
-    // NOTE: args.call.__kind === 'NftManager' && args.call.value.__kind === 'signed_mint_single_nft'
-    return args.call.value
+    return args
   }
 
-  // NOTE: proxy call requires manual typing
-  const proxyArgs = args as ProxyCallArgs<NftMintCallArgs>
+  const proxyArgs = args as ProxyCallArgs<SingleNftMintedCallArgs>
   const { royalties, t1Authority, uniqueExternalRef } = proxyArgs.call.value
   return {
     royalties,
     t1Authority,
     uniqueExternalRef
+  }
+}
+
+export const handleSignedMintBatchNft = (
+  callItem: BatchNftMintedEventCallItem
+): BatchNftMintedCallArgs => {
+  const { args } = callItem
+  if (!callItem.name.includes('proxy')) {
+    return args
+  }
+
+  const proxyArgs = args as ProxyCallArgs<BatchNftMintedCallArgs>
+  const { owner, batchId, uniqueExternalRef, index } = proxyArgs.call.value
+  return {
+    index,
+    owner,
+    batchId,
+    uniqueExternalRef
+  }
+}
+
+export const handleSignedCreateBatchNft = (
+  callItem: BatchCreatedEventCallItem
+): BatchCreatedCallArgs => {
+  const { args } = callItem
+  if (!callItem.name.includes('proxy')) {
+    return args
+  }
+
+  const proxyArgs = args as ProxyCallArgs<BatchCreatedCallArgs>
+  const { royalties, t1Authority, totalSupply } = proxyArgs.call.value
+  return {
+    royalties,
+    t1Authority,
+    totalSupply
   }
 }

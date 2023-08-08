@@ -1,4 +1,4 @@
-import { EventItem } from '@subsquid/substrate-processor/lib/interfaces/dataSelection'
+import { EventItem as _EventItem } from '@subsquid/substrate-processor/lib/interfaces/dataSelection'
 
 export type NftEventName =
   | 'NftManager.SingleNftMinted'
@@ -7,8 +7,10 @@ export type NftEventName =
   | 'NftManager.FiatNftTransfer'
   | 'NftManager.EthNftTransfer'
 
-export type NftMintEventItem = EventItem<
-  'NftManager.SingleNftMinted' | 'NftManager.BatchNftMinted',
+type EventItem<T extends NftEventName, R> = _EventItem<T, R>
+
+export type SingleNftMintedEventItem = EventItem<
+  'NftManager.SingleNftMinted',
   {
     event: {
       args: true
@@ -19,9 +21,30 @@ export type NftMintEventItem = EventItem<
   }
 >
 
+export type BatchNftMintedEventItem = EventItem<
+  'NftManager.BatchNftMinted',
+  {
+    event: {
+      args: true
+      call: {
+        args: true
+      }
+    }
+  }
+>
+
+export type BatchNftCreatedEventItem = EventItem<
+  'NftManager.BatchCreated',
+  { event: { args: true; call: false } }
+>
+
 export type NftTransferEventItem = EventItem<
   'NftManager.FiatNftTransfer' | 'NftManager.EthNftTransfer',
   { event: { args: true; call: false } }
 >
 
-export type NftEventItem = NftMintEventItem | NftTransferEventItem
+export type NftEventItem =
+  | SingleNftMintedEventItem
+  | BatchNftMintedEventItem
+  | BatchNftCreatedEventItem
+  | NftTransferEventItem
