@@ -25,7 +25,9 @@ export const processor = getProcessor()
     data: {
       event: {
         args: true,
-        call: {}
+        call: {
+          args: true
+        }
       }
     }
   } as const)
@@ -33,7 +35,7 @@ export const processor = getProcessor()
     data: {
       event: {
         args: true,
-        call: {}
+        call: false
       }
     }
   } as const)
@@ -41,7 +43,7 @@ export const processor = getProcessor()
     data: {
       event: {
         args: true,
-        call: {}
+        call: false
       }
     }
   } as const)

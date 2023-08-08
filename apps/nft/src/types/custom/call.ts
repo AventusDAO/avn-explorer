@@ -1,16 +1,12 @@
 import { CallItem } from '@subsquid/substrate-processor/lib/interfaces/dataSelection'
 import { NftRoyalty } from '.'
-import {
-  BatchNftCreatedEventItem,
-  BatchNftMintedEventItem,
-  SingleNftMintedEventItem
-} from './event'
+import { BatchCreatedEventItem, BatchNftMintedEventItem, SingleNftMintedEventItem } from './event'
 export { ProxyCallArgs } from '@avn/types'
 
 export type MintCallItem = CallItem<'NftManager.SingleNftMinted', { call: { args: true } }>
 export type SingleNftMintedEventCallItem = Required<SingleNftMintedEventItem['event']>['call']
 export type BatchNftMintedEventCallItem = Required<BatchNftMintedEventItem['event']>['call']
-export type BatchCreatedEventCallItem = Required<BatchNftCreatedEventItem['event']>['call']
+export type BatchCreatedEventCallItem = Required<BatchCreatedEventItem['event']>['call']
 
 // NOTE: call args require manual typing
 export type NftCallKind = 'signed_mint_single_nft' | 'signed_mint_batch_nft' | 'signed_create_batch'

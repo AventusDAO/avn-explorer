@@ -21,12 +21,12 @@ export class Batch {
     @Column_("timestamp with time zone", {nullable: false})
     mintDate!: Date
 
-    @Column_("text", {nullable: true})
-    uniqueExternalRef!: string | undefined | null
-
-    @Column_("text", {nullable: true})
-    t1Authority!: string | undefined | null
+    @Column_("text", {nullable: false})
+    t1Authority!: string
 
     @Column_("jsonb", {transformer: {to: obj => obj == null ? undefined : obj.map((val: any) => val.toJSON()), from: obj => obj == null ? undefined : marshal.fromList(obj, val => new NftRoyalty(undefined, marshal.nonNull(val)))}, nullable: true})
     royalties!: (NftRoyalty)[] | undefined | null
+
+    @Column_("int4", {nullable: false})
+    totalSupply!: number
 }

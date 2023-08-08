@@ -33,9 +33,16 @@ export type BatchNftMintedEventItem = EventItem<
   }
 >
 
-export type BatchNftCreatedEventItem = EventItem<
+export type BatchCreatedEventItem = EventItem<
   'NftManager.BatchCreated',
-  { event: { args: true; call: false } }
+  {
+    event: {
+      args: true
+      call: {
+        args: true
+      }
+    }
+  }
 >
 
 export type NftTransferEventItem = EventItem<
@@ -46,5 +53,5 @@ export type NftTransferEventItem = EventItem<
 export type NftEventItem =
   | SingleNftMintedEventItem
   | BatchNftMintedEventItem
-  | BatchNftCreatedEventItem
+  | BatchCreatedEventItem
   | NftTransferEventItem

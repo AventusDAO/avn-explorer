@@ -8,7 +8,7 @@ import {
   BatchCreatedEventCallItem
 } from './types'
 
-export const handleSignedMintSingleNft = (
+export const handleSignedMintSingleNftCallItem = (
   callItem: SingleNftMintedEventCallItem
 ): SingleNftMintedCallArgs => {
   const { args } = callItem
@@ -25,7 +25,7 @@ export const handleSignedMintSingleNft = (
   }
 }
 
-export const handleSignedMintBatchNft = (
+export const handleSignedMintBatchNftCallItem = (
   callItem: BatchNftMintedEventCallItem
 ): BatchNftMintedCallArgs => {
   const { args } = callItem
@@ -43,7 +43,7 @@ export const handleSignedMintBatchNft = (
   }
 }
 
-export const handleSignedCreateBatchNft = (
+export const handleSignedCreateBatchCallItem = (
   callItem: BatchCreatedEventCallItem
 ): BatchCreatedCallArgs => {
   const { args } = callItem

@@ -1,5 +1,8 @@
 import { Ctx } from '.'
 import {
+  BatchCreatedCallArgs,
+  BatchCreatedEventItem,
+  BatchMetadata,
   BatchNftMetadata,
   BatchNftMintedEventItem,
   NftMetadata,
@@ -11,11 +14,16 @@ import {
   NftManagerSingleNftMintedEvent,
   NftManagerBatchNftMintedEvent,
   NftManagerFiatNftTransferEvent,
-  NftManagerEthNftTransferEvent
+  NftManagerEthNftTransferEvent,
+  NftManagerBatchCreatedEvent
 } from './types/generated/parachain-dev/events'
 import { encodeId } from '@avn/utils'
 import { SubstrateBlock, toHex } from '@subsquid/substrate-processor'
-import { handleSignedMintBatchNft, handleSignedMintSingleNft } from './callHandlers'
+import {
+  handleSignedCreateBatchCallItem,
+  handleSignedMintBatchNftCallItem,
+  handleSignedMintSingleNftCallItem
+} from './callHandlers'
 
 class UknownVersionError extends Error {
   constructor() {
@@ -33,7 +41,7 @@ export function handleSingleNftMintedEventItem(
     const { nftId, owner } = event.asV21
     const call = item.event.call
     if (!call) throw new Error(`missing related call data in ${item.name} event item`)
-    const args = handleSignedMintSingleNft(call)
+    const args = handleSignedMintSingleNftCallItem(call)
     const { t1Authority, royalties, uniqueExternalRef } = args
     return {
       id: nftId.toString(),
@@ -58,8 +66,9 @@ export function handleBatchNftMintedEventItem(
     const { nftId, owner, authority, batchNftId } = event.asV21
     const call = item.event.call
     if (!call) throw new Error(`missing related call data in ${item.name} event item`)
-    const args = handleSignedMintBatchNft(call)
+    const args = handleSignedMintBatchNftCallItem(call)
     const { index, batchId, uniqueExternalRef } = args
+    if (batchNftId.toString() !== batchId) throw new Error('something went wrong')
     return {
       id: nftId.toString(),
       owner: encodeId(owner),
@@ -69,6 +78,33 @@ export function handleBatchNftMintedEventItem(
       t1Authority: toHex(authority),
       batchId,
       index
+    }
+  }
+  throw new UknownVersionError()
+}
+
+export function handleBatchCreatedEventItem(
+  item: BatchCreatedEventItem,
+  block: SubstrateBlock,
+  ctx: Ctx
+): BatchMetadata {
+  const event = new NftManagerBatchCreatedEvent(ctx, item.event)
+  if (event.isV21) {
+    const { batchNftId, totalSupply, batchCreator, authority } = event.asV21
+    const call = item.event.call
+    if (!call) throw new Error(`missing related call data in ${item.name} event item`)
+    const args: BatchCreatedCallArgs = handleSignedCreateBatchCallItem(call)
+    const { royalties, t1Authority } = args
+    if (toHex(authority) !== t1Authority) throw new Error('something went wrong')
+    return {
+      id: batchNftId.toString(),
+      owner: encodeId(batchCreator),
+      mintBlock: block.height,
+      mintDate: new Date(block.timestamp),
+      royalties,
+      t1Authority: toHex(authority),
+      // assuming totalSupply is a safe int
+      totalSupply: Number(totalSupply)
     }
   }
   throw new UknownVersionError()

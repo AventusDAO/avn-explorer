@@ -18,9 +18,9 @@ type Batch @entity {
   owner: String! @index
   mintBlock: Int!
   mintDate: DateTime!
-  uniqueExternalRef: String
-  t1Authority: String
+  t1Authority: String!
   royalties: [NftRoyalty!]
+  totalSupply: Int!
 }
 
 type NftRoyalty {

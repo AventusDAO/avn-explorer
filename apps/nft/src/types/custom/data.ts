@@ -25,5 +25,12 @@ export interface BatchNftMetadata extends _NftMetadata {
 
 export type NftMetadata = SingleNftMetadata | BatchNftMetadata
 
-// todo:
-export interface BatchMetadata {}
+export interface BatchMetadata {
+  id: string
+  mintBlock: number
+  mintDate: Date
+  owner: string
+  t1Authority: string
+  royalties: NftRoyalty[]
+  totalSupply: number
+}
