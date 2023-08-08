@@ -3,8 +3,8 @@ import * as marshal from "./marshal"
 import {NftRoyalty} from "./_nftRoyalty"
 
 @Entity_()
-export class Batch {
-    constructor(props?: Partial<Batch>) {
+export class BatchNft {
+    constructor(props?: Partial<BatchNft>) {
         Object.assign(this, props)
     }
 

@@ -4,6 +4,7 @@ import {
   BatchCreatedEventItem,
   BatchMetadata,
   BatchNftMetadata,
+  BatchNftMintedCallArgs,
   BatchNftMintedEventItem,
   NftMetadata,
   NftTransferEventItem,
@@ -41,8 +42,8 @@ export function handleSingleNftMintedEventItem(
     const { nftId, owner } = event.asV21
     const call = item.event.call
     if (!call) throw new Error(`missing related call data in ${item.name} event item`)
-    const args = handleSignedMintSingleNftCallItem(call)
-    const { t1Authority, royalties, uniqueExternalRef } = args
+    const callArgs = handleSignedMintSingleNftCallItem(call)
+    const { t1Authority, royalties, uniqueExternalRef } = callArgs
     return {
       id: nftId.toString(),
       owner: encodeId(owner),
@@ -66,18 +67,20 @@ export function handleBatchNftMintedEventItem(
     const { nftId, owner, authority, batchNftId } = event.asV21
     const call = item.event.call
     if (!call) throw new Error(`missing related call data in ${item.name} event item`)
-    const args = handleSignedMintBatchNftCallItem(call)
-    const { index, batchId, uniqueExternalRef } = args
+    const callArgs = handleSignedMintBatchNftCallItem(call)
 
-    if (batchId === undefined) {
-      // NOTE: single `NftManager.BatchNftMinted` event on public-testnet (id: 0000740775-000003-dc365)
-      // originates from `EthereumEvents.process_event` call (id: 0000740775-000002-dc365)
-      // making the call args `undefined`
-      ctx.log.debug('batchNftId: ' + batchNftId.toString())
-      ctx.log.debug('nftId: ' + nftId.toString())
-      ctx.log.debug(item.event.call)
-      // throw new Error('something went wrong, batchNftId !== batchId for item: ' + item.name)
-    }
+    const {
+      index: _index,
+      batchId: _batchId,
+      uniqueExternalRef: _uniqueExternalRef
+    } = callArgs as Partial<BatchNftMintedCallArgs>
+    // NOTE: work around corrupted `NftManager.BatchNftMinted` event that originates
+    // from `EthereumEvents.process_event` instead of `NftManager` call.
+    // There's only 1 occurence on public-testnet on parachain public-testnet
+    // (event_id: 0000740775-000003-dc365, call_id: 0000740775-000002-dc365)
+    const uniqueExternalRef = _uniqueExternalRef ?? ''
+    const index = _index ?? 0
+
     return {
       id: nftId.toString(),
       owner: encodeId(owner),
@@ -102,11 +105,8 @@ export function handleBatchCreatedEventItem(
     const { batchNftId, totalSupply, batchCreator, authority } = event.asV21
     const call = item.event.call
     if (!call) throw new Error(`missing related call data in ${item.name} event item`)
-    const args: BatchCreatedCallArgs = handleSignedCreateBatchCallItem(call)
-    const { royalties, t1Authority } = args
-    // testing assumptions
-    if (toHex(authority) !== t1Authority)
-      throw new Error('something went wrong, authority !== t1Authority')
+    const callArgs: BatchCreatedCallArgs = handleSignedCreateBatchCallItem(call)
+    const { royalties } = callArgs
     return {
       id: batchNftId.toString(),
       owner: encodeId(batchCreator),

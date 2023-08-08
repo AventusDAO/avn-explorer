@@ -1,6 +1,6 @@
 import { BatchContext, BatchProcessorItem, SubstrateBlock } from '@subsquid/substrate-processor'
 import { Store, TypeormDatabase } from '@subsquid/typeorm-store'
-import { Batch, Nft, NftRoyalty } from './model'
+import { BatchNft, Nft, NftRoyalty } from './model'
 import { NftEventItem, NftMetadata, NftTransferEventItem } from './types/custom'
 import {
   handleBatchCreatedEventItem,
@@ -49,7 +49,7 @@ async function processData(ctx: Ctx): Promise<void> {
     .map(item => {
       if (item.event.name === 'NftManager.BatchCreated') {
         const metadata = handleBatchCreatedEventItem(item.event, item.block, ctx)
-        return new Batch({
+        return new BatchNft({
           ...metadata,
           royalties: metadata.royalties.map(r => new NftRoyalty(undefined, r))
         })

@@ -5,15 +5,15 @@ type Nft @entity {
   mintBlock: Int!
   mintDate: DateTime!
   uniqueExternalRef: String
-  # single minted nft
   t1Authority: String
+  # single minted nft
   royalties: [NftRoyalty!]
   # batch minted nft
   batchId: String
   index: Int
 }
 
-type Batch @entity {
+type BatchNft @entity {
   id: ID! @index
   owner: String! @index
   mintBlock: Int!
