@@ -7,8 +7,8 @@
     "build": "rm -rf lib && tsc",
     "build:watch": "tsc -w",
     "dev": "nodemon",
-    "processor:start": "yarn db:migrate && node lib/processor.js",
-    "processor:debug": "node --inspect --enable-source-maps -r dotenv/config lib/processor.js",
+    "processor:start": "yarn db:migrate && node lib/index.js",
+    "processor:debug": "node --inspect --enable-source-maps -r dotenv/config lib/index.js",
     "server:start": "squid-graphql-server",
     "db:reset": "node ../../packages/utils/scripts/reset-db.js",
     "db:migrate": "yarn squid-typeorm-migration-apply"

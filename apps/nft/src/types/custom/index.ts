@@ -1,5 +1,3 @@
-export interface MintedNftEventData {
-  id: string
-  nftId: bigint
-  owner: string
-}
+export * from './event'
+export * from './data'
+export * from './call'

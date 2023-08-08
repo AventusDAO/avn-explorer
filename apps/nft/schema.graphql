@@ -1,5 +1,18 @@
 type Nft @entity {
   id: ID! @index
-  nftId: BigInt! @index
   owner: String! @index
+  mintBlock: Int!
+  mintDate: DateTime!
+  t1Authority: String
+  royalties: [NftRoyalty!]
+  uniqueExternalRef: String
+}
+
+type NftRoyalty {
+  rate: NftRoyaltyRate!
+  recipientT1Address: String!
+}
+
+type NftRoyaltyRate {
+  partsPerMillion: Int!
 }

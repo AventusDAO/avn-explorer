@@ -1,7 +1,13 @@
 {
   "outDir": "../src/types/generated/parachain-testnet",
   "specVersions": "../../../packages/metadata/versions.avn-parachain.testnet.jsonl",
-  "events": ["NftManager.SingleNftMinted", "NftManager.BatchNftMinted"],
+  "events": [
+    "NftManager.BatchCreated",
+    "NftManager.SingleNftMinted",
+    "NftManager.BatchNftMinted",
+    "NftManager.EthNftTransfer",
+    "NftManager.FiatNftTransfer"
+  ],
   "calls": [],
   "storage": []
 }
