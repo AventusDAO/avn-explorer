@@ -68,7 +68,16 @@ export function handleBatchNftMintedEventItem(
     if (!call) throw new Error(`missing related call data in ${item.name} event item`)
     const args = handleSignedMintBatchNftCallItem(call)
     const { index, batchId, uniqueExternalRef } = args
-    if (batchNftId.toString() !== batchId) throw new Error('something went wrong')
+
+    if (batchId === undefined) {
+      // NOTE: single `NftManager.BatchNftMinted` event on public-testnet (id: 0000740775-000003-dc365)
+      // originates from `EthereumEvents.process_event` call (id: 0000740775-000002-dc365)
+      // making the call args `undefined`
+      ctx.log.debug('batchNftId: ' + batchNftId.toString())
+      ctx.log.debug('nftId: ' + nftId.toString())
+      ctx.log.debug(item.event.call)
+      // throw new Error('something went wrong, batchNftId !== batchId for item: ' + item.name)
+    }
     return {
       id: nftId.toString(),
       owner: encodeId(owner),
@@ -76,7 +85,7 @@ export function handleBatchNftMintedEventItem(
       mintDate: new Date(block.timestamp),
       uniqueExternalRef,
       t1Authority: toHex(authority),
-      batchId,
+      batchId: batchNftId.toString(),
       index
     }
   }
@@ -95,7 +104,9 @@ export function handleBatchCreatedEventItem(
     if (!call) throw new Error(`missing related call data in ${item.name} event item`)
     const args: BatchCreatedCallArgs = handleSignedCreateBatchCallItem(call)
     const { royalties, t1Authority } = args
-    if (toHex(authority) !== t1Authority) throw new Error('something went wrong')
+    // testing assumptions
+    if (toHex(authority) !== t1Authority)
+      throw new Error('something went wrong, authority !== t1Authority')
     return {
       id: batchNftId.toString(),
       owner: encodeId(batchCreator),
