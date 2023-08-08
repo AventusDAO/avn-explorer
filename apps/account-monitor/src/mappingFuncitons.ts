@@ -174,9 +174,9 @@ function updateAccounts(
   data: Array<TokenTransferEventData | NftTransferEventData>
 ) {
   for (const item of data) {
-    updateAccount(accounts, encodeIdCache, balances, item.from)
-    updateAccount(accounts, encodeIdCache, balances, item.to)
     updateAccount(accounts, encodeIdCache, balances, item.relayer)
+    updateAccount(accounts, encodeIdCache, balances, item.to)
+    updateAccount(accounts, encodeIdCache, balances, item.from)
   }
 }
 
@@ -187,7 +187,7 @@ function updateAccount(
   address: Uint8Array
 ) {
   const accountId = encodeIdCache.get(address)
-  const accountBalance: BalanceType | undefined = balances.shift()
+  const accountBalance: BalanceType | undefined = balances.pop()
 
   if (accountId && accountBalance) {
     const avtBalance: bigint | number = accountBalance.free + accountBalance.reserved
