@@ -5,6 +5,7 @@ const processor = getProcessor()
       event: {
         args: true,
         extrinsic: {
+          signature: true,
           hash: true
         },
         call: { origin: true }
@@ -16,6 +17,7 @@ const processor = getProcessor()
       event: {
         args: true,
         extrinsic: {
+          signature: true,
           hash: true
         },
         call: { origin: true }
@@ -27,6 +29,7 @@ const processor = getProcessor()
       event: {
         args: true,
         extrinsic: {
+          signature: true,
           hash: true
         },
         call: { origin: true }
@@ -38,6 +41,7 @@ const processor = getProcessor()
       event: {
         args: true,
         extrinsic: {
+          signature: true,
           hash: true
         },
         call: { origin: true }
@@ -49,6 +53,7 @@ const processor = getProcessor()
       event: {
         args: true,
         extrinsic: {
+          signature: true,
           hash: true
         },
         call: { origin: true }
@@ -60,6 +65,7 @@ const processor = getProcessor()
       event: {
         args: true,
         extrinsic: {
+          signature: true,
           hash: true
         },
         call: { origin: true }
@@ -71,6 +77,7 @@ const processor = getProcessor()
       event: {
         args: true,
         extrinsic: {
+          signature: true,
           hash: true
         },
         call: { origin: true }
@@ -82,6 +89,7 @@ const processor = getProcessor()
       event: {
         args: true,
         extrinsic: {
+          signature: true,
           hash: true
         },
         call: { origin: true }
@@ -93,6 +101,7 @@ const processor = getProcessor()
       event: {
         args: true,
         extrinsic: {
+          signature: true,
           hash: true
         },
         call: { origin: true }
@@ -104,6 +113,7 @@ const processor = getProcessor()
       event: {
         args: true,
         extrinsic: {
+          signature: true,
           hash: true
         },
         call: { origin: true }
@@ -115,6 +125,7 @@ const processor = getProcessor()
       event: {
         args: true,
         extrinsic: {
+          signature: true,
           hash: true
         },
         call: { origin: true }
@@ -126,6 +137,7 @@ const processor = getProcessor()
       event: {
         args: true,
         extrinsic: {
+          signature: true,
           hash: true
         },
         call: { origin: true }
@@ -137,6 +149,7 @@ const processor = getProcessor()
       event: {
         args: true,
         extrinsic: {
+          signature: true,
           hash: true
         },
         call: { origin: true }
@@ -148,6 +161,7 @@ const processor = getProcessor()
       event: {
         args: true,
         extrinsic: {
+          signature: true,
           hash: true
         },
         call: { origin: true }
@@ -159,6 +173,7 @@ const processor = getProcessor()
       event: {
         args: true,
         extrinsic: {
+          signature: true,
           hash: true
         },
         call: { origin: true }
@@ -170,6 +185,7 @@ const processor = getProcessor()
       event: {
         args: true,
         extrinsic: {
+          signature: true,
           hash: true
         },
         call: { origin: true }

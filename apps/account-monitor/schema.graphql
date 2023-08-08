@@ -37,7 +37,8 @@ type NftTransfer @entity {
   extrinsicHash: String! @index
   from: Account
   to: Account
-  payer: Account
+  relayer: Account
+  nonce: BigInt
   nft: Nft
   pallet: String! @index
   method: String! @index
@@ -50,7 +51,8 @@ type TokenTransfer @entity {
   extrinsicHash: String @index
   from: Account
   to: Account
-  payer: Account
+  relayer: Account
+  nonce: BigInt
   amount: BigInt! @index
   token: Token
   pallet: String! @index

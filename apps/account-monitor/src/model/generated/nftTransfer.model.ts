@@ -40,7 +40,11 @@ export class NftTransfer {
 
   @Index_()
   @ManyToOne_(() => Account, { nullable: true })
-  payer!: Account
+  relayer!: Account
+
+  @Index_()
+  @Column_('numeric', { transformer: marshal.bigintTransformer, nullable: true })
+  nonce!: bigint
 
   @Index_()
   @ManyToOne_(() => Nft, { nullable: true })

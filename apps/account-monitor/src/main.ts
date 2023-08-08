@@ -186,10 +186,11 @@ function getEventTransferData(
     pallet: palletInfoArray[0],
     method: palletInfoArray[1],
     // @ts-expect-error
-    payer: item.event?.call?.origin?.value?.value
+    relayer: item.event?.call?.origin?.value?.value
       ? // @ts-expect-error
         decodeHex(item.event.call?.origin.value.value)
-      : undefined
+      : undefined,
+    nonce: item.event.extrinsic?.signature?.signedExtensions?.CheckNonce ?? 0
   }
 }
 

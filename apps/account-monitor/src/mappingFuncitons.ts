@@ -20,7 +20,8 @@ export function createTransfers(
         extrinsicHash: transfer.extrinsicHash,
         from: transfer.from ? accounts.get(encodeId(transfer.from)) : undefined,
         to: accounts.get(encodeId(transfer.to)),
-        payer: transfer.payer ? accounts.get(encodeId(transfer.payer)) : undefined,
+        relayer: transfer.relayer ? accounts.get(encodeId(transfer.relayer)) : undefined,
+        nonce: transfer.nonce,
         amount: transfer.amount,
         token: tokens.get(toHex(transfer.tokenId) ?? ''),
         pallet: transfer.pallet,
@@ -44,7 +45,8 @@ export function createNftTransfers(
         extrinsicHash: transfer.extrinsicHash,
         from: transfer.from ? accounts.get(encodeId(transfer.from)) : undefined,
         to: accounts.get(encodeId(transfer.to)),
-        payer: transfer.payer ? accounts.get(encodeId(transfer.payer)) : undefined,
+        relayer: transfer.relayer ? accounts.get(encodeId(transfer.relayer)) : undefined,
+        nonce: transfer.nonce,
         nft: nfts.get(transfer.nftId ?? ''),
         pallet: transfer.pallet,
         method: transfer.method
@@ -144,7 +146,7 @@ function extractAddresses(
   for (const item of data) {
     addressSet.add(item.from)
     addressSet.add(item.to)
-    addressSet.add(item.payer)
+    addressSet.add(item.relayer)
   }
 
   return addressSet
@@ -174,7 +176,7 @@ function updateAccounts(
   for (const item of data) {
     updateAccount(accounts, encodeIdCache, balances, item.from)
     updateAccount(accounts, encodeIdCache, balances, item.to)
-    updateAccount(accounts, encodeIdCache, balances, item.payer)
+    updateAccount(accounts, encodeIdCache, balances, item.relayer)
   }
 }
 
