@@ -20,15 +20,25 @@ router.get(
     const timestampStart = processIntegerParam(req.query.timestampStart, 'timestampStart')
     const timestampEnd = processIntegerParam(req.query.timestampEnd, 'timestampEnd')
     const signedOnly = processBooleanParam(req.query.signedOnly, 'signedOnly')
+    const includeProxyName = processBooleanParam(req.query.includeProxyName, 'includeProxyName')
 
-    const data = await getExtrinsics(size, from, sort, address, undefined, signedOnly, {
-      section,
-      method,
-      blockHeightFrom,
-      blockHeightTo,
-      timestampStart,
-      timestampEnd
-    })
+    const data = await getExtrinsics(
+      size,
+      from,
+      sort,
+      address,
+      undefined,
+      signedOnly,
+      {
+        section,
+        method,
+        blockHeightFrom,
+        blockHeightTo,
+        timestampStart,
+        timestampEnd
+      },
+      includeProxyName
+    )
 
     res.status(200).json({
       data
