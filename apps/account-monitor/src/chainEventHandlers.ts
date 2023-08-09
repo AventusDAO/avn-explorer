@@ -129,7 +129,7 @@ export function normalizeBalancesReserveRepatriatedEvent(
 ): { from: Uint8Array; to: Uint8Array; amount: bigint; tokenId: Uint8Array } {
   const e = new BalancesReserveRepatriatedEvent(ctx, item.event)
   if (e.isV4) {
-    const { amount, destinationStatus, from, to } = e.asV4
+    const { amount, from, to } = e.asV4
     return {
       from,
       to,
@@ -225,7 +225,7 @@ export function normalizeTokenLiftedEvent(
 } {
   const e = new TokenManagerTokenLiftedEvent(ctx, item.event)
   if (e.isV4) {
-    const { tokenId, recipient, tokenBalance, ethTxHash } = e.asV4
+    const { tokenId, recipient, tokenBalance } = e.asV4
     return { from: undefined, to: recipient, amount: tokenBalance, tokenId }
   } else {
     throw new UnknownVersionError()
@@ -242,7 +242,7 @@ export function normalizeTokenLoweredEvent(
 } {
   const e = new TokenManagerTokenLoweredEvent(ctx, item.event)
   if (e.isV4) {
-    const { tokenId, recipient, sender, amount, t1Recipient } = e.asV4
+    const { tokenId, recipient, sender, amount } = e.asV4
     return { from: sender, to: recipient, amount, tokenId }
   } else {
     throw new UnknownVersionError()
@@ -252,10 +252,15 @@ export function normalizeTokenLoweredEvent(
 export function normalizeNftBatchCreated(
   ctx: Ctx,
   item: EventItem<'NftManager.BatchCreated', { event: { args: true }; call: { origin: true } }>
-) {
+): {
+  from: undefined
+  to: Uint8Array
+  nftId: bigint
+  totalSupply: bigint
+} {
   const e = new NftManagerBatchCreatedEvent(ctx, item.event)
   if (e.isV4) {
-    const { batchNftId, authority, batchCreator, totalSupply } = e.asV4
+    const { batchNftId, batchCreator, totalSupply } = e.asV4
     return { from: undefined, to: batchCreator, nftId: batchNftId, totalSupply }
   } else {
     throw new UnknownVersionError()
@@ -265,10 +270,15 @@ export function normalizeNftBatchCreated(
 export function normalizeNftSingleNftMinted(
   ctx: Ctx,
   item: EventItem<'NftManager.SingleNftMinted', { event: { args: true }; call: { origin: true } }>
-) {
+): {
+  from: undefined
+  to: Uint8Array
+  nftId: bigint
+  totalSupply: number
+} {
   const e = new NftManagerSingleNftMintedEvent(ctx, item.event)
   if (e.isV4) {
-    const { authority, nftId, owner } = e.asV4
+    const { nftId, owner } = e.asV4
     return { from: undefined, to: owner, nftId, totalSupply: 1 }
   } else {
     throw new UnknownVersionError()
@@ -281,7 +291,7 @@ export function normalizeNftBatchNftMinted(
 ): { from: undefined; to: Uint8Array; nftId: bigint; totalSupply: number } {
   const e = new NftManagerBatchNftMintedEvent(ctx, item.event)
   if (e.isV4) {
-    const { authority, batchNftId, nftId, owner } = e.asV4
+    const { nftId, owner } = e.asV4
     return { from: undefined, to: owner, nftId, totalSupply: 1 }
   } else {
     throw new UnknownVersionError()
@@ -294,7 +304,7 @@ export function normalizeNftFiatNftTransfer(
 ): { from: Uint8Array; to: Uint8Array; nftId: bigint; totalSupply: number } {
   const e = new NftManagerFiatNftTransferEvent(ctx, item.event)
   if (e.isV4) {
-    const { newOwner, nftId, opId, saleType, sender } = e.asV4
+    const { newOwner, nftId, sender } = e.asV4
     return { from: sender, to: newOwner, nftId, totalSupply: 1 }
   } else {
     throw new UnknownVersionError()
@@ -307,7 +317,7 @@ export function normalizeNftEthNftTransfer(
 ): { from: undefined; to: Uint8Array; nftId: bigint; totalSupply: number } {
   const e = new NftManagerEthNftTransferEvent(ctx, item.event)
   if (e.isV4) {
-    const { newOwner, nftId, ethEventId, opId, saleType } = e.asV4
+    const { newOwner, nftId } = e.asV4
     return { from: undefined, to: newOwner, nftId, totalSupply: 1 }
   } else {
     throw new UnknownVersionError()

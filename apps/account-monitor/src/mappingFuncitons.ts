@@ -59,7 +59,7 @@ export function mapTokenEntities(
   ctx: Ctx,
   data: TokenTransferEventData[],
   tokens: Map<string, Token>
-) {
+): void {
   for (const item of data) {
     if (item.tokenId) {
       const tokenId = toHex(item.tokenId)
@@ -75,7 +75,11 @@ export function mapTokenEntities(
   ctx.log.child('state').info(`mapping tokens ${tokens.size}`)
 }
 
-export function mapNftEntities(ctx: Ctx, data: NftTransferEventData[], nfts: Map<string, Nft>) {
+export function mapNftEntities(
+  ctx: Ctx,
+  data: NftTransferEventData[],
+  nfts: Map<string, Nft>
+): void {
   for (const item of data) {
     if (item.nftId) {
       nfts.set(
@@ -93,9 +97,9 @@ export async function mapAccountTokenEntities(
   ctx: Ctx,
   block: Block,
   data: TokenTransferEventData[],
-  accountTokens: Map<string, AccountToken>,
-  avtHash: string
-) {
+  accountTokens: Map<string, AccountToken>
+  // avtHash: string
+): Promise<void> {
   for (const item of data) {
     if (item.to && item.tokenId) {
       const tokenId = toHex(item.tokenId)
@@ -122,7 +126,7 @@ export async function mapAccountNftEntities(
   ctx: Ctx,
   data: NftTransferEventData[],
   accountNfts: Map<string, AccountNft>
-) {
+): Promise<void> {
   for (const item of data) {
     if (item.to && item.nftId) {
       const accountId = encodeId(item.to)
@@ -172,7 +176,7 @@ function updateAccounts(
   encodeIdCache: Map<Uint8Array, string>,
   balances: BalanceType[],
   data: Array<TokenTransferEventData | NftTransferEventData>
-) {
+): void {
   for (const item of data) {
     updateAccount(accounts, encodeIdCache, balances, item.relayer)
     updateAccount(accounts, encodeIdCache, balances, item.to)
@@ -185,7 +189,7 @@ function updateAccount(
   encodeIdCache: Map<Uint8Array, string>,
   balances: BalanceType[],
   address: Uint8Array
-) {
+): void {
   const accountId = encodeIdCache.get(address)
   const accountBalance: BalanceType | undefined = balances.pop()
 
