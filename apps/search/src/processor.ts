@@ -1,4 +1,5 @@
 import { getProcessor } from '@avn/config'
+import { ProxyCallArgs } from '@avn/types'
 import { ChainGen, getChainGen } from '@avn/utils'
 import {
   BatchContext,
@@ -129,8 +130,13 @@ const mapExtrinsics = (block: BatchBlock<Item>): SearchExtrinsic[] => {
       const isSuccess = isProcessed && innerFailedEvent === undefined
 
       let proxySigner: string | undefined
+      let proxyCallSection: string | undefined
+      let proxyCallMethod: string | undefined
       if (item.name === 'AvnProxy.proxy') {
-        proxySigner = item.call.args.call.value.proof.signer
+        const proxyArgs = item.call.args as ProxyCallArgs<unknown>
+        proxySigner = proxyArgs.call.value.proof.signer
+        proxyCallSection = proxyArgs.call.__kind
+        proxyCallMethod = proxyArgs.call.value.__kind
       }
 
       return {
@@ -146,7 +152,9 @@ const mapExtrinsics = (block: BatchBlock<Item>): SearchExtrinsic[] => {
         isSuccess,
         signer,
         nonce,
-        proxySigner
+        proxySigner,
+        proxyCallSection,
+        proxyCallMethod
       }
     })
 }
