@@ -39,6 +39,14 @@ export class TokenTransfer {
   to!: Account
 
   @Index_()
+  @ManyToOne_(() => Account, { nullable: true })
+  relayer!: Account
+
+  @Index_()
+  @Column_('numeric', { transformer: marshal.bigintTransformer, nullable: true })
+  nonce!: bigint
+
+  @Index_()
   @Column_('numeric', { transformer: marshal.bigintTransformer, nullable: false })
   amount!: bigint
 

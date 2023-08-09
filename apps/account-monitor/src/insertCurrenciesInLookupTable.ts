@@ -4,13 +4,18 @@ import { ApiPromise, WsProvider } from '@polkadot/api'
 
 const Client = pg.Client
 
-async function getApi() {
+async function getApi(): Promise<ApiPromise> {
   const wsProvider = new WsProvider(process.env.CHAIN_URL)
   const api = await ApiPromise.create({ provider: wsProvider })
   return api
 }
 
-async function getData() {
+async function getData(): Promise<
+  Array<{
+    tokenId: string
+    tokenName: string
+  }>
+> {
   const coins = [
     {
       tokenId: '0x1bbf25e71ec48b84d773809b4ba55b6f4be946fb',
@@ -61,7 +66,7 @@ async function checkIfDataExists(client: pg.Client, tokenId: string): Promise<bo
   return result.rows[0].exists
 }
 
-async function connectToDatabase() {
+async function connectToDatabase(): Promise<any> {
   const client = new Client({
     user: process.env.DB_USER,
     host: process.env.DB_HOST,
@@ -73,7 +78,7 @@ async function connectToDatabase() {
   return client
 }
 
-async function insertData() {
+async function insertData(): Promise<void> {
   const client = await connectToDatabase()
   const data = await getData()
   try {

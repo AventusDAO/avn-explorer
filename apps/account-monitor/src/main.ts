@@ -1,4 +1,4 @@
-import { SubstrateBlock, toHex } from '@subsquid/substrate-processor'
+import { decodeHex, SubstrateBlock, toHex } from '@subsquid/substrate-processor'
 import { TypeormDatabase } from '@subsquid/typeorm-store'
 import {
   TokenTransfer,
@@ -13,6 +13,7 @@ import {
 import processor from './processor'
 import {
   Ctx,
+  eventNames,
   NftTransferEventData,
   TokenTransferEventData,
   TransferData,
@@ -40,13 +41,13 @@ async function createTokenLookupMap(ctx: Ctx): Promise<Map<any, any>> {
   return tokenLookupMap
 }
 
-async function getTokenLookupData(ctx: Ctx) {
+async function getTokenLookupData(ctx: Ctx): Promise<TokenLookup[]> {
   return await ctx.store.find(TokenLookup, { where: {} })
 }
 
 let tokenLookupMap: Map<string, string> | null = null
 
-async function processEvents(ctx: Ctx) {
+async function processEvents(ctx: Ctx): Promise<void> {
   if (!tokenLookupMap) {
     tokenLookupMap = await createTokenLookupMap(ctx)
   }
@@ -66,7 +67,7 @@ async function recordTransferData(
   nfts: Map<string, Nft>,
   accountNfts: Map<string, AccountNft>,
   nftTransfers: NftTransfer[]
-) {
+): Promise<void> {
   await recordTokenTransferData(ctx, accounts, tokens, accountTokens, transfers)
   await recordNftTransferData(ctx, accounts, nfts, accountNfts, nftTransfers)
 }
@@ -77,7 +78,7 @@ async function recordTokenTransferData(
   tokens: Map<string, Token>,
   accountTokens: Map<string, AccountToken>,
   transfers: TokenTransfer[]
-) {
+): Promise<void> {
   await ctx.store.save([...accounts.values()])
   await ctx.store.save([...tokens.values()])
   await ctx.store.save([...accountTokens.values()])
@@ -91,14 +92,18 @@ async function recordNftTransferData(
   nfts: Map<string, Nft>,
   accountNfts: Map<string, AccountNft>,
   nftTransfers: NftTransfer[]
-) {
+): Promise<void> {
   await ctx.store.save([...accounts.values()])
   await ctx.store.save([...nfts.values()])
   await ctx.store.save([...accountNfts.values()])
   await ctx.store.insert(nftTransfers)
 }
 
-async function getTransfers(ctx: Ctx, tokenLookupMap: Map<string, string>, avtHash: string) {
+async function getTransfers(
+  ctx: Ctx,
+  tokenLookupMap: Map<string, string>,
+  avtHash: string
+): Promise<void> {
   for (const block of ctx.blocks) {
     const transfersData: TokenTransferEventData[] = []
     const nftTransfersData: NftTransferEventData[] = []
@@ -110,27 +115,34 @@ async function getTransfers(ctx: Ctx, tokenLookupMap: Map<string, string>, avtHa
     const accountNfts: Map<string, AccountNft> = new Map()
     const nftTransfers: NftTransfer[] = []
     for (const item of block.items) {
-      const transfer = getTransferData(
-        ctx,
-        block.header,
-        item as TransfersEventItem,
-        tokenLookupMap,
-        avtHash
-      )
-      if (transfer?.pallet === 'TokenManager' && 'amount' in transfer) {
-        transfersData.push(transfer)
-      } else if (transfer?.pallet === 'NftManager' && 'nftId' in transfer) {
-        nftTransfersData.push(transfer)
+      if (item.kind === 'event' && eventNames.includes(item.name)) {
+        const transfer = getTransferData(
+          ctx,
+          block.header,
+          item as TransfersEventItem,
+          tokenLookupMap,
+          avtHash
+        )
+        if (transfer?.pallet === 'TokenManager' && 'amount' in transfer) {
+          transfersData.push(transfer)
+        } else if (transfer?.pallet === 'NftManager' && 'nftId' in transfer) {
+          nftTransfersData.push(transfer)
+        }
       }
     }
-    await mapAccountEntities(ctx, block.header, transfersData, accounts)
-    await mapTokenEntities(ctx, transfersData, tokens)
-    await mapAccountTokenEntities(ctx, block.header, transfersData, accountTokens, avtHash)
-    createTransfers(transfersData, transfers, accounts, tokens)
-    await mapAccountEntities(ctx, block.header, nftTransfersData, accounts)
-    await mapNftEntities(ctx, nftTransfersData, nfts)
-    await mapAccountNftEntities(ctx, nftTransfersData, accountNfts)
-    createNftTransfers(nftTransfersData, nftTransfers, accounts, nfts)
+    await processMappingData(
+      ctx,
+      block.header,
+      transfers,
+      nftTransfers,
+      transfersData,
+      nftTransfersData,
+      accounts,
+      tokens,
+      accountTokens,
+      nfts,
+      accountNfts
+    )
     await recordTransferData(
       ctx,
       accounts,
@@ -142,6 +154,31 @@ async function getTransfers(ctx: Ctx, tokenLookupMap: Map<string, string>, avtHa
       nftTransfers
     )
   }
+}
+
+async function processMappingData(
+  ctx: Ctx,
+  block: SubstrateBlock,
+  transfers: TokenTransfer[],
+  nftTransfers: NftTransfer[],
+  transfersData: TokenTransferEventData[],
+  nftTransfersData: NftTransferEventData[],
+  accounts: Map<string, Account>,
+  tokens: Map<string, Token>,
+  accountTokens: Map<string, AccountToken>,
+  nfts: Map<string, Nft>,
+  accountNfts: Map<string, AccountNft>
+): Promise<void> {
+  await Promise.all([
+    mapAccountEntities(ctx, block, transfersData, accounts),
+    mapTokenEntities(ctx, transfersData, tokens),
+    mapAccountTokenEntities(ctx, block, transfersData, accountTokens),
+    mapAccountEntities(ctx, block, nftTransfersData, accounts),
+    mapNftEntities(ctx, nftTransfersData, nfts),
+    mapAccountNftEntities(ctx, nftTransfersData, accountNfts)
+  ])
+  createTransfers(transfersData, transfers, accounts, tokens)
+  createNftTransfers(nftTransfersData, nftTransfers, accounts, nfts)
 }
 
 function getTransferData(
@@ -181,7 +218,13 @@ function getEventTransferData(
     from: event.from,
     to: event.to,
     pallet: palletInfoArray[0],
-    method: palletInfoArray[1]
+    method: palletInfoArray[1],
+    // @ts-expect-error
+    relayer: item.event?.call?.origin?.value?.value
+      ? // @ts-expect-error
+        decodeHex(item.event.call?.origin.value.value)
+      : undefined,
+    nonce: item.event.extrinsic?.signature?.signedExtensions?.CheckNonce ?? 0
   }
 }
 
