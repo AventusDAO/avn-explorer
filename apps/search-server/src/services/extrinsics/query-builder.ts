@@ -44,21 +44,26 @@ const signedOnlyQuery = (): EsQuery => ({
 const extrinsicDataQuery = (
   dataQuery: ExtrinsicDataQuery,
   includeProxyName?: boolean
-): { mustItems: JsonMap[]; shouldItems: JsonMap[] } => {
+): { mustItems: JsonMap[] } => {
   const mustItems: JsonMap[] = []
-  const shouldItems: JsonMap[] = []
 
   const { section, method, blockHeightFrom, blockHeightTo, timestampStart, timestampEnd } =
     dataQuery
 
   if (includeProxyName === true) {
     if (section) {
-      shouldItems.push({ match: { section } })
-      shouldItems.push({ match: { proxyCallSection: section } })
+      mustItems.push({
+        bool: {
+          should: [{ match: { section } }, { match: { proxyCallSection: section } }]
+        }
+      })
     }
     if (method) {
-      shouldItems.push({ match: { method } })
-      shouldItems.push({ match: { proxyCallMethod: method } })
+      mustItems.push({
+        bool: {
+          should: [{ match: { method } }, { match: { proxyCallMethod: method } }]
+        }
+      })
     }
   } else {
     if (section) mustItems.push({ match: { section } })
@@ -70,8 +75,7 @@ const extrinsicDataQuery = (
   const timestampQuery = timestampRangeFilterSubQuery('timestamp', timestampStart, timestampEnd)
   if (timestampQuery) mustItems.push(timestampQuery)
   return {
-    mustItems,
-    shouldItems
+    mustItems
   }
 }
 
@@ -92,7 +96,6 @@ export const getExtrinsicsQuery = (
   if (dataQuery) {
     const dataQueryRes = extrinsicDataQuery(dataQuery, includeProxyName)
     mustItems.push(...dataQueryRes.mustItems)
-    shouldItems.push(...dataQueryRes.shouldItems)
   }
 
   const filters: AnyJson[] = []
