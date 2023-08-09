@@ -1,6 +1,6 @@
 export interface ProxyCallArgs<A> {
   call: {
-    value: A & ProxyCallProof
+    value: A & ProxyCallProof & { __kind: string }
   }
   paymentInfo: {
     payer: string

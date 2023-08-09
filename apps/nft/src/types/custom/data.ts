@@ -5,12 +5,32 @@ export interface NftRoyalty {
   recipientT1Address: string
 }
 
-export interface NftMetadata {
+interface _NftMetadata {
+  id: string
+  mintBlock: number
+  mintDate: Date
+  owner: string
+  uniqueExternalRef: string
+  t1Authority: string
+}
+
+export interface SingleNftMetadata extends _NftMetadata {
+  royalties: NftRoyalty[]
+}
+
+export interface BatchNftMetadata extends _NftMetadata {
+  batchId: string
+  index: number
+}
+
+export type NftMetadata = SingleNftMetadata | BatchNftMetadata
+
+export interface BatchMetadata {
   id: string
   mintBlock: number
   mintDate: Date
   owner: string
   t1Authority: string
   royalties: NftRoyalty[]
-  uniqueExternalRef: string
+  totalSupply: number
 }

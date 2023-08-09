@@ -1,11 +1,26 @@
 type Nft @entity {
+  # common
   id: ID! @index
   owner: String! @index
   mintBlock: Int!
   mintDate: DateTime!
-  t1Authority: String
-  royalties: [NftRoyalty!]
   uniqueExternalRef: String
+  t1Authority: String
+  # single minted nft
+  royalties: [NftRoyalty!]
+  # batch minted nft
+  batchId: String
+  index: Int
+}
+
+type BatchNft @entity {
+  id: ID! @index
+  owner: String! @index
+  mintBlock: Int!
+  mintDate: DateTime!
+  t1Authority: String!
+  royalties: [NftRoyalty!]
+  totalSupply: Int!
 }
 
 type NftRoyalty {
