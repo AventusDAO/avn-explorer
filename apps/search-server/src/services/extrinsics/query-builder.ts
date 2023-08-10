@@ -41,17 +41,42 @@ const signedOnlyQuery = (): EsQuery => ({
   match: { isSigned: true }
 })
 
-const extrinsicDataQuery = (dataQuery: ExtrinsicDataQuery): JsonMap[] => {
-  const matches: JsonMap[] = []
+const extrinsicDataQuery = (
+  dataQuery: ExtrinsicDataQuery,
+  includeProxyName?: boolean
+): { mustItems: JsonMap[] } => {
+  const mustItems: JsonMap[] = []
+
   const { section, method, blockHeightFrom, blockHeightTo, timestampStart, timestampEnd } =
     dataQuery
-  if (section) matches.push({ match: { section } })
-  if (method) matches.push({ match: { method } })
+
+  if (includeProxyName === true) {
+    if (section) {
+      mustItems.push({
+        bool: {
+          should: [{ match: { section } }, { match: { proxyCallSection: section } }]
+        }
+      })
+    }
+    if (method) {
+      mustItems.push({
+        bool: {
+          should: [{ match: { method } }, { match: { proxyCallMethod: method } }]
+        }
+      })
+    }
+  } else {
+    if (section) mustItems.push({ match: { section } })
+    if (method) mustItems.push({ match: { method } })
+  }
+
   const blockRangeQuery = numberRangeFilterSubQuery('blockHeight', blockHeightFrom, blockHeightTo)
-  if (blockRangeQuery) matches.push(blockRangeQuery)
+  if (blockRangeQuery) mustItems.push(blockRangeQuery)
   const timestampQuery = timestampRangeFilterSubQuery('timestamp', timestampStart, timestampEnd)
-  if (timestampQuery) matches.push(timestampQuery)
-  return matches
+  if (timestampQuery) mustItems.push(timestampQuery)
+  return {
+    mustItems
+  }
 }
 
 /**
@@ -63,17 +88,24 @@ const extrinsicDataQuery = (dataQuery: ExtrinsicDataQuery): JsonMap[] => {
 export const getExtrinsicsQuery = (
   isFailed?: boolean,
   signedOnly?: boolean,
-  dataQuery?: ExtrinsicDataQuery
+  dataQuery?: ExtrinsicDataQuery,
+  includeProxyName?: boolean
 ): EsQuery => {
   const mustItems: JsonMap[] = []
-  if (dataQuery) mustItems.push(...extrinsicDataQuery(dataQuery))
+  const shouldItems: JsonMap[] = []
+  if (dataQuery) {
+    const dataQueryRes = extrinsicDataQuery(dataQuery, includeProxyName)
+    mustItems.push(...dataQueryRes.mustItems)
+  }
 
   const filters: AnyJson[] = []
   if (isFailed !== undefined) filters.push(isFailedSubQuery(isFailed))
   if (signedOnly) filters.push(signedOnlyQuery())
+
   return {
     bool: {
       must: mustItems,
+      should: shouldItems,
       filter: filters
     }
   }

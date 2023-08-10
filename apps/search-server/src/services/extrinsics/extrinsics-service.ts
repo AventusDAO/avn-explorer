@@ -43,7 +43,8 @@ export const getExtrinsics = async (
   address?: string,
   isFailed?: boolean,
   signedOnly?: boolean,
-  dataQuery?: ExtrinsicDataQuery
+  dataQuery?: ExtrinsicDataQuery,
+  includeProxyName?: boolean
 ): Promise<SearchExtrinsic[]> => {
   let query: EsQuery
   let isHexAddress = false
@@ -67,7 +68,7 @@ export const getExtrinsics = async (
       }
     }
   } else {
-    query = getExtrinsicsQuery(isFailed, signedOnly, dataQuery)
+    query = getExtrinsicsQuery(isFailed, signedOnly, dataQuery, includeProxyName)
   }
 
   const sort: EsSortItem[] = []
