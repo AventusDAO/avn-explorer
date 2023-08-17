@@ -96,7 +96,7 @@ export class ElasticSearch {
    * Execute bulk upload of objects to ElasticSearch
    * @param {*} objects - array of objects
    *
-   * @returns {Promise<ElasticSearchBulkResult>} Promise of the ES bulk operation
+   * @returns {Promise<void>} Promise of the ES bulk operation
    */
   async storeBulk(objects: any[], indexName: string, idAccessor = 'refId'): Promise<void> {
     const url = `${this.baseUrl}/_bulk`
