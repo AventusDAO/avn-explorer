@@ -60,6 +60,11 @@ ES_URL_SEARCH=http://localhost:9200
 ES_BLOCKS_INDEX_SEARCH=blocks
 ES_EXTRINSICS_INDEX_SEARCH=extrinsics
 ES_EVENTS_INDEX_SEARCH=events
+
+RESET_SOLOCHAIN_SEARCH=false
+DB_SCHEMA_SOLOCHAIN_SEARCH=solochain-search
+DB_USER_SOLOCHAIN_SEARCH=postgres
+DB_PASS_SOLOCHAIN_SEARCH=postgres
 ```
 
 > NOTE: don't forget to append new env vars when adding a new processor

@@ -61,8 +61,22 @@ const processor = getProcessor()
     data: {
       event: {
         args: false,
-        extrinsic: false,
-        call: false
+        extrinsic: {
+          signature: true,
+          success: true,
+          fee: false,
+          tip: false,
+          call: false,
+          calls: false,
+          events: false,
+          hash: true
+        },
+        call: {
+          args: false,
+          error: true,
+          origin: false,
+          parent: false
+        }
       }
     }
   })
