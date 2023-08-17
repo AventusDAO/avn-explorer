@@ -15,6 +15,26 @@ type Item = BatchProcessorItem<typeof processor>
 export type Context = BatchContext<Store, Item>
 
 const processor = getProcessor()
+  .addCall('AvnProxy.proxy', {
+    data: {
+      call: {
+        args: true,
+        error: true,
+        origin: false,
+        parent: false // fetch parent call data
+      },
+      extrinsic: {
+        signature: true,
+        success: true,
+        fee: false,
+        tip: false,
+        call: false,
+        calls: false,
+        events: false,
+        hash: true
+      }
+    }
+  } as const)
   // NOTE: keep the data as small as possible for wildcard '*' queries.
   // otherwise you might overload the archive gateway and see pool timeouts
   .addCall('*', {
@@ -60,26 +80,6 @@ const processor = getProcessor()
       }
     }
   })
-  .addCall('AvnProxy.proxy', {
-    data: {
-      call: {
-        args: true,
-        error: true,
-        origin: false,
-        parent: false // fetch parent call data
-      },
-      extrinsic: {
-        signature: true,
-        success: true,
-        fee: false,
-        tip: false,
-        call: false,
-        calls: false,
-        events: false,
-        hash: true
-      }
-    }
-  } as const)
 
 const mapChainGen = (block: BatchBlock<Item>): ChainGen => {
   const [specName, specVersion] = block.header.specId.split('@')
@@ -147,7 +147,6 @@ const mapExtrinsics = (block: BatchBlock<Item>): SearchExtrinsic[] => {
       let proxyCallSection: string | undefined
       let proxyCallMethod: string | undefined
       if (item.name === 'AvnProxy.proxy') {
-        console.log(item)
         const proxyArgs = item.call.args as ProxyCallArgs<unknown>
         proxySigner = proxyArgs.call.value.proof.signer
         proxyCallSection = proxyArgs.call.__kind
