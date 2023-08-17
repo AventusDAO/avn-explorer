@@ -32,7 +32,7 @@ const clearDatabase = async (config: DatabaseConfig) => {
     host: process.env.DB_HOST
   })
 
-  if (config.name === 'search') {
+  if (config.name === 'search' && config.resetIndexes === true) {
     const { esUrl, esBlocksIndex, esExtrinsicsIndex, esEventsIndex } = config
     if (esUrl && esBlocksIndex && esExtrinsicsIndex && esEventsIndex) {
       console.log('Clearing ElasticSearch indices...')

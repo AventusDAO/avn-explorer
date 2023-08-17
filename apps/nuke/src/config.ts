@@ -14,6 +14,7 @@ export interface DatabaseConfig {
   db?: string
   user?: string
   pass?: string
+  resetIndexes?: boolean
   esUrl?: string
   esBlocksIndex?: string
   esExtrinsicsIndex?: string
@@ -84,6 +85,7 @@ export const getDbConfigs: () => Readonly<DatabaseConfig[]> = () =>
       db: process.env.DB_SCHEMA_SEARCH,
       user: process.env.DB_USER_SEARCH,
       pass: process.env.DB_PASS_SEARCH,
+      resetIndexes: process.env.RESET_SEARCH_INDEXES === 'true',
       esUrl: process.env.ES_URL_SEARCH,
       esBlocksIndex: process.env.ES_BLOCKS_INDEX_SEARCH,
       esExtrinsicsIndex: process.env.ES_EXTRINSICS_INDEX_SEARCH,
