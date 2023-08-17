@@ -8,6 +8,7 @@ export interface DatabaseConfig {
     | 'balances'
     | 'summary'
     | 'tokens'
+    | 'solochain-search'
     | 'search'
     | 'account-monitor'
   reset: boolean
@@ -90,5 +91,12 @@ export const getDbConfigs: () => Readonly<DatabaseConfig[]> = () =>
       esBlocksIndex: process.env.ES_BLOCKS_INDEX_SEARCH,
       esExtrinsicsIndex: process.env.ES_EXTRINSICS_INDEX_SEARCH,
       esEventsIndex: process.env.ES_EVENTS_INDEX_SEARCH
+    },
+    {
+      name: 'solochain-search',
+      reset: process.env.RESET_SOLOCHAIN_SEARCH === 'true',
+      db: process.env.DB_SCHEMA_SOLOCHAIN_SEARCH,
+      user: process.env.DB_USER_SOLOCHAIN_SEARCH,
+      pass: process.env.DB_PASS_SOLOCHAIN_SEARCH
     }
   ])
