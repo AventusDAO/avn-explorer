@@ -3,7 +3,8 @@ import { NftRoyalty } from '.'
 import { BatchCreatedEventItem, BatchNftMintedEventItem, SingleNftMintedEventItem } from './event'
 export { ProxyCallArgs } from '@avn/types'
 
-export type MintCallItem = CallItem<'NftManager.SingleNftMinted', { call: { args: true } }>
+export type MigrationCallItem = CallItem<'Migration.migrate_nfts', { call: { args: true } }>
+
 export type SingleNftMintedEventCallItem = Required<SingleNftMintedEventItem['event']>['call']
 export type BatchNftMintedEventCallItem = Required<BatchNftMintedEventItem['event']>['call']
 export type BatchCreatedEventCallItem = Required<BatchCreatedEventItem['event']>['call']

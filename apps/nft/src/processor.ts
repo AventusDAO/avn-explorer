@@ -47,3 +47,10 @@ export const processor = getProcessor()
       }
     }
   } as const)
+  .addCall('Migration.migrate_nfts', {
+    data: {
+      call: {
+        args: true
+      }
+    }
+  } as const)

@@ -1,7 +1,12 @@
-import { BatchContext, BatchProcessorItem, SubstrateBlock } from '@subsquid/substrate-processor'
+import {
+  BatchContext,
+  BatchProcessorItem,
+  decodeHex,
+  SubstrateBlock
+} from '@subsquid/substrate-processor'
 import { Store, TypeormDatabase } from '@subsquid/typeorm-store'
 import { BatchNft, Nft, NftRoyalty } from './model'
-import { NftEventItem, NftMetadata, NftTransferEventItem } from './types/custom'
+import { MigrationCallItem, NftEventItem, NftMetadata, NftTransferEventItem } from './types/custom'
 import {
   handleBatchCreatedEventItem,
   handleBatchNftMintedEventItem,
@@ -22,10 +27,32 @@ export type Ctx = BatchContext<Store, Item>
 processor.run(new TypeormDatabase(), processData)
 
 async function processData(ctx: Ctx): Promise<void> {
+  // const hexStr1 =
+  //   '0xd8bf2414679493e5a8f33ebae762fd6ae8d49389c2e23e152fdd6364daadd2ccb3df41db3caad46704c0f4aa6ab514afd631de13f12014a3c23c2b07fd8ba2df9006bb4eccbeaf69c753ca2dfcf02b0a'
+  // const hexStr =
+  //   '"0xd631de13f12014a3c23c2b07fd8ba2df9006bb4eccbeaf69c753ca2dfcf02b0a6c00000000000000000000000000000000000000000000000000000000000000a461766e2d676174657761792d746573742d323032322d30342d31345430393a32383a30392e3135315a0000000000000000484e4dbf30df0afc2493a0e54921865b3b4898ec448597936bcd334507d0131000'
+
+  // // const lol = decodeHex(hexStr)
+  // // console.log(lol)
+
+  // const lol1 = Number(hexStr1)
+  // console.log(lol1.toLocaleString())
+  // process.exit(0)
+
+  const migrationsData = ctx.blocks
+    .map(block =>
+      block.items
+        .filter(item => item.kind === 'call' && item.call.name === 'Migration.migrate_nfts')
+        .map(item => item as MigrationCallItem)
+    )
+    .flat()
+    .map(item => item)
+
   interface NftDataItem {
     block: SubstrateBlock
     event: NftEventItem
   }
+
   const data: NftDataItem[] = ctx.blocks
     .map(block =>
       block.items
