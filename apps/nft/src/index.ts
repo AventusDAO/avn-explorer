@@ -1,9 +1,4 @@
-import {
-  BatchContext,
-  BatchProcessorItem,
-  decodeHex,
-  SubstrateBlock
-} from '@subsquid/substrate-processor'
+import { BatchContext, BatchProcessorItem, SubstrateBlock } from '@subsquid/substrate-processor'
 import { Store, TypeormDatabase } from '@subsquid/typeorm-store'
 import { BatchNft, Nft, NftRoyalty } from './model'
 import { MigrationCallItem, NftEventItem, NftMetadata, NftTransferEventItem } from './types/custom'
@@ -15,6 +10,8 @@ import {
 } from './eventHandlers'
 import { processor } from './processor'
 import { In } from 'typeorm'
+import { handleNftsMigration } from './migrationHandler'
+import { JsonCodec } from '@subsquid/scale-codec'
 // import { CallItem, EventItem } from '@subsquid/substrate-processor/lib/interfaces/dataSelection'
 
 // export type Item = Omit<
@@ -46,7 +43,14 @@ async function processData(ctx: Ctx): Promise<void> {
         .map(item => item as MigrationCallItem)
     )
     .flat()
-    .map(item => item)
+    // .map(item => handleNftsMigration(item))
+    .map(data => {
+      return ctx._chain.decodeCall({ name: data.call.name, args: data.call.args })
+    })
+
+  const obj = typeof migrationsData[0].nfts
+  console.log(obj)
+  // console.log(migrationsData[0].nfts[0][1].toString())
 
   interface NftDataItem {
     block: SubstrateBlock
@@ -63,6 +67,8 @@ async function processData(ctx: Ctx): Promise<void> {
         }))
     )
     .flat()
+
+  if (data.length === 0) return
 
   ctx.log.info(
     `blocks: #${data[0].block.height} - #${data[data.length - 1].block.height}, count: ${

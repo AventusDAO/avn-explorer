@@ -1,4 +1,4 @@
-import { decodeMetadata, Metadata } from '@subsquid/substrate-metadata'
+import { decodeMetadata, Metadata, Si1TypeDef_Composite } from '@subsquid/substrate-metadata'
 import { readLines } from '@subsquid/util-internal-read-lines'
 import path from 'path'
 
@@ -39,6 +39,28 @@ export const getMetadata = (versionsFileName: string, specId: string): Metadata 
 
   const meta = decodeMetadata(version.metadata)
   return meta
+}
+
+export const getNftTypes = (
+  specId: string,
+  versionsFileName: string
+): Si1TypeDef_Composite | undefined => {
+  const meta = getMetadata(versionsFileName, specId)
+  if (meta.__kind !== 'V14') throw new Error('Unsupported Metadata version')
+
+  const { pallets } = meta.value
+
+  const data = pallets.map(p => {
+    return p
+  })
+
+  const nftPallet = data.find(p => p.name === 'NftManager')
+  const nftsStorageItems = nftPallet?.storage?.items.find(i => i.name === 'Nfts')
+  const nftValueIndex = nftsStorageItems?.type.value
+  const lookupType = meta.value.lookup.types.find(t => t.id === nftValueIndex)
+  const def = lookupType?.type.def
+
+  return def as Si1TypeDef_Composite
 }
 
 function readJsonLines(file: string): SpecVersion[] {
