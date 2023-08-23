@@ -43,14 +43,19 @@ async function processData(ctx: Ctx): Promise<void> {
         .map(item => item as MigrationCallItem)
     )
     .flat()
-    // .map(item => handleNftsMigration(item))
-    .map(data => {
-      return ctx._chain.decodeCall({ name: data.call.name, args: data.call.args })
-    })
+    .map(item => handleNftsMigration(item))
+  // .map(data => {
+  //   return ctx._chain.decodeCall({ name: data.call.name, args: data.call.args })
+  // })
 
-  const obj = typeof migrationsData[0].nfts
-  console.log(obj)
+  console.log(migrationsData[0])
+  // console.log(migrationsData[0].nfts[0][0].toString('hex'))
+  // const id = BigInt(`0x${migrationsData[0].nfts[0][0].toString('hex')}`)
+  // console.log('id', id)
+  // console.log(migrationsData[0].nfts[0][1].toString('hex'))
   // console.log(migrationsData[0].nfts[0][1].toString())
+  // const string = new TextDecoder('utf-8').decode(migrationsData[0].nfts[0][0])
+  // console.log(string)
 
   interface NftDataItem {
     block: SubstrateBlock
