@@ -47,6 +47,8 @@ export const processor = getProcessor()
       }
     }
   } as const)
+  // NOTE: there are also other related Migration calls, i.e.: 'Migration.migrate_used_external_refs', 'Migration.migrate_nft_infos', 'Migration.migrate_batch_info_ids', 'Migration.migrate_batch_nonces',
+  // but we don't need to query them as we're reading the Nft and BatchNft data directly from the appropriate NftManager storages after the migration takes place
   .addCall('Migration.migrate_nfts', {
     data: {
       call: {
@@ -54,35 +56,7 @@ export const processor = getProcessor()
       }
     }
   } as const)
-  .addCall('Migration.migrate_used_external_refs', {
-    data: {
-      call: {
-        args: true
-      }
-    }
-  })
-  .addCall('Migration.migrate_nft_infos', {
-    data: {
-      call: {
-        args: true
-      }
-    }
-  })
   .addCall('Migration.migrate_nft_batches', {
-    data: {
-      call: {
-        args: true
-      }
-    }
-  })
-  .addCall('Migration.migrate_batch_info_ids', {
-    data: {
-      call: {
-        args: true
-      }
-    }
-  })
-  .addCall('Migration.migrate_batch_nonces', {
     data: {
       call: {
         args: true

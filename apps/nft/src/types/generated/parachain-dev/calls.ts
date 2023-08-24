@@ -17,15 +17,15 @@ export class MigrationMigrateNftBatchesCall {
     /**
      * Migrates NftManager Nft Batches from the AvN source chain
      */
-    get isV12(): boolean {
+    get isV21(): boolean {
         return this._chain.getCallHash('Migration.migrate_nft_batches') === 'd0f69b37cceb9b2e5b2cf910869bd696509e55e943aeb4b45037497449482869'
     }
 
     /**
      * Migrates NftManager Nft Batches from the AvN source chain
      */
-    get asV12(): {batches: [Uint8Array, Uint8Array][]} {
-        assert(this.isV12)
+    get asV21(): {batches: [Uint8Array, Uint8Array][]} {
+        assert(this.isV21)
         return this._chain.decodeCall(this.call)
     }
 }
@@ -46,15 +46,15 @@ export class MigrationMigrateNftsCall {
     /**
      * Migrates NftManager Nfts from the AvN source chain
      */
-    get isV12(): boolean {
+    get isV21(): boolean {
         return this._chain.getCallHash('Migration.migrate_nfts') === '5b0cdacc742b2fc3541017ac980a9633646efd74e9f2c9752171948886d9abac'
     }
 
     /**
      * Migrates NftManager Nfts from the AvN source chain
      */
-    get asV12(): {nfts: [Uint8Array, Uint8Array][]} {
-        assert(this.isV12)
+    get asV21(): {nfts: [Uint8Array, Uint8Array][]} {
+        assert(this.isV21)
         return this._chain.decodeCall(this.call)
     }
 }

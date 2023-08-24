@@ -1,6 +1,6 @@
 import assert from 'assert'
 import {Block, BlockContext, Chain, ChainContext, Option, Result, StorageBase} from './support'
-import * as v4 from './v4'
+import * as v21 from './v21'
 
 export class NftManagerBatchInfoIdStorage extends StorageBase {
     protected getPrefix() {
@@ -14,15 +14,15 @@ export class NftManagerBatchInfoIdStorage extends StorageBase {
     /**
      *  A mapping between the external batch id and its corresponding NtfInfoId
      */
-    get isV4(): boolean {
+    get isV21(): boolean {
         return this.getTypeHash() === '562642e80114763badea02d1e1f1ca3ec06ced33d0cb004f035c6617dcb1cbfc'
     }
 
     /**
      *  A mapping between the external batch id and its corresponding NtfInfoId
      */
-    get asV4(): NftManagerBatchInfoIdStorageV4 {
-        assert(this.isV4)
+    get asV21(): NftManagerBatchInfoIdStorageV21 {
+        assert(this.isV21)
         return this as any
     }
 }
@@ -30,7 +30,7 @@ export class NftManagerBatchInfoIdStorage extends StorageBase {
 /**
  *  A mapping between the external batch id and its corresponding NtfInfoId
  */
-export interface NftManagerBatchInfoIdStorageV4 {
+export interface NftManagerBatchInfoIdStorageV21 {
     get(key: bigint): Promise<bigint>
     getAll(): Promise<bigint[]>
     getMany(keys: bigint[]): Promise<bigint[]>
@@ -56,15 +56,15 @@ export class NftManagerNftBatchesStorage extends StorageBase {
     /**
      *  A mapping between the external batch id and its nft Ids
      */
-    get isV4(): boolean {
+    get isV21(): boolean {
         return this.getTypeHash() === '7a968372960ac77ac96e560da0239c573568f7317c27f5defde03880957cbfca'
     }
 
     /**
      *  A mapping between the external batch id and its nft Ids
      */
-    get asV4(): NftManagerNftBatchesStorageV4 {
-        assert(this.isV4)
+    get asV21(): NftManagerNftBatchesStorageV21 {
+        assert(this.isV21)
         return this as any
     }
 }
@@ -72,7 +72,7 @@ export class NftManagerNftBatchesStorage extends StorageBase {
 /**
  *  A mapping between the external batch id and its nft Ids
  */
-export interface NftManagerNftBatchesStorageV4 {
+export interface NftManagerNftBatchesStorageV21 {
     get(key: bigint): Promise<bigint[]>
     getAll(): Promise<bigint[][]>
     getMany(keys: bigint[]): Promise<bigint[][]>
@@ -98,15 +98,15 @@ export class NftManagerNftInfosStorage extends StorageBase {
     /**
      *  A mapping between NFT info Id and info data
      */
-    get isV4(): boolean {
+    get isV21(): boolean {
         return this.getTypeHash() === '9ea985f300029ae4b4fdd1d90aa971d35c3a35ed65bfdbe59be956448f1c09da'
     }
 
     /**
      *  A mapping between NFT info Id and info data
      */
-    get asV4(): NftManagerNftInfosStorageV4 {
-        assert(this.isV4)
+    get asV21(): NftManagerNftInfosStorageV21 {
+        assert(this.isV21)
         return this as any
     }
 }
@@ -114,18 +114,18 @@ export class NftManagerNftInfosStorage extends StorageBase {
 /**
  *  A mapping between NFT info Id and info data
  */
-export interface NftManagerNftInfosStorageV4 {
-    get(key: bigint): Promise<(v4.NftInfo | undefined)>
-    getAll(): Promise<v4.NftInfo[]>
-    getMany(keys: bigint[]): Promise<(v4.NftInfo | undefined)[]>
+export interface NftManagerNftInfosStorageV21 {
+    get(key: bigint): Promise<(v21.NftInfo | undefined)>
+    getAll(): Promise<v21.NftInfo[]>
+    getMany(keys: bigint[]): Promise<(v21.NftInfo | undefined)[]>
     getKeys(): Promise<bigint[]>
     getKeys(key: bigint): Promise<bigint[]>
     getKeysPaged(pageSize: number): AsyncIterable<bigint[]>
     getKeysPaged(pageSize: number, key: bigint): AsyncIterable<bigint[]>
-    getPairs(): Promise<[k: bigint, v: v4.NftInfo][]>
-    getPairs(key: bigint): Promise<[k: bigint, v: v4.NftInfo][]>
-    getPairsPaged(pageSize: number): AsyncIterable<[k: bigint, v: v4.NftInfo][]>
-    getPairsPaged(pageSize: number, key: bigint): AsyncIterable<[k: bigint, v: v4.NftInfo][]>
+    getPairs(): Promise<[k: bigint, v: v21.NftInfo][]>
+    getPairs(key: bigint): Promise<[k: bigint, v: v21.NftInfo][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: bigint, v: v21.NftInfo][]>
+    getPairsPaged(pageSize: number, key: bigint): AsyncIterable<[k: bigint, v: v21.NftInfo][]>
 }
 
 export class NftManagerNftsStorage extends StorageBase {
@@ -140,15 +140,15 @@ export class NftManagerNftsStorage extends StorageBase {
     /**
      *  A mapping between NFT Id and data
      */
-    get isV4(): boolean {
+    get isV21(): boolean {
         return this.getTypeHash() === '50f35cd0a15d899320a9f067dc26e4634be02523e5ccb84abe5b66e47d100787'
     }
 
     /**
      *  A mapping between NFT Id and data
      */
-    get asV4(): NftManagerNftsStorageV4 {
-        assert(this.isV4)
+    get asV21(): NftManagerNftsStorageV21 {
+        assert(this.isV21)
         return this as any
     }
 }
@@ -156,16 +156,16 @@ export class NftManagerNftsStorage extends StorageBase {
 /**
  *  A mapping between NFT Id and data
  */
-export interface NftManagerNftsStorageV4 {
-    get(key: bigint): Promise<(v4.Nft | undefined)>
-    getAll(): Promise<v4.Nft[]>
-    getMany(keys: bigint[]): Promise<(v4.Nft | undefined)[]>
+export interface NftManagerNftsStorageV21 {
+    get(key: bigint): Promise<(v21.Nft | undefined)>
+    getAll(): Promise<v21.Nft[]>
+    getMany(keys: bigint[]): Promise<(v21.Nft | undefined)[]>
     getKeys(): Promise<bigint[]>
     getKeys(key: bigint): Promise<bigint[]>
     getKeysPaged(pageSize: number): AsyncIterable<bigint[]>
     getKeysPaged(pageSize: number, key: bigint): AsyncIterable<bigint[]>
-    getPairs(): Promise<[k: bigint, v: v4.Nft][]>
-    getPairs(key: bigint): Promise<[k: bigint, v: v4.Nft][]>
-    getPairsPaged(pageSize: number): AsyncIterable<[k: bigint, v: v4.Nft][]>
-    getPairsPaged(pageSize: number, key: bigint): AsyncIterable<[k: bigint, v: v4.Nft][]>
+    getPairs(): Promise<[k: bigint, v: v21.Nft][]>
+    getPairs(key: bigint): Promise<[k: bigint, v: v21.Nft][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: bigint, v: v21.Nft][]>
+    getPairsPaged(pageSize: number, key: bigint): AsyncIterable<[k: bigint, v: v21.Nft][]>
 }
