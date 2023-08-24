@@ -12,8 +12,7 @@
     "Migration.migrate_nfts",
     "Migration.migrate_nft_infos",
     "Migration.migrate_nft_batches",
-    "Migration.migrate_batch_info_ids",
-    "Migration.migrate_batch_nonces"
+    "Migration.migrate_batch_info_ids"
   ],
   "storage": [
     "NftManager.NftInfos",

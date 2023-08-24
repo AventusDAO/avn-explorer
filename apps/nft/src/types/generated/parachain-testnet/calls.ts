@@ -30,35 +30,6 @@ export class MigrationMigrateBatchInfoIdsCall {
     }
 }
 
-export class MigrationMigrateBatchNoncesCall {
-    private readonly _chain: Chain
-    private readonly call: Call
-
-    constructor(ctx: CallContext)
-    constructor(ctx: ChainContext, call: Call)
-    constructor(ctx: CallContext, call?: Call) {
-        call = call || ctx.call
-        assert(call.name === 'Migration.migrate_batch_nonces')
-        this._chain = ctx._chain
-        this.call = call
-    }
-
-    /**
-     * Migrates NftManager Nft Batch Nonces from the AvN source chain
-     */
-    get isV12(): boolean {
-        return this._chain.getCallHash('Migration.migrate_batch_nonces') === '3b7d8303d90a5274938396d2994c20016ab0084d29768b191a9dfce68dfb6e1a'
-    }
-
-    /**
-     * Migrates NftManager Nft Batch Nonces from the AvN source chain
-     */
-    get asV12(): {nonces: [Uint8Array, bigint][]} {
-        assert(this.isV12)
-        return this._chain.decodeCall(this.call)
-    }
-}
-
 export class MigrationMigrateNftBatchesCall {
     private readonly _chain: Chain
     private readonly call: Call
