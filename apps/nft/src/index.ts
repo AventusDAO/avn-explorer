@@ -1,7 +1,13 @@
 import { BatchContext, BatchProcessorItem, SubstrateBlock } from '@subsquid/substrate-processor'
 import { Store, TypeormDatabase } from '@subsquid/typeorm-store'
 import { BatchNft, Nft, NftRoyalty } from './model'
-import { MigrationCallItem, NftEventItem, NftMetadata, NftTransferEventItem } from './types/custom'
+import {
+  NftMigrationCallItem,
+  NftEventItem,
+  NftMetadata,
+  NftTransferEventItem,
+  BatchNftMigrationCallItem
+} from './types/custom'
 import {
   handleBatchCreatedEventItem,
   handleBatchNftMintedEventItem,
@@ -10,13 +16,13 @@ import {
 } from './eventHandlers'
 import { processor } from './processor'
 import { In } from 'typeorm'
-import { getMigratedNftIds, getMigratedNfts } from './migrationHandler'
-// import { CallItem, EventItem } from '@subsquid/substrate-processor/lib/interfaces/dataSelection'
+import {
+  getMigratedBatchNftIds,
+  getMigratedNftBatches,
+  getMigratedNftIds,
+  getMigratedNfts
+} from './migrationHandler'
 
-// export type Item = Omit<
-//   BatchProcessorItem<typeof processor>,
-//   EventItem<'*', false> & CallItem<'*', false>
-// >
 export type Item = BatchProcessorItem<typeof processor>
 export type Ctx = BatchContext<Store, Item>
 
@@ -31,11 +37,26 @@ async function processData(ctx: Ctx): Promise<void> {
 
   // handle migration calls and store in the DB
 
+  const migratedBatchNftIds = ctx.blocks
+    .map(block =>
+      block.items
+        .filter(item => item.kind === 'call' && item.call.name === 'Migration.migrate_nft_batches')
+        .map(item => item as BatchNftMigrationCallItem)
+    )
+    .flat()
+    .map(item => getMigratedBatchNftIds(item, ctx))
+    .flat()
+
+  const migratedNftBatches = await getMigratedNftBatches(migratedBatchNftIds, ctx)
+  await ctx.store.insert(migratedNftBatches)
+  if (migratedNftBatches.length)
+    ctx.log.info(`stored ${migratedNftBatches.length} migrated BatchNFTs`)
+
   const migratedNftIds = ctx.blocks
     .map(block =>
       block.items
         .filter(item => item.kind === 'call' && item.call.name === 'Migration.migrate_nfts')
-        .map(item => item as MigrationCallItem)
+        .map(item => item as NftMigrationCallItem)
     )
     .flat()
     .map(item => getMigratedNftIds(item, ctx))
