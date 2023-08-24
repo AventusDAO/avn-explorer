@@ -47,3 +47,45 @@ export const processor = getProcessor()
       }
     }
   } as const)
+  .addCall('Migration.migrate_nfts', {
+    data: {
+      call: {
+        args: true
+      }
+    }
+  } as const)
+  .addCall('Migration.migrate_used_external_refs', {
+    data: {
+      call: {
+        args: true
+      }
+    }
+  })
+  .addCall('Migration.migrate_nft_infos', {
+    data: {
+      call: {
+        args: true
+      }
+    }
+  })
+  .addCall('Migration.migrate_nft_batches', {
+    data: {
+      call: {
+        args: true
+      }
+    }
+  })
+  .addCall('Migration.migrate_batch_info_ids', {
+    data: {
+      call: {
+        args: true
+      }
+    }
+  })
+  .addCall('Migration.migrate_batch_nonces', {
+    data: {
+      call: {
+        args: true
+      }
+    }
+  })

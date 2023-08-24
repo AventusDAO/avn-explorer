@@ -386,7 +386,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@avn/metadata@workspace:^, @avn/metadata@workspace:packages/metadata":
+"@avn/metadata@^1.0.0, @avn/metadata@workspace:^, @avn/metadata@workspace:packages/metadata":
   version: 0.0.0-use.local
   resolution: "@avn/metadata@workspace:packages/metadata"
   dependencies:
@@ -406,6 +406,7 @@ __metadata:
   resolution: "@avn/nft@workspace:apps/nft"
   dependencies:
     "@avn/config": ^1.0.0
+    "@avn/metadata": ^1.0.0
     "@avn/types": ^1.0.0
     "@avn/utils": ^1.0.0
     "@subsquid/cli": ^2.4.3
