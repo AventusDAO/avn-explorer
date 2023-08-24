@@ -1,4 +1,4 @@
-import { decodeMetadata, Metadata, Si1TypeDef_Composite } from '@subsquid/substrate-metadata'
+import { decodeMetadata, Metadata } from '@subsquid/substrate-metadata'
 import { readLines } from '@subsquid/util-internal-read-lines'
 import path from 'path'
 
