@@ -1,6 +1,4 @@
-// import { CodecType, CodecStructType } from '@subsquid/scale-codec/src/types-codec'
-import { encodeId } from '@avn/utils'
-import { decodeHex } from '@subsquid/substrate-processor'
+import { encodeId, reverseEndian, uint8ArrToHexStr } from '@avn/utils'
 import { Ctx } from '.'
 import { Nft, NftRoyalty, NftRoyaltyRate } from './model'
 import { MigrationCallItem } from './types'
@@ -9,12 +7,7 @@ import {
   NftManagerNftInfosStorage,
   NftManagerNftsStorage
 } from './types/generated/parachain-testnet/storage'
-import { Nft as V4Nft, NftInfo, NftInfo as V4NftInfo } from './types/generated/parachain-testnet/v4'
-
-function reverseEndian(endian: string): string {
-  const matches = endian.match(/../g) ?? []
-  return '0x' + matches.reverse().join('')
-}
+import { Nft as V4Nft, NftInfo as V4NftInfo } from './types/generated/parachain-testnet/v4'
 
 export const getMigratedNftIds = (item: MigrationCallItem, ctx: Ctx): bigint[] => {
   const data = new MigrationMigrateNftsCall(ctx, item.call)
@@ -45,23 +38,32 @@ export const getMigratedNfts = async (nftIds: bigint[], ctx: Ctx): Promise<Nft[]
   const storageNfts: V4Nft[] = removeUndefinedItems(await storage.asV4.getMany(nftIds))
 
   const infoStorage = new NftManagerNftInfosStorage(ctx, block)
-  const nftInfos: NftInfo[] = removeUndefinedItems(
+  const nftInfos: V4NftInfo[] = removeUndefinedItems(
     await infoStorage.asV4.getMany(storageNfts.map(nft => nft.infoId))
   )
 
   const nfts = storageNfts.map((nft, idx) => {
-    const nftInfo = nftInfos[idx]
+    const nftInfo: V4NftInfo = nftInfos[idx]
 
     const mintDate = new Date(block.timestamp)
-    const uniqueExternalRef = new TextDecoder().decode(nft.uniqueExternalRef)
-    const t1Authority = new TextDecoder().decode(nftInfo.t1Authority)
+    let uniqueExternalRef: string
+    if (
+      nft.nftId === 75192147361011253200690299112337059520822422747933994625323155140300140689581n
+    ) {
+      // corrupted or malicious `uniqueExternalRef`
+      uniqueExternalRef = ''
+    } else {
+      uniqueExternalRef = nft.uniqueExternalRef.toString()
+    }
+    const t1Authority = uint8ArrToHexStr(nftInfo.t1Authority)
+
     const royalties = nftInfo.royalties.map(
       r =>
         new NftRoyalty({
           rate: new NftRoyaltyRate({
             ...r.rate
           }),
-          recipientT1Address: r.recipientT1Address.toString()
+          recipientT1Address: uint8ArrToHexStr(r.recipientT1Address)
         })
     )
 
