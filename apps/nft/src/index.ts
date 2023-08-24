@@ -23,6 +23,14 @@ export type Ctx = BatchContext<Store, Item>
 processor.run(new TypeormDatabase(), processData)
 
 async function processData(ctx: Ctx): Promise<void> {
+  ctx.log.info(
+    `processing blocks range: #${ctx.blocks[0].header.height} - #${
+      ctx.blocks[ctx.blocks.length - 1].header.height
+    }`
+  )
+
+  // handle migration calls and store in the DB
+
   const migratedNftIds = ctx.blocks
     .map(block =>
       block.items
@@ -34,8 +42,10 @@ async function processData(ctx: Ctx): Promise<void> {
     .flat()
 
   const migratedNfts = await getMigratedNfts(migratedNftIds, ctx)
-  ctx.log.debug(migratedNfts)
   await ctx.store.insert(migratedNfts)
+  if (migratedNfts.length) ctx.log.info(`stored ${migratedNfts.length} migrated NFTs`)
+
+  // handle non migration events
 
   interface NftDataItem {
     block: SubstrateBlock
@@ -55,12 +65,6 @@ async function processData(ctx: Ctx): Promise<void> {
 
   if (data.length === 0) return
 
-  ctx.log.info(
-    `blocks: #${data[0].block.height} - #${data[data.length - 1].block.height}, count: ${
-      data.length
-    }`
-  )
-
   // get newly created NftBatches and save in DB
   const createdBatches = data
     .filter(item => item.event.name === 'NftManager.BatchCreated')
@@ -75,8 +79,9 @@ async function processData(ctx: Ctx): Promise<void> {
       throw new Error('unexpected event item')
     })
 
-  ctx.log.debug(createdBatches)
+  // ctx.log.debug(createdBatches)
   await ctx.store.insert(createdBatches)
+  if (createdBatches.length) ctx.log.info(`stored ${createdBatches.length} created NFT Batches`)
 
   // get all newly minted NFTs and save in DB
   const mintedNfts = data
@@ -103,6 +108,7 @@ async function processData(ctx: Ctx): Promise<void> {
 
   // ctx.log.debug(mintedNfts)
   await ctx.store.insert(mintedNfts)
+  if (mintedNfts.length) ctx.log.info(`stored ${mintedNfts.length} minted NFTs`)
 
   // get all other events and overwrite the owner
   const transferNftsData = data
@@ -116,13 +122,16 @@ async function processData(ctx: Ctx): Promise<void> {
     })
 
   // ctx.log.debug(transferNftsData)
-  await updateTransferNfts(transferNftsData, ctx)
+  const nftTransferUpdates = await getNftTransferUpdates(transferNftsData, ctx)
+  await ctx.store.upsert(nftTransferUpdates)
+  if (nftTransferUpdates.length)
+    ctx.log.info(`stored ${nftTransferUpdates.length} NFT transfer updates`)
 }
 
-async function updateTransferNfts(
+async function getNftTransferUpdates(
   nftsMetadata: Array<Pick<NftMetadata, 'id' | 'owner'>>,
   ctx: Ctx
-): Promise<void> {
+): Promise<Nft[]> {
   const existingNfts = await ctx.store.find(Nft, {
     where: {
       id: In(nftsMetadata.map(nft => nft.id))
@@ -139,5 +148,5 @@ async function updateTransferNfts(
     })
   })
 
-  await ctx.store.upsert(nfts)
+  return nfts
 }
