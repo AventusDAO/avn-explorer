@@ -121,9 +121,16 @@ async function processData(ctx: Ctx): Promise<void> {
       return handleTransferredNfts(item.event as NftTransferEventItem, item.block, ctx)
     })
 
-  // ctx.log.debug(transferNftsData)
   const nftTransferUpdates = await getNftTransferUpdates(transferNftsData, ctx)
-  await ctx.store.upsert(nftTransferUpdates)
+  // ctx.log.debug(nftTransferUpdates)
+
+  // get the unique (last) NFT transfer in the batch to fix QueryFailedError: "ON CONFLICT DO UPDATE command cannot affect row a second time"
+  // ensures that no rows proposed for insertion within the same command have duplicate constrained values
+  const uniqueNftTransferUpdates = new Map<string, Nft>()
+  nftTransferUpdates.forEach(nft => {
+    uniqueNftTransferUpdates.set(nft.id, nft)
+  })
+  await ctx.store.upsert([...uniqueNftTransferUpdates.values()])
   if (nftTransferUpdates.length)
     ctx.log.info(`stored ${nftTransferUpdates.length} NFT transfer updates`)
 }
