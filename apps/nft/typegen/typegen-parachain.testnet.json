@@ -8,10 +8,7 @@
     "NftManager.EthNftTransfer",
     "NftManager.FiatNftTransfer"
   ],
-  "calls": [
-    "Migration.migrate_nfts",
-    "Migration.migrate_nft_batches"
-  ],
+  "calls": ["Migration.migrate_nfts", "Migration.migrate_nft_batches"],
   "storage": [
     "NftManager.NftInfos",
     "NftManager.Nfts",
