@@ -35,5 +35,5 @@ export const getAllEvents = (specId: string, versionsFileName: string) => {
   return data.filter(x => x.events.length > 0).sort((a, b) => a.name.localeCompare(b.name))
 }
 
-const eventsMetadata = getAllEvents('avn-parachain@31', 'versions.avn-parachain.dev.jsonl')
+const eventsMetadata = getAllEvents('avn-parachain@37', 'versions.avn-parachain.dev.jsonl')
 console.log(eventsMetadata)
