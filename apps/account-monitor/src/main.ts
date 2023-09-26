@@ -123,7 +123,10 @@ async function getTransfers(
           tokenLookupMap,
           avtHash
         )
-        if (transfer?.pallet === 'TokenManager' && 'amount' in transfer) {
+        if (
+          (transfer?.pallet === 'TokenManager' || transfer?.pallet === 'Balances') &&
+          'amount' in transfer
+        ) {
           transfersData.push(transfer)
         } else if (transfer?.pallet === 'NftManager' && 'nftId' in transfer) {
           nftTransfersData.push(transfer)
