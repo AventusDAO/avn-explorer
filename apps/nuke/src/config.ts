@@ -11,7 +11,7 @@ export interface DatabaseConfig {
     | 'solochain-search'
     | 'search'
     | 'account-monitor'
-  | 'nft'
+    | 'nft'
   reset: boolean
   db?: string
   user?: string
