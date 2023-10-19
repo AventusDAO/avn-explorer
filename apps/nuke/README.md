@@ -51,6 +51,11 @@ DB_USER_ACCOUNT_MONITOR=account-monitor
 DB_SCHEMA_ACCOUNT_MONITOR=explorer_account_monitor_db
 DB_PASS_ACCOUNT_MONITOR=
 
+RESET_NFT=true
+DB_USER_NFT=nft
+DB_SCHEMA_NFT=explorer_nft_db
+DB_PASS_NFT=
+
 RESET_SEARCH=false
 DB_SCHEMA_SEARCH=explorer_search_db
 DB_USER_SEARCH=search

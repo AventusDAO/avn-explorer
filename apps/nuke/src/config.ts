@@ -11,6 +11,7 @@ export interface DatabaseConfig {
     | 'solochain-search'
     | 'search'
     | 'account-monitor'
+    | 'nft'
   reset: boolean
   db?: string
   user?: string
@@ -79,6 +80,13 @@ export const getDbConfigs: () => Readonly<DatabaseConfig[]> = () =>
       db: process.env.DB_SCHEMA_ACCOUNT_MONITOR,
       user: process.env.DB_USER_ACCOUNT_MONITOR,
       pass: process.env.DB_PASS_ACCOUNT_MONITOR
+    },
+    {
+      name: 'nft',
+      reset: process.env.RESET_NFT === 'true',
+      db: process.env.DB_SCHEMA_NFT,
+      user: process.env.DB_USER_NFT,
+      pass: process.env.DB_PASS_NFT
     },
     {
       name: 'search',
