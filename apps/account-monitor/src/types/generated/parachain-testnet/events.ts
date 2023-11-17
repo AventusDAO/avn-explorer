@@ -404,6 +404,29 @@ export class NftManagerSingleNftMintedEvent {
     }
 }
 
+export class TokenManagerAvtLoweredEvent {
+    private readonly _chain: Chain
+    private readonly event: Event
+
+    constructor(ctx: EventContext)
+    constructor(ctx: ChainContext, event: Event)
+    constructor(ctx: EventContext, event?: Event) {
+        event = event || ctx.event
+        assert(event.name === 'TokenManager.AvtLowered')
+        this._chain = ctx._chain
+        this.event = event
+    }
+
+    get isV51(): boolean {
+        return this._chain.getEventHash('TokenManager.AvtLowered') === '970149ac9ba4e3bd551be3cd445c6d4e241055bd9dca7ccc42ef81042f061a0b'
+    }
+
+    get asV51(): {sender: Uint8Array, recipient: Uint8Array, amount: bigint, t1Recipient: Uint8Array} {
+        assert(this.isV51)
+        return this._chain.decodeEvent(this.event)
+    }
+}
+
 export class TokenManagerTokenLiftedEvent {
     private readonly _chain: Chain
     private readonly event: Event

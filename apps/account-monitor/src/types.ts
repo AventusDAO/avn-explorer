@@ -80,6 +80,10 @@ export type TransfersEventItem =
       { event: { args: true; extrinsic: { hash: true; signature: true }; call: { origin: true } } }
     >
   | EventItem<
+      'TokenManager.AvtLowered',
+      { event: { args: true; extrinsic: { hash: true; signature: true }; call: { origin: true } } }
+    >
+  | EventItem<
       'NftManager.BatchCreated',
       { event: { args: true; extrinsic: { hash: true; signature: true }; call: { origin: true } } }
     >
@@ -117,6 +121,7 @@ export type EventName =
   | 'TokenManager.TokenTransferred'
   | 'TokenManager.TokenLifted'
   | 'TokenManager.TokenLowered'
+  | 'TokenManager.AvtLowered'
   | 'NftManager.BatchCreated'
   | 'NftManager.SingleNftMinted'
   | 'NftManager.BatchNftMinted'
@@ -136,6 +141,7 @@ export const eventNames = [
   'TokenManager.TokenTransferred',
   'TokenManager.TokenLifted',
   'TokenManager.TokenLowered',
+  'TokenManager.AvtLowered',
   'NftManager.BatchCreated',
   'NftManager.SingleNftMinted',
   'NftManager.BatchNftMinted',
