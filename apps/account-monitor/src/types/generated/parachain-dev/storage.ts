@@ -1,6 +1,6 @@
 import assert from 'assert'
 import {Block, BlockContext, Chain, ChainContext, Option, Result, StorageBase} from './support'
-import * as v21 from './v21'
+import * as v31 from './v31'
 
 export class BalancesAccountStorage extends StorageBase {
     protected getPrefix() {
@@ -37,7 +37,7 @@ export class BalancesAccountStorage extends StorageBase {
      *  `Balances` pallet, which uses a `StorageMap` to store balances data only.
      *  NOTE: This is only used in the case that this pallet is used to store balances.
      */
-    get isV21(): boolean {
+    get isV31(): boolean {
         return this.getTypeHash() === '0b3b4bf0dd7388459eba461bc7c3226bf58608c941710a714e02f33ec0f91e78'
     }
 
@@ -67,8 +67,8 @@ export class BalancesAccountStorage extends StorageBase {
      *  `Balances` pallet, which uses a `StorageMap` to store balances data only.
      *  NOTE: This is only used in the case that this pallet is used to store balances.
      */
-    get asV21(): BalancesAccountStorageV21 {
-        assert(this.isV21)
+    get asV31(): BalancesAccountStorageV31 {
+        assert(this.isV31)
         return this as any
     }
 }
@@ -99,18 +99,18 @@ export class BalancesAccountStorage extends StorageBase {
  *  `Balances` pallet, which uses a `StorageMap` to store balances data only.
  *  NOTE: This is only used in the case that this pallet is used to store balances.
  */
-export interface BalancesAccountStorageV21 {
-    get(key: Uint8Array): Promise<v21.AccountData>
-    getAll(): Promise<v21.AccountData[]>
-    getMany(keys: Uint8Array[]): Promise<v21.AccountData[]>
+export interface BalancesAccountStorageV31 {
+    get(key: Uint8Array): Promise<v31.AccountData>
+    getAll(): Promise<v31.AccountData[]>
+    getMany(keys: Uint8Array[]): Promise<v31.AccountData[]>
     getKeys(): Promise<Uint8Array[]>
     getKeys(key: Uint8Array): Promise<Uint8Array[]>
     getKeysPaged(pageSize: number): AsyncIterable<Uint8Array[]>
     getKeysPaged(pageSize: number, key: Uint8Array): AsyncIterable<Uint8Array[]>
-    getPairs(): Promise<[k: Uint8Array, v: v21.AccountData][]>
-    getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: v21.AccountData][]>
-    getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: v21.AccountData][]>
-    getPairsPaged(pageSize: number, key: Uint8Array): AsyncIterable<[k: Uint8Array, v: v21.AccountData][]>
+    getPairs(): Promise<[k: Uint8Array, v: v31.AccountData][]>
+    getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: v31.AccountData][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: v31.AccountData][]>
+    getPairsPaged(pageSize: number, key: Uint8Array): AsyncIterable<[k: Uint8Array, v: v31.AccountData][]>
 }
 
 export class NftManagerOwnedNftsStorage extends StorageBase {
@@ -125,15 +125,15 @@ export class NftManagerOwnedNftsStorage extends StorageBase {
     /**
      *  A mapping between the external batch id and its nft Ids
      */
-    get isV21(): boolean {
+    get isV31(): boolean {
         return this.getTypeHash() === '4e90f20e9cdec881bc0cee1678e1cbf89c26707d4dc4adcfdbec06dd5ca15948'
     }
 
     /**
      *  A mapping between the external batch id and its nft Ids
      */
-    get asV21(): NftManagerOwnedNftsStorageV21 {
-        assert(this.isV21)
+    get asV31(): NftManagerOwnedNftsStorageV31 {
+        assert(this.isV31)
         return this as any
     }
 }
@@ -141,7 +141,7 @@ export class NftManagerOwnedNftsStorage extends StorageBase {
 /**
  *  A mapping between the external batch id and its nft Ids
  */
-export interface NftManagerOwnedNftsStorageV21 {
+export interface NftManagerOwnedNftsStorageV31 {
     get(key: Uint8Array): Promise<bigint[]>
     getAll(): Promise<bigint[][]>
     getMany(keys: Uint8Array[]): Promise<bigint[][]>
@@ -167,15 +167,15 @@ export class SystemAccountStorage extends StorageBase {
     /**
      *  The full account information for a particular account ID.
      */
-    get isV21(): boolean {
+    get isV31(): boolean {
         return this.getTypeHash() === '1ddc7ade926221442c388ee4405a71c9428e548fab037445aaf4b3a78f4735c1'
     }
 
     /**
      *  The full account information for a particular account ID.
      */
-    get asV21(): SystemAccountStorageV21 {
-        assert(this.isV21)
+    get asV31(): SystemAccountStorageV31 {
+        assert(this.isV31)
         return this as any
     }
 }
@@ -183,18 +183,18 @@ export class SystemAccountStorage extends StorageBase {
 /**
  *  The full account information for a particular account ID.
  */
-export interface SystemAccountStorageV21 {
-    get(key: Uint8Array): Promise<v21.AccountInfo>
-    getAll(): Promise<v21.AccountInfo[]>
-    getMany(keys: Uint8Array[]): Promise<v21.AccountInfo[]>
+export interface SystemAccountStorageV31 {
+    get(key: Uint8Array): Promise<v31.AccountInfo>
+    getAll(): Promise<v31.AccountInfo[]>
+    getMany(keys: Uint8Array[]): Promise<v31.AccountInfo[]>
     getKeys(): Promise<Uint8Array[]>
     getKeys(key: Uint8Array): Promise<Uint8Array[]>
     getKeysPaged(pageSize: number): AsyncIterable<Uint8Array[]>
     getKeysPaged(pageSize: number, key: Uint8Array): AsyncIterable<Uint8Array[]>
-    getPairs(): Promise<[k: Uint8Array, v: v21.AccountInfo][]>
-    getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: v21.AccountInfo][]>
-    getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: v21.AccountInfo][]>
-    getPairsPaged(pageSize: number, key: Uint8Array): AsyncIterable<[k: Uint8Array, v: v21.AccountInfo][]>
+    getPairs(): Promise<[k: Uint8Array, v: v31.AccountInfo][]>
+    getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: v31.AccountInfo][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: v31.AccountInfo][]>
+    getPairsPaged(pageSize: number, key: Uint8Array): AsyncIterable<[k: Uint8Array, v: v31.AccountInfo][]>
 }
 
 export class TokenManagerBalancesStorage extends StorageBase {
@@ -209,15 +209,15 @@ export class TokenManagerBalancesStorage extends StorageBase {
     /**
      *  The number of units of tokens held by any given account.
      */
-    get isV21(): boolean {
+    get isV31(): boolean {
         return this.getTypeHash() === '70874cd5f158184b9b398819cb71b85684c5adb4e5cc9e1065d1115dac23d5f2'
     }
 
     /**
      *  The number of units of tokens held by any given account.
      */
-    get asV21(): TokenManagerBalancesStorageV21 {
-        assert(this.isV21)
+    get asV31(): TokenManagerBalancesStorageV31 {
+        assert(this.isV31)
         return this as any
     }
 }
@@ -225,7 +225,7 @@ export class TokenManagerBalancesStorage extends StorageBase {
 /**
  *  The number of units of tokens held by any given account.
  */
-export interface TokenManagerBalancesStorageV21 {
+export interface TokenManagerBalancesStorageV31 {
     get(key: [Uint8Array, Uint8Array]): Promise<bigint>
     getAll(): Promise<bigint[]>
     getMany(keys: [Uint8Array, Uint8Array][]): Promise<bigint[]>
