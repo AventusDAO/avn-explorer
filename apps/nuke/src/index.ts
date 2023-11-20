@@ -10,7 +10,7 @@ const clearSchemaTables = async (schemaName: string, client: typeof Client) => {
   const { rows: tables } = await client.query(query)
 
   for (const { schemaname, tablename } of tables) {
-    const dropQuery = `TRUNCATE TABLE IF EXISTS ${schemaname}.${tablename} CASCADE;`
+    const dropQuery = `TRUNCATE TABLE ${schemaname}.${tablename} CASCADE;`
     console.log(`Dropping ${schemaname}.${tablename}`)
     await client.query(dropQuery)
   }
