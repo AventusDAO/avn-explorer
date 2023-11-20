@@ -10,10 +10,19 @@ const clearSchemaTables = async (schemaName: string, client: typeof Client) => {
   const { rows: tables } = await client.query(query)
 
   for (const { schemaname, tablename } of tables) {
-    const dropQuery = `TRUNCATE TABLE ${schemaname}.${tablename} CASCADE;`
+    const dropQuery = `DROP TABLE ${schemaname}.${tablename} CASCADE;`
     console.log(`Dropping ${schemaname}.${tablename}`)
     await client.query(dropQuery)
   }
+}
+
+const addPermissions = async (client: typeof Client) => {
+  let query = "GRANT USAGE ON SCHEMA public To readonly;"
+  await client.query(query);
+  query = "GRANT SELECT ON ALL TABLES IN SCHEMA public TO readonly;"
+  await client.query(query);
+  query = "GRANT SELECT ON ALL SEQUENCES IN SCHEMA public TO readonly;"
+  await client.query(query);
 }
 
 const clearDatabase = async (config: DatabaseConfig) => {
@@ -47,6 +56,7 @@ const clearDatabase = async (config: DatabaseConfig) => {
 
   await clearSchemaTables('public', client)
   await clearSchemaTables('squid_processor', client)
+  await addPermissions(client)
 
   console.log(`Done clearing ${db}.`)
   await client.end()
