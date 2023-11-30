@@ -130,7 +130,6 @@ export class TokenTransferService {
         AND token_id = $3
       GROUP BY method
     `
-
     const result = await this.manager.query(query, [startDate, endDate, tokenId])
     return result
   }
