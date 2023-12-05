@@ -1,13 +1,10 @@
-
-
-
-import { EntityManager } from 'typeorm';
+import { EntityManager } from 'typeorm'
 
 export class TokenTransferService {
-  constructor(private readonly manager: EntityManager) { }
+  constructor(private readonly manager: EntityManager) {}
 
   private formatDateForQuery(date: Date): string {
-    return date.toISOString();
+    return date.toISOString()
   }
 
   private async executeAggregateQuery(
@@ -19,8 +16,8 @@ export class TokenTransferService {
       const result = await this.manager.query(query, params)
       return BigInt(result?.[0]?.[output] ?? 0)
     } catch (error) {
-      console.error('Error executing aggregate query:', error);
-      throw new Error('Error executing database operation');
+      console.error('Error executing aggregate query:', error)
+      throw new Error('Error executing database operation')
     }
   }
 
