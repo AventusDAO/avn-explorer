@@ -5,4 +5,6 @@ export interface SearchEvent extends EsItem {
   blockHeight: number
   section: string
   name: string
+  /// values of event.args normalized into a string array
+  __argValues?: string[]
 }

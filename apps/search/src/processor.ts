@@ -10,6 +10,7 @@ import {
 import { Store, TypeormDatabase } from '@subsquid/typeorm-store'
 import { getElasticSearch } from './elastic-search'
 import { SearchBlock, SearchEvent, SearchExtrinsic } from './elastic-search/types'
+import { normalizeEventArgValues } from './utils'
 
 type Item = BatchProcessorItem<typeof processor>
 export type Context = BatchContext<Store, Item>
@@ -60,7 +61,9 @@ const processor = getProcessor()
   .addEvent('*', {
     data: {
       event: {
-        args: false,
+        // WARNING! this is a wildcard query
+        // TODO: test the whole chain on testnet first to see if there isn't any huge `args` object blocking the gateway
+        args: true,
         extrinsic: {
           signature: true,
           success: true,
@@ -173,7 +176,7 @@ const mapExtrinsics = (block: BatchBlock<Item>): SearchExtrinsic[] => {
     })
 }
 
-const mapEvents = (block: BatchBlock<Item>): SearchEvent[] => {
+const mapEvents = (block: BatchBlock<Item>, _ctx: Context): SearchEvent[] => {
   const blockHeader: SubstrateBlock = block.header
   const { height, timestamp } = blockHeader
   const chainGen = mapChainGen(block)
@@ -185,13 +188,32 @@ const mapEvents = (block: BatchBlock<Item>): SearchEvent[] => {
       if (item.kind !== 'event') throw new Error(`item must be of 'event' kind`)
       const _name = item.event.name
       const [section, name] = _name.split('.')
+      const args = item.event.args
+      let argValues: string[] | undefined
+      // TODO: make sure we want those sections to be searchable by their `args`
+      const dataSearchableSections = [
+        'Balances',
+        'AvnProxy',
+        'EthereumTransactions',
+        'EthereumEvents',
+        'NftManager',
+        'TokenManager',
+        'TransactionPayment'
+      ]
+      if (dataSearchableSections.includes(section) && args) {
+        argValues = normalizeEventArgValues(args)
+        // _ctx.log.debug(
+        //   `event ${_name}\nargs: ${JSON.stringify(args)}\ndataSearch: ${JSON.stringify(argValues)}`
+        // )
+      }
       return {
         refId: item.event.id,
         timestamp,
         chainGen,
         blockHeight: height,
         section,
-        name
+        name,
+        __argValues: argValues
       }
     })
 }
@@ -204,7 +226,7 @@ const handleBatch = async (ctx: Context): Promise<void> => {
   const batchedEvents: SearchEvent[] = []
 
   ctx.blocks.forEach(batchBlock => {
-    const events = mapEvents(batchBlock)
+    const events = mapEvents(batchBlock, ctx)
     const extrinsics = mapExtrinsics(batchBlock)
     const block = mapBlockBatch(batchBlock, extrinsics)
 

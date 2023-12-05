@@ -1,6 +1,6 @@
 import { AxiosError } from 'axios'
 import { ApiError, isAxiosError } from '../../utils'
-import { EsSortItem, EsRequestPayload, EsSortDirection, EsQuery, SearchEvent } from '../../types'
+import { EsSortItem, EsRequestPayload, EsSortDirection, SearchEvent } from '../../types'
 import { getLogger } from '../../utils/logger'
 import { config } from '../../config'
 import { processSortParam } from '../../utils/paramHelpers'

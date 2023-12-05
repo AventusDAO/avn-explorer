@@ -8,17 +8,29 @@ export interface EventsDataQuery {
   blockHeightTo?: number
   timestampStart?: number
   timestampEnd?: number
+  dataSearch?: string[]
 }
 
 const extrinsicDataQuery = (dataQuery: EventsDataQuery): JsonMap[] => {
   const matches: JsonMap[] = []
-  const { section, name, blockHeightFrom, blockHeightTo, timestampStart, timestampEnd } = dataQuery
+  const {
+    section,
+    name,
+    blockHeightFrom,
+    blockHeightTo,
+    timestampStart,
+    timestampEnd,
+    dataSearch
+  } = dataQuery
   if (section) matches.push({ match: { section } })
   if (name) matches.push({ match: { name } })
   const blockRangeQuery = numberRangeFilterSubQuery('blockHeight', blockHeightFrom, blockHeightTo)
   if (blockRangeQuery) matches.push(blockRangeQuery)
   const timestampQuery = timestampRangeFilterSubQuery('timestamp', timestampStart, timestampEnd)
   if (timestampQuery) matches.push(timestampQuery)
+  if (dataSearch && dataSearch.length > 0) {
+    console.log('TODO: query ES for ' + JSON.stringify(dataSearch))
+  }
   return matches
 }
 
