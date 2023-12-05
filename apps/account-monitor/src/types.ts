@@ -84,9 +84,9 @@ export type TransfersEventItem =
       { event: { args: true; extrinsic: { hash: true; signature: true }; call: { origin: true } } }
     >
   | EventItem<
-    'TokenManager.AVTLifted',
-    { event: { args: true; extrinsic: { hash: true; signature: true }; call: { origin: true } } }
-  >
+      'TokenManager.AVTLifted',
+      { event: { args: true; extrinsic: { hash: true; signature: true }; call: { origin: true } } }
+    >
   | EventItem<
       'NftManager.BatchCreated',
       { event: { args: true; extrinsic: { hash: true; signature: true }; call: { origin: true } } }
