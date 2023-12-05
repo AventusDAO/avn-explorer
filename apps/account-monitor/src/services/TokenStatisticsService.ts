@@ -59,8 +59,9 @@ export class TokenTransferService {
   async getAverageAmountLastNDays(n: number, tokenId: string, accountId?: string): Promise<bigint> {
     const dateAgo = this.formatDateForQuery(new Date(Date.now() - n * 24 * 60 * 60 * 1000));
     let query = `
-      SELECT AVG(SUM(CASE WHEN method = 'TokenLifted' THEN amount ELSE 0 END) -
-        SUM(CASE WHEN method = 'TokenLowered' THEN amount ELSE 0 END) as averageAmount
+      SELECT AVG(${this.buildSumQuery('TokenLifted', true)}
+        ${this.buildSumQuery('TokenLowered')}
+) as averageAmount
       FROM token_transfer
       WHERE token_id = $1
         AND timestamp >= $2
