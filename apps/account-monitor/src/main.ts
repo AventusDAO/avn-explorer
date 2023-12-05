@@ -196,7 +196,7 @@ function getTransferData(
   const palletInfoArray = item.name.split('.')
   if (event && Object.keys(event).includes('tokenId')) {
     const tokenTransfer = getTokenEventTransferData(block, item, event, tokensMap, palletInfoArray)
-
+    console.log("HELP !!!", tokenTransfer.payer)
     return tokenTransfer
   }
 
@@ -222,10 +222,11 @@ function getEventTransferData(
     to: event.to,
     pallet: palletInfoArray[0],
     method: palletInfoArray[1],
+    payer: event.payer,
     // @ts-expect-error
     relayer: item.event?.call?.origin?.value?.value
       ? // @ts-expect-error
-        decodeHex(item.event.call?.origin.value.value)
+      decodeHex(item.event.call?.origin.value.value)
       : undefined,
     nonce: item.event.extrinsic?.signature?.signedExtensions?.CheckNonce ?? 0
   }

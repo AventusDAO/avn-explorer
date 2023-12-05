@@ -151,6 +151,7 @@ function extractAddresses(
     addressSet.add(item.from)
     addressSet.add(item.to)
     addressSet.add(item.relayer)
+    addressSet.add(item.payer)
   }
 
   return addressSet
@@ -162,7 +163,7 @@ function createEncodeIdCache(addresses: Set<Uint8Array>): Map<Uint8Array, string
   for (const address of addresses) {
     const encodedId = encodeIdCache.get(address) ?? ''
 
-    if (!encodedId && address) {
+    if (!encodedId && address && address.length) {
       const encoded = encodeId(address)
       encodeIdCache.set(address, encoded)
     }
@@ -181,6 +182,7 @@ function updateAccounts(
     updateAccount(accounts, encodeIdCache, balances, item.relayer)
     updateAccount(accounts, encodeIdCache, balances, item.to)
     updateAccount(accounts, encodeIdCache, balances, item.from)
+    updateAccount(accounts, encodeIdCache, balances, item.payer)
   }
 }
 

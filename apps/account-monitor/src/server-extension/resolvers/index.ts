@@ -2,6 +2,7 @@ import 'reflect-metadata'
 import { Query, Resolver, Arg, ObjectType, Field } from 'type-graphql'
 import { Any, EntityManager } from 'typeorm'
 import { TokenTransferService } from '../../services/TokenStatisticsService'
+import { TokenTransfer } from '../../model'
 
 @ObjectType()
 class TokenTransferCount {
@@ -12,11 +13,23 @@ class TokenTransferCount {
   count!: number
 }
 
+@ObjectType()
+class PayerTransaction {
+  @Field(() => BigInt)
+  balance!: bigint
+
+  @Field(() => [TokenTransfer])
+  transactions!: TokenTransfer[]
+
+  @Field()
+  transactionCount!: number
+}
+
 @Resolver()
 export class TokenStatisticsResolver {
   private readonly tokenStatisticsService: TokenTransferService | null = null
 
-  constructor(private readonly tx: () => Promise<EntityManager>) {}
+  constructor(private readonly tx: () => Promise<EntityManager>) { }
 
   @Query(() => BigInt)
   async getAverageAmountLast30Days(@Arg('tokenId') tokenId: string): Promise<bigint> {
@@ -93,5 +106,16 @@ export class TokenStatisticsResolver {
       startDate,
       endDate
     )
+  }
+
+  @Query(() => PayerTransaction)
+  async getPayerTransactionsAndBalance(
+    @Arg('payerId') payerId: string,
+    @Arg('startDate', () => String) startDate: string,
+    @Arg('endDate', () => String) endDate: string
+  ): Promise<PayerTransaction> {
+    const manager = await this.tx()
+    const tokenStatisticsService = new TokenTransferService(manager)
+    return await tokenStatisticsService.getPayerTransactionsAndBalance(payerId, new Date(startDate), new Date(endDate))
   }
 }

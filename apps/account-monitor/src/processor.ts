@@ -8,7 +8,7 @@ const processor = getProcessor()
           signature: true,
           hash: true
         },
-        call: { origin: true }
+        call: { origin: true, args: true }
       }
     }
   } as const)
@@ -20,7 +20,7 @@ const processor = getProcessor()
           signature: true,
           hash: true
         },
-        call: { origin: true }
+        call: { origin: true, args: true }
       }
     }
   } as const)
@@ -32,7 +32,7 @@ const processor = getProcessor()
           signature: true,
           hash: true
         },
-        call: { origin: true }
+        call: { origin: true, args: true }
       }
     }
   } as const)
@@ -56,7 +56,7 @@ const processor = getProcessor()
           signature: true,
           hash: true
         },
-        call: { origin: true }
+        call: { origin: true, args: true }
       }
     }
   } as const)
@@ -68,7 +68,7 @@ const processor = getProcessor()
           signature: true,
           hash: true
         },
-        call: { origin: true }
+        call: { origin: true, args: true }
       }
     }
   } as const)
@@ -80,7 +80,7 @@ const processor = getProcessor()
           signature: true,
           hash: true
         },
-        call: { origin: true }
+        call: { origin: true, args: true }
       }
     }
   } as const)
@@ -92,7 +92,7 @@ const processor = getProcessor()
           signature: true,
           hash: true
         },
-        call: { origin: true }
+        call: { origin: true, args: true }
       }
     }
   } as const)
@@ -104,7 +104,7 @@ const processor = getProcessor()
           signature: true,
           hash: true
         },
-        call: { origin: true }
+        call: { origin: true, args: true }
       }
     }
   } as const)
@@ -116,7 +116,7 @@ const processor = getProcessor()
           signature: true,
           hash: true
         },
-        call: { origin: true }
+        call: { origin: true, args: true }
       }
     }
   } as const)
@@ -128,7 +128,7 @@ const processor = getProcessor()
           signature: true,
           hash: true
         },
-        call: { origin: true }
+        call: { origin: true, args: true }
       }
     }
   } as const)
@@ -140,7 +140,7 @@ const processor = getProcessor()
           signature: true,
           hash: true
         },
-        call: { origin: true }
+        call: { origin: true, args: true }
       }
     }
   } as const)
@@ -152,7 +152,7 @@ const processor = getProcessor()
           signature: true,
           hash: true
         },
-        call: { origin: true }
+        call: { origin: true, args: true }
       }
     }
   } as const)
@@ -164,7 +164,7 @@ const processor = getProcessor()
           signature: true,
           hash: true
         },
-        call: { origin: true }
+        call: { origin: true, args: true }
       }
     }
   } as const)
@@ -176,7 +176,7 @@ const processor = getProcessor()
           signature: true,
           hash: true
         },
-        call: { origin: true }
+        call: { origin: true, args: true }
       }
     }
   } as const)
@@ -188,7 +188,7 @@ const processor = getProcessor()
           signature: true,
           hash: true
         },
-        call: { origin: true }
+        call: { origin: true, args: true }
       }
     }
   } as const)
@@ -200,7 +200,7 @@ const processor = getProcessor()
           signature: true,
           hash: true
         },
-        call: { origin: true }
+        call: { origin: true, args: true }
       }
     }
   } as const)
@@ -212,7 +212,7 @@ const processor = getProcessor()
           signature: true,
           hash: true
         },
-        call: { origin: true }
+        call: { origin: true, args: true }
       }
     }
   } as const)

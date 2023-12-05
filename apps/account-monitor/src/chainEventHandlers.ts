@@ -28,20 +28,28 @@ import {
 } from './types/generated/parachain-testnet/storage'
 import { Block } from './types/generated/parachain-testnet/support'
 import { AccountInfo } from './types/generated/parachain-testnet/v4'
+import { decodeId } from '@avn/utils'
+import { stringToU8a } from '@polkadot/util'
 
 export function normalizeBalancesTransferEvent(
   ctx: Ctx,
-  item: EventItem<'Balances.Transfer', { event: { args: true }; call: { origin: true } }>,
+  item: EventItem<
+    'Balances.Transfer',
+    { event: { args: true }; call: { origin: true; args: true } }
+  >,
   avtHash?: string
-): { from: Uint8Array; to: Uint8Array; amount: bigint; tokenId: Uint8Array } {
+): { from: Uint8Array; to: Uint8Array; amount: bigint; tokenId: Uint8Array; payer: Uint8Array } {
   const e = new BalancesTransferEvent(ctx, item.event)
+
+  const payer = item.event.call?.args?.paymentInfo?.payer
   if (e.isV4) {
     const { from, to, amount } = e.asV4
     return {
       from,
       to,
       amount,
-      tokenId: avtHash ? decodeHex(avtHash) : /* this should not be reached */ new Uint8Array()
+      tokenId: avtHash ? decodeHex(avtHash) : /* this should not be reached */ new Uint8Array(),
+      payer: payer ? decodeHex(payer) : new Uint8Array()
     }
   } else {
     throw new UnknownVersionError()
@@ -50,17 +58,22 @@ export function normalizeBalancesTransferEvent(
 
 export function normalizeBalancesEndowedEvent(
   ctx: Ctx,
-  item: EventItem<'Balances.Endowed', { event: { args: true }; call: { origin: true } }>,
+  item: EventItem<
+    'Balances.Endowed',
+    { event: { args: true }; call: { origin: true; args: true } }
+  >,
   avtHash?: string
-): { from: Uint8Array; to: Uint8Array; amount: bigint; tokenId: Uint8Array } {
+): { from: Uint8Array; to: Uint8Array; amount: bigint; tokenId: Uint8Array; payer: Uint8Array } {
   const e = new BalancesEndowedEvent(ctx, item.event)
+  const payer = item.event.call?.args?.paymentInfo?.payer
   if (e.isV4) {
     const { account, freeBalance } = e.asV4
     return {
       from: account,
       to: account,
       amount: freeBalance,
-      tokenId: avtHash ? decodeHex(avtHash) : /* this should not be reached */ new Uint8Array()
+      tokenId: avtHash ? decodeHex(avtHash) : /* this should not be reached */ new Uint8Array(),
+      payer: payer ? decodeHex(payer) : new Uint8Array()
     }
   } else {
     throw new UnknownVersionError()
@@ -69,17 +82,22 @@ export function normalizeBalancesEndowedEvent(
 
 export function normalizeBalancesBalanceSetEvent(
   ctx: Ctx,
-  item: EventItem<'Balances.BalanceSet', { event: { args: true }; call: { origin: true } }>,
+  item: EventItem<
+    'Balances.BalanceSet',
+    { event: { args: true }; call: { origin: true; args: true } }
+  >,
   avtHash?: string
-): { from: Uint8Array; to: Uint8Array; amount: bigint; tokenId: Uint8Array } {
+): { from: Uint8Array; to: Uint8Array; amount: bigint; tokenId: Uint8Array; payer: Uint8Array } {
   const e = new BalancesBalanceSetEvent(ctx, item.event)
+  const payer = item.event.call?.args?.paymentInfo?.payer
   if (e.isV4) {
     const { free, reserved, who } = e.asV4
     return {
       from: new Uint8Array(),
       to: who,
       amount: free + reserved,
-      tokenId: avtHash ? decodeHex(avtHash) : /* this should not be reached */ new Uint8Array()
+      tokenId: avtHash ? decodeHex(avtHash) : /* this should not be reached */ new Uint8Array(),
+      payer: payer ? decodeHex(payer) : new Uint8Array()
     }
   } else {
     throw new UnknownVersionError()
@@ -88,17 +106,22 @@ export function normalizeBalancesBalanceSetEvent(
 
 export function normalizeBalancesReservedEvent(
   ctx: Ctx,
-  item: EventItem<'Balances.Reserved', { event: { args: true }; call: { origin: true } }>,
+  item: EventItem<
+    'Balances.Reserved',
+    { event: { args: true }; call: { origin: true; args: true } }
+  >,
   avtHash?: string
-): { from: Uint8Array; to: Uint8Array; amount: bigint; tokenId: Uint8Array } {
+): { from: Uint8Array; to: Uint8Array; amount: bigint; tokenId: Uint8Array; payer: Uint8Array } {
   const e = new BalancesReservedEvent(ctx, item.event)
+  const payer = item.event.call?.args?.paymentInfo?.payer
   if (e.isV4) {
     const { amount, who } = e.asV4
     return {
       from: who,
       to: who,
       amount,
-      tokenId: avtHash ? decodeHex(avtHash) : /* this should not be reached */ new Uint8Array()
+      tokenId: avtHash ? decodeHex(avtHash) : /* this should not be reached */ new Uint8Array(),
+      payer: payer ? decodeHex(payer) : new Uint8Array()
     }
   } else {
     throw new UnknownVersionError()
@@ -107,17 +130,22 @@ export function normalizeBalancesReservedEvent(
 
 export function normalizeBalancesUnreservedEvent(
   ctx: Ctx,
-  item: EventItem<'Balances.Unreserved', { event: { args: true }; call: { origin: true } }>,
+  item: EventItem<
+    'Balances.Unreserved',
+    { event: { args: true }; call: { origin: true; args: true } }
+  >,
   avtHash?: string
-): { from: Uint8Array; to: Uint8Array; amount: bigint; tokenId: Uint8Array } {
+): { from: Uint8Array; to: Uint8Array; amount: bigint; tokenId: Uint8Array; payer: Uint8Array } {
   const e = new BalancesUnreservedEvent(ctx, item.event)
+  const payer = item.event.call?.args?.paymentInfo?.payer
   if (e.isV4) {
     const { amount, who } = e.asV4
     return {
       from: who,
       to: who,
       amount,
-      tokenId: avtHash ? decodeHex(avtHash) : /* this should not be reached */ new Uint8Array()
+      tokenId: avtHash ? decodeHex(avtHash) : /* this should not be reached */ new Uint8Array(),
+      payer: payer ? decodeHex(payer) : new Uint8Array()
     }
   } else {
     throw new UnknownVersionError()
@@ -126,17 +154,22 @@ export function normalizeBalancesUnreservedEvent(
 
 export function normalizeBalancesReserveRepatriatedEvent(
   ctx: Ctx,
-  item: EventItem<'Balances.ReserveRepatriated', { event: { args: true }; call: { origin: true } }>,
+  item: EventItem<
+    'Balances.ReserveRepatriated',
+    { event: { args: true }; call: { origin: true; args: true } }
+  >,
   avtHash?: string
-): { from: Uint8Array; to: Uint8Array; amount: bigint; tokenId: Uint8Array } {
+): { from: Uint8Array; to: Uint8Array; amount: bigint; tokenId: Uint8Array; payer: Uint8Array } {
   const e = new BalancesReserveRepatriatedEvent(ctx, item.event)
+  const payer = item.event.call?.args?.paymentInfo?.payer
   if (e.isV4) {
     const { amount, from, to } = e.asV4
     return {
       from,
       to,
       amount,
-      tokenId: avtHash ? decodeHex(avtHash) : /* this should not be reached */ new Uint8Array()
+      tokenId: avtHash ? decodeHex(avtHash) : /* this should not be reached */ new Uint8Array(),
+      payer: payer ? decodeHex(payer) : new Uint8Array()
     }
   } else {
     throw new UnknownVersionError()
@@ -145,17 +178,22 @@ export function normalizeBalancesReserveRepatriatedEvent(
 
 export function normalizeBalancesDepositEvent(
   ctx: Ctx,
-  item: EventItem<'Balances.Deposit', { event: { args: true }; call: { origin: true } }>,
+  item: EventItem<
+    'Balances.Deposit',
+    { event: { args: true }; call: { origin: true; args: true } }
+  >,
   avtHash?: string
-): { from: Uint8Array; to: Uint8Array; amount: bigint; tokenId: Uint8Array } {
+): { from: Uint8Array; to: Uint8Array; amount: bigint; tokenId: Uint8Array; payer: Uint8Array } {
   const e = new BalancesDepositEvent(ctx, item.event)
+  const payer = item.event.call?.args?.paymentInfo?.payer
   if (e.isV4) {
     const { amount, who } = e.asV4
     return {
       from: who,
       to: who,
       amount,
-      tokenId: avtHash ? decodeHex(avtHash) : /* this should not be reached */ new Uint8Array()
+      tokenId: avtHash ? decodeHex(avtHash) : /* this should not be reached */ new Uint8Array(),
+      payer: payer ? decodeHex(payer) : new Uint8Array()
     }
   } else {
     throw new UnknownVersionError()
@@ -164,17 +202,22 @@ export function normalizeBalancesDepositEvent(
 
 export function normalizeBalancesWithdrawEvent(
   ctx: Ctx,
-  item: EventItem<'Balances.Withdraw', { event: { args: true }; call: { origin: true } }>,
+  item: EventItem<
+    'Balances.Withdraw',
+    { event: { args: true }; call: { origin: true; args: true } }
+  >,
   avtHash?: string
-): { from: Uint8Array; to: Uint8Array; amount: bigint; tokenId: Uint8Array } {
+): { from: Uint8Array; to: Uint8Array; amount: bigint; tokenId: Uint8Array; payer: Uint8Array } {
   const e = new BalancesWithdrawEvent(ctx, item.event)
+  const payer = item.event.call?.args?.paymentInfo?.payer
   if (e.isV4) {
     const { amount, who } = e.asV4
     return {
       from: who,
       to: who,
       amount,
-      tokenId: avtHash ? decodeHex(avtHash) : /* this should not be reached */ new Uint8Array()
+      tokenId: avtHash ? decodeHex(avtHash) : /* this should not be reached */ new Uint8Array(),
+      payer: payer ? decodeHex(payer) : new Uint8Array()
     }
   } else {
     throw new UnknownVersionError()
@@ -183,17 +226,22 @@ export function normalizeBalancesWithdrawEvent(
 
 export function normalizeBalancesSlashedEvent(
   ctx: Ctx,
-  item: EventItem<'Balances.Slashed', { event: { args: true }; call: { origin: true } }>,
+  item: EventItem<
+    'Balances.Slashed',
+    { event: { args: true }; call: { origin: true; args: true } }
+  >,
   avtHash?: string
-): { from: Uint8Array; to: Uint8Array; amount: bigint; tokenId: Uint8Array } {
+): { from: Uint8Array; to: Uint8Array; amount: bigint; tokenId: Uint8Array; payer: Uint8Array } {
   const e = new BalancesSlashedEvent(ctx, item.event)
+  const payer = item.event.call?.args?.paymentInfo?.payer
   if (e.isV4) {
     const { amount, who } = e.asV4
     return {
       from: who,
       to: who,
       amount,
-      tokenId: avtHash ? decodeHex(avtHash) : /* this should not be reached */ new Uint8Array()
+      tokenId: avtHash ? decodeHex(avtHash) : /* this should not be reached */ new Uint8Array(),
+      payer: payer ? decodeHex(payer) : new Uint8Array()
     }
   } else {
     throw new UnknownVersionError()
@@ -204,13 +252,14 @@ export function normalizeTokenTransferEvent(
   ctx: Ctx,
   item: EventItem<
     'TokenManager.TokenTransferred',
-    { event: { args: true }; call: { origin: true } }
+    { event: { args: true }; call: { origin: true; args: true } }
   >
-): { from: Uint8Array; to: Uint8Array; amount: bigint; tokenId: Uint8Array } {
+): { from: Uint8Array; to: Uint8Array; amount: bigint; tokenId: Uint8Array; payer: Uint8Array } {
   const e = new TokenManagerTokenTransferredEvent(ctx, item.event)
+  const payer = item.event.call?.args?.paymentInfo?.payer
   if (e.isV4) {
     const { sender, recipient, tokenBalance, tokenId } = e.asV4
-    return { from: sender, to: recipient, amount: tokenBalance, tokenId }
+    return { from: sender, to: recipient, amount: tokenBalance, tokenId, payer: payer ? decodeHex(payer) : new Uint8Array() }
   } else {
     throw new UnknownVersionError()
   }
@@ -218,34 +267,44 @@ export function normalizeTokenTransferEvent(
 
 export function normalizeTokenLiftedEvent(
   ctx: Ctx,
-  item: EventItem<'TokenManager.TokenLifted', { event: { args: true }; call: { origin: true } }>
+  item: EventItem<
+    'TokenManager.TokenLifted',
+    { event: { args: true }; call: { origin: true; args: true } }
+  >
 ): {
   from: undefined
   to: Uint8Array
   amount: bigint
   tokenId: Uint8Array
+  payer: Uint8Array
 } {
   const e = new TokenManagerTokenLiftedEvent(ctx, item.event)
+  const payer = item.event.call?.args?.paymentInfo?.payer
   if (e.isV4) {
     const { tokenId, recipient, tokenBalance } = e.asV4
-    return { from: undefined, to: recipient, amount: tokenBalance, tokenId }
+    return { from: undefined, to: recipient, amount: tokenBalance, tokenId, payer: payer ? decodeHex(payer) : new Uint8Array() }
   } else {
     throw new UnknownVersionError()
   }
 }
 export function normalizeTokenLoweredEvent(
   ctx: Ctx,
-  item: EventItem<'TokenManager.TokenLowered', { event: { args: true }; call: { origin: true } }>
+  item: EventItem<
+    'TokenManager.TokenLowered',
+    { event: { args: true }; call: { origin: true; args: true } }
+  >
 ): {
   from: Uint8Array
   to: Uint8Array
   amount: bigint
   tokenId: Uint8Array
+  payer: Uint8Array
 } {
   const e = new TokenManagerTokenLoweredEvent(ctx, item.event)
+  const payer = item.event.call?.args?.paymentInfo?.payer
   if (e.isV4) {
     const { tokenId, recipient, sender, amount } = e.asV4
-    return { from: sender, to: recipient, amount, tokenId }
+    return { from: sender, to: recipient, amount, tokenId, payer: payer ? decodeHex(payer) : new Uint8Array() }
   } else {
     throw new UnknownVersionError()
   }
@@ -253,22 +312,28 @@ export function normalizeTokenLoweredEvent(
 
 export function normalizeAvtLoweredEvent(
   ctx: Ctx,
-  item: EventItem<'TokenManager.AvtLowered', { event: { args: true }; call: { origin: true } }>,
+  item: EventItem<
+    'TokenManager.AvtLowered',
+    { event: { args: true }; call: { origin: true; args: true } }
+  >,
   avtHash?: string
 ): {
   from: Uint8Array
   to: Uint8Array
   amount: bigint
   tokenId: Uint8Array
+  payer: Uint8Array
 } {
   const e = new TokenManagerAvtLoweredEvent(ctx, item.event)
+  const payer = item.event.call?.args?.paymentInfo?.payer
   if (e.isV51) {
     const { amount, recipient, sender, t1Recipient } = e.asV51
     return {
       from: sender,
       to: recipient,
       amount,
-      tokenId: avtHash ? decodeHex(avtHash) : /* this should not be reached */ new Uint8Array()
+      tokenId: avtHash ? decodeHex(avtHash) : /* this should not be reached */ new Uint8Array(),
+      payer: payer ? decodeHex(payer) : new Uint8Array()
     }
   } else {
     throw new UnknownVersionError()
@@ -301,17 +366,22 @@ export function normalizeAvtLiftedEvent(
 
 export function normalizeNftBatchCreated(
   ctx: Ctx,
-  item: EventItem<'NftManager.BatchCreated', { event: { args: true }; call: { origin: true } }>
+  item: EventItem<
+    'NftManager.BatchCreated',
+    { event: { args: true }; call: { origin: true; args: true } }
+  >
 ): {
   from: undefined
   to: Uint8Array
   nftId: bigint
   totalSupply: bigint
+  payer: Uint8Array
 } {
   const e = new NftManagerBatchCreatedEvent(ctx, item.event)
+  const payer = item.event.call?.args?.paymentInfo?.payer
   if (e.isV4) {
     const { batchNftId, batchCreator, totalSupply } = e.asV4
-    return { from: undefined, to: batchCreator, nftId: batchNftId, totalSupply }
+    return { from: undefined, to: batchCreator, nftId: batchNftId, totalSupply, payer: payer ? decodeHex(payer) : new Uint8Array() }
   } else {
     throw new UnknownVersionError()
   }
@@ -319,17 +389,22 @@ export function normalizeNftBatchCreated(
 
 export function normalizeNftSingleNftMinted(
   ctx: Ctx,
-  item: EventItem<'NftManager.SingleNftMinted', { event: { args: true }; call: { origin: true } }>
+  item: EventItem<
+    'NftManager.SingleNftMinted',
+    { event: { args: true }; call: { origin: true; args: true } }
+  >
 ): {
   from: undefined
   to: Uint8Array
   nftId: bigint
   totalSupply: number
+  payer: Uint8Array
 } {
   const e = new NftManagerSingleNftMintedEvent(ctx, item.event)
+  const payer = item.event.call?.args?.paymentInfo?.payer
   if (e.isV4) {
     const { nftId, owner } = e.asV4
-    return { from: undefined, to: owner, nftId, totalSupply: 1 }
+    return { from: undefined, to: owner, nftId, totalSupply: 1, payer: payer ? decodeHex(payer) : new Uint8Array() }
   } else {
     throw new UnknownVersionError()
   }
@@ -337,12 +412,16 @@ export function normalizeNftSingleNftMinted(
 
 export function normalizeNftBatchNftMinted(
   ctx: Ctx,
-  item: EventItem<'NftManager.BatchNftMinted', { event: { args: true }; call: { origin: true } }>
-): { from: undefined; to: Uint8Array; nftId: bigint; totalSupply: number } {
+  item: EventItem<
+    'NftManager.BatchNftMinted',
+    { event: { args: true }; call: { origin: true; args: true } }
+  >
+): { from: undefined; to: Uint8Array; nftId: bigint; totalSupply: number; payer: Uint8Array } {
   const e = new NftManagerBatchNftMintedEvent(ctx, item.event)
+  const payer = item.event.call?.args?.paymentInfo?.payer
   if (e.isV4) {
     const { nftId, owner } = e.asV4
-    return { from: undefined, to: owner, nftId, totalSupply: 1 }
+    return { from: undefined, to: owner, nftId, totalSupply: 1, payer: payer ? decodeHex(payer) : new Uint8Array() }
   } else {
     throw new UnknownVersionError()
   }
@@ -350,12 +429,16 @@ export function normalizeNftBatchNftMinted(
 
 export function normalizeNftFiatNftTransfer(
   ctx: Ctx,
-  item: EventItem<'NftManager.FiatNftTransfer', { event: { args: true }; call: { origin: true } }>
-): { from: Uint8Array; to: Uint8Array; nftId: bigint; totalSupply: number } {
+  item: EventItem<
+    'NftManager.FiatNftTransfer',
+    { event: { args: true }; call: { origin: true; args: true } }
+  >
+): { from: Uint8Array; to: Uint8Array; nftId: bigint; totalSupply: number; payer: Uint8Array } {
   const e = new NftManagerFiatNftTransferEvent(ctx, item.event)
+  const payer = item.event.call?.args?.paymentInfo?.payer
   if (e.isV4) {
     const { newOwner, nftId, sender } = e.asV4
-    return { from: sender, to: newOwner, nftId, totalSupply: 1 }
+    return { from: sender, to: newOwner, nftId, totalSupply: 1, payer: payer ? decodeHex(payer) : new Uint8Array() }
   } else {
     throw new UnknownVersionError()
   }
@@ -363,12 +446,16 @@ export function normalizeNftFiatNftTransfer(
 
 export function normalizeNftEthNftTransfer(
   ctx: Ctx,
-  item: EventItem<'NftManager.EthNftTransfer', { event: { args: true }; call: { origin: true } }>
-): { from: undefined; to: Uint8Array; nftId: bigint; totalSupply: number } {
+  item: EventItem<
+    'NftManager.EthNftTransfer',
+    { event: { args: true }; call: { origin: true; args: true } }
+  >
+): { from: undefined; to: Uint8Array; nftId: bigint; totalSupply: number; payer: Uint8Array } {
   const e = new NftManagerEthNftTransferEvent(ctx, item.event)
+  const payer = item.event.call?.args?.paymentInfo?.payer
   if (e.isV4) {
     const { newOwner, nftId } = e.asV4
-    return { from: undefined, to: newOwner, nftId, totalSupply: 1 }
+    return { from: undefined, to: newOwner, nftId, totalSupply: 1, payer: payer ? decodeHex(payer) : new Uint8Array() }
   } else {
     throw new UnknownVersionError()
   }
@@ -445,7 +532,7 @@ export async function getSystemAccountBalances(
 ): Promise<BalanceType[] | undefined> {
   const storage = new SystemAccountStorage(ctx, block)
   if (!storage.isExists) return undefined
-  const data = (await storage.asV4.getMany(accounts.filter(Boolean))) as AccountInfo[]
+  const data = (await storage.asV4.getMany(accounts.filter(Boolean).filter(account => account.length))) as AccountInfo[]
 
   return data.map(d => ({
     free: d.data.free,
