@@ -1,10 +1,13 @@
-import { EntityManager } from 'typeorm'
+
+
+
+import { EntityManager } from 'typeorm';
 
 export class TokenTransferService {
-  constructor(private readonly manager: EntityManager) {}
+  constructor(private readonly manager: EntityManager) { }
 
   private formatDateForQuery(date: Date): string {
-    return date.toISOString()
+    return date.toISOString();
   }
 
   private async executeAggregateQuery(
@@ -13,63 +16,63 @@ export class TokenTransferService {
     output: string
   ): Promise<bigint> {
     try {
-      const result = await this.manager.query(query, params)
-      console.log(result)
-      return result[0] ? (result[0][output] ? BigInt(result[0][output]) : BigInt(0)) : BigInt(0)
+      const result = await this.manager.query(query, params);
+      return BigInt(result?.[0]?.[output] ?? 0);
     } catch (error) {
-      console.error('Error executing aggregate query:', error)
-      throw new Error('Error executing database operation')
+      console.error('Error executing aggregate query:', error);
+      throw new Error('Error executing database operation');
     }
   }
 
-  async getTotalAmountByToken(tokenId: string): Promise<bigint> {
-    const query = `
-      SELECT SUM(amount) as totalAmount
+  private buildSumQuery(method: string, isNegative: boolean = false): string {
+    return `SUM(CASE WHEN method = '${method}' THEN amount ELSE 0 END) ${isNegative ? '-' : ''} `;
+  }
+
+  private buildCommonQuery(tokenId: string, accountId?: string): string {
+    let query = `
+      SELECT 
+        ${this.buildSumQuery('TokenLifted', true)}
+        ${this.buildSumQuery('TokenLowered')}
+        AS totalAmount
       FROM token_transfer
       WHERE token_id = $1
-    `
+        AND method IN ('TokenLifted', 'TokenLowered')
+    `;
 
-    return await this.executeAggregateQuery(query, [tokenId], 'totalamount')
+    if (accountId) {
+      query += ` AND (from_id = $2 OR to_id = $2)`;
+    }
+
+    return query;
+  }
+
+  async getTotalAmountByToken(tokenId: string): Promise<bigint> {
+    const query = this.buildCommonQuery(tokenId);
+    return await this.executeAggregateQuery(query, [tokenId], 'totalamount');
   }
 
   async getTotalAmountByAccountAndToken(accountId: string, tokenId: string): Promise<bigint> {
-    const query = `
-      SELECT SUM(amount) as totalAmount
-      FROM token_transfer
-      WHERE to_id = $1 AND token_id = $2
-    `
-
-    return await this.executeAggregateQuery(query, [accountId, tokenId], 'totalamount')
+    const query = this.buildCommonQuery(tokenId, accountId);
+    return await this.executeAggregateQuery(query, [accountId, tokenId], 'totalamount');
   }
 
-  async getAverageAmountLast30Days(tokenId: string): Promise<bigint> {
-    const thirtyDaysAgo = this.formatDateForQuery(new Date(Date.now() - 30 * 24 * 60 * 60 * 1000))
-
-    const query = `
-      SELECT AVG(amount) as averageAmount
+  async getAverageAmountLastNDays(n: number, tokenId: string, accountId?: string): Promise<bigint> {
+    const dateAgo = this.formatDateForQuery(new Date(Date.now() - n * 24 * 60 * 60 * 1000));
+    let query = `
+      SELECT AVG(SUM(CASE WHEN method = 'TokenLifted' THEN amount ELSE 0 END) -
+        SUM(CASE WHEN method = 'TokenLowered' THEN amount ELSE 0 END) as averageAmount
       FROM token_transfer
       WHERE token_id = $1
         AND timestamp >= $2
-    `
+    `;
 
-    return await this.executeAggregateQuery(query, [tokenId, thirtyDaysAgo], 'averageamount')
-  }
+    const params = [tokenId, dateAgo];
+    if (accountId) {
+      query += ` AND (from_id = $3 OR to_id = $3)`;
+      params.push(accountId);
+    }
 
-  async getAverageAmountLast7Days(accountId: string, tokenId: string): Promise<bigint> {
-    const sevenDaysAgo = this.formatDateForQuery(new Date(Date.now() - 7 * 24 * 60 * 60 * 1000))
-
-    const query = `
-      SELECT AVG(amount) as averageAmount
-      FROM token_transfer
-      WHERE to_id = $1 AND token_id = $2
-        AND timestamp >= $3
-    `
-
-    return await this.executeAggregateQuery(
-      query,
-      [accountId, tokenId, sevenDaysAgo],
-      'averageamount'
-    )
+    return await this.executeAggregateQuery(query, params, 'averageamount');
   }
 
   async getTotalLoweredAmountByToken(tokenId: string): Promise<bigint> {
@@ -77,22 +80,9 @@ export class TokenTransferService {
       SELECT SUM(amount) as totalAmount
       FROM token_transfer
       WHERE token_id = $1 AND method = 'TokenLowered'
-    `
+    `;
 
-    return await this.executeAggregateQuery(query, [tokenId], 'totalamount')
-  }
-
-  async getTotalLoweredAmountByAccountAndToken(
-    accountId: string,
-    tokenId: string
-  ): Promise<bigint> {
-    const query = `
-      SELECT SUM(amount) as totalAmount
-      FROM token_transfer
-      WHERE token_id = $1 AND method = 'TokenLowered' AND 
-    `
-
-    return await this.executeAggregateQuery(query, [tokenId], 'totalamount')
+    return await this.executeAggregateQuery(query, [tokenId], 'totalamount');
   }
 
   async getTotalLiftedAmountByToken(tokenId: string): Promise<bigint> {
@@ -100,12 +90,34 @@ export class TokenTransferService {
       SELECT SUM(amount) as totalAmount
       FROM token_transfer
       WHERE token_id = $1 AND method = 'TokenLifted'
-    `
+    `;
 
-    return await this.executeAggregateQuery(query, [tokenId], 'totalamount')
+    return await this.executeAggregateQuery(query, [tokenId], 'totalamount');
   }
 
-  async countTokenTransfersByMethodForMonth(
+
+
+  async getTotalAvtLoweredAmount(): Promise<bigint> {
+    const query = `
+      SELECT SUM(amount) as totalAmount
+      FROM token_transfer
+      WHERE method = 'AvtLowered'
+    `;
+
+    return await this.executeAggregateQuery(query, [], 'totalamount');
+  }
+
+  async getTotalAvtLiftedAmount(): Promise<bigint> {
+    const query = `
+      SELECT SUM(amount) as totalAmount
+      FROM token_transfer
+      WHERE method = 'AVTLifted'
+    `;
+
+    return await this.executeAggregateQuery(query, [], 'totalamount');
+  }
+
+  async countTokenTransactionsByMethodForPeriod(
     tokenId: string,
     startDate: string,
     endDate: string
@@ -117,9 +129,9 @@ export class TokenTransferService {
         AND timestamp < $2
         AND token_id = $3
       GROUP BY method
-    `
+    `;
 
-    const result = await this.manager.query(query, [startDate, endDate, tokenId])
-    return result
+    const result = await this.manager.query(query, [startDate, endDate, tokenId]);
+    return result;
   }
 }

@@ -22,7 +22,7 @@ export class TokenStatisticsResolver {
   async getAverageAmountLast30Days(@Arg('tokenId') tokenId: string): Promise<bigint> {
     const manager = await this.tx()
     const tokenStatisticsService = new TokenTransferService(manager)
-    return await tokenStatisticsService.getAverageAmountLast30Days(tokenId)
+    return await tokenStatisticsService.getAverageAmountLastNDays(30, tokenId)
   }
 
   @Query(() => BigInt)
@@ -32,7 +32,7 @@ export class TokenStatisticsResolver {
   ): Promise<bigint> {
     const manager = await this.tx()
     const tokenStatisticsService = new TokenTransferService(manager)
-    return await tokenStatisticsService.getAverageAmountLast7Days(accountId, tokenId)
+    return await tokenStatisticsService.getAverageAmountLastNDays(7, tokenId, accountId)
   }
 
   @Query(() => BigInt)
@@ -57,6 +57,20 @@ export class TokenStatisticsResolver {
   }
 
   @Query(() => BigInt)
+  async getTotalAvtLiftedAmount(): Promise<bigint> {
+    const manager = await this.tx()
+    const tokenStatisticsService = new TokenTransferService(manager)
+    return await tokenStatisticsService.getTotalAvtLiftedAmount()
+  }
+
+  @Query(() => BigInt)
+  async getTotalAvtLoweredAmount(): Promise<bigint> {
+    const manager = await this.tx()
+    const tokenStatisticsService = new TokenTransferService(manager)
+    return await tokenStatisticsService.getTotalAvtLoweredAmount()
+  }
+
+  @Query(() => BigInt)
   async getTotalAmountByAccountAndToken(
     @Arg('accountId') accountId: string,
     @Arg('tokenId') tokenId: string
@@ -74,7 +88,7 @@ export class TokenStatisticsResolver {
   ): Promise<TokenTransferCount[]> {
     const manager = await this.tx()
     const tokenStatisticsService = new TokenTransferService(manager)
-    return await tokenStatisticsService.countTokenTransfersByMethodForMonth(
+    return await tokenStatisticsService.countTokenTransactionsByMethodForPeriod(
       tokenId,
       startDate,
       endDate
