@@ -61,8 +61,6 @@ const processor = getProcessor()
   .addEvent('*', {
     data: {
       event: {
-        // WARNING! this is a wildcard query
-        // TODO: test the whole chain on testnet first to see if there isn't any huge `args` object blocking the gateway
         args: true,
         extrinsic: {
           signature: true,

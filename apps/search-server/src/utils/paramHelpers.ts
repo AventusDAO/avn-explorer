@@ -102,7 +102,7 @@ export function processArrayParam<T = string>(param: QueryParam, name: string): 
     throw new ApiError(
       'bad_request',
       400,
-      `expected ${name} not to be an array object parameter. Example: '?${name}=val1', '?${name}=val1&${name}=val2', or '?${name}=val1,val2'.`,
+      `Expected ${name} to be an array query type. Valid examples: '?${name}=val1', '?${name}=val1&${name}=val2', or '?${name}=val1,val2'.`,
       true
     )
   }
