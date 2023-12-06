@@ -29,7 +29,7 @@ class PayerTransaction {
 export class TokenStatisticsResolver {
   private readonly tokenStatisticsService: TokenTransferService | null = null
 
-  constructor(private readonly tx: () => Promise<EntityManager>) { }
+  constructor(private readonly tx: () => Promise<EntityManager>) {}
 
   @Query(() => BigInt)
   async getAverageAmountLast30Days(@Arg('tokenId') tokenId: string): Promise<bigint> {
@@ -116,6 +116,10 @@ export class TokenStatisticsResolver {
   ): Promise<PayerTransaction> {
     const manager = await this.tx()
     const tokenStatisticsService = new TokenTransferService(manager)
-    return await tokenStatisticsService.getPayerTransactionsAndBalance(payerId, new Date(startDate), new Date(endDate))
+    return await tokenStatisticsService.getPayerTransactionsAndBalance(
+      payerId,
+      new Date(startDate),
+      new Date(endDate)
+    )
   }
 }

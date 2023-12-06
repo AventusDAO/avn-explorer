@@ -2,7 +2,7 @@ import { EntityManager } from 'typeorm'
 import { Account, TokenTransfer } from '../model'
 
 export class TokenTransferService {
-  constructor(private readonly manager: EntityManager) { }
+  constructor(private readonly manager: EntityManager) {}
 
   private formatDateForQuery(date: Date): string {
     return date.toISOString()
@@ -135,11 +135,16 @@ export class TokenTransferService {
     return result
   }
 
-  async getPayerTransactionsAndBalance(payerId: string, startDate: Date, endDate: Date): Promise<{ balance: bigint, transactions: any[], transactionCount: number }> {
+  async getPayerTransactionsAndBalance(
+    payerId: string,
+    startDate: Date,
+    endDate: Date
+  ): Promise<{ balance: bigint; transactions: any[]; transactionCount: number }> {
     try {
       const payerAccount = await this.manager.findOneOrFail(Account, { where: { id: payerId } })
 
-      const transactions = await this.manager.createQueryBuilder(TokenTransfer, 'transaction')
+      const transactions = await this.manager
+        .createQueryBuilder(TokenTransfer, 'transaction')
         .where('transaction.payer = :payerId', { payerId })
         .andWhere('transaction.timestamp >= :startDate', { startDate })
         .andWhere('transaction.timestamp < :endDate', { endDate })

@@ -95,19 +95,19 @@ export type EventNormalizer<T extends TransfersEventItem> = (
   avtHash?: string
 ) =>
   | {
-    from: Uint8Array | undefined
-    to: Uint8Array
-    amount: bigint
-    tokenId: Uint8Array
-    payer?: Uint8Array
-  }
+      from: Uint8Array | undefined
+      to: Uint8Array
+      amount: bigint
+      tokenId: Uint8Array
+      payer?: Uint8Array
+    }
   | {
-    from: Uint8Array | undefined
-    to: Uint8Array
-    nftId: bigint
-    totalSupply: number | bigint
-    payer?: Uint8Array
-  }
+      from: Uint8Array | undefined
+      to: Uint8Array
+      nftId: bigint
+      totalSupply: number | bigint
+      payer?: Uint8Array
+    }
 
 export type BalanceType = {
   free: bigint

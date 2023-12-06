@@ -226,7 +226,7 @@ function getEventTransferData(
     // @ts-expect-error
     relayer: item.event?.call?.origin?.value?.value
       ? // @ts-expect-error
-      decodeHex(item.event.call?.origin.value.value)
+        decodeHex(item.event.call?.origin.value.value)
       : undefined,
     nonce: item.event.extrinsic?.signature?.signedExtensions?.CheckNonce ?? 0
   }
