@@ -21,6 +21,7 @@ export function createTransfers(
         from: transfer.from ? accounts.get(encodeId(transfer.from)) : undefined,
         to: accounts.get(encodeId(transfer.to)),
         relayer: transfer.relayer ? accounts.get(encodeId(transfer.relayer)) : undefined,
+        payer: transfer.payer?.length ? accounts.get(encodeId(transfer.payer)) : undefined,
         nonce: transfer.nonce,
         amount: transfer.amount,
         token: tokens.get(toHex(transfer.tokenId) ?? ''),
@@ -151,6 +152,7 @@ function extractAddresses(
     addressSet.add(item.from)
     addressSet.add(item.to)
     addressSet.add(item.relayer)
+    addressSet.add(item.payer)
   }
 
   return addressSet
@@ -162,7 +164,7 @@ function createEncodeIdCache(addresses: Set<Uint8Array>): Map<Uint8Array, string
   for (const address of addresses) {
     const encodedId = encodeIdCache.get(address) ?? ''
 
-    if (!encodedId && address) {
+    if (!encodedId && address && address.length) {
       const encoded = encodeId(address)
       encodeIdCache.set(address, encoded)
     }
@@ -181,6 +183,7 @@ function updateAccounts(
     updateAccount(accounts, encodeIdCache, balances, item.relayer)
     updateAccount(accounts, encodeIdCache, balances, item.to)
     updateAccount(accounts, encodeIdCache, balances, item.from)
+    updateAccount(accounts, encodeIdCache, balances, item.payer)
   }
 }
 

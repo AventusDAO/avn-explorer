@@ -13,6 +13,7 @@ export interface TransferEventData {
   pallet: string
   method: string
   relayer: Uint8Array
+  payer: Uint8Array
   nonce: bigint
 }
 export interface NftTransferEventData extends TransferEventData {
@@ -30,83 +31,16 @@ export type TransferData = TokenTransferEventData | NftTransferEventData | undef
 export type Item = BatchProcessorItem<typeof processor>
 export type Ctx = BatchContext<Store, Item>
 
-export type TransfersEventItem =
-  | EventItem<
-      'Balances.Transfer',
-      { event: { args: true; extrinsic: { hash: true; signature: true }; call: { origin: true } } }
-    >
-  | EventItem<
-      'Balances.Endowed',
-      { event: { args: true; extrinsic: { hash: true; signature: true }; call: { origin: true } } }
-    >
-  | EventItem<
-      'Balances.BalanceSet',
-      { event: { args: true; extrinsic: { hash: true; signature: true }; call: { origin: true } } }
-    >
-  | EventItem<
-      'Balances.Reserved',
-      { event: { args: true; extrinsic: { hash: true; signature: true }; call: { origin: true } } }
-    >
-  | EventItem<
-      'Balances.Unreserved',
-      { event: { args: true; extrinsic: { hash: true; signature: true }; call: { origin: true } } }
-    >
-  | EventItem<
-      'Balances.ReserveRepatriated',
-      { event: { args: true; extrinsic: { hash: true; signature: true }; call: { origin: true } } }
-    >
-  | EventItem<
-      'Balances.Deposit',
-      { event: { args: true; extrinsic: { hash: true; signature: true }; call: { origin: true } } }
-    >
-  | EventItem<
-      'Balances.Withdraw',
-      { event: { args: true; extrinsic: { hash: true; signature: true }; call: { origin: true } } }
-    >
-  | EventItem<
-      'Balances.Slashed',
-      { event: { args: true; extrinsic: { hash: true; signature: true }; call: { origin: true } } }
-    >
-  | EventItem<
-      'TokenManager.TokenTransferred',
-      { event: { args: true; extrinsic: { hash: true; signature: true }; call: { origin: true } } }
-    >
-  | EventItem<
-      'TokenManager.TokenLifted',
-      { event: { args: true; extrinsic: { hash: true; signature: true }; call: { origin: true } } }
-    >
-  | EventItem<
-      'TokenManager.TokenLowered',
-      { event: { args: true; extrinsic: { hash: true; signature: true }; call: { origin: true } } }
-    >
-  | EventItem<
-      'TokenManager.AvtLowered',
-      { event: { args: true; extrinsic: { hash: true; signature: true }; call: { origin: true } } }
-    >
-  | EventItem<
-      'TokenManager.AVTLifted',
-      { event: { args: true; extrinsic: { hash: true; signature: true }; call: { origin: true } } }
-    >
-  | EventItem<
-      'NftManager.BatchCreated',
-      { event: { args: true; extrinsic: { hash: true; signature: true }; call: { origin: true } } }
-    >
-  | EventItem<
-      'NftManager.SingleNftMinted',
-      { event: { args: true; extrinsic: { hash: true; signature: true }; call: { origin: true } } }
-    >
-  | EventItem<
-      'NftManager.BatchNftMinted',
-      { event: { args: true; extrinsic: { hash: true; signature: true }; call: { origin: true } } }
-    >
-  | EventItem<
-      'NftManager.FiatNftTransfer',
-      { event: { args: true; extrinsic: { hash: true; signature: true }; call: { origin: true } } }
-    >
-  | EventItem<
-      'NftManager.EthNftTransfer',
-      { event: { args: true; extrinsic: { hash: true; signature: true }; call: { origin: true } } }
-    >
+export type TransfersEventItem = EventItem<
+  EventName,
+  {
+    event: {
+      args: true
+      extrinsic: { hash: true; signature: true }
+      call: { origin: true; args: true }
+    }
+  }
+>
 
 export type EventNormalizers = {
   [K in TransfersEventItem['name']]: EventNormalizer<Extract<TransfersEventItem, { name: K }>>
@@ -160,8 +94,20 @@ export type EventNormalizer<T extends TransfersEventItem> = (
   item: T,
   avtHash?: string
 ) =>
-  | { from: Uint8Array | undefined; to: Uint8Array; amount: bigint; tokenId: Uint8Array }
-  | { from: Uint8Array | undefined; to: Uint8Array; nftId: bigint; totalSupply: number | bigint }
+  | {
+      from: Uint8Array | undefined
+      to: Uint8Array
+      amount: bigint
+      tokenId: Uint8Array
+      payer?: Uint8Array
+    }
+  | {
+      from: Uint8Array | undefined
+      to: Uint8Array
+      nftId: bigint
+      totalSupply: number | bigint
+      payer?: Uint8Array
+    }
 
 export type BalanceType = {
   free: bigint

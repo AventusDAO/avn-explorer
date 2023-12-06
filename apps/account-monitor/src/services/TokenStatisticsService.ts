@@ -1,4 +1,5 @@
 import { EntityManager } from 'typeorm'
+import { Account, TokenTransfer } from '../model'
 
 export class TokenTransferService {
   constructor(private readonly manager: EntityManager) {}
@@ -130,8 +131,38 @@ export class TokenTransferService {
         AND token_id = $3
       GROUP BY method
     `
-
     const result = await this.manager.query(query, [startDate, endDate, tokenId])
     return result
+  }
+
+  async getPayerTransactionsAndBalance(
+    payerId: string,
+    startDate: Date,
+    endDate: Date
+  ): Promise<{ balance: bigint; transactions: any[]; transactionCount: number }> {
+    try {
+      const payerAccount = await this.manager.findOneOrFail(Account, { where: { id: payerId } })
+
+      const transactions = await this.manager
+        .createQueryBuilder(TokenTransfer, 'transaction')
+        .where('transaction.payer = :payerId', { payerId })
+        .andWhere('transaction.timestamp >= :startDate', { startDate })
+        .andWhere('transaction.timestamp < :endDate', { endDate })
+        .leftJoinAndSelect('transaction.token', 'token')
+        .leftJoinAndSelect('transaction.from', 'from')
+        .leftJoinAndSelect('transaction.to', 'to')
+        .leftJoinAndSelect('transaction.relayer', 'relayer')
+        .leftJoinAndSelect('transaction.payer', 'payer')
+        .getMany()
+
+      const transactionCount = transactions.length
+
+      const balance: bigint = payerAccount.avtBalance
+
+      return { balance, transactions, transactionCount }
+    } catch (error) {
+      console.error('Error getting payer transactions and balance:', error)
+      throw new Error('Error executing database operation')
+    }
   }
 }

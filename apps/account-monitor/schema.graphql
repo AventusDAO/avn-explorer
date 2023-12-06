@@ -38,6 +38,7 @@ type NftTransfer @entity {
   from: Account
   to: Account
   relayer: Account
+  payer: Account
   nonce: BigInt
   nft: Nft
   pallet: String! @index
@@ -52,6 +53,7 @@ type TokenTransfer @entity {
   from: Account
   to: Account
   relayer: Account
+  payer: Account
   nonce: BigInt
   amount: BigInt! @index
   token: Token

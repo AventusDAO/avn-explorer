@@ -12,9 +12,6 @@ module.exports = class Data1691508023725 {
         await db.query(`CREATE INDEX IF NOT EXISTS "IDX_8d8e30d2fbac29e746147f25b4" ON "token_transfer" ("nonce") `)
         await db.query(`ALTER TABLE "nft_transfer" ADD CONSTRAINT "FK_f6e64c228ad00b8dbdf0afec053" FOREIGN KEY ("relayer_id") REFERENCES "account"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`)
         await db.query(`ALTER TABLE "token_transfer" ADD CONSTRAINT "FK_c53243bf2b970f2133e46c67bde" FOREIGN KEY ("relayer_id") REFERENCES "account"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`)
-        await db.query(`GRANT USAGE ON SCHEMA public To readonly`)
-        await db.query(`GRANT SELECT ON ALL TABLES IN SCHEMA public TO readonly`)
-        await db.query(`GRANT SELECT ON ALL SEQUENCES IN SCHEMA public TO readonly`)
     }
 
     async down(db) {

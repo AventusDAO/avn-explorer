@@ -2,6 +2,7 @@ import 'reflect-metadata'
 import { Query, Resolver, Arg, ObjectType, Field } from 'type-graphql'
 import { Any, EntityManager } from 'typeorm'
 import { TokenTransferService } from '../../services/TokenStatisticsService'
+import { TokenTransfer } from '../../model'
 
 @ObjectType()
 class TokenTransferCount {
@@ -10,6 +11,18 @@ class TokenTransferCount {
 
   @Field()
   count!: number
+}
+
+@ObjectType()
+class PayerTransaction {
+  @Field(() => BigInt)
+  balance!: bigint
+
+  @Field(() => [TokenTransfer])
+  transactions!: TokenTransfer[]
+
+  @Field()
+  transactionCount!: number
 }
 
 @Resolver()
@@ -92,6 +105,21 @@ export class TokenStatisticsResolver {
       tokenId,
       startDate,
       endDate
+    )
+  }
+
+  @Query(() => PayerTransaction)
+  async getPayerTransactionsAndBalance(
+    @Arg('payerId') payerId: string,
+    @Arg('startDate', () => String) startDate: string,
+    @Arg('endDate', () => String) endDate: string
+  ): Promise<PayerTransaction> {
+    const manager = await this.tx()
+    const tokenStatisticsService = new TokenTransferService(manager)
+    return await tokenStatisticsService.getPayerTransactionsAndBalance(
+      payerId,
+      new Date(startDate),
+      new Date(endDate)
     )
   }
 }
