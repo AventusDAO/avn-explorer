@@ -146,6 +146,8 @@ export class TokenTransferService {
         .leftJoinAndSelect('transaction.token', 'token')
         .leftJoinAndSelect('transaction.from', 'from')
         .leftJoinAndSelect('transaction.to', 'to')
+        .leftJoinAndSelect('transaction.relayer', 'relayer')
+        .leftJoinAndSelect('transaction.payer', 'payer')
         .getMany()
 
       const transactionCount = transactions.length

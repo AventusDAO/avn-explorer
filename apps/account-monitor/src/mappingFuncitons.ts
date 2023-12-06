@@ -21,6 +21,7 @@ export function createTransfers(
         from: transfer.from ? accounts.get(encodeId(transfer.from)) : undefined,
         to: accounts.get(encodeId(transfer.to)),
         relayer: transfer.relayer ? accounts.get(encodeId(transfer.relayer)) : undefined,
+        payer: transfer.payer?.length ? accounts.get(encodeId(transfer.payer)) : undefined,
         nonce: transfer.nonce,
         amount: transfer.amount,
         token: tokens.get(toHex(transfer.tokenId) ?? ''),
