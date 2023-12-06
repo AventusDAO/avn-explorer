@@ -11,6 +11,8 @@ export const argsSearchableSections = Object.freeze([
   'TransactionPayment'
 ])
 
+export type RecursiveArray<T> = Array<RecursiveArray<T> | T>
+
 /**
  * Maps data value to a string keyword for ES search
  * @param {*} val data value to map into a string keyword
@@ -18,16 +20,15 @@ export const argsSearchableSections = Object.freeze([
  */
 function argsToKeywordMapper(
   val: string | object | number | null
-): string | null | string[] | string[][] {
+): string | RecursiveArray<string> | null {
   if (val === null) return null
   switch (typeof val) {
     case 'string':
       return val
-    // array, to flatten it later
-    case 'object':
-      // @ts-expect-error not sure why TS complains here
-      return Object.values(val).map((vv: any) => argsToKeywordMapper(vv))
-    // e.g. number "123"
+    case 'object': {
+      const mappedVals = Object.values(val).map((vv: any) => argsToKeywordMapper(vv))
+      return mappedVals.filter(v => v !== null).map(v => v as string | RecursiveArray<string>)
+    }
     default:
       return String(val)
   }
@@ -43,6 +44,9 @@ export const normalizeEventArgValues = (
 
   const data = argsToKeywordMapper(args)
   if (!data) return undefined
-  if (Array.isArray(data)) return data.flat()
+  if (Array.isArray(data)) {
+    // @ts-expect-error we know the depth of the array is not infinite, because event args is not infinite
+    return data.flat(Infinity)
+  }
   return [data]
 }
