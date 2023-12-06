@@ -36,6 +36,18 @@ const processor = getProcessor()
       }
     }
   } as const)
+  .addEvent('TokenManager.AVTLifted', {
+    data: {
+      event: {
+        args: true,
+        extrinsic: {
+          signature: true,
+          hash: true
+        },
+        call: { origin: true }
+      }
+    }
+  } as const)
   .addEvent('TokenManager.AvtLowered', {
     data: {
       event: {

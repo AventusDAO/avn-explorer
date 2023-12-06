@@ -17,7 +17,8 @@ import {
   TokenManagerTokenLiftedEvent,
   TokenManagerTokenLoweredEvent,
   TokenManagerAvtLoweredEvent,
-  TokenManagerTokenTransferredEvent
+  TokenManagerTokenTransferredEvent,
+  TokenManagerAvtLiftedEvent
 } from './types/generated/parachain-testnet/events'
 import { EventItem } from '@subsquid/substrate-processor/lib/interfaces/dataSelection'
 import { decodeHex } from '@subsquid/substrate-processor'
@@ -274,6 +275,30 @@ export function normalizeAvtLoweredEvent(
   }
 }
 
+export function normalizeAvtLiftedEvent(
+  ctx: Ctx,
+  item: EventItem<'TokenManager.AVTLifted', { event: { args: true }; call: { origin: true } }>,
+  avtHash?: string
+): {
+  from: undefined
+  to: Uint8Array
+  amount: bigint
+  tokenId: Uint8Array
+} {
+  const e = new TokenManagerAvtLiftedEvent(ctx, item.event)
+  if (e.isV4) {
+    const { amount, recipient, ethTxHash } = e.asV4
+    return {
+      from: undefined,
+      to: recipient,
+      amount,
+      tokenId: avtHash ? decodeHex(avtHash) : /* this should not be reached */ new Uint8Array()
+    }
+  } else {
+    throw new UnknownVersionError()
+  }
+}
+
 export function normalizeNftBatchCreated(
   ctx: Ctx,
   item: EventItem<'NftManager.BatchCreated', { event: { args: true }; call: { origin: true } }>
@@ -369,6 +394,7 @@ const eventNormalizers: EventNormalizers = {
   'TokenManager.TokenLifted': normalizeTokenLiftedEvent,
   'TokenManager.TokenLowered': normalizeTokenLoweredEvent,
   'TokenManager.AvtLowered': normalizeAvtLoweredEvent,
+  'TokenManager.AVTLifted': normalizeAvtLiftedEvent,
   'NftManager.BatchCreated': normalizeNftBatchCreated,
   'NftManager.SingleNftMinted': normalizeNftSingleNftMinted,
   'NftManager.BatchNftMinted': normalizeNftBatchNftMinted,
