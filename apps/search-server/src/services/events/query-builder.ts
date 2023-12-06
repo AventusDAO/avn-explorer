@@ -1,5 +1,9 @@
 import { EsQuery, JsonMap } from '../../types'
-import { numberRangeFilterSubQuery, timestampRangeFilterSubQuery } from '../../utils/query-builder'
+import {
+  getMultiSearchQuery,
+  numberRangeFilterSubQuery,
+  timestampRangeFilterSubQuery
+} from '../../utils/query-builder'
 
 export interface EventsDataQuery {
   section?: string
@@ -8,10 +12,10 @@ export interface EventsDataQuery {
   blockHeightTo?: number
   timestampStart?: number
   timestampEnd?: number
-  dataSearch?: string[]
+  argsSearch?: string[]
 }
 
-const extrinsicDataQuery = (dataQuery: EventsDataQuery): JsonMap[] => {
+const eventsDataQuery = (dataQuery: EventsDataQuery): JsonMap[] => {
   const matches: JsonMap[] = []
   const {
     section,
@@ -20,17 +24,20 @@ const extrinsicDataQuery = (dataQuery: EventsDataQuery): JsonMap[] => {
     blockHeightTo,
     timestampStart,
     timestampEnd,
-    dataSearch
+    argsSearch
   } = dataQuery
+
   if (section) matches.push({ match: { section } })
   if (name) matches.push({ match: { name } })
+
   const blockRangeQuery = numberRangeFilterSubQuery('blockHeight', blockHeightFrom, blockHeightTo)
   if (blockRangeQuery) matches.push(blockRangeQuery)
+
   const timestampQuery = timestampRangeFilterSubQuery('timestamp', timestampStart, timestampEnd)
   if (timestampQuery) matches.push(timestampQuery)
-  if (dataSearch && dataSearch.length > 0) {
-    console.log('TODO: query ES for ' + JSON.stringify(dataSearch))
-  }
+
+  if (argsSearch && argsSearch.length > 0) matches.push(getEventArgsMultiSearchQuery(argsSearch))
+
   return matches
 }
 
@@ -42,7 +49,7 @@ export const getEventsQuery = (dataQuery: EventsDataQuery = {}): EsQuery | undef
   if (!Object.values(dataQuery).length) return undefined
 
   const mustItems: JsonMap[] = []
-  if (dataQuery) mustItems.push(...extrinsicDataQuery(dataQuery))
+  if (dataQuery) mustItems.push(...eventsDataQuery(dataQuery))
 
   return {
     bool: {
@@ -50,16 +57,6 @@ export const getEventsQuery = (dataQuery: EventsDataQuery = {}): EsQuery | undef
     }
   }
 }
-/**
- * Gets ElasticSearch/OpenSearch query for fetching events
- * @returns {EventsDataQuery} query object for ElasticSearch
- */
-export const getExtrinsicsQuery = (dataQuery?: EventsDataQuery): EsQuery => {
-  const mustItems: JsonMap[] = []
-  if (dataQuery) mustItems.push(...extrinsicDataQuery(dataQuery))
-  return {
-    bool: {
-      must: mustItems
-    }
-  }
-}
+
+export const getEventArgsMultiSearchQuery = (argsSearch: string[]): EsQuery =>
+  getMultiSearchQuery(argsSearch, ['__argValues'], 'must')

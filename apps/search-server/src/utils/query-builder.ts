@@ -1,4 +1,4 @@
-import { JsonMap } from '../types'
+import { EsQuery, JsonMap } from '../types'
 
 interface NumberRangeQuery extends JsonMap {
   range: Record<
@@ -59,3 +59,25 @@ export const timestampRangeFilterSubQuery = (
   if (end) rangeQuery.range[paramName].lte = end
   return rangeQuery
 }
+
+/**
+ * Gets query for searching for multiple values in multiple fields at the same time
+ * @param {string} values values to search for
+ * @param {string[]} fields fields to search in
+ * @param {'should' | 'must'} operator the operator, 'should' will return results that match any of the values, 'must' will return results that match all of the values
+ * @returns {EsQuery} query object for ElasticSearch
+ */
+export const getMultiSearchQuery = (
+  values: string[],
+  fields: string[],
+  operator: 'should' | 'must' = 'should'
+): EsQuery => ({
+  bool: {
+    [operator]: values.map(value => ({
+      multi_match: {
+        query: value,
+        fields
+      }
+    }))
+  }
+})

@@ -1,4 +1,17 @@
 /**
+ * This list defines the which sections will have their event.args searchable
+ */
+export const argsSearchableSections = Object.freeze([
+  'Balances',
+  'AvnProxy',
+  'EthereumTransactions',
+  'EthereumEvents',
+  'NftManager',
+  'TokenManager',
+  'TransactionPayment'
+])
+
+/**
  * Maps data value to a string keyword for ES search
  * @param {*} val data value to map into a string keyword
  * @returns {string | null | string[] | string[][]} string, null or array of strings (any depth)

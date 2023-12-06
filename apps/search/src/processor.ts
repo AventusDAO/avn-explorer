@@ -10,7 +10,7 @@ import {
 import { Store, TypeormDatabase } from '@subsquid/typeorm-store'
 import { getElasticSearch } from './elastic-search'
 import { SearchBlock, SearchEvent, SearchExtrinsic } from './elastic-search/types'
-import { normalizeEventArgValues } from './utils'
+import { argsSearchableSections, normalizeEventArgValues } from './utils'
 
 type Item = BatchProcessorItem<typeof processor>
 export type Context = BatchContext<Store, Item>
@@ -190,17 +190,8 @@ const mapEvents = (block: BatchBlock<Item>, _ctx: Context): SearchEvent[] => {
       const [section, name] = _name.split('.')
       const args = item.event.args
       let argValues: string[] | undefined
-      // TODO: make sure we want those sections to be searchable by their `args`
-      const dataSearchableSections = [
-        'Balances',
-        'AvnProxy',
-        'EthereumTransactions',
-        'EthereumEvents',
-        'NftManager',
-        'TokenManager',
-        'TransactionPayment'
-      ]
-      if (dataSearchableSections.includes(section) && args) {
+
+      if (!!args && argsSearchableSections.includes(section)) {
         argValues = normalizeEventArgValues(args)
         // _ctx.log.debug(
         //   `event ${_name}\nargs: ${JSON.stringify(args)}\ndataSearch: ${JSON.stringify(argValues)}`

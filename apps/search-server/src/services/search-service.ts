@@ -14,6 +14,7 @@ import {
 import { ApiError, avnHashRegex, isAxiosError } from '../utils'
 import { elasticSearch } from './elastic-search'
 import { SearchResultBlock, SearchResultExtrinsic } from '@avn/types/src/search'
+import { getMultiSearchQuery } from '../utils/query-builder'
 
 const logger = getLogger('search-controller')
 
@@ -75,20 +76,5 @@ export const searchForHash = async (
   }
 }
 
-/**
- * Gets query for searching for given hash
- * @param {string} value the hash to search for
- * @returns {EsQuery} query object for ElasticSearch
- */
-export const getHashSearchQuery = (value: string): EsQuery => ({
-  multi_match: {
-    query: value,
-    fields: searchFields.hash
-  }
-})
-
-export const getMultiSearchHashQuery = (values: string[]): EsQuery => ({
-  bool: {
-    should: values.map(value => getHashSearchQuery(value))
-  }
-})
+const getMultiSearchHashQuery = (values: string[]): EsQuery =>
+  getMultiSearchQuery(values, searchFields.hash, 'should')
