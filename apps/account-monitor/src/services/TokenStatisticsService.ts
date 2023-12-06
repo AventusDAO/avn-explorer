@@ -141,7 +141,7 @@ export class TokenTransferService {
 
       const transactions = await this.manager.createQueryBuilder(TokenTransfer, 'transaction')
         .where('transaction.payer = :payerId', { payerId })
-        .andWhere('transaction.timestamp > :startDate', { startDate })
+        .andWhere('transaction.timestamp >= :startDate', { startDate })
         .andWhere('transaction.timestamp < :endDate', { endDate })
         .leftJoinAndSelect('transaction.token', 'token')
         .leftJoinAndSelect('transaction.from', 'from')
