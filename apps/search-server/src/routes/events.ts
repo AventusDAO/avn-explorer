@@ -1,7 +1,7 @@
 import { Router } from 'express'
 import { getEvents } from '../services/events'
 import { SearchEvent, DataResponse } from '../types'
-import { asyncCatch, processIntegerParam, processStringParam } from '../utils'
+import { asyncCatch, processArrayParam, processIntegerParam, processStringParam } from '../utils'
 const router = Router()
 
 router.get(
@@ -18,6 +18,7 @@ router.get(
     const blockHeightTo = processIntegerParam(req.query.blockHeightTo, 'blockHeightTo')
     const timestampStart = processIntegerParam(req.query.timestampStart, 'timestampStart')
     const timestampEnd = processIntegerParam(req.query.timestampEnd, 'timestampEnd')
+    const argsSearch = processArrayParam<string>(req.query.argsSearch, 'argsSearch')
 
     const data = await getEvents(size, from, sort, {
       section,
@@ -25,7 +26,8 @@ router.get(
       blockHeightFrom,
       blockHeightTo,
       timestampStart,
-      timestampEnd
+      timestampEnd,
+      argsSearch
     })
     const response: DataResponse<SearchEvent[]> = {
       data

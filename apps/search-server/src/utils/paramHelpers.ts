@@ -88,15 +88,31 @@ export function processBooleanParam(param: QueryParam, name: string): boolean | 
 }
 
 /**
- * Asserts that if the parameter is defined as an array. Throws ApiError (400) otherwise
+ * Asserts that if the parameter is defined as an array. Throws ApiError (400) otherwise.
+ * Note: this function does not check the type of the array elements.
  * @param param query parameter
  * @param name name of the query parameter
  * @returns array (or undefined if it doesn't exist)
  */
-export function processArrayParam<T>(param: QueryParam, name: string): T[] | undefined {
-  if (!param || (param !== undefined && !Array.isArray(param)))
-    throw new ApiError('bad_request', 400, `expected ${name} to be an array`, true)
-  return param as unknown as T[]
+export function processArrayParam<T = string>(param: QueryParam, name: string): T[] | undefined {
+  if (param === undefined) return undefined
+  if (Array.isArray(param)) return param as unknown as T[]
+
+  if (typeof param === 'object') {
+    throw new ApiError(
+      'bad_request',
+      400,
+      `Expected ${name} to be an array query type. Valid examples: '?${name}=val1', '?${name}=val1&${name}=val2', or '?${name}=val1,val2'.`,
+      true
+    )
+  }
+
+  if (param.includes(',')) {
+    return param.split(',') as unknown as T[]
+  } else {
+    // single value
+    return [param] as unknown as T[]
+  }
 }
 
 /**
