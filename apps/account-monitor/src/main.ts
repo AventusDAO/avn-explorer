@@ -250,7 +250,7 @@ function getTokenEventTransferData(
     lowerId: event.lowerId,
     scheduleName: event.scheduleName,
     senderNonce: event.senderNonce,
-    t1Recipient: event.t1Recipient,
+    t1Recipient: event.t1Recipient
   }
 }
 

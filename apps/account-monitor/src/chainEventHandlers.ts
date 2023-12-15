@@ -301,7 +301,7 @@ export function normalizeAvtLoweredEvent(
 ): {
   from: Uint8Array
   to: Uint8Array
-    t1Recipient: Uint8Array
+  t1Recipient: Uint8Array
   amount: bigint
   tokenId: Uint8Array
 } {
@@ -351,10 +351,10 @@ export function normalizeLowerRequested(
 ): {
   from: Uint8Array
   to: undefined
-    lowerId?: number
-    scheduleName?: Uint8Array
-    senderNonce?: bigint | undefined
-    t1Recipient?: Uint8Array
+  lowerId?: number
+  scheduleName?: Uint8Array
+  senderNonce?: bigint | undefined
+  t1Recipient?: Uint8Array
 
   amount: bigint
   tokenId: Uint8Array

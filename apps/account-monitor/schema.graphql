@@ -55,7 +55,7 @@ type TokenTransfer @entity {
   relayer: Account
   payer: Account
   nonce: BigInt
-  scheduleName:String
+  scheduleName: String
   senderNonce: BigInt
   t1Recipient: String
   lowerId: Int

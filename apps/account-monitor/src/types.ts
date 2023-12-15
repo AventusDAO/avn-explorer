@@ -102,14 +102,14 @@ export type EventNormalizer<T extends TransfersEventItem> = (
 ) =>
   | {
       from: Uint8Array | undefined
-    to: Uint8Array | undefined
+      to: Uint8Array | undefined
       amount: bigint
       tokenId: Uint8Array
       payer?: Uint8Array
-    lowerId?: number
-    scheduleName?: Uint8Array
-    senderNonce?: bigint | undefined
-    t1Recipient?: Uint8Array
+      lowerId?: number
+      scheduleName?: Uint8Array
+      senderNonce?: bigint | undefined
+      t1Recipient?: Uint8Array
     }
   | {
       from: Uint8Array | undefined
