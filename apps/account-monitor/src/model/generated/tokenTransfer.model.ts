@@ -80,4 +80,20 @@ export class TokenTransfer {
   @Field(() => String)
   @Column_('text', { nullable: false })
   method!: string
+
+  @Field(() => String, { nullable: true })
+  @Column_('text', { nullable: true })
+  scheduleName!: string
+
+  @Field(() => BigInt, { nullable: true })
+  @Column_('numeric', { nullable: true })
+  senderNonce!: bigint
+
+  @Field(() => String, { nullable: true })
+  @Column_('text', { nullable: true })
+  t1Recipient!: string
+
+  @Field(() => BigInt, { nullable: true })
+  @Column_('int4', { nullable: true })
+  lowerId!: number
 }

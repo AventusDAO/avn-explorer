@@ -20,6 +20,7 @@ import {
   TokenManagerTokenTransferredEvent,
   TokenManagerAvtLiftedEvent
 } from './types/generated/parachain-testnet/events'
+import { TokenManagerLowerRequestedEvent } from './types/generated/parachain-dev/events'
 import { EventItem } from '@subsquid/substrate-processor/lib/interfaces/dataSelection'
 import { decodeHex } from '@subsquid/substrate-processor'
 import {
@@ -300,6 +301,7 @@ export function normalizeAvtLoweredEvent(
 ): {
   from: Uint8Array
   to: Uint8Array
+    t1Recipient: Uint8Array
   amount: bigint
   tokenId: Uint8Array
 } {
@@ -309,6 +311,7 @@ export function normalizeAvtLoweredEvent(
     return {
       from: sender,
       to: recipient,
+      t1Recipient,
       amount,
       tokenId: avtHash ? decodeHex(avtHash) : /* this should not be reached */ new Uint8Array()
     }
@@ -335,6 +338,39 @@ export function normalizeAvtLiftedEvent(
       to: recipient,
       amount,
       tokenId: avtHash ? decodeHex(avtHash) : /* this should not be reached */ new Uint8Array()
+    }
+  } else {
+    throw new UnknownVersionError()
+  }
+}
+
+export function normalizeLowerRequested(
+  ctx: Ctx,
+  item: EventItem<'TokenManager.LowerRequested', { event: { args: true }; call: { origin: true } }>,
+  avtHash?: string
+): {
+  from: Uint8Array
+  to: undefined
+    lowerId?: number
+    scheduleName?: Uint8Array
+    senderNonce?: bigint | undefined
+    t1Recipient?: Uint8Array
+
+  amount: bigint
+  tokenId: Uint8Array
+} {
+  const e = new TokenManagerLowerRequestedEvent(ctx, item.event)
+  if (e.isV55) {
+    const { amount, from, lowerId, scheduleName, senderNonce, t1Recipient, tokenId } = e.asV55
+    return {
+      from,
+      to: undefined,
+      lowerId,
+      scheduleName,
+      senderNonce,
+      t1Recipient,
+      amount,
+      tokenId
     }
   } else {
     throw new UnknownVersionError()
@@ -452,6 +488,7 @@ const eventNormalizers: EventNormalizers = {
   'TokenManager.TokenLowered': normalizeTokenLoweredEvent,
   'TokenManager.AvtLowered': normalizeAvtLoweredEvent,
   'TokenManager.AVTLifted': normalizeAvtLiftedEvent,
+  'TokenManager.LowerRequested': normalizeLowerRequested,
   'NftManager.BatchCreated': normalizeNftBatchCreated,
   'NftManager.SingleNftMinted': normalizeNftSingleNftMinted,
   'NftManager.BatchNftMinted': normalizeNftBatchNftMinted,

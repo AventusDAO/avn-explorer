@@ -448,6 +448,38 @@ export class TokenManagerAvtLoweredEvent {
         assert(this.isV51)
         return this._chain.decodeEvent(this.event)
     }
+
+    get isV55(): boolean {
+        return this._chain.getEventHash('TokenManager.AvtLowered') === '9ec7946287b2369a0a7842510a97a6739e23625a46431d68f0641ef11cdc2525'
+    }
+
+    get asV55(): {sender: Uint8Array, recipient: Uint8Array, amount: bigint, t1Recipient: Uint8Array, lowerId: number} {
+        assert(this.isV55)
+        return this._chain.decodeEvent(this.event)
+    }
+}
+
+export class TokenManagerLowerRequestedEvent {
+    private readonly _chain: Chain
+    private readonly event: Event
+
+    constructor(ctx: EventContext)
+    constructor(ctx: ChainContext, event: Event)
+    constructor(ctx: EventContext, event?: Event) {
+        event = event || ctx.event
+        assert(event.name === 'TokenManager.LowerRequested')
+        this._chain = ctx._chain
+        this.event = event
+    }
+
+    get isV55(): boolean {
+        return this._chain.getEventHash('TokenManager.LowerRequested') === 'd58277472a35d5f5f3dd5adb11404106e2c540170245a204a76c5fe79a9c8967'
+    }
+
+    get asV55(): {tokenId: Uint8Array, from: Uint8Array, amount: bigint, t1Recipient: Uint8Array, senderNonce: (bigint | undefined), lowerId: number, scheduleName: Uint8Array} {
+        assert(this.isV55)
+        return this._chain.decodeEvent(this.event)
+    }
 }
 
 export class TokenManagerTokenLiftedEvent {
@@ -492,6 +524,15 @@ export class TokenManagerTokenLoweredEvent {
 
     get asV31(): {tokenId: Uint8Array, sender: Uint8Array, recipient: Uint8Array, amount: bigint, t1Recipient: Uint8Array} {
         assert(this.isV31)
+        return this._chain.decodeEvent(this.event)
+    }
+
+    get isV55(): boolean {
+        return this._chain.getEventHash('TokenManager.TokenLowered') === '9569ef92ccde6c2b9f0e7f72a9efbee0dd23f8162ddd5073794481026018379b'
+    }
+
+    get asV55(): {tokenId: Uint8Array, sender: Uint8Array, recipient: Uint8Array, amount: bigint, t1Recipient: Uint8Array, lowerId: number} {
+        assert(this.isV55)
         return this._chain.decodeEvent(this.event)
     }
 }

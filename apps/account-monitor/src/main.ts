@@ -246,7 +246,11 @@ function getTokenEventTransferData(
     ...getEventTransferData(block, item, event, palletInfoArray),
     amount: event.amount,
     tokenName,
-    tokenId: event.tokenId
+    tokenId: event.tokenId,
+    lowerId: event.lowerId,
+    scheduleName: event.scheduleName,
+    senderNonce: event.senderNonce,
+    t1Recipient: event.t1Recipient,
   }
 }
 

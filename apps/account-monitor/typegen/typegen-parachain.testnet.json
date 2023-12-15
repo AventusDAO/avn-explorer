@@ -16,6 +16,7 @@
     "TokenManager.TokenLowered",
     "TokenManager.AvtLowered",
     "TokenManager.AVTLifted",
+    "TokenManager.LowerRequested",
     "NftManager.BatchCreated",
     "NftManager.SingleNftMinted",
     "NftManager.BatchNftMinted",
