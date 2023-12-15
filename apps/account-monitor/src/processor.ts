@@ -60,6 +60,18 @@ const processor = getProcessor()
       }
     }
   } as const)
+  .addEvent('TokenManager.LowerRequested', {
+    data: {
+      event: {
+        args: true,
+        extrinsic: {
+          signature: true,
+          hash: true
+        },
+        call: { origin: true, args: true }
+      }
+    }
+  } as const)
   .addEvent('Balances.Endowed', {
     data: {
       event: {

@@ -26,7 +26,11 @@ export function createTransfers(
         amount: transfer.amount,
         token: tokens.get(toHex(transfer.tokenId) ?? ''),
         pallet: transfer.pallet,
-        method: transfer.method
+        method: transfer.method,
+        lowerId: transfer.lowerId,
+        scheduleName: transfer.scheduleName,
+        senderNonce: transfer.senderNonce,
+        t1Recipient: transfer.t1Recipient ? encodeId(transfer.t1Recipient) : undefined
       })
     )
   })

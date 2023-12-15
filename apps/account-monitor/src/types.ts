@@ -24,6 +24,10 @@ export interface TokenTransferEventData extends TransferEventData {
   amount: bigint
   tokenName: string | undefined
   tokenId: Uint8Array
+  scheduleName: string | undefined
+  senderNonce: bigint | undefined
+  t1Recipient: Uint8Array | undefined
+  lowerId: number | undefined
 }
 
 export type TransferData = TokenTransferEventData | NftTransferEventData | undefined
@@ -61,6 +65,7 @@ export type EventName =
   | 'TokenManager.TokenLowered'
   | 'TokenManager.AvtLowered'
   | 'TokenManager.AVTLifted'
+  | 'TokenManager.LowerRequested'
   | 'NftManager.BatchCreated'
   | 'NftManager.SingleNftMinted'
   | 'NftManager.BatchNftMinted'
@@ -82,6 +87,7 @@ export const eventNames = [
   'TokenManager.TokenLowered',
   'TokenManager.AvtLowered',
   'TokenManager.AVTLifted',
+  'TokenManager.LowerRequested',
   'NftManager.BatchCreated',
   'NftManager.SingleNftMinted',
   'NftManager.BatchNftMinted',
@@ -96,10 +102,14 @@ export type EventNormalizer<T extends TransfersEventItem> = (
 ) =>
   | {
       from: Uint8Array | undefined
-      to: Uint8Array
+      to: Uint8Array | undefined
       amount: bigint
       tokenId: Uint8Array
       payer?: Uint8Array
+      lowerId?: number
+      scheduleName?: Uint8Array
+      senderNonce?: bigint | undefined
+      t1Recipient?: Uint8Array
     }
   | {
       from: Uint8Array | undefined
