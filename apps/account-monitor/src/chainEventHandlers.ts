@@ -18,9 +18,9 @@ import {
   TokenManagerTokenLoweredEvent,
   TokenManagerAvtLoweredEvent,
   TokenManagerTokenTransferredEvent,
-  TokenManagerAvtLiftedEvent
+  TokenManagerAvtLiftedEvent,
+  TokenManagerLowerRequestedEvent
 } from './types/generated/parachain-testnet/events'
-import { TokenManagerLowerRequestedEvent } from './types/generated/parachain-dev/events'
 import { EventItem } from '@subsquid/substrate-processor/lib/interfaces/dataSelection'
 import { decodeHex } from '@subsquid/substrate-processor'
 import {
@@ -360,8 +360,8 @@ export function normalizeLowerRequested(
   tokenId: Uint8Array
 } {
   const e = new TokenManagerLowerRequestedEvent(ctx, item.event)
-  if (e.isV55) {
-    const { amount, from, lowerId, scheduleName, senderNonce, t1Recipient, tokenId } = e.asV55
+  if (e.isV56) {
+    const { amount, from, lowerId, scheduleName, senderNonce, t1Recipient, tokenId } = e.asV56
     return {
       from,
       to: undefined,
