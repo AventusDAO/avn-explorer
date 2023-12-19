@@ -5,7 +5,7 @@ import {
   Index as Index_,
   ManyToOne as ManyToOne_
 } from 'typeorm'
-import { ObjectType, Field, ID, } from 'type-graphql';
+import { ObjectType, Field, ID, Int, } from 'type-graphql';
 import * as marshal from './marshal'
 import { Account } from './account.model'
 import { Token } from './token.model'
@@ -93,7 +93,7 @@ export class TokenTransfer {
   @Column_('text', { nullable: true })
   t1Recipient!: string
 
-  @Field(() => BigInt, { nullable: true })
+  @Field(() => Int, { nullable: true })
   @Column_('int4', { nullable: true })
   lowerId!: number
 }

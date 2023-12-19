@@ -19,7 +19,7 @@ export function createTransfers(
         timestamp: transfer.timestamp,
         extrinsicHash: transfer.extrinsicHash,
         from: transfer.from ? accounts.get(encodeId(transfer.from)) : undefined,
-        to: accounts.get(encodeId(transfer.to)),
+        to: transfer.to ? accounts.get(encodeId(transfer.to)) : undefined,
         relayer: transfer.relayer ? accounts.get(encodeId(transfer.relayer)) : undefined,
         payer: transfer.payer?.length ? accounts.get(encodeId(transfer.payer)) : undefined,
         nonce: transfer.nonce,
