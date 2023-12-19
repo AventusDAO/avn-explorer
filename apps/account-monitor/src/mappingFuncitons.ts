@@ -28,7 +28,7 @@ export function createTransfers(
         pallet: transfer.pallet,
         method: transfer.method,
         lowerId: transfer.lowerId,
-        scheduleName: transfer.scheduleName,
+        scheduleName: transfer.scheduleName ? toHex(transfer.scheduleName) : '',
         senderNonce: transfer.senderNonce,
         t1Recipient: transfer.t1Recipient ? toHex(transfer.t1Recipient) : undefined
       })
