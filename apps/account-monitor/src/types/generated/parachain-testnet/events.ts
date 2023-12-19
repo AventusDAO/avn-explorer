@@ -1,6 +1,7 @@
 import assert from 'assert'
 import {Chain, ChainContext, EventContext, Event, Result, Option} from './support'
 import * as v4 from './v4'
+import * as v43 from './v43'
 
 export class BalancesBalanceSetEvent {
     private readonly _chain: Chain
@@ -400,6 +401,93 @@ export class NftManagerSingleNftMintedEvent {
 
     get asV4(): {nftId: bigint, owner: Uint8Array, authority: Uint8Array} {
         assert(this.isV4)
+        return this._chain.decodeEvent(this.event)
+    }
+}
+
+export class SchedulerCanceledEvent {
+    private readonly _chain: Chain
+    private readonly event: Event
+
+    constructor(ctx: EventContext)
+    constructor(ctx: ChainContext, event: Event)
+    constructor(ctx: EventContext, event?: Event) {
+        event = event || ctx.event
+        assert(event.name === 'Scheduler.Canceled')
+        this._chain = ctx._chain
+        this.event = event
+    }
+
+    /**
+     * Canceled some task.
+     */
+    get isV43(): boolean {
+        return this._chain.getEventHash('Scheduler.Canceled') === '4186e24556a58b04e04d6d697a530eedf78f255da1ba9d84df6511dd6d6465f7'
+    }
+
+    /**
+     * Canceled some task.
+     */
+    get asV43(): {when: number, index: number} {
+        assert(this.isV43)
+        return this._chain.decodeEvent(this.event)
+    }
+}
+
+export class SchedulerDispatchedEvent {
+    private readonly _chain: Chain
+    private readonly event: Event
+
+    constructor(ctx: EventContext)
+    constructor(ctx: ChainContext, event: Event)
+    constructor(ctx: EventContext, event?: Event) {
+        event = event || ctx.event
+        assert(event.name === 'Scheduler.Dispatched')
+        this._chain = ctx._chain
+        this.event = event
+    }
+
+    /**
+     * Dispatched some task.
+     */
+    get isV43(): boolean {
+        return this._chain.getEventHash('Scheduler.Dispatched') === 'b67102cc706599639b8e52e776b81c51142dad43652e91e7e72197b7df9a63f4'
+    }
+
+    /**
+     * Dispatched some task.
+     */
+    get asV43(): {task: [number, number], id: (Uint8Array | undefined), result: v43.Type_94} {
+        assert(this.isV43)
+        return this._chain.decodeEvent(this.event)
+    }
+}
+
+export class SchedulerScheduledEvent {
+    private readonly _chain: Chain
+    private readonly event: Event
+
+    constructor(ctx: EventContext)
+    constructor(ctx: ChainContext, event: Event)
+    constructor(ctx: EventContext, event?: Event) {
+        event = event || ctx.event
+        assert(event.name === 'Scheduler.Scheduled')
+        this._chain = ctx._chain
+        this.event = event
+    }
+
+    /**
+     * Scheduled some task.
+     */
+    get isV43(): boolean {
+        return this._chain.getEventHash('Scheduler.Scheduled') === '4186e24556a58b04e04d6d697a530eedf78f255da1ba9d84df6511dd6d6465f7'
+    }
+
+    /**
+     * Scheduled some task.
+     */
+    get asV43(): {when: number, index: number} {
+        assert(this.isV43)
         return this._chain.decodeEvent(this.event)
     }
 }

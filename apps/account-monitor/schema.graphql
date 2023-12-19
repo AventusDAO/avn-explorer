@@ -69,3 +69,14 @@ type TokenLookup @entity {
   tokenId: String! @index
   tokenName: String! @index
 }
+
+type ScheduledLowerTransaction @entity {
+  id: ID!
+  name: String!
+  scheduledTransactionName: String!
+  from: String
+  amount: BigInt
+  lowerId: Int
+  tokenId: String
+  t1Recipient: String
+}

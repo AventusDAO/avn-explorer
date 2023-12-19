@@ -131,6 +131,8 @@ async function getTransfers(
         } else if (transfer?.pallet === 'NftManager' && 'nftId' in transfer) {
           nftTransfersData.push(transfer)
         }
+      } else if (item.kind === 'event' && item.name.toLowerCase().includes('scheduler')) {
+        console.log("HELP !!!", item)
       }
     }
     await processMappingData(

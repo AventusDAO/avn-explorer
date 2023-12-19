@@ -1,8 +1,8 @@
 import { getBalances } from './chainEventHandlers'
 import { Account, AccountNft, AccountToken, Nft, NftTransfer, Token, TokenTransfer } from './model'
 import { BalanceType, Ctx, NftTransferEventData, TokenTransferEventData } from './types'
-import { TokenManagerBalancesStorage } from './types/generated/parachain-testnet/storage'
-import { Block } from './types/generated/parachain-testnet/support'
+import { TokenManagerBalancesStorage } from './types/generated/parachain-dev/storage'
+import { Block } from './types/generated/parachain-dev/support'
 import { encodeId } from '@avn/utils'
 import { toHex, decodeHex } from '@subsquid/substrate-processor'
 
@@ -110,7 +110,7 @@ export async function mapAccountTokenEntities(
       const tokenId = toHex(item.tokenId)
       const accountId = encodeId(item.to)
       const tokenManagerBalance = new TokenManagerBalancesStorage(ctx, block)
-      const tokenBalance = await tokenManagerBalance.asV4.get([item.tokenId, item.to])
+      const tokenBalance = await tokenManagerBalance.asV31.get([item.tokenId, item.to])
       if (tokenBalance > 0) {
         accountTokens.set(
           `${accountId}-${tokenId}`,
