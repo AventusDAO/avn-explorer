@@ -30,7 +30,7 @@ export function createTransfers(
         lowerId: transfer.lowerId,
         scheduleName: transfer.scheduleName,
         senderNonce: transfer.senderNonce,
-        t1Recipient: transfer.t1Recipient ? encodeId(transfer.t1Recipient) : undefined
+        t1Recipient: transfer.t1Recipient ? toHex(transfer.t1Recipient) : undefined
       })
     )
   })
