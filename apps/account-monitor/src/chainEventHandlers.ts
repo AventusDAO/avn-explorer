@@ -281,11 +281,12 @@ export function normalizeTokenLoweredEvent(
   to: Uint8Array
   amount: bigint
   tokenId: Uint8Array
+  t1Recipient: Uint8Array
 } {
   const e = new TokenManagerTokenLoweredEvent(ctx, item.event)
-  if (e.isV4) {
-    const { tokenId, recipient, sender, amount } = e.asV4
-    return { from: sender, to: recipient, amount, tokenId }
+  if (e.isV56) {
+    const { tokenId, recipient, sender, amount, t1Recipient } = e.asV56
+    return { from: sender, to: recipient, amount, tokenId, t1Recipient }
   } else {
     throw new UnknownVersionError()
   }
@@ -306,8 +307,8 @@ export function normalizeAvtLoweredEvent(
   tokenId: Uint8Array
 } {
   const e = new TokenManagerAvtLoweredEvent(ctx, item.event)
-  if (e.isV51) {
-    const { amount, recipient, sender, t1Recipient } = e.asV51
+  if (e.isV56) {
+    const { amount, recipient, sender, t1Recipient } = e.asV56
     return {
       from: sender,
       to: recipient,

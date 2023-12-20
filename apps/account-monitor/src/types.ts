@@ -24,7 +24,7 @@ export interface TokenTransferEventData extends TransferEventData {
   amount: bigint
   tokenName: string | undefined
   tokenId: Uint8Array
-  scheduleName: string | undefined
+  scheduleName: Uint8Array | undefined
   senderNonce: bigint | undefined
   t1Recipient: Uint8Array | undefined
   lowerId: number | undefined
