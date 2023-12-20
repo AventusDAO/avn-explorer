@@ -281,7 +281,7 @@ export function normalizeTokenLoweredEvent(
   to: Uint8Array
   amount: bigint
   tokenId: Uint8Array
-    t1Recipient: Uint8Array
+  t1Recipient: Uint8Array
 } {
   const e = new TokenManagerTokenLoweredEvent(ctx, item.event)
   if (e.isV56) {
