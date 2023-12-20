@@ -99,6 +99,12 @@ async function recordNftTransferData(
   await ctx.store.insert(nftTransfers)
 }
 
+async function recordSchedulerEventData(ctx: Ctx, block: any, item: any) {
+  const events = block.items.filter((i: any) => i.kind === 'event')
+  console.log("help !!!", events)
+  console.log("help 2 !!!", item)
+}
+
 async function getTransfers(
   ctx: Ctx,
   tokenLookupMap: Map<string, string>,
@@ -132,7 +138,7 @@ async function getTransfers(
           nftTransfersData.push(transfer)
         }
       } else if (item.kind === 'event' && item.name.toLowerCase().includes('scheduler')) {
-        console.log("HELP !!!", item)
+        await recordSchedulerEventData(ctx, block, item)
       }
     }
     await processMappingData(

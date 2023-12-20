@@ -232,9 +232,6 @@ const processor = getProcessor()
     data: {
       event: {
         args: true,
-        block: {
-          events: { args: true, name: true }
-        }
       }
     }
   } as const)
@@ -242,9 +239,6 @@ const processor = getProcessor()
     data: {
       event: {
         args: true,
-        block: {
-          events: { args: true, name: true }
-        }
       }
     }
   } as const)
@@ -252,9 +246,6 @@ const processor = getProcessor()
     data: {
       event: {
         args: true,
-        block: {
-          events: { args: true, name: true }
-        }
       }
     }
   } as const)

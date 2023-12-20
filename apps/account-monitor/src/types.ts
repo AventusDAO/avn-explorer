@@ -72,6 +72,12 @@ export type EventName =
   | 'NftManager.FiatNftTransfer'
   | 'NftManager.EthNftTransfer'
 
+export const schedulerEventNames = [
+  'Scheduler.Scheduled',
+  'Scheduler.Dispatched',
+  'Scheduler.Canceled'
+]
+
 export const eventNames = [
   'Balances.Transfer',
   'Balances.Endowed',
