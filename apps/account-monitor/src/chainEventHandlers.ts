@@ -287,6 +287,9 @@ export function normalizeTokenLoweredEvent(
   if (e.isV56) {
     const { tokenId, recipient, sender, amount, t1Recipient } = e.asV56
     return { from: sender, to: recipient, amount, tokenId, t1Recipient }
+  } else if (e.isV4) {
+    const { tokenId, recipient, sender, amount, t1Recipient } = e.asV4
+    return { from: sender, to: recipient, amount, tokenId, t1Recipient }
   } else {
     throw new UnknownVersionError()
   }
