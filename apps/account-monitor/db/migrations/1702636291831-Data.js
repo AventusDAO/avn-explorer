@@ -6,6 +6,15 @@ module.exports = class Data1702636291831 {
         await db.query(`ALTER TABLE "token_transfer" ADD "sender_nonce" numeric`)
         await db.query(`ALTER TABLE "token_transfer" ADD "t1_recipient" text`)
         await db.query(`ALTER TABLE "token_transfer" ADD "lower_id" integer`)
+
+
+        await db.query(`GRANT USAGE ON SCHEMA public To readonly`) 
+         await db.query(`GRANT SELECT ON ALL TABLES IN SCHEMA public TO readonly`) 
+         await db.query(`GRANT SELECT ON ALL SEQUENCES IN SCHEMA public TO readonly`) 
+  
+         await db.query(`GRANT USAGE ON SCHEMA public To explorer_ro`) 
+         await db.query(`GRANT SELECT ON ALL TABLES IN SCHEMA public TO explorer_ro`) 
+         await db.query(`GRANT SELECT ON ALL SEQUENCES IN SCHEMA public TO explorer_ro`)
     }
 
     async down(db) {
