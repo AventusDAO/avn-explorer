@@ -319,6 +319,15 @@ export function normalizeAvtLoweredEvent(
       amount,
       tokenId: avtHash ? decodeHex(avtHash) : /* this should not be reached */ new Uint8Array()
     }
+  } else if (e.isV51) {
+    const { amount, recipient, sender, t1Recipient } = e.asV51
+    return {
+      from: sender,
+      to: recipient,
+      t1Recipient,
+      amount,
+      tokenId: avtHash ? decodeHex(avtHash) : /* this should not be reached */ new Uint8Array()
+    }
   } else {
     throw new UnknownVersionError()
   }
