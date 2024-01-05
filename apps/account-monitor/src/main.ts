@@ -8,7 +8,8 @@ import {
   AccountToken,
   Nft,
   AccountNft,
-  NftTransfer
+  NftTransfer,
+  ScheduledLowerTransaction
 } from './model'
 import processor from './processor'
 import {
@@ -101,8 +102,39 @@ async function recordNftTransferData(
 
 async function recordSchedulerEventData(ctx: Ctx, block: any, item: any) {
   const events = block.items.filter((i: any) => i.kind === 'event')
-  console.log("help !!!", events)
-  console.log("help 2 !!!", item)
+  if (item.name === 'Scheduler.Scheduled' && events.some((e: any) => e.name === 'TokenManager.LowerRequested')) {
+    console.log("help !!!", JSON.stringify(item))
+    const scheduledEvent = events.find((e: any) => e.name === 'TokenManager.LowerRequested')
+    console.log("SCHEDULER EVENT", JSON.stringify(scheduledEvent))
+    const record = new ScheduledLowerTransaction();
+    record.id = `${item.event.args.when}${item.event.args.index}`
+    record.name = item.name
+    record.scheduledTransactionName = scheduledEvent.name
+    record.from = scheduledEvent.event.args.from
+    record.amount = scheduledEvent.event.args.amount
+    record.lowerId = scheduledEvent.event.args.lowerId
+    record.tokenId = scheduledEvent.event.args.tokenId
+    record.t1Recipient = scheduledEvent.event.args.t1Recipient
+    await ctx.store.save(record)
+  } else if (item.name === 'Scheduler.Dispatched') {
+    const record = await ctx.store.findOne(ScheduledLowerTransaction, { where: { id: `${item.event.args.task[0]}${item.event.args.task[1]}` } })
+    if (!record) {
+      console.log("No record was found")
+      return
+    }
+    record.name = item.name
+    await ctx.store.upsert(record)
+    console.log("HELP 2 !!!", JSON.stringify(item))
+  } else if (item.anme === 'Scheduler.Canceled') {
+    const record = await ctx.store.findOne(ScheduledLowerTransaction, { where: { id: `${item.event.args.when}${item.event.args.index}` } })
+    if (!record) {
+      console.log("No record was found")
+      return
+    }
+    record.name = item.name
+    await ctx.store.upsert(record)
+    console.log("HELP 3 !!!", JSON.stringify(item))
+  }
 }
 
 async function getTransfers(
