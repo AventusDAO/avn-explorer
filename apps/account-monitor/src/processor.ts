@@ -231,21 +231,21 @@ const processor = getProcessor()
   .addEvent('Scheduler.Scheduled', {
     data: {
       event: {
-        args: true,
+        args: true
       }
     }
   } as const)
   .addEvent('Scheduler.Dispatched', {
     data: {
       event: {
-        args: true,
+        args: true
       }
     }
   } as const)
   .addEvent('Scheduler.Canceled', {
     data: {
       event: {
-        args: true,
+        args: true
       }
     }
   } as const)
