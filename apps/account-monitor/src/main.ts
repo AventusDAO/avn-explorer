@@ -108,7 +108,7 @@ async function recordSchedulerEventData(ctx: Ctx, block: any, item: any) {
   ) {
     const scheduledEvent = events.find((e: any) => e.name === 'TokenManager.LowerRequested')
     const record = new ScheduledLowerTransaction()
-    record.id = `${item.event.args.when}${item.event.args.index}`
+    record.id = `${item.event.args.when}-${item.event.args.index}`
     record.name = item.name
     record.scheduledTransactionName = scheduledEvent.name
     record.from = scheduledEvent.event.args.from
@@ -119,7 +119,7 @@ async function recordSchedulerEventData(ctx: Ctx, block: any, item: any) {
     await ctx.store.save(record)
   } else if (item.name === 'Scheduler.Dispatched') {
     const record = await ctx.store.findOne(ScheduledLowerTransaction, {
-      where: { id: `${item.event.args.task[0]}${item.event.args.task[1]}` }
+      where: { id: `${item.event.args.task[0]}-${item.event.args.task[1]}` }
     })
     if (!record) {
       console.log('No record was found')
@@ -129,7 +129,7 @@ async function recordSchedulerEventData(ctx: Ctx, block: any, item: any) {
     await ctx.store.upsert(record)
   } else if (item.name === 'Scheduler.Canceled') {
     const record = await ctx.store.findOne(ScheduledLowerTransaction, {
-      where: { id: `${item.event.args.when}${item.event.args.index}` }
+      where: { id: `${item.event.args.when}-${item.event.args.index}` }
     })
     if (!record) {
       console.log('No record was found')
