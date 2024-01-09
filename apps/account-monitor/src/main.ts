@@ -127,7 +127,7 @@ async function recordSchedulerEventData(ctx: Ctx, block: any, item: any) {
     }
     record.name = item.name
     await ctx.store.upsert(record)
-  } else if (item.anme === 'Scheduler.Canceled') {
+  } else if (item.name === 'Scheduler.Canceled') {
     const record = await ctx.store.findOne(ScheduledLowerTransaction, {
       where: { id: `${item.event.args.when}${item.event.args.index}` }
     })
