@@ -1,5 +1,10 @@
 import { EntityManager } from 'typeorm'
 import { Account, TokenTransfer } from '../model'
+import { Keyring } from '@polkadot/api'
+
+const accountKeyring = new Keyring({ type: 'sr25519' })
+
+export const avnHashRegex = /^0x[A-Fa-f0-9]{64}$/
 
 export class TokenTransferService {
   constructor(private readonly manager: EntityManager) {}
@@ -141,7 +146,14 @@ export class TokenTransferService {
     endDate: Date
   ): Promise<{ balance: bigint; transactions: any[]; transactionCount: number }> {
     try {
-      const payerAccount = await this.manager.findOneOrFail(Account, { where: { id: payerId } })
+      const isHexAddress = avnHashRegex.test(payerId)
+
+      let payerAddress = payerId
+
+      if (isHexAddress) {
+        payerAddress = accountKeyring.encodeAddress(payerId)
+      }
+      const payerAccount = await this.manager.findOneOrFail(Account, { where: { id: payerAddress } })
 
       const transactions = await this.manager
         .createQueryBuilder(TokenTransfer, 'transaction')
