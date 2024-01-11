@@ -153,7 +153,9 @@ export class TokenTransferService {
       if (isHexAddress) {
         payerAddress = accountKeyring.encodeAddress(payerId)
       }
-      const payerAccount = await this.manager.findOneOrFail(Account, { where: { id: payerAddress } })
+      const payerAccount = await this.manager.findOneOrFail(Account, {
+        where: { id: payerAddress }
+      })
 
       const transactions = await this.manager
         .createQueryBuilder(TokenTransfer, 'transaction')
