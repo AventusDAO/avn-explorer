@@ -223,7 +223,7 @@ async function processMappingData(
     mapNftEntities(ctx, nftTransfersData, nfts),
     mapAccountNftEntities(ctx, nftTransfersData, accountNfts)
   ])
-  createTransfers(transfersData, transfers, accounts, tokens)
+  await createTransfers(ctx, transfersData, transfers, accounts, tokens)
   createNftTransfers(nftTransfersData, nftTransfers, accounts, nfts)
 }
 

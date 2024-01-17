@@ -144,7 +144,7 @@ export class TokenTransferService {
     payerId: string,
     startDate: Date,
     endDate: Date
-  ): Promise<{ balance: bigint; transactions: any[]; transactionCount: number }> {
+  ): Promise<{ balance: bigint; transactions: any[]; transactionCount: number } | null> {
     try {
       const isHexAddress = avnHashRegex.test(payerId)
 
@@ -175,8 +175,22 @@ export class TokenTransferService {
 
       return { balance, transactions, transactionCount }
     } catch (error) {
-      console.error('Error getting payer transactions and balance:', error)
-      throw new Error('Error executing database operation')
+      console.error('Error getting payer transactions and balance:', error);
+      return { balance: BigInt(0), transactions: [], transactionCount: 0 };
     }
+  }
+}
+
+class DatabaseError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "DatabaseError";
+  }
+}
+
+export class InvalidInputError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = "InvalidInputError";
   }
 }
