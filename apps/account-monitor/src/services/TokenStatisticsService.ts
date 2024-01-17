@@ -175,22 +175,22 @@ export class TokenTransferService {
 
       return { balance, transactions, transactionCount }
     } catch (error) {
-      console.error('Error getting payer transactions and balance:', error);
-      return { balance: BigInt(0), transactions: [], transactionCount: 0 };
+      console.error('Error getting payer transactions and balance:', error)
+      return { balance: BigInt(0), transactions: [], transactionCount: 0 }
     }
   }
 }
 
 class DatabaseError extends Error {
   constructor(message: string) {
-    super(message);
-    this.name = "DatabaseError";
+    super(message)
+    this.name = 'DatabaseError'
   }
 }
 
 export class InvalidInputError extends Error {
   constructor(message: string) {
-    super(message);
-    this.name = "InvalidInputError";
+    super(message)
+    this.name = 'InvalidInputError'
   }
 }

@@ -18,10 +18,10 @@ export async function createTransfers(
     const transferTo = transfer.to ? encodeId(transfer.to) : undefined
     const transferRelayer = transfer.relayer ? encodeId(transfer.relayer) : undefined
     const transferPayer = transfer.payer.length ? encodeId(transfer.payer) : undefined
-    const participants = [transferFrom, transferTo, transferRelayer, transferPayer];
+    const participants = [transferFrom, transferTo, transferRelayer, transferPayer]
     for (const address of participants) {
       if (address && !accounts.has(address)) {
-        await createAndAddAccount(ctx, address, accounts);
+        await createAndAddAccount(ctx, address, accounts)
       }
     }
     tokenTransfers.push(
@@ -48,16 +48,16 @@ export async function createTransfers(
 }
 
 async function createAndAddAccount(ctx: Ctx, account: string, accounts: Map<string, Account>) {
-  const existingAccount = await ctx.store.findOne(Account, { where: { id: account } });
+  const existingAccount = await ctx.store.findOne(Account, { where: { id: account } })
 
   if (!existingAccount) {
     const newAccount = new Account({
       id: account,
       avtBalance: BigInt(0)
-    });
-    accounts.set(account, newAccount);
+    })
+    accounts.set(account, newAccount)
   } else {
-    accounts.set(account, existingAccount);
+    accounts.set(account, existingAccount)
   }
 }
 
