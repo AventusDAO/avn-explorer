@@ -160,6 +160,6 @@ export function parseDDMMYYYY(dateString: string, separator: string): Date | nul
 
 export function parse(dateString: string): Date | null {
   return (
-    parseISO8601(dateString) || parseDDMMYYYY(dateString, '/') || parseDDMMYYYY(dateString, '.')
+    parseISO8601(dateString) ?? parseDDMMYYYY(dateString, '/') ?? parseDDMMYYYY(dateString, '.')
   )
 }
