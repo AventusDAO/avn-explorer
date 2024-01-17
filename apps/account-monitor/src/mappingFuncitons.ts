@@ -6,22 +6,33 @@ import { Block } from './types/generated/parachain-dev/support'
 import { encodeId } from '@avn/utils'
 import { toHex, decodeHex } from '@subsquid/substrate-processor'
 
-export function createTransfers(
+export async function createTransfers(
+  ctx: Ctx,
   transfers: TokenTransferEventData[],
   tokenTransfers: TokenTransfer[],
   accounts: Map<string, Account>,
   tokens: Map<string, Token>
-): void {
-  transfers.forEach(transfer => {
+): Promise<void> {
+  for (const transfer of transfers) {
+    const transferFrom = transfer.from ? encodeId(transfer.from) : undefined
+    const transferTo = transfer.to ? encodeId(transfer.to) : undefined
+    const transferRelayer = transfer.relayer ? encodeId(transfer.relayer) : undefined
+    const transferPayer = transfer.payer.length ? encodeId(transfer.payer) : undefined
+    const participants = [transferFrom, transferTo, transferRelayer, transferPayer]
+    for (const address of participants) {
+      if (address && !accounts.has(address)) {
+        await createAndAddAccount(ctx, address, accounts)
+      }
+    }
     tokenTransfers.push(
       new TokenTransfer({
         blockNumber: transfer.blockNumber,
         timestamp: transfer.timestamp,
         extrinsicHash: transfer.extrinsicHash,
-        from: transfer.from ? accounts.get(encodeId(transfer.from)) : undefined,
-        to: transfer.to ? accounts.get(encodeId(transfer.to)) : undefined,
-        relayer: transfer.relayer ? accounts.get(encodeId(transfer.relayer)) : undefined,
-        payer: transfer.payer?.length ? accounts.get(encodeId(transfer.payer)) : undefined,
+        from: transferFrom ? accounts.get(transferFrom) : undefined,
+        to: transferTo ? accounts.get(transferTo) : undefined,
+        relayer: transferRelayer ? accounts.get(transferRelayer) : undefined,
+        payer: transferPayer ? accounts.get(transferPayer) : undefined,
         nonce: transfer.nonce,
         amount: transfer.amount,
         token: tokens.get(toHex(transfer.tokenId) ?? ''),
@@ -33,7 +44,21 @@ export function createTransfers(
         t1Recipient: transfer.t1Recipient ? toHex(transfer.t1Recipient) : undefined
       })
     )
-  })
+  }
+}
+
+async function createAndAddAccount(ctx: Ctx, account: string, accounts: Map<string, Account>) {
+  const existingAccount = await ctx.store.findOne(Account, { where: { id: account } })
+
+  if (!existingAccount) {
+    const newAccount = new Account({
+      id: account,
+      avtBalance: BigInt(0)
+    })
+    accounts.set(account, newAccount)
+  } else {
+    accounts.set(account, existingAccount)
+  }
 }
 
 export function createNftTransfers(
@@ -106,7 +131,7 @@ export async function mapAccountTokenEntities(
   // avtHash: string
 ): Promise<void> {
   for (const item of data) {
-    if (item.to && item.tokenId) {
+    if (item.to?.length && item.tokenId?.length) {
       const tokenId = toHex(item.tokenId)
       const accountId = encodeId(item.to)
       const tokenManagerBalance = new TokenManagerBalancesStorage(ctx, block)
