@@ -167,6 +167,7 @@ export class TokenTransferService {
         .leftJoinAndSelect('transaction.to', 'to')
         .leftJoinAndSelect('transaction.relayer', 'relayer')
         .leftJoinAndSelect('transaction.payer', 'payer')
+        .distinctOn(['transaction.extrinsic_hash', 'transaction.nonce'])
         .getMany()
 
       const transactionCount = transactions.length
