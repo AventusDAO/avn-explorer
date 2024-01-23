@@ -61,9 +61,8 @@ async function createAndAddAccount(ctx: Ctx, account: string, accounts: Map<stri
       accounts.set(account, newAccount)
     }
   } catch (e: any) {
-    console.error(`Error in createAndAddAccount while accessing the database: ${e.message}`);
+    console.error(`Error in createAndAddAccount while accessing the database: ${e.message}`)
   }
-
 }
 
 export function createNftTransfers(
