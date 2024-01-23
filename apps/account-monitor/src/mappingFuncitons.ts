@@ -48,17 +48,22 @@ export async function createTransfers(
 }
 
 async function createAndAddAccount(ctx: Ctx, account: string, accounts: Map<string, Account>) {
-  const existingAccount = await ctx.store.findOne(Account, { where: { id: account } })
+  try {
+    const existingAccount = await ctx.store.findOne(Account, { where: { id: account } })
 
-  if (!existingAccount) {
-    const newAccount = new Account({
-      id: account,
-      avtBalance: BigInt(0)
-    })
-    accounts.set(account, newAccount)
-  } else {
-    accounts.set(account, existingAccount)
+    if (existingAccount) {
+      accounts.set(account, existingAccount)
+    } else {
+      const newAccount = new Account({
+        id: account,
+        avtBalance: BigInt(0)
+      })
+      accounts.set(account, newAccount)
+    }
+  } catch (e: any) {
+    console.error(`Error in createAndAddAccount while accessing the database: ${e.message}`);
   }
+
 }
 
 export function createNftTransfers(
