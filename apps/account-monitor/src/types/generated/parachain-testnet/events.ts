@@ -2,6 +2,7 @@ import assert from 'assert'
 import {Chain, ChainContext, EventContext, Event, Result, Option} from './support'
 import * as v4 from './v4'
 import * as v43 from './v43'
+import * as v60 from './v60'
 
 export class BalancesBalanceSetEvent {
     private readonly _chain: Chain
@@ -28,6 +29,21 @@ export class BalancesBalanceSetEvent {
      */
     get asV4(): {who: Uint8Array, free: bigint, reserved: bigint} {
         assert(this.isV4)
+        return this._chain.decodeEvent(this.event)
+    }
+
+    /**
+     * A balance was set by root.
+     */
+    get isV60(): boolean {
+        return this._chain.getEventHash('Balances.BalanceSet') === '8c52e43e845654720e1db5c5bd166f80eb777baf474e93ce4d20fd385601a8fb'
+    }
+
+    /**
+     * A balance was set by root.
+     */
+    get asV60(): {who: Uint8Array, free: bigint} {
+        assert(this.isV60)
         return this._chain.decodeEvent(this.event)
     }
 }
@@ -459,6 +475,21 @@ export class SchedulerDispatchedEvent {
      */
     get asV43(): {task: [number, number], id: (Uint8Array | undefined), result: v43.Type_94} {
         assert(this.isV43)
+        return this._chain.decodeEvent(this.event)
+    }
+
+    /**
+     * Dispatched some task.
+     */
+    get isV60(): boolean {
+        return this._chain.getEventHash('Scheduler.Dispatched') === '6eb5580f3023aa9d8b919b2e4d4c348b6d18e7b61b4d3362b70f19480d1767fc'
+    }
+
+    /**
+     * Dispatched some task.
+     */
+    get asV60(): {task: [number, number], id: (Uint8Array | undefined), result: v60.Type_108} {
+        assert(this.isV60)
         return this._chain.decodeEvent(this.event)
     }
 }

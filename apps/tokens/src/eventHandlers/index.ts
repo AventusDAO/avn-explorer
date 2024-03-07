@@ -9,8 +9,8 @@ import { UnknownVersionError } from '@avn/types'
 export const getTokenLowerData = (ctx: ChainContext, event: Event): RawTokenBalanceData => {
   const data = new TokenManagerTokenLoweredEvent(ctx, event)
 
-  if (data.isV21) {
-    const v10Data = data.asV21
+  if (data.isV55) {
+    const v10Data = data.asV55
     return {
       tokenId: v10Data.tokenId,
       accountId: v10Data.recipient,
@@ -24,8 +24,8 @@ export const getTokenLowerData = (ctx: ChainContext, event: Event): RawTokenBala
 export const getTokenTransferredData = (ctx: ChainContext, event: Event): RawTokenBalanceData => {
   const data = new TokenManagerTokenTransferredEvent(ctx, event)
 
-  if (data.isV21) {
-    const v10Data = data.asV21
+  if (data.isV31) {
+    const v10Data = data.asV31
     return {
       tokenId: v10Data.tokenId,
       accountId: v10Data.recipient,
@@ -39,8 +39,8 @@ export const getTokenTransferredData = (ctx: ChainContext, event: Event): RawTok
 export const getTokenLiftedData = (ctx: ChainContext, event: Event): RawTokenBalanceData => {
   const data = new TokenManagerTokenLiftedEvent(ctx, event)
 
-  if (data.isV21) {
-    const v10Data = data.asV21
+  if (data.isV31) {
+    const v10Data = data.asV31
     return {
       tokenId: v10Data.tokenId,
       accountId: v10Data.recipient,
