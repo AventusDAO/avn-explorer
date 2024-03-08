@@ -341,8 +341,8 @@ async function getSystemAccountBalances(
 ): Promise<IBalance[] | undefined> {
   const storage = new SystemAccountStorage(ctx, block)
   if (!storage.isExists) return undefined
-  if (storage.isV4) {
-    const data = await storage.asV4.getMany(accounts)
+  if (storage.isV60) {
+    const data = await storage.asV60.getMany(accounts)
     return data.map(d => ({
       free: d.data.free,
       reserved: d.data.reserved

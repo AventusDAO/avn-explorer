@@ -28,7 +28,7 @@ import {
   SystemAccountStorage
 } from './types/generated/parachain-testnet/storage'
 import { Block } from './types/generated/parachain-testnet/support'
-import { AccountInfo } from './types/generated/parachain-testnet/v4'
+import { AccountInfo } from './types/generated/parachain-testnet/v60'
 
 export function normalizeBalancesTransferEvent(
   ctx: Ctx,
@@ -40,7 +40,7 @@ export function normalizeBalancesTransferEvent(
 ): { from: Uint8Array; to: Uint8Array; amount: bigint; tokenId: Uint8Array } {
   const e = new BalancesTransferEvent(ctx, item.event)
 
-  if (e.asV4) {
+  if (e.isV4) {
     const { from, to, amount } = e.asV4
     return {
       from,
@@ -63,7 +63,7 @@ export function normalizeBalancesEndowedEvent(
 ): { from: Uint8Array; to: Uint8Array; amount: bigint; tokenId: Uint8Array } {
   const e = new BalancesEndowedEvent(ctx, item.event)
 
-  if (e.asV4) {
+  if (e.isV4) {
     const { account, freeBalance } = e.asV4
     return {
       from: account,
@@ -86,12 +86,12 @@ export function normalizeBalancesBalanceSetEvent(
 ): { from: Uint8Array; to: Uint8Array; amount: bigint; tokenId: Uint8Array } {
   const e = new BalancesBalanceSetEvent(ctx, item.event)
 
-  if (e.asV4) {
-    const { free, reserved, who } = e.asV4
+  if (e.isV60) {
+    const { free, who } = e.asV60
     return {
       from: new Uint8Array(),
       to: who,
-      amount: free + reserved,
+      amount: free,
       tokenId: avtHash ? decodeHex(avtHash) : /* this should not be reached */ new Uint8Array()
     }
   } else {
@@ -109,7 +109,7 @@ export function normalizeBalancesReservedEvent(
 ): { from: Uint8Array; to: Uint8Array; amount: bigint; tokenId: Uint8Array } {
   const e = new BalancesReservedEvent(ctx, item.event)
 
-  if (e.asV4) {
+  if (e.isV4) {
     const { amount, who } = e.asV4
     return {
       from: who,
@@ -132,7 +132,7 @@ export function normalizeBalancesUnreservedEvent(
 ): { from: Uint8Array; to: Uint8Array; amount: bigint; tokenId: Uint8Array } {
   const e = new BalancesUnreservedEvent(ctx, item.event)
 
-  if (e.asV4) {
+  if (e.isV4) {
     const { amount, who } = e.asV4
     return {
       from: who,
@@ -155,7 +155,7 @@ export function normalizeBalancesReserveRepatriatedEvent(
 ): { from: Uint8Array; to: Uint8Array; amount: bigint; tokenId: Uint8Array } {
   const e = new BalancesReserveRepatriatedEvent(ctx, item.event)
 
-  if (e.asV4) {
+  if (e.isV4) {
     const { amount, from, to } = e.asV4
     return {
       from,
@@ -177,7 +177,7 @@ export function normalizeBalancesDepositEvent(
   avtHash?: string
 ): { from: Uint8Array; to: Uint8Array; amount: bigint; tokenId: Uint8Array } {
   const e = new BalancesDepositEvent(ctx, item.event)
-  if (e.asV4) {
+  if (e.isV4) {
     const { amount, who } = e.asV4
     return {
       from: who,
@@ -199,7 +199,7 @@ export function normalizeBalancesWithdrawEvent(
   avtHash?: string
 ): { from: Uint8Array; to: Uint8Array; amount: bigint; tokenId: Uint8Array } {
   const e = new BalancesWithdrawEvent(ctx, item.event)
-  if (e.asV4) {
+  if (e.isV4) {
     const { amount, who } = e.asV4
     return {
       from: who,
@@ -221,7 +221,7 @@ export function normalizeBalancesSlashedEvent(
   avtHash?: string
 ): { from: Uint8Array; to: Uint8Array; amount: bigint; tokenId: Uint8Array } {
   const e = new BalancesSlashedEvent(ctx, item.event)
-  if (e.asV4) {
+  if (e.isV4) {
     const { amount, who } = e.asV4
     return {
       from: who,
@@ -242,7 +242,7 @@ export function normalizeTokenTransferEvent(
   >
 ): { from: Uint8Array; to: Uint8Array; amount: bigint; tokenId: Uint8Array } {
   const e = new TokenManagerTokenTransferredEvent(ctx, item.event)
-  if (e.asV4) {
+  if (e.isV4) {
     const { sender, recipient, tokenBalance, tokenId } = e.asV4
     return { from: sender, to: recipient, amount: tokenBalance, tokenId }
   } else {
@@ -263,7 +263,7 @@ export function normalizeTokenLiftedEvent(
   tokenId: Uint8Array
 } {
   const e = new TokenManagerTokenLiftedEvent(ctx, item.event)
-  if (e.asV4) {
+  if (e.isV4) {
     const { tokenId, recipient, tokenBalance } = e.asV4
     return { from: undefined, to: recipient, amount: tokenBalance, tokenId }
   } else {
@@ -344,7 +344,7 @@ export function normalizeAvtLiftedEvent(
   tokenId: Uint8Array
 } {
   const e = new TokenManagerAvtLiftedEvent(ctx, item.event)
-  if (e.asV4) {
+  if (e.isV4) {
     const { amount, recipient, ethTxHash } = e.asV4
     return {
       from: undefined,
@@ -403,7 +403,7 @@ export function normalizeNftBatchCreated(
   totalSupply: bigint
 } {
   const e = new NftManagerBatchCreatedEvent(ctx, item.event)
-  if (e.asV4) {
+  if (e.isV4) {
     const { batchNftId, batchCreator, totalSupply } = e.asV4
     return { from: undefined, to: batchCreator, nftId: batchNftId, totalSupply }
   } else {
@@ -424,7 +424,7 @@ export function normalizeNftSingleNftMinted(
   totalSupply: number
 } {
   const e = new NftManagerSingleNftMintedEvent(ctx, item.event)
-  if (e.asV4) {
+  if (e.isV4) {
     const { nftId, owner } = e.asV4
     return { from: undefined, to: owner, nftId, totalSupply: 1 }
   } else {
@@ -440,7 +440,7 @@ export function normalizeNftBatchNftMinted(
   >
 ): { from: undefined; to: Uint8Array; nftId: bigint; totalSupply: number } {
   const e = new NftManagerBatchNftMintedEvent(ctx, item.event)
-  if (e.asV4) {
+  if (e.isV4) {
     const { nftId, owner } = e.asV4
     return { from: undefined, to: owner, nftId, totalSupply: 1 }
   } else {
@@ -456,7 +456,7 @@ export function normalizeNftFiatNftTransfer(
   >
 ): { from: Uint8Array; to: Uint8Array; nftId: bigint; totalSupply: number } {
   const e = new NftManagerFiatNftTransferEvent(ctx, item.event)
-  if (e.asV4) {
+  if (e.isV4) {
     const { newOwner, nftId, sender } = e.asV4
     return { from: sender, to: newOwner, nftId, totalSupply: 1 }
   } else {
@@ -472,7 +472,7 @@ export function normalizeNftEthNftTransfer(
   >
 ): { from: undefined; to: Uint8Array; nftId: bigint; totalSupply: number } {
   const e = new NftManagerEthNftTransferEvent(ctx, item.event)
-  if (e.asV4) {
+  if (e.isV4) {
     const { newOwner, nftId } = e.asV4
     return { from: undefined, to: newOwner, nftId, totalSupply: 1 }
   } else {
@@ -540,7 +540,7 @@ export async function getBalancesAccountBalances(
   const storage = new BalancesAccountStorage(ctx, block)
   if (!storage.isExists) return undefined
 
-  const data = await storage.asV4.getMany(accounts.filter(Boolean))
+  const data = await storage.asV60.getMany(accounts.filter(Boolean))
 
   return data.map((d: BalanceType) => ({ free: d.free, reserved: d.reserved }))
 }
@@ -552,7 +552,7 @@ export async function getSystemAccountBalances(
 ): Promise<BalanceType[] | undefined> {
   const storage = new SystemAccountStorage(ctx, block)
   if (!storage.isExists) return undefined
-  const data = (await storage.asV4.getMany(
+  const data = (await storage.asV60.getMany(
     accounts.filter(Boolean).filter(account => account.length)
   )) as AccountInfo[]
 
