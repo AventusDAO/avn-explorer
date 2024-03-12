@@ -17,6 +17,7 @@ import {
   eventNames,
   NftTransferEventData,
   TokenTransferEventData,
+  transactionEvents,
   TransferData,
   TransferEventData,
   TransfersEventItem
@@ -140,6 +141,10 @@ async function recordSchedulerEventData(ctx: Ctx, block: any, item: any) {
   }
 }
 
+function processTransferEvent(transferEvent: any): void {
+  console.log('HELP !!!', transferEvent)
+}
+
 async function getTransfers(
   ctx: Ctx,
   tokenLookupMap: Map<string, string>,
@@ -156,7 +161,12 @@ async function getTransfers(
     const accountNfts: Map<string, AccountNft> = new Map()
     const nftTransfers: NftTransfer[] = []
     for (const item of block.items) {
+      if (item.kind === 'event' && transactionEvents.includes(item.name)) {
+        processTransferEvent(item)
+      }
+
       if (item.kind === 'event' && eventNames.includes(item.name)) {
+        console.log('running')
         const transfer = getTransferData(
           ctx,
           block.header,

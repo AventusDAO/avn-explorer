@@ -66,7 +66,9 @@ const processor = getProcessor()
         args: true,
         extrinsic: {
           signature: true,
-          hash: true
+          hash: true,
+          indexInBlock: true,
+          block: { height: true }
         },
         call: { origin: true, args: true }
       }
@@ -174,7 +176,9 @@ const processor = getProcessor()
         args: true,
         extrinsic: {
           signature: true,
-          hash: true
+          hash: true,
+          indexInBlock: true,
+          block: { height: true }
         },
         call: { origin: true, args: true }
       }
@@ -186,7 +190,9 @@ const processor = getProcessor()
         args: true,
         extrinsic: {
           signature: true,
-          hash: true
+          hash: true,
+          indexInBlock: true,
+          block: { height: true }
         },
         call: { origin: true, args: true }
       }
@@ -198,7 +204,9 @@ const processor = getProcessor()
         args: true,
         extrinsic: {
           signature: true,
-          hash: true
+          hash: true,
+          indexInBlock: true,
+          block: { height: true }
         },
         call: { origin: true, args: true }
       }
@@ -246,6 +254,66 @@ const processor = getProcessor()
     data: {
       event: {
         args: true
+      }
+    }
+  } as const)
+  .addEvent('EthereumEvents.EthereumEventAdded', {
+    data: {
+      event: {
+        args: true,
+        extrinsic: true,
+        call: true,
+        block: true
+      }
+    }
+  } as const)
+  .addEvent('EthereumEvents.NftEthereumEventAdded', {
+    data: {
+      event: {
+        args: true,
+        extrinsic: true,
+        call: true,
+        block: true
+      }
+    }
+  } as const)
+  .addEvent('System.ExtrinsicFailed', {
+    data: {
+      event: {
+        args: true,
+        extrinsic: true,
+        call: true,
+        block: true
+      }
+    }
+  } as const)
+  .addEvent('AvnProxy.InnerCallFailed', {
+    data: {
+      event: {
+        args: true,
+        extrinsic: true,
+        call: true,
+        block: true
+      }
+    }
+  } as const)
+  .addEvent('EthereumEvents.EventRejected', {
+    data: {
+      event: {
+        args: true,
+        extrinsic: true,
+        call: true,
+        block: true
+      }
+    }
+  } as const)
+  .addEvent('System.ExtrinsicSuccess', {
+    data: {
+      event: {
+        args: true,
+        extrinsic: true,
+        call: true,
+        block: true
       }
     }
   } as const)
