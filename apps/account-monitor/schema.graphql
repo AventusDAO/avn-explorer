@@ -81,7 +81,6 @@ type ScheduledLowerTransaction @entity {
   t1Recipient: String
 }
 
-
 type TransactionEvent @entity {
   id: ID!
   name: String!
