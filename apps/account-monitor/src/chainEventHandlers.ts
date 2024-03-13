@@ -538,7 +538,7 @@ export async function getBalancesAccountBalances(
   accounts: Uint8Array[]
 ): Promise<BalanceType[] | undefined> {
   const storage = new BalancesAccountStorage(ctx, block)
-  if (!storage.isExists) return undefined
+  if (!storage.isV60) return undefined
 
   const data = await storage.asV60.getMany(accounts.filter(Boolean))
 
@@ -551,7 +551,7 @@ export async function getSystemAccountBalances(
   accounts: Uint8Array[]
 ): Promise<BalanceType[] | undefined> {
   const storage = new SystemAccountStorage(ctx, block)
-  if (!storage.isExists) return undefined
+  if (!storage.isV60) return undefined
   const data = (await storage.asV60.getMany(
     accounts.filter(Boolean).filter(account => account.length)
   )) as AccountInfo[]

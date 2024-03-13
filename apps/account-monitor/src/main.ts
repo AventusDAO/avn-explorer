@@ -9,8 +9,10 @@ import {
   Nft,
   AccountNft,
   NftTransfer,
-  ScheduledLowerTransaction
+  ScheduledLowerTransaction,
+  TransactionEvent
 } from './model'
+import { randomUUID } from 'crypto'
 import processor from './processor'
 import {
   Ctx,
@@ -141,8 +143,20 @@ async function recordSchedulerEventData(ctx: Ctx, block: any, item: any) {
   }
 }
 
-function processTransferEvent(transferEvent: any): void {
-  console.log('HELP !!!', transferEvent)
+async function processTransferEvent(
+  ctx: Ctx,
+  transferEvent: any,
+  block: SubstrateBlock
+): Promise<void> {
+  const transaction = new TransactionEvent()
+  transaction.id = randomUUID()
+  transaction.args = transferEvent.event.args
+  transaction.name = transferEvent.name
+  transaction.extrinsicHash = transferEvent.event.extrinsic.hash
+  transaction.extrinsicIndexInBlock = transferEvent.event.extrinsic.indexInBlock
+  transaction.extrinsicSuccess = transferEvent.event.extrinsic.success
+  transaction.extrinsicBlockNumber = BigInt(block.height)
+  await ctx.store.upsert(transaction)
 }
 
 async function getTransfers(
@@ -162,7 +176,7 @@ async function getTransfers(
     const nftTransfers: NftTransfer[] = []
     for (const item of block.items) {
       if (item.kind === 'event' && transactionEvents.includes(item.name)) {
-        processTransferEvent(item)
+        await processTransferEvent(ctx, item, block.header)
       }
 
       if (item.kind === 'event' && eventNames.includes(item.name)) {

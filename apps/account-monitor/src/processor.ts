@@ -67,8 +67,7 @@ const processor = getProcessor()
         extrinsic: {
           signature: true,
           hash: true,
-          indexInBlock: true,
-          block: { height: true }
+          indexInBlock: true
         },
         call: { origin: true, args: true }
       }
@@ -177,8 +176,7 @@ const processor = getProcessor()
         extrinsic: {
           signature: true,
           hash: true,
-          indexInBlock: true,
-          block: { height: true }
+          indexInBlock: true
         },
         call: { origin: true, args: true }
       }
@@ -191,8 +189,7 @@ const processor = getProcessor()
         extrinsic: {
           signature: true,
           hash: true,
-          indexInBlock: true,
-          block: { height: true }
+          indexInBlock: true
         },
         call: { origin: true, args: true }
       }
@@ -205,8 +202,7 @@ const processor = getProcessor()
         extrinsic: {
           signature: true,
           hash: true,
-          indexInBlock: true,
-          block: { height: true }
+          indexInBlock: true
         },
         call: { origin: true, args: true }
       }
@@ -261,9 +257,7 @@ const processor = getProcessor()
     data: {
       event: {
         args: true,
-        extrinsic: true,
-        call: true,
-        block: true
+        extrinsic: true
       }
     }
   } as const)
@@ -271,9 +265,7 @@ const processor = getProcessor()
     data: {
       event: {
         args: true,
-        extrinsic: true,
-        call: true,
-        block: true
+        extrinsic: true
       }
     }
   } as const)
@@ -281,9 +273,7 @@ const processor = getProcessor()
     data: {
       event: {
         args: true,
-        extrinsic: true,
-        call: true,
-        block: true
+        extrinsic: true
       }
     }
   } as const)
@@ -291,9 +281,7 @@ const processor = getProcessor()
     data: {
       event: {
         args: true,
-        extrinsic: true,
-        call: true,
-        block: true
+        extrinsic: true
       }
     }
   } as const)
@@ -301,9 +289,7 @@ const processor = getProcessor()
     data: {
       event: {
         args: true,
-        extrinsic: true,
-        call: true,
-        block: true
+        extrinsic: true
       }
     }
   } as const)
@@ -311,9 +297,7 @@ const processor = getProcessor()
     data: {
       event: {
         args: true,
-        extrinsic: true,
-        call: true,
-        block: true
+        extrinsic: true
       }
     }
   } as const)
