@@ -180,7 +180,6 @@ async function getTransfers(
       }
 
       if (item.kind === 'event' && eventNames.includes(item.name)) {
-        console.log('running')
         const transfer = getTransferData(
           ctx,
           block.header,
