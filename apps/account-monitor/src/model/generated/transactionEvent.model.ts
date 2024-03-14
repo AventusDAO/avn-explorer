@@ -17,6 +17,12 @@ export class TransactionEvent {
     args!: unknown
 
     @Column_("text", {nullable: false})
+    ethEventIdSignature!: string
+
+    @Column_("text", {nullable: false})
+    ethEventIdTransactionHash!: string
+
+    @Column_("text", {nullable: false})
     extrinsicHash!: string
 
     @Column_("numeric", {transformer: marshal.bigintTransformer, nullable: false})

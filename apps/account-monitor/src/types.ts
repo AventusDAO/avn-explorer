@@ -104,14 +104,8 @@ export const eventNames = [
 export const transactionEvents = [
   'EthereumEvents.EthereumEventAdded',
   'EthereumEvents.NftEthereumEventAdded',
-  'NftManager.SingleNftMinted',
-  'NftManager.BatchNftMinted',
-  'NftManager.BatchCreated',
-  'TokenManager.LowerRequested',
-  'System.ExtrinsicFailed',
-  'AvnProxy.InnerCallFailed',
   'EthereumEvents.EventRejected',
-  'System.ExtrinsicSuccess'
+  'EthereumEvents.EventAccepted'
 ]
 
 export type EventNormalizer<T extends TransfersEventItem> = (

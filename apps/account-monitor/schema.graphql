@@ -85,6 +85,8 @@ type TransactionEvent @entity {
   id: ID!
   name: String!
   args: JSON!
+  ethEventIdSignature: String!
+  ethEventIdTransactionHash:String!
   extrinsicHash: String!
   extrinsicIndexInBlock: BigInt!
   extrinsicSuccess: Boolean!

@@ -152,6 +152,8 @@ async function processTransferEvent(
   transaction.id = randomUUID()
   transaction.args = transferEvent.event.args
   transaction.name = transferEvent.name
+  transaction.ethEventIdSignature = transferEvent.event.args.ethEventId.signature
+  transaction.ethEventIdTransactionHash = transferEvent.event.args.ethEventId.transactionHash
   transaction.extrinsicHash = transferEvent.event.extrinsic.hash
   transaction.extrinsicIndexInBlock = transferEvent.event.extrinsic.indexInBlock
   transaction.extrinsicSuccess = transferEvent.event.extrinsic.success
