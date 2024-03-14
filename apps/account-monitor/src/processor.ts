@@ -269,22 +269,6 @@ const processor = getProcessor()
       }
     }
   } as const)
-  .addEvent('System.ExtrinsicFailed', {
-    data: {
-      event: {
-        args: true,
-        extrinsic: true
-      }
-    }
-  } as const)
-  .addEvent('AvnProxy.InnerCallFailed', {
-    data: {
-      event: {
-        args: true,
-        extrinsic: true
-      }
-    }
-  } as const)
   .addEvent('EthereumEvents.EventRejected', {
     data: {
       event: {
@@ -293,7 +277,7 @@ const processor = getProcessor()
       }
     }
   } as const)
-  .addEvent('System.ExtrinsicSuccess', {
+  .addEvent('EthereumEvents.EventAccepted', {
     data: {
       event: {
         args: true,
