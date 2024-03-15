@@ -148,16 +148,29 @@ async function processTransferEvent(
   transferEvent: any,
   block: SubstrateBlock
 ): Promise<void> {
+  const {
+    name,
+    event: {
+      args: {
+        ethEventId: { signature, transactionHash }
+      },
+      extrinsic: { hash: extrinsicHash, indexInBlock, success }
+    }
+  } = transferEvent
+
   const transaction = new TransactionEvent()
   transaction.id = randomUUID()
-  transaction.args = transferEvent.event.args
-  transaction.name = transferEvent.name
-  transaction.ethEventIdSignature = transferEvent.event.args.ethEventId.signature
-  transaction.ethEventIdTransactionHash = transferEvent.event.args.ethEventId.transactionHash
-  transaction.extrinsicHash = transferEvent.event.extrinsic.hash
-  transaction.extrinsicIndexInBlock = transferEvent.event.extrinsic.indexInBlock
-  transaction.extrinsicSuccess = transferEvent.event.extrinsic.success
+  transaction.name = name
+  transaction.ethEventIdSignature = signature
+  transaction.ethEventIdTransactionHash = transactionHash
+  transaction.extrinsicHash = extrinsicHash
+  transaction.extrinsicIndexInBlock = indexInBlock
+  transaction.extrinsicSuccess = success
   transaction.extrinsicBlockNumber = BigInt(block.height)
+
+  delete transferEvent.event.args.ethEventId
+
+  transaction.args = transferEvent.event.args
   await ctx.store.upsert(transaction)
 }
 
