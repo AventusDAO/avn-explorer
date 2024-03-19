@@ -10,7 +10,7 @@ import {
   AccountNft,
   NftTransfer,
   ScheduledLowerTransaction,
-  TransactionEvent
+  CrossChainTransactionEvent
 } from './model'
 import { randomUUID } from 'crypto'
 import processor from './processor'
@@ -158,7 +158,7 @@ async function processTransferEvent(
     }
   } = transferEvent
 
-  const transaction = new TransactionEvent()
+  const transaction = new CrossChainTransactionEvent()
   transaction.id = randomUUID()
   transaction.name = name
   transaction.ethEventIdSignature = signature
