@@ -9,14 +9,17 @@ import {
   Nft,
   AccountNft,
   NftTransfer,
-  ScheduledLowerTransaction
+  ScheduledLowerTransaction,
+  TransactionEvent
 } from './model'
+import { randomUUID } from 'crypto'
 import processor from './processor'
 import {
   Ctx,
   eventNames,
   NftTransferEventData,
   TokenTransferEventData,
+  transactionEvents,
   TransferData,
   TransferEventData,
   TransfersEventItem
@@ -140,6 +143,37 @@ async function recordSchedulerEventData(ctx: Ctx, block: any, item: any) {
   }
 }
 
+async function processTransferEvent(
+  ctx: Ctx,
+  transferEvent: any,
+  block: SubstrateBlock
+): Promise<void> {
+  const {
+    name,
+    event: {
+      args: {
+        ethEventId: { signature, transactionHash }
+      },
+      extrinsic: { hash: extrinsicHash, indexInBlock, success }
+    }
+  } = transferEvent
+
+  const transaction = new TransactionEvent()
+  transaction.id = randomUUID()
+  transaction.name = name
+  transaction.ethEventIdSignature = signature
+  transaction.ethEventIdTransactionHash = transactionHash
+  transaction.extrinsicHash = extrinsicHash
+  transaction.extrinsicIndexInBlock = indexInBlock
+  transaction.extrinsicSuccess = success
+  transaction.extrinsicBlockNumber = BigInt(block.height)
+
+  delete transferEvent.event.args.ethEventId
+
+  transaction.args = transferEvent.event.args
+  await ctx.store.upsert(transaction)
+}
+
 async function getTransfers(
   ctx: Ctx,
   tokenLookupMap: Map<string, string>,
@@ -156,6 +190,10 @@ async function getTransfers(
     const accountNfts: Map<string, AccountNft> = new Map()
     const nftTransfers: NftTransfer[] = []
     for (const item of block.items) {
+      if (item.kind === 'event' && transactionEvents.includes(item.name)) {
+        await processTransferEvent(ctx, item, block.header)
+      }
+
       if (item.kind === 'event' && eventNames.includes(item.name)) {
         const transfer = getTransferData(
           ctx,

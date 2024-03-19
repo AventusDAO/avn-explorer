@@ -66,7 +66,8 @@ const processor = getProcessor()
         args: true,
         extrinsic: {
           signature: true,
-          hash: true
+          hash: true,
+          indexInBlock: true
         },
         call: { origin: true, args: true }
       }
@@ -174,7 +175,8 @@ const processor = getProcessor()
         args: true,
         extrinsic: {
           signature: true,
-          hash: true
+          hash: true,
+          indexInBlock: true
         },
         call: { origin: true, args: true }
       }
@@ -186,7 +188,8 @@ const processor = getProcessor()
         args: true,
         extrinsic: {
           signature: true,
-          hash: true
+          hash: true,
+          indexInBlock: true
         },
         call: { origin: true, args: true }
       }
@@ -198,7 +201,8 @@ const processor = getProcessor()
         args: true,
         extrinsic: {
           signature: true,
-          hash: true
+          hash: true,
+          indexInBlock: true
         },
         call: { origin: true, args: true }
       }
@@ -246,6 +250,38 @@ const processor = getProcessor()
     data: {
       event: {
         args: true
+      }
+    }
+  } as const)
+  .addEvent('EthereumEvents.EthereumEventAdded', {
+    data: {
+      event: {
+        args: true,
+        extrinsic: true
+      }
+    }
+  } as const)
+  .addEvent('EthereumEvents.NftEthereumEventAdded', {
+    data: {
+      event: {
+        args: true,
+        extrinsic: true
+      }
+    }
+  } as const)
+  .addEvent('EthereumEvents.EventRejected', {
+    data: {
+      event: {
+        args: true,
+        extrinsic: true
+      }
+    }
+  } as const)
+  .addEvent('EthereumEvents.EventAccepted', {
+    data: {
+      event: {
+        args: true,
+        extrinsic: true
       }
     }
   } as const)

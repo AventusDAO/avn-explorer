@@ -101,6 +101,13 @@ export const eventNames = [
   'NftManager.EthNftTransfer'
 ]
 
+export const transactionEvents = [
+  'EthereumEvents.EthereumEventAdded',
+  'EthereumEvents.NftEthereumEventAdded',
+  'EthereumEvents.EventRejected',
+  'EthereumEvents.EventAccepted'
+]
+
 export type EventNormalizer<T extends TransfersEventItem> = (
   ctx: Ctx,
   item: T,
