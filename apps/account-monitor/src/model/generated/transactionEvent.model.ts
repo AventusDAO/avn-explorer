@@ -3,7 +3,7 @@ import * as marshal from "./marshal"
 
 @Entity_()
 export class CrossChainTransactionEvent {
-    constructor(props?: Partial<TransactionEvent>) {
+    constructor(props?: Partial<CrossChainTransactionEvent>) {
         Object.assign(this, props)
     }
 

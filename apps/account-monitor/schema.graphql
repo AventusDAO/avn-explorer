@@ -81,7 +81,7 @@ type ScheduledLowerTransaction @entity {
   t1Recipient: String
 }
 
-type TransactionEvent @entity {
+type CrossChainTransactionEvent @entity {
   id: ID!
   name: String!
   args: JSON!
