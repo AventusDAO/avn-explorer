@@ -2,7 +2,7 @@ import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, I
 import * as marshal from "./marshal"
 
 @Entity_()
-export class TransactionEvent {
+export class CrossChainTransactionEvent {
     constructor(props?: Partial<TransactionEvent>) {
         Object.assign(this, props)
     }
