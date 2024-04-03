@@ -103,7 +103,7 @@ async function recordNftTransferData(
   await ctx.store.insert(nftTransfers)
 }
 
-async function recordSchedulerEventData(ctx: Ctx, block: any, item: any) {
+async function recordSchedulerEventData(ctx: Ctx, block: any, item: any): Promise<void> {
   const events = block.items.filter((i: any) => i.kind === 'event')
   if (
     item.name === 'Scheduler.Scheduled' &&
