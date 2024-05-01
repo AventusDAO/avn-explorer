@@ -36,7 +36,7 @@ jobs:
 
   ew-docker-build:
     name: EW Explorer Search
-    if: github.ref == 'refs/heads/main'
+    if: ${{ github.event_name == 'workflow_dispatch' && github.ref_name == 'main' }}
     uses: ./.github/workflows/docker-build.yml
     with:
       runner: avn-runner
