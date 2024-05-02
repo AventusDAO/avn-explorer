@@ -1,10 +1,10 @@
-import { getBalances } from './chainEventHandlers'
+import { getBalanceForAccount } from './chainEventHandlers'
 import { Account, AccountNft, AccountToken, Nft, NftTransfer, Token, TokenTransfer } from './model'
-import { BalanceType, Ctx, NftTransferEventData, TokenTransferEventData } from './types'
+import { Ctx, NftTransferEventData, TokenTransferEventData } from './types'
 import { TokenManagerBalancesStorage } from './types/generated/parachain-dev/storage'
 import { Block } from './types/generated/parachain-dev/support'
 import { encodeId } from '@avn/utils'
-import { toHex, decodeHex } from '@subsquid/substrate-processor'
+import { toHex } from '@subsquid/substrate-processor'
 
 export async function createTransfers(
   ctx: Ctx,
@@ -47,7 +47,11 @@ export async function createTransfers(
   }
 }
 
-async function createAndAddAccount(ctx: Ctx, account: string, accounts: Map<string, Account>) {
+async function createAndAddAccount(
+  ctx: Ctx,
+  account: string,
+  accounts: Map<string, Account>
+): Promise<void> {
   try {
     const existingAccount = await ctx.store.findOne(Account, { where: { id: account } })
 
@@ -176,61 +180,31 @@ export async function mapAccountNftEntities(
   ctx.log.child('state').info(`mapping account-nfts ${accountNfts.size}`)
 }
 
-function extractAddresses(
-  data: Array<TokenTransferEventData | NftTransferEventData>
-): Set<Uint8Array> {
-  const addressSet = new Set<Uint8Array>()
-
-  for (const item of data) {
-    addressSet.add(item.from)
-    addressSet.add(item.to)
-    addressSet.add(item.relayer)
-    addressSet.add(item.payer)
-  }
-
-  return addressSet
-}
-
-function createEncodeIdCache(addresses: Set<Uint8Array>): Map<Uint8Array, string> {
-  const encodeIdCache = new Map<Uint8Array, string>()
-
-  for (const address of addresses) {
-    const encodedId = encodeIdCache.get(address) ?? ''
-
-    if (!encodedId && address && address.length) {
-      const encoded = encodeId(address)
-      encodeIdCache.set(address, encoded)
-    }
-  }
-
-  return encodeIdCache
-}
-
-function updateAccounts(
+async function updateAccounts(
+  ctx: Ctx,
+  block: Block,
   accounts: Map<string, Account>,
-  encodeIdCache: Map<Uint8Array, string>,
-  balances: BalanceType[],
   data: Array<TokenTransferEventData | NftTransferEventData>
-): void {
+): Promise<void> {
   for (const item of data) {
-    updateAccount(accounts, encodeIdCache, balances, item.relayer)
-    updateAccount(accounts, encodeIdCache, balances, item.to)
-    updateAccount(accounts, encodeIdCache, balances, item.from)
-    updateAccount(accounts, encodeIdCache, balances, item.payer)
+    if (item?.from?.length) await updateAccount(ctx, block, accounts, item.from)
+    if (item?.to?.length) await updateAccount(ctx, block, accounts, item.to)
+    if (item?.relayer?.length) await updateAccount(ctx, block, accounts, item.relayer)
+    if (item?.payer?.length) await updateAccount(ctx, block, accounts, item.payer)
   }
 }
 
-function updateAccount(
+async function updateAccount(
+  ctx: Ctx,
+  block: Block,
   accounts: Map<string, Account>,
-  encodeIdCache: Map<Uint8Array, string>,
-  balances: BalanceType[],
   address: Uint8Array
-): void {
-  const accountId = encodeIdCache.get(address)
-  const accountBalance: BalanceType | undefined = balances.pop()
+): Promise<void> {
+  const accountId = encodeId(address)
 
-  if (accountId && accountBalance) {
-    const avtBalance: bigint | number = accountBalance.free + accountBalance.reserved
+  if (accountId) {
+    const balance = await getBalanceForAccount(ctx, block, address)
+    const avtBalance = BigInt(balance ? balance.free + balance.reserved : 0)
     accounts.set(
       accountId,
       new Account({
@@ -247,12 +221,7 @@ export async function mapAccountEntities(
   data: TokenTransferEventData[] | NftTransferEventData[],
   accounts: Map<string, Account>
 ): Promise<void> {
-  const addressSet = extractAddresses(data)
-  const encodeIdCache = createEncodeIdCache(addressSet)
-  const balances = await getBalances(ctx, block, [...addressSet])
-  if (balances) {
-    updateAccounts(accounts, encodeIdCache, balances, data)
-  }
+  await updateAccounts(ctx, block, accounts, data)
 
   ctx.log.child('state').info(`mapping accounts ${accounts.size}`)
 }
