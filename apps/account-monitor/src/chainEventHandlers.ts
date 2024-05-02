@@ -520,6 +520,43 @@ export function getEvent<T extends EventName>(
   }
   throw new Error()
 }
+
+export async function getBalanceForAccount(
+  ctx: Ctx,
+  block: Block,
+  account: Uint8Array
+): Promise<BalanceType | undefined> {
+  return (
+    (await getSystemAccountBalance(ctx, block, account)) ??
+    (await getBalancesAccountBalance(ctx, block, account))
+  )
+}
+
+export async function getSystemAccountBalance(
+  ctx: Ctx,
+  block: Block,
+  account: Uint8Array
+): Promise<BalanceType | undefined> {
+  const storage = new SystemAccountStorage(ctx, block)
+  if (!storage.isV4) return undefined
+  const data = await storage.asV4.get(account)
+
+  return { free: data.data.free, reserved: data.data.reserved }
+}
+
+export async function getBalancesAccountBalance(
+  ctx: Ctx,
+  block: Block,
+  account: Uint8Array
+): Promise<BalanceType | undefined> {
+  const storage = new BalancesAccountStorage(ctx, block)
+  if (!storage.isV4) return undefined
+
+  const data = await storage.asV4.get(account)
+
+  return { free: data.free, reserved: data.reserved }
+}
+
 export async function getBalances(
   ctx: Ctx,
   block: Block,
