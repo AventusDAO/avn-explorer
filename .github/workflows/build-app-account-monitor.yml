@@ -1,37 +1,19 @@
 name: Build Account Monitor
 
 on:
-  workflow_dispatch:
-  pull_request:
-    types: [opened, synchronize, reopened, ready_for_review]
-    branches:
-      - main
-    paths:
-      - 'apps/account-monitor/**'
-      - 'packages/types/**'
-      - 'packages/config/**'
-      - 'packages/utils/**'
-      - 'packages/metadata/**'
   push:
     branches:
-      - main
-    paths:
-      - 'apps/account-monitor/**'
-      - 'packages/types/**'
-      - 'packages/config/**'
-      - 'packages/utils/**'
-      - 'packages/metadata/**'
+      - ew-main
 
 jobs:
-  avn-docker-build:
-    name: AvN Explorer Account Monitor
+  ew-docker-build:
+    name: EW Explorer Account Monitor
     uses: ./.github/workflows/docker-build.yml
     with:
+      runner: avn-runner
+      config_creds: false
       short_image_name: account-monitor
-      ecr_repository_prefix: avn-explorer
-      aws_region: eu-west-2
-      aws_account_id: 189013141504
+      ecr_repository_prefix: explorer
+      aws_region: us-east-1
+      aws_account_id: 541507968610
       dockerfile: apps/account-monitor/Dockerfile
-    secrets:
-      aws_access_key: ${{ secrets.TESTNET_AWS_ACCESS_KEY_ID }}
-      aws_secret_key: ${{ secrets.TESTNET_AWS_SECRET_ACCESS_KEY }}

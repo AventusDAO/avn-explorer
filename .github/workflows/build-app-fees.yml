@@ -1,35 +1,19 @@
 name: Build Fees
 
 on:
-  workflow_dispatch:
-  pull_request:
-    types: [opened, synchronize, reopened, ready_for_review]
-    branches:
-      - main
-    paths:
-      - 'apps/fees/**'
-      - 'packages/types/**'
-      - 'packages/config/**'
-      - 'packages/utils/**'
   push:
     branches:
-      - main
-    paths:
-      - 'apps/fees/**'
-      - 'packages/types/**'
-      - 'packages/config/**'
-      - 'packages/utils/**'
+      - ew-main
 
 jobs:
-  avn-docker-build:
-    name: AvN Explorer Fees
+  ew-docker-build:
+    name: EW Explorer Fees
     uses: ./.github/workflows/docker-build.yml
     with:
+      runner: avn-runner
+      config_creds: false
       short_image_name: fees
-      ecr_repository_prefix: avn-explorer
-      aws_region: eu-west-2
-      aws_account_id: 189013141504
+      ecr_repository_prefix: explorer
+      aws_region: us-east-1
+      aws_account_id: 541507968610
       dockerfile: apps/fees/Dockerfile
-    secrets:
-      aws_access_key: ${{ secrets.TESTNET_AWS_ACCESS_KEY_ID }}
-      aws_secret_key: ${{ secrets.TESTNET_AWS_SECRET_ACCESS_KEY }}
