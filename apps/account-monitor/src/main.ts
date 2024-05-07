@@ -260,10 +260,6 @@ function getEventTransferData(
     // @ts-expect-error
     item.event?.call?.origin?.value?.value || item.event?.call?.origin?.value?.value?.value
 
-    if (payer || relayer) {
-      console.log('HELP !!!', payer, relayer)
-    }
-  
   return {
     id: item.event.id,
     blockNumber: block.height,
