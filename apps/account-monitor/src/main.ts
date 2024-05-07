@@ -258,6 +258,11 @@ function getEventTransferData(
   const payer = item.event?.call?.args?.paymentInfo?.payer
   // @ts-expect-error
   const relayer = item.event?.call?.origin?.value?.value
+
+    if (payer || relayer) {
+      console.log('HELP !!!', payer, relayer)
+    }
+  
   return {
     id: item.event.id,
     blockNumber: block.height,
