@@ -17,7 +17,7 @@ export async function createTransfers(
     const transferFrom = transfer.from ? encodeId(transfer.from) : undefined
     const transferTo = transfer.to ? encodeId(transfer.to) : undefined
     const transferRelayer = transfer.relayer ? encodeId(transfer.relayer) : undefined
-    const transferPayer = transfer.payer.length ? encodeId(transfer.payer) : undefined
+    const transferPayer = transfer.payer ? encodeId(transfer.payer) : undefined
     const participants = [transferFrom, transferTo, transferRelayer, transferPayer]
     for (const address of participants) {
       if (address && !accounts.has(address)) {
