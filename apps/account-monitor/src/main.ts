@@ -294,8 +294,11 @@ function getEventTransferData(
   palletInfoArray: string[]
 ): TransferEventData {
   const payer = item.event?.call?.args?.paymentInfo?.payer
-  // @ts-expect-error
-  const relayer = item.event?.call?.origin?.value?.value
+  
+  const relayer =
+    // @ts-expect-error
+    item.event?.call?.origin?.value?.value?.value || item.event?.call?.origin?.value?.value
+
   return {
     id: item.event.id,
     blockNumber: block.height,
