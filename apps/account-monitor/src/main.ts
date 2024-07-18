@@ -294,6 +294,11 @@ function getEventTransferData(
   palletInfoArray: string[]
 ): TransferEventData {
   const payer = item.event?.call?.args?.paymentInfo?.payer
+
+  const relayer =
+    // @ts-expect-error
+    item.event?.call?.origin?.value?.value?.value || item.event?.call?.origin?.value?.value
+
   return {
     id: item.event.id,
     blockNumber: block.height,
@@ -305,10 +310,7 @@ function getEventTransferData(
     method: palletInfoArray[1],
     payer: payer ? decodeHex(payer) : new Uint8Array(),
     // @ts-expect-error
-    relayer: item.event?.call?.origin?.value?.value
-      ? // @ts-expect-error
-        decodeHex(item.event.call?.origin.value.value)
-      : undefined,
+    relayer: relayer ? decodeHex(relayer) : undefined,
     nonce: item.event.extrinsic?.signature?.signedExtensions?.CheckNonce ?? 0
   }
 }
