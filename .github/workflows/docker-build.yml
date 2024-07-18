@@ -59,7 +59,12 @@ jobs:
         with:
           registries: ${{ inputs.aws_account_id }}
 
+      - name: Create tag for PR
+        if: github.ref != 'refs/heads/main'
+        run: echo "DOCKER_TAG=${{ steps.login-ecr.outputs.registry }}/${{ inputs.ecr_repository_prefix }}/${{ inputs.short_image_name }}:pr-${{ github.event.number }}" >> $GITHUB_ENV
+
       - name: Create tag for merge
+        if: github.ref == 'refs/heads/main'
         run: echo "DOCKER_TAG=${{ steps.login-ecr.outputs.registry }}/${{ inputs.ecr_repository_prefix }}/${{ inputs.short_image_name }}:${GITHUB_SHA::7},${{ steps.login-ecr.outputs.registry }}/${{ inputs.ecr_repository_prefix }}/${{ inputs.short_image_name }}:latest" >> $GITHUB_ENV
 
       - name: Build and push

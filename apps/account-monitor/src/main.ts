@@ -294,7 +294,7 @@ function getEventTransferData(
   palletInfoArray: string[]
 ): TransferEventData {
   const payer = item.event?.call?.args?.paymentInfo?.payer
-  
+
   const relayer =
     // @ts-expect-error
     item.event?.call?.origin?.value?.value?.value || item.event?.call?.origin?.value?.value
