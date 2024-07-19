@@ -1,3 +1,8 @@
-type TokenExample @entity {
+type SolutionGroup @entity {
   id: ID!
+  votingReward: BigInt
+  subscriptionReward: BigInt
+  unclaimedRewards: BigInt
+  remainingBlocks: Int
+  reservedFunds: BigInt
 }
