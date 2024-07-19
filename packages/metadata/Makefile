@@ -18,7 +18,7 @@ versions-parachain-testnet:
 	@yarn squid-substrate-metadata-explorer --chain wss://avn-parachain-internal.test.aventus.network --archive https://archive-explorer.testnet.aventus.network/graphql --out ./versions.avn-parachain.testnet.jsonl
 
 versions-parachain-mainnet:
-	@yarn squid-substrate-metadata-explorer --chain wss://avn-parachain.mainnet.aventus.network --archive https://archive-explorer.mainnet.aventus.io/graphql --out ./versions.avn-parachain.mainnet.jsonl
+	@yarn squid-substrate-metadata-explorer --chain wss://avn-parachain.mainnet.aventus.network --archive https://archive-explorer.mainnet.aventus.network/graphql --out ./versions.avn-parachain.mainnet.jsonl
 
 # ew parachain
 
