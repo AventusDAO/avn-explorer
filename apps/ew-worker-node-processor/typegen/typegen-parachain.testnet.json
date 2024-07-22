@@ -78,6 +78,7 @@
     "WorkerNodePallet.SubmissionsQuota",
     "WorkerNodePallet.WorkerNodeOperatorDeposit",
     "WorkerNodePallet.WorkerNodeOperatorInventory",
-    "WorkerNodePallet.WorkerNodeToOperator"
+    "WorkerNodePallet.WorkerNodeToOperator",
+    "System.Account"
   ]
 }

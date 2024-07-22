@@ -1,7 +1,83 @@
 import assert from 'assert'
 import {Block, BlockContext, Chain, ChainContext, Option, Result, StorageBase} from './support'
+import * as avnParachainV32 from './avnParachainV32'
 import * as v50 from './v50'
 import * as v56 from './v56'
+import * as v71 from './v71'
+
+export class SystemAccountStorage extends StorageBase {
+    protected getPrefix() {
+        return 'System'
+    }
+
+    protected getName() {
+        return 'Account'
+    }
+
+    /**
+     *  The full account information for a particular account ID.
+     */
+    get isAvnParachainV32(): boolean {
+        return this.getTypeHash() === '1ddc7ade926221442c388ee4405a71c9428e548fab037445aaf4b3a78f4735c1'
+    }
+
+    /**
+     *  The full account information for a particular account ID.
+     */
+    get asAvnParachainV32(): SystemAccountStorageAvnParachainV32 {
+        assert(this.isAvnParachainV32)
+        return this as any
+    }
+
+    /**
+     *  The full account information for a particular account ID.
+     */
+    get isV71(): boolean {
+        return this.getTypeHash() === 'd6b7a816e0cf6dc8f60cb2bd55c5c5ae7ad928521a6e98aafbe6e954f5c54878'
+    }
+
+    /**
+     *  The full account information for a particular account ID.
+     */
+    get asV71(): SystemAccountStorageV71 {
+        assert(this.isV71)
+        return this as any
+    }
+}
+
+/**
+ *  The full account information for a particular account ID.
+ */
+export interface SystemAccountStorageAvnParachainV32 {
+    get(key: Uint8Array): Promise<avnParachainV32.AccountInfo>
+    getAll(): Promise<avnParachainV32.AccountInfo[]>
+    getMany(keys: Uint8Array[]): Promise<avnParachainV32.AccountInfo[]>
+    getKeys(): Promise<Uint8Array[]>
+    getKeys(key: Uint8Array): Promise<Uint8Array[]>
+    getKeysPaged(pageSize: number): AsyncIterable<Uint8Array[]>
+    getKeysPaged(pageSize: number, key: Uint8Array): AsyncIterable<Uint8Array[]>
+    getPairs(): Promise<[k: Uint8Array, v: avnParachainV32.AccountInfo][]>
+    getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: avnParachainV32.AccountInfo][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: avnParachainV32.AccountInfo][]>
+    getPairsPaged(pageSize: number, key: Uint8Array): AsyncIterable<[k: Uint8Array, v: avnParachainV32.AccountInfo][]>
+}
+
+/**
+ *  The full account information for a particular account ID.
+ */
+export interface SystemAccountStorageV71 {
+    get(key: Uint8Array): Promise<v71.AccountInfo>
+    getAll(): Promise<v71.AccountInfo[]>
+    getMany(keys: Uint8Array[]): Promise<v71.AccountInfo[]>
+    getKeys(): Promise<Uint8Array[]>
+    getKeys(key: Uint8Array): Promise<Uint8Array[]>
+    getKeysPaged(pageSize: number): AsyncIterable<Uint8Array[]>
+    getKeysPaged(pageSize: number, key: Uint8Array): AsyncIterable<Uint8Array[]>
+    getPairs(): Promise<[k: Uint8Array, v: v71.AccountInfo][]>
+    getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: v71.AccountInfo][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: v71.AccountInfo][]>
+    getPairsPaged(pageSize: number, key: Uint8Array): AsyncIterable<[k: Uint8Array, v: v71.AccountInfo][]>
+}
 
 export class WorkerNodePalletActiveRewardPeriodInfoStorage extends StorageBase {
     protected getPrefix() {
