@@ -33,4 +33,3 @@ jobs:
       aws_region: eu-west-1
       aws_account_id: 931945598683
       dockerfile: apps/errors/Dockerfile
-

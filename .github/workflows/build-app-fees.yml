@@ -32,7 +32,6 @@ jobs:
       aws_account_id: 931945598683
       dockerfile: apps/fees/Dockerfile
 
-
   ew-docker-build:
     name: EW Explorer Fees
     if: ${{ github.event_name == 'workflow_dispatch' && github.ref_name == 'main' }}
