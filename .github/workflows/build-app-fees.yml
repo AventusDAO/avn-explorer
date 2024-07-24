@@ -25,14 +25,13 @@ jobs:
     name: AvN Explorer Fees
     uses: ./.github/workflows/docker-build.yml
     with:
+      runner: avn-runner
       short_image_name: fees
-      ecr_repository_prefix: avn-explorer
-      aws_region: eu-west-2
-      aws_account_id: 189013141504
+      ecr_repository_prefix: explorer
+      aws_region: eu-west-1
+      aws_account_id: 931945598683
       dockerfile: apps/fees/Dockerfile
-    secrets:
-      aws_access_key: ${{ secrets.TESTNET_AWS_ACCESS_KEY_ID }}
-      aws_secret_key: ${{ secrets.TESTNET_AWS_SECRET_ACCESS_KEY }}
+
 
   ew-docker-build:
     name: EW Explorer Fees
