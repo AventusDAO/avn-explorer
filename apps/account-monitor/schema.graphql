@@ -91,4 +91,5 @@ type CrossChainTransactionEvent @entity {
   extrinsicIndexInBlock: BigInt!
   extrinsicSuccess: Boolean!
   extrinsicBlockNumber: BigInt! @index
+  rejectionReason: String
 }

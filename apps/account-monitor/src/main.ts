@@ -152,7 +152,8 @@ async function processTransferEvent(
     name,
     event: {
       args: {
-        ethEventId: { signature, transactionHash }
+        ethEventId: { signature, transactionHash },
+        reason: { DispatchError }
       },
       extrinsic: { hash: extrinsicHash, indexInBlock, success }
     }
@@ -167,6 +168,7 @@ async function processTransferEvent(
   transaction.extrinsicIndexInBlock = indexInBlock
   transaction.extrinsicSuccess = success
   transaction.extrinsicBlockNumber = BigInt(block.height)
+  transaction.rejectionReason = DispatchError
 
   delete transferEvent.event.args.ethEventId
 

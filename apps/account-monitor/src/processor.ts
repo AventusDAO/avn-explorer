@@ -253,7 +253,7 @@ const processor = getProcessor()
       }
     }
   } as const)
-  .addEvent('EthereumEvents.EthereumEventAdded', {
+  .addEvent('EthBridge.EventRejected', {
     data: {
       event: {
         args: true,
@@ -261,23 +261,7 @@ const processor = getProcessor()
       }
     }
   } as const)
-  .addEvent('EthereumEvents.NftEthereumEventAdded', {
-    data: {
-      event: {
-        args: true,
-        extrinsic: true
-      }
-    }
-  } as const)
-  .addEvent('EthereumEvents.EventRejected', {
-    data: {
-      event: {
-        args: true,
-        extrinsic: true
-      }
-    }
-  } as const)
-  .addEvent('EthereumEvents.EventAccepted', {
+  .addEvent('EthBridge.EventAccepted', {
     data: {
       event: {
         args: true,
