@@ -168,7 +168,7 @@ async function processTransferEvent(
   transaction.extrinsicIndexInBlock = indexInBlock
   transaction.extrinsicSuccess = success
   transaction.extrinsicBlockNumber = BigInt(block.height)
-  transaction.rejectionReason = DispatchError
+  transaction.rejectionReason = DispatchError ? DispatchError.toString() : null
 
   delete transferEvent.event.args.ethEventId
 
