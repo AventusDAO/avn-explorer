@@ -1,4 +1,9 @@
-import { BatchContext, BatchProcessorItem, SubstrateBlock } from '@subsquid/substrate-processor'
+import {
+  BatchContext,
+  BatchProcessorItem,
+  SubstrateBlock,
+  toHex
+} from '@subsquid/substrate-processor'
 import { Store, TypeormDatabase } from '@subsquid/typeorm-store'
 import { getProcessor } from '@avn/config'
 import { encodeId } from '@avn/utils'
@@ -58,7 +63,7 @@ export async function getSolutionGroups(
     console.log('HELP 3 !!! inside getSolutionGroups', solutionGroups)
     for (const s of solutionGroups) {
       const solutionGroup = new SolutionGroupModel()
-      solutionGroup.id = encodeId(s.namespace)
+      solutionGroup.id = toHex(s.namespace)
       solutionGroup.votingReward = s.rewardsConfig.votingRewardPerBlock
       solutionGroup.subscriptionReward = s.rewardsConfig.subscriptionRewardPerBlock
       solutionGroup.remainingBlocks = s.operationEndBlock - block.height
