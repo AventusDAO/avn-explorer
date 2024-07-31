@@ -12,8 +12,8 @@ export interface TransferEventData {
   to: Uint8Array
   pallet: string
   method: string
-  relayer: Uint8Array
-  payer: Uint8Array
+  relayer: Uint8Array | undefined
+  payer: Uint8Array | undefined
   nonce: bigint
 }
 export interface NftTransferEventData extends TransferEventData {
