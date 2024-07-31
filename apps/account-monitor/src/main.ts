@@ -308,8 +308,7 @@ function getEventTransferData(
     to: event.to,
     pallet: palletInfoArray[0],
     method: palletInfoArray[1],
-    payer: payer ? decodeHex(payer) : new Uint8Array(),
-    // @ts-expect-error
+    payer: payer ? decodeHex(payer) : undefined,
     relayer: relayer ? decodeHex(relayer) : undefined,
     nonce: item.event.extrinsic?.signature?.signedExtensions?.CheckNonce ?? 0
   }
