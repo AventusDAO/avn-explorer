@@ -104,8 +104,8 @@ export const eventNames = [
 export const transactionEvents = [
   'EthereumEvents.EthereumEventAdded',
   'EthereumEvents.NftEthereumEventAdded',
-  'EthereumEvents.EventRejected',
-  'EthereumEvents.EventAccepted'
+  'EthBridge.EventRejected',
+  'EthBridge.EventAccepted'
 ]
 
 export type EventNormalizer<T extends TransfersEventItem> = (

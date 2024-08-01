@@ -11,6 +11,8 @@
     "Balances.Deposit",
     "Balances.Withdraw",
     "Balances.Slashed",
+    "EthBridge.EventAccepted",
+    "EthBridge.EventRejected",
     "TokenManager.TokenLifted",
     "TokenManager.TokenTransferred",
     "TokenManager.TokenLowered",
@@ -27,5 +29,5 @@
     "Scheduler.Canceled"
   ],
   "calls": [],
-  "storage": ["TokenManager.Balances", "NftManager.OwnedNfts", "System.Account", "Balances.Account"]
+  "storage": ["TokenManager.Balances", "System.Account", "Balances.Account"]
 }

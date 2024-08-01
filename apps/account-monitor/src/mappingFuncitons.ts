@@ -143,7 +143,7 @@ export async function mapAccountTokenEntities(
       const tokenId = toHex(item.tokenId)
       const accountId = encodeId(item.to)
       const tokenManagerBalance = new TokenManagerBalancesStorage(ctx, block)
-      const tokenBalance = await tokenManagerBalance.asV31.get([item.tokenId, item.to])
+      const tokenBalance = await tokenManagerBalance.asV58.get([item.tokenId, item.to])
       if (tokenBalance > 0) {
         accountTokens.set(
           `${accountId}-${tokenId}`,

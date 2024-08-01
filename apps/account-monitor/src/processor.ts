@@ -269,7 +269,7 @@ const processor = getProcessor()
       }
     }
   } as const)
-  .addEvent('EthereumEvents.EventRejected', {
+  .addEvent('EthBridge.EventRejected', {
     data: {
       event: {
         args: true,
@@ -277,7 +277,7 @@ const processor = getProcessor()
       }
     }
   } as const)
-  .addEvent('EthereumEvents.EventAccepted', {
+  .addEvent('EthBridge.EventAccepted', {
     data: {
       event: {
         args: true,
