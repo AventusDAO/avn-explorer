@@ -59,7 +59,9 @@ export async function getSolutionGroups(
   console.log('HELP 3 !!! inside getSolutionGroups', registrarInventory.isV50)
   // console.log('HELP 2.5 !!! inside getSolutionGroups', instance.isV50)
   if (instance.isV50) {
-    const solutionGroups = await instance.asV50.getAll()
+    const solutionGroups = (await instance.asV50.getAll()).filter(
+      s => s.operationEndBlock > block.height
+    )
     console.log('HELP 3 !!! inside getSolutionGroups', solutionGroups)
     for (const s of solutionGroups) {
       const solutionGroup = new SolutionGroupModel()
@@ -107,14 +109,14 @@ export async function getReservedFundsForSolutionGroup(
   const registrarInventoryStorage = new WorkerNodePalletRegistrarInventoryStorage(ctx, block)
   const accountStorage = new SystemAccountStorage(ctx, block)
 
-  if (registrarInventoryStorage.isV50 && accountStorage.isV71) {
+  if (registrarInventoryStorage.isV50) {
     const registrarInventory = await registrarInventoryStorage.asV50.getPairs()
 
     for (const [registrarId, _] of registrarInventory) {
-      const account = await accountStorage.asV71.get(registrarId)
-      if (account) {
-        return account.data.reserved
-      }
+      // const account = await accountStorage.asV71.get(registrarId)
+      // if (account) {
+      //   return account.data.reserved
+      // }
     }
   }
 
