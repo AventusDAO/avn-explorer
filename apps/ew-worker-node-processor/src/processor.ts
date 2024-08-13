@@ -11,6 +11,7 @@ import {
   SystemAccountStorage,
   WorkerNodePalletEarnedRewardsStorage,
   WorkerNodePalletRegistrarInventoryStorage,
+  WorkerNodePalletSolutionGroupCalculatedRewardsStorage,
   WorkerNodePalletSolutionsGroupsStorage
 } from './types/generated/parachain-testnet/storage'
 import { BlockContext } from './types/generated/parachain-testnet/support'
@@ -57,7 +58,6 @@ export async function getSolutionGroups(
 
   const groups: SolutionGroupModel[] = []
   console.log('HELP 3 !!! inside getSolutionGroups', registrarInventory.isV50)
-  // console.log('HELP 2.5 !!! inside getSolutionGroups', instance.isV50)
   if (instance.isV50) {
     const solutionGroups = (await instance.asV50.getAll()).filter(
       s => s.operationEndBlock > block.height
@@ -85,15 +85,19 @@ export async function getUnclaimedRewardsForGroup(
   group: SolutionGroup
 ): Promise<bigint> {
   console.log('HELP 5 !!! inside getUnclaimedRewardsForGroup')
-  const rewardsStorage = new WorkerNodePalletEarnedRewardsStorage(ctx, block)
+  // const earnedRewardsStorage = new WorkerNodePalletEarnedRewardsStorage(ctx, block)
+  const calculatedRewards = new WorkerNodePalletSolutionGroupCalculatedRewardsStorage(ctx, block)
+
   let totalUnclaimed = BigInt(0)
 
-  if (rewardsStorage.isV50) {
-    const allRewards = await rewardsStorage.asV50.getPairs()
-    console.log('HELP 6 !!! inside getUnclaimedRewardsForGroup', allRewards)
-    for (const [key, rewards] of allRewards) {
-      if (Buffer.from(key[1]).toString() === Buffer.from(group.namespace).toString()) {
-        totalUnclaimed += rewards[0] + rewards[1] // sum of subscription and participation rewards
+  if (calculatedRewards.isV56) {
+    // const allEarnedRewards = await earnedRewardsStorage.asV50.getPairs()
+    const allPossibleRewards = await calculatedRewards.asV56.getPairs()
+    console.log('isV56 inside getUnclaimedRewardsForGroup', allPossibleRewards)
+    for (const [key, rewards] of allPossibleRewards) {
+      if (Buffer.from(key).toString() === Buffer.from(group.namespace).toString()) {
+        const unclaimed_rewards = rewards[0] - rewards[1]
+        totalUnclaimed += unclaimed_rewards
       }
     }
   }
@@ -101,6 +105,7 @@ export async function getUnclaimedRewardsForGroup(
   return totalUnclaimed
 }
 
+// seperated changes, this function in different commit
 export async function getReservedFundsForSolutionGroup(
   ctx: Ctx,
   block: SubstrateBlock,
