@@ -3,6 +3,7 @@ import {Chain, ChainContext, CallContext, Call, Result, Option} from './support'
 import * as v50 from './v50'
 import * as v56 from './v56'
 import * as v66 from './v66'
+import * as v73 from './v73'
 
 export class WorkerNodePalletAddSolutionToGroupCall {
     private readonly _chain: Chain
@@ -533,6 +534,21 @@ export class WorkerNodePalletSolutionGroupRegistrationCall {
      */
     get asV50(): {namespace: Uint8Array, info: v50.EntityInfo, operatorsConfig: v50.OperatorConfig, rewardsConfig: v50.RewardsConfiguration, operationStartBlock: number, operationEndBlock: number} {
         assert(this.isV50)
+        return this._chain.decodeCall(this.call)
+    }
+
+    /**
+     * See [`Pallet::solution_group_registration`].
+     */
+    get isV73(): boolean {
+        return this._chain.getCallHash('WorkerNodePallet.solution_group_registration') === 'd266cab595c8d7735bb96c03f2d570016168f1fa5783f04100811c37eefe6d40'
+    }
+
+    /**
+     * See [`Pallet::solution_group_registration`].
+     */
+    get asV73(): {namespace: Uint8Array, info: v73.EntityInfo, operatorsConfig: v73.OperatorConfig, rewardsConfig: v73.RewardsConfiguration, operationStartBlock: number, operationEndBlock: number, withdrawalDelay: number} {
+        assert(this.isV73)
         return this._chain.decodeCall(this.call)
     }
 }

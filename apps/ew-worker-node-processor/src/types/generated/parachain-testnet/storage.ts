@@ -4,6 +4,7 @@ import * as avnParachainV32 from './avnParachainV32'
 import * as v50 from './v50'
 import * as v56 from './v56'
 import * as v71 from './v71'
+import * as v73 from './v73'
 
 export class SystemAccountStorage extends StorageBase {
     protected getPrefix() {
@@ -951,6 +952,15 @@ export class WorkerNodePalletSolutionsStorage extends StorageBase {
         assert(this.isV56)
         return this as any
     }
+
+    get isV73(): boolean {
+        return this.getTypeHash() === '771c26dd35ee107fbd431dcfdaf2c5aff67d0b846dac0ca9ff3c1e97570c1100'
+    }
+
+    get asV73(): WorkerNodePalletSolutionsStorageV73 {
+        assert(this.isV73)
+        return this as any
+    }
 }
 
 export interface WorkerNodePalletSolutionsStorageV50 {
@@ -981,6 +991,20 @@ export interface WorkerNodePalletSolutionsStorageV56 {
     getPairsPaged(pageSize: number, key: Uint8Array): AsyncIterable<[k: Uint8Array, v: v56.Solution][]>
 }
 
+export interface WorkerNodePalletSolutionsStorageV73 {
+    get(key: Uint8Array): Promise<(v73.Solution | undefined)>
+    getAll(): Promise<v73.Solution[]>
+    getMany(keys: Uint8Array[]): Promise<(v73.Solution | undefined)[]>
+    getKeys(): Promise<Uint8Array[]>
+    getKeys(key: Uint8Array): Promise<Uint8Array[]>
+    getKeysPaged(pageSize: number): AsyncIterable<Uint8Array[]>
+    getKeysPaged(pageSize: number, key: Uint8Array): AsyncIterable<Uint8Array[]>
+    getPairs(): Promise<[k: Uint8Array, v: v73.Solution][]>
+    getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: v73.Solution][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: v73.Solution][]>
+    getPairsPaged(pageSize: number, key: Uint8Array): AsyncIterable<[k: Uint8Array, v: v73.Solution][]>
+}
+
 export class WorkerNodePalletSolutionsGroupsStorage extends StorageBase {
     protected getPrefix() {
         return 'WorkerNodePallet'
@@ -998,6 +1022,15 @@ export class WorkerNodePalletSolutionsGroupsStorage extends StorageBase {
         assert(this.isV50)
         return this as any
     }
+
+    get isV73(): boolean {
+        return this.getTypeHash() === '58b8c74f4ee01f1f85de0d4754868c0b608de28088113ea888b6582b09b34f6f'
+    }
+
+    get asV73(): WorkerNodePalletSolutionsGroupsStorageV73 {
+        assert(this.isV73)
+        return this as any
+    }
 }
 
 export interface WorkerNodePalletSolutionsGroupsStorageV50 {
@@ -1012,6 +1045,20 @@ export interface WorkerNodePalletSolutionsGroupsStorageV50 {
     getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: v50.SolutionGroup][]>
     getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: v50.SolutionGroup][]>
     getPairsPaged(pageSize: number, key: Uint8Array): AsyncIterable<[k: Uint8Array, v: v50.SolutionGroup][]>
+}
+
+export interface WorkerNodePalletSolutionsGroupsStorageV73 {
+    get(key: Uint8Array): Promise<(v73.SolutionGroup | undefined)>
+    getAll(): Promise<v73.SolutionGroup[]>
+    getMany(keys: Uint8Array[]): Promise<(v73.SolutionGroup | undefined)[]>
+    getKeys(): Promise<Uint8Array[]>
+    getKeys(key: Uint8Array): Promise<Uint8Array[]>
+    getKeysPaged(pageSize: number): AsyncIterable<Uint8Array[]>
+    getKeysPaged(pageSize: number, key: Uint8Array): AsyncIterable<Uint8Array[]>
+    getPairs(): Promise<[k: Uint8Array, v: v73.SolutionGroup][]>
+    getPairs(key: Uint8Array): Promise<[k: Uint8Array, v: v73.SolutionGroup][]>
+    getPairsPaged(pageSize: number): AsyncIterable<[k: Uint8Array, v: v73.SolutionGroup][]>
+    getPairsPaged(pageSize: number, key: Uint8Array): AsyncIterable<[k: Uint8Array, v: v73.SolutionGroup][]>
 }
 
 export class WorkerNodePalletSubmissionsQuotaStorage extends StorageBase {

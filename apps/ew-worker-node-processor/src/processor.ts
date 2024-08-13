@@ -40,7 +40,7 @@ async function main(ctx: Ctx): Promise<void> {
     //   }
     // }
 
-    console.log('HELP 1 !!!', groups)
+    // console.log('HELP 1 !!!', groups)
 
     await ctx.store.save(groups)
   }
@@ -52,7 +52,7 @@ export async function getSolutionGroups(
   ctx: Ctx,
   block: SubstrateBlock
 ): Promise<SolutionGroupModel[]> {
-  console.log('HELP 2 !!! inside getSolutionGroups')
+  // console.log('HELP 2 !!! inside getSolutionGroups')
   const registrarInventory = new WorkerNodePalletRegistrarInventoryStorage(ctx, block)
   const instance = new WorkerNodePalletSolutionsGroupsStorage(ctx, block)
 
@@ -62,7 +62,7 @@ export async function getSolutionGroups(
     const solutionGroups = (await instance.asV50.getAll()).filter(
       s => s.operationEndBlock > block.height
     )
-    console.log('HELP 3 !!! inside getSolutionGroups', solutionGroups)
+    // console.log('HELP 3 !!! inside getSolutionGroups', solutionGroups)
     for (const s of solutionGroups) {
       const solutionGroup = new SolutionGroupModel()
       solutionGroup.id = toHex(s.namespace)
@@ -73,7 +73,7 @@ export async function getSolutionGroups(
       solutionGroup.reservedFunds = await getReservedFundsForSolutionGroup(ctx, block, s)
       groups.push(solutionGroup)
     }
-    console.log('HELP 4 !!! inside getSolutionGroups', groups)
+    // console.log('HELP 4 !!! inside getSolutionGroups', groups)
   }
 
   return groups
@@ -101,7 +101,7 @@ export async function getUnclaimedRewardsForGroup(
       }
     }
   }
-  console.log('HELP 7 !!! inside getUnclaimedRewardsForGroup', totalUnclaimed)
+  // console.log('HELP 7 !!! inside getUnclaimedRewardsForGroup', totalUnclaimed)
   return totalUnclaimed
 }
 

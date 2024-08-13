@@ -59,6 +59,21 @@ export class WorkerNodePalletNewOperatorAllowedEvent {
         assert(this.isV50)
         return this._chain.decodeEvent(this.event)
     }
+
+    /**
+     * Signals account added to allowed operators
+     */
+    get isV73(): boolean {
+        return this._chain.getEventHash('WorkerNodePallet.NewOperatorAllowed') === '27ba148605caf53a403f91164bfb0d8f279fb743aa22610b083539c30205b97a'
+    }
+
+    /**
+     * Signals account added to allowed operators
+     */
+    get asV73(): {operator: Uint8Array, solutionGroup: Uint8Array} {
+        assert(this.isV73)
+        return this._chain.decodeEvent(this.event)
+    }
 }
 
 export class WorkerNodePalletNewRegistrarAllowedEvent {
@@ -521,6 +536,21 @@ export class WorkerNodePalletSolutionResultSubmittedEvent {
      */
     get asV50(): {solutionNamespace: Uint8Array, votingRoundId: Uint8Array, result: Uint8Array} {
         assert(this.isV50)
+        return this._chain.decodeEvent(this.event)
+    }
+
+    /**
+     * Signals that a vote has been submitted towards a particular solution result
+     */
+    get isV73(): boolean {
+        return this._chain.getEventHash('WorkerNodePallet.SolutionResultSubmitted') === 'e1c48f8cba8ba963baf7569436ea399a76b7bea7e306bb0a8f363ef45304ce50'
+    }
+
+    /**
+     * Signals that a vote has been submitted towards a particular solution result
+     */
+    get asV73(): {solutionNamespace: Uint8Array, votingRoundId: Uint8Array, result: Uint8Array, operator: Uint8Array, worker: Uint8Array} {
+        assert(this.isV73)
         return this._chain.decodeEvent(this.event)
     }
 }
