@@ -57,9 +57,8 @@ export async function getSolutionGroups(
   const instance = new WorkerNodePalletSolutionsGroupsStorage(ctx, block)
 
   const groups: SolutionGroupModel[] = []
-  console.log('HELP 3 !!! inside getSolutionGroups', registrarInventory.isV50)
-  if (instance.isV50) {
-    const solutionGroups = (await instance.asV50.getAll()).filter(
+  if (instance.isV73) {
+    const solutionGroups = (await instance.asV73.getAll()).filter(
       s => s.operationEndBlock > block.height
     )
     // console.log('HELP 3 !!! inside getSolutionGroups', solutionGroups)
@@ -76,6 +75,7 @@ export async function getSolutionGroups(
       solutionGroup.unclaimedRewards = await getUnclaimedRewardsForGroup(ctx, block, s)
       solutionGroup.reservedFunds = totalReservedFundsForGroup
       groups.push(solutionGroup)
+      console.log('SOLUTION GROUP !!!', solutionGroup)
     }
     // console.log('HELP 4 !!! inside getSolutionGroups', groups)
   }
