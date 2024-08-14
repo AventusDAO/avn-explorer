@@ -64,13 +64,17 @@ export async function getSolutionGroups(
     )
     // console.log('HELP 3 !!! inside getSolutionGroups', solutionGroups)
     for (const s of solutionGroups) {
+      const totalReservedFundsForGroup =
+        s.rewardsConfig.subscriptionRewardPerBlock *
+          BigInt(s.operationEndBlock - s.operationStartBlock) +
+        s.rewardsConfig.votingRewardPerBlock * BigInt(s.operationEndBlock - s.operationStartBlock)
       const solutionGroup = new SolutionGroupModel()
       solutionGroup.id = toHex(s.namespace)
       solutionGroup.votingReward = s.rewardsConfig.votingRewardPerBlock
       solutionGroup.subscriptionReward = s.rewardsConfig.subscriptionRewardPerBlock
       solutionGroup.remainingBlocks = s.operationEndBlock - block.height
       solutionGroup.unclaimedRewards = await getUnclaimedRewardsForGroup(ctx, block, s)
-      solutionGroup.reservedFunds = await getReservedFundsForSolutionGroup(ctx, block, s)
+      solutionGroup.reservedFunds = totalReservedFundsForGroup
       groups.push(solutionGroup)
     }
     // console.log('HELP 4 !!! inside getSolutionGroups', groups)
@@ -96,34 +100,11 @@ export async function getUnclaimedRewardsForGroup(
     console.log('isV56 inside getUnclaimedRewardsForGroup', allPossibleRewards)
     for (const [key, rewards] of allPossibleRewards) {
       if (Buffer.from(key).toString() === Buffer.from(group.namespace).toString()) {
-        const unclaimed_rewards = rewards[0] - rewards[1]
-        totalUnclaimed += unclaimed_rewards
+        const unclaimedRewards = rewards[0] - rewards[1]
+        totalUnclaimed += unclaimedRewards
       }
     }
   }
   // console.log('HELP 7 !!! inside getUnclaimedRewardsForGroup', totalUnclaimed)
   return totalUnclaimed
-}
-
-// seperated changes, this function in different commit
-export async function getReservedFundsForSolutionGroup(
-  ctx: Ctx,
-  block: SubstrateBlock,
-  group: SolutionGroup
-): Promise<bigint> {
-  const registrarInventoryStorage = new WorkerNodePalletRegistrarInventoryStorage(ctx, block)
-  const accountStorage = new SystemAccountStorage(ctx, block)
-
-  if (registrarInventoryStorage.isV50) {
-    const registrarInventory = await registrarInventoryStorage.asV50.getPairs()
-
-    for (const [registrarId, _] of registrarInventory) {
-      // const account = await accountStorage.asV71.get(registrarId)
-      // if (account) {
-      //   return account.data.reserved
-      // }
-    }
-  }
-
-  return BigInt(0)
 }
