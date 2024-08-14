@@ -31,18 +31,8 @@ export type Ctx = BatchContext<Store, Item>
 export type BlockCtx = BlockContext
 
 async function main(ctx: Ctx): Promise<void> {
-  console.log("processing groups")
   for (const block of ctx.blocks) {
     const groups = await getSolutionGroups(ctx, block.header)
-    // for (const item of block.items) {
-    //   if (item.kind === 'event') {
-    //     // if (item.event.name.includes('WorkerNodePallet')) {
-    //     // }
-    //   }
-    // }
-
-    // console.log('HELP 1 !!!', groups)
-
     await ctx.store.save(groups)
   }
 }
@@ -53,7 +43,6 @@ export async function getSolutionGroups(
   ctx: Ctx,
   block: SubstrateBlock
 ): Promise<SolutionGroupModel[]> {
-  console.log('HELP 2 !!! inside getSolutionGroups')
   const registrarInventory = new WorkerNodePalletRegistrarInventoryStorage(ctx, block)
   const instance = new WorkerNodePalletSolutionsGroupsStorage(ctx, block)
 
@@ -62,7 +51,6 @@ export async function getSolutionGroups(
     const solutionGroups = (await instance.asV73.getAll()).filter(
       s => s.operationEndBlock > block.height
     )
-    // console.log('HELP 3 !!! inside getSolutionGroups', solutionGroups)
     for (const s of solutionGroups) {
       const totalReservedFundsForGroup =
         s.rewardsConfig.subscriptionRewardPerBlock *
@@ -78,7 +66,6 @@ export async function getSolutionGroups(
       groups.push(solutionGroup)
       console.log('SOLUTION GROUP !!!', solutionGroup)
     }
-    console.log('HELP 4 !!! inside getSolutionGroups', groups)
   }
 
   return groups
@@ -89,27 +76,12 @@ export async function getUnclaimedRewardsForGroup(
   block: SubstrateBlock,
   group: SolutionGroup
 ): Promise<bigint> {
-  console.log('HELP 5 !!! inside getUnclaimedRewardsForGroup')
   const earnedRewardsStorage = new WorkerNodePalletEarnedRewardsStorage(ctx, block)
-  // const calculatedRewards = new WorkerNodePalletSolutionGroupCalculatedRewardsStorage(ctx, block)
-
-
-  console.log("Earned rewards storage is: ", earnedRewardsStorage.isV50)
-  if (earnedRewardsStorage.isV50) {
-    console.log("isV50")
-  }
-
-  // console.log("Calculated rewards storage is: ", calculatedRewards.isV56)
-  // if (calculatedRewards.isV56) {
-  //   console.log("isV56")
-  // }
 
   let totalUnclaimed = BigInt(0)
 
   if (earnedRewardsStorage.isV50) {
     const allEarnedRewards = await earnedRewardsStorage.asV50.getPairs()
-    //const allPossibleRewards = await calculatedRewards.asV56.getPairs()
-    // console.log('isV56 inside getUnclaimedRewardsForGroup', allPossibleRewards)
     for (const [key, rewards] of allEarnedRewards) {
       if (Buffer.from(key[1]).toString() === Buffer.from(group.namespace).toString()) {
         const unclaimedRewards = rewards[0] + rewards[1]
@@ -117,6 +89,5 @@ export async function getUnclaimedRewardsForGroup(
       }
     }
   }
-  // console.log('HELP 7 !!! inside getUnclaimedRewardsForGroup', totalUnclaimed)
   return totalUnclaimed
 }
