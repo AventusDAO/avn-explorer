@@ -64,7 +64,6 @@ export async function getSolutionGroups(
       solutionGroup.unclaimedRewards = await getUnclaimedRewardsForGroup(ctx, block, s)
       solutionGroup.reservedFunds = totalReservedFundsForGroup
       groups.push(solutionGroup)
-      console.log('SOLUTION GROUP !!!', solutionGroup)
     }
   }
 
@@ -83,7 +82,7 @@ export async function getUnclaimedRewardsForGroup(
   if (earnedRewardsStorage.isV50) {
     const allEarnedRewards = await earnedRewardsStorage.asV50.getPairs()
     for (const [key, rewards] of allEarnedRewards) {
-      if (Buffer.from(key[1]).toString() === Buffer.from(group.namespace).toString()) {
+      if (toHex(key[1]) === toHex(group.namespace)) {
         const unclaimedRewards = rewards[0] + rewards[1]
         totalUnclaimed += unclaimedRewards
       }
