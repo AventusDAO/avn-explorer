@@ -43,7 +43,6 @@ export async function getSolutionGroups(
   ctx: Ctx,
   block: SubstrateBlock
 ): Promise<SolutionGroupModel[]> {
-  const registrarInventory = new WorkerNodePalletRegistrarInventoryStorage(ctx, block)
   const instance = new WorkerNodePalletSolutionsGroupsStorage(ctx, block)
 
   const groups: SolutionGroupModel[] = []
@@ -51,6 +50,11 @@ export async function getSolutionGroups(
     const solutionGroups = (await instance.asV73.getAll()).filter(
       s => s.operationEndBlock > block.height
     )
+
+    const namespaceHexes = solutionGroups.map(s => toHex(s.namespace))
+
+    const unclaimedRewardsMap = await getUnclaimedRewardsForGroups(ctx, block, namespaceHexes)
+
     for (const s of solutionGroups) {
       const totalReservedFundsForGroup =
         s.rewardsConfig.subscriptionRewardPerBlock *
@@ -61,7 +65,7 @@ export async function getSolutionGroups(
       solutionGroup.votingReward = s.rewardsConfig.votingRewardPerBlock
       solutionGroup.subscriptionReward = s.rewardsConfig.subscriptionRewardPerBlock
       solutionGroup.remainingBlocks = s.operationEndBlock - block.height
-      solutionGroup.unclaimedRewards = await getUnclaimedRewardsForGroup(ctx, block, s)
+      solutionGroup.unclaimedRewards = unclaimedRewardsMap.get(toHex(s.namespace)) ?? BigInt(0)
       solutionGroup.reservedFunds = totalReservedFundsForGroup
       groups.push(solutionGroup)
     }
@@ -70,23 +74,27 @@ export async function getSolutionGroups(
   return groups
 }
 
-export async function getUnclaimedRewardsForGroup(
+export async function getUnclaimedRewardsForGroups(
   ctx: Ctx,
   block: SubstrateBlock,
-  group: SolutionGroup
-): Promise<bigint> {
+  namespaceHexes: string[]
+): Promise<Map<string, bigint>> {
   const earnedRewardsStorage = new WorkerNodePalletEarnedRewardsStorage(ctx, block)
 
-  let totalUnclaimed = BigInt(0)
+  const unclaimedRewardsMap = new Map<string, bigint>()
 
   if (earnedRewardsStorage.isV50) {
     const allEarnedRewards = await earnedRewardsStorage.asV50.getPairs()
     for (const [key, rewards] of allEarnedRewards) {
-      if (toHex(key[1]) === toHex(group.namespace)) {
+      const namespaceHex = toHex(key[1])
+      if (namespaceHexes.includes(namespaceHex)) {
         const unclaimedRewards = rewards[0] + rewards[1]
-        totalUnclaimed += unclaimedRewards
+        unclaimedRewardsMap.set(
+          namespaceHex,
+          (unclaimedRewardsMap.get(namespaceHex) ?? BigInt(0)) + unclaimedRewards
+        )
       }
     }
   }
-  return totalUnclaimed
+  return unclaimedRewardsMap
 }
