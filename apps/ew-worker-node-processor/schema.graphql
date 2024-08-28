@@ -1,3 +1,8 @@
+type CalculatedRewards {
+  reward1: BigInt!
+  reward2: BigInt!
+}
+
 type SolutionGroup @entity {
   id: ID!
   votingReward: BigInt
@@ -5,4 +10,5 @@ type SolutionGroup @entity {
   unclaimedRewards: BigInt
   remainingBlocks: Int
   reservedFunds: BigInt
+  calculatedRewards: CalculatedRewards
 }

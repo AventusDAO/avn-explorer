@@ -6,17 +6,14 @@ import {
 } from '@subsquid/substrate-processor'
 import { Store, TypeormDatabase } from '@subsquid/typeorm-store'
 import { getProcessor } from '@avn/config'
-import { encodeId } from '@avn/utils'
 import {
-  SystemAccountStorage,
+  WorkerNodePalletActiveRewardPeriodInfoStorage,
   WorkerNodePalletEarnedRewardsStorage,
-  WorkerNodePalletRegistrarInventoryStorage,
   WorkerNodePalletSolutionGroupCalculatedRewardsStorage,
   WorkerNodePalletSolutionsGroupsStorage
 } from './types/generated/parachain-testnet/storage'
 import { BlockContext } from './types/generated/parachain-testnet/support'
-import { SolutionGroup as SolutionGroupModel } from './model'
-import { SolutionGroup } from './types/generated/parachain-testnet/v50'
+import { CalculatedRewards, SolutionGroup as SolutionGroupModel } from './model'
 
 const processor = getProcessor().addEvent('*', {
   data: {
@@ -55,23 +52,42 @@ export async function getSolutionGroups(
 
     const unclaimedRewardsMap = await getUnclaimedRewardsForGroups(ctx, block, namespaceHexes)
 
+    const rewardPeriodFirstBlock = await getRewardPeriodFirstBlock(ctx, block)
+
     for (const s of solutionGroups) {
       const totalReservedFundsForGroup =
         s.rewardsConfig.subscriptionRewardPerBlock *
           BigInt(s.operationEndBlock - s.operationStartBlock) +
         s.rewardsConfig.votingRewardPerBlock * BigInt(s.operationEndBlock - s.operationStartBlock)
+
       const solutionGroup = new SolutionGroupModel()
       solutionGroup.id = toHex(s.namespace)
       solutionGroup.votingReward = s.rewardsConfig.votingRewardPerBlock
       solutionGroup.subscriptionReward = s.rewardsConfig.subscriptionRewardPerBlock
-      solutionGroup.remainingBlocks = s.operationEndBlock - block.height
+      solutionGroup.remainingBlocks = s.operationEndBlock - (rewardPeriodFirstBlock ?? 0)
       solutionGroup.unclaimedRewards = unclaimedRewardsMap.get(toHex(s.namespace)) ?? BigInt(0)
       solutionGroup.reservedFunds = totalReservedFundsForGroup
+      solutionGroup.calculatedRewards = await getSolutionGroupCalculatedRewards(
+        ctx,
+        block,
+        s.info.name
+      )
       groups.push(solutionGroup)
     }
   }
 
   return groups
+}
+
+export async function getRewardPeriodFirstBlock(
+  ctx: Ctx,
+  block: SubstrateBlock
+): Promise<number | undefined> {
+  const rewardPeriodStorage = new WorkerNodePalletActiveRewardPeriodInfoStorage(ctx, block)
+  if (rewardPeriodStorage.isV50) {
+    const rewardPeriod = await rewardPeriodStorage.asV50.get()
+    return rewardPeriod.firstBlock
+  }
 }
 
 export async function getUnclaimedRewardsForGroups(
@@ -97,4 +113,23 @@ export async function getUnclaimedRewardsForGroups(
     }
   }
   return unclaimedRewardsMap
+}
+
+export async function getSolutionGroupCalculatedRewards(
+  ctx: Ctx,
+  block: SubstrateBlock,
+  solutionGroupKey: Uint8Array
+): Promise<CalculatedRewards | null> {
+  const calculatedRewardsStorage = await new WorkerNodePalletSolutionGroupCalculatedRewardsStorage(
+    ctx,
+    block
+  )
+
+  if (!calculatedRewardsStorage.isV56) {
+    return null
+  }
+
+  const calculatedRewards = await calculatedRewardsStorage.asV56.get(solutionGroupKey)
+
+  return new CalculatedRewards({ reward1: calculatedRewards[0], reward2: calculatedRewards[1] })
 }
