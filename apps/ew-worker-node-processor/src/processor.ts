@@ -70,7 +70,7 @@ export async function getSolutionGroups(
       solutionGroup.calculatedRewards = await getSolutionGroupCalculatedRewards(
         ctx,
         block,
-        s.info.name
+        s.namespace
       )
       groups.push(solutionGroup)
     }
