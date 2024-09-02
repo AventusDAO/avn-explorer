@@ -150,29 +150,30 @@ async function processTransferEvent(
 ): Promise<void> {
   const {
     name,
-    event: {
-      args: {
-        ethEventId: { signature, transactionHash },
-        reason: { dispatchError }
-      },
-      extrinsic: { hash: extrinsicHash, indexInBlock, success }
-    }
+    event: { args, extrinsic }
   } = transferEvent
+
+  const ethEventId = args?.ethEventId || {}
+  const reason = args?.reason || {}
+  const extrinsicData = extrinsic || {}
 
   const transaction = new CrossChainTransactionEvent()
   transaction.id = randomUUID()
   transaction.name = name
-  transaction.ethEventIdSignature = signature
-  transaction.ethEventIdTransactionHash = transactionHash
-  transaction.extrinsicHash = extrinsicHash
-  transaction.extrinsicIndexInBlock = indexInBlock
-  transaction.extrinsicSuccess = success
+  transaction.ethEventIdSignature = ethEventId.signature || null
+  transaction.ethEventIdTransactionHash = ethEventId.transactionHash || null
+  transaction.extrinsicHash = extrinsicData.hash || null
+  transaction.extrinsicIndexInBlock = extrinsicData.indexInBlock || null
+  transaction.extrinsicSuccess = extrinsicData.success || false
   transaction.extrinsicBlockNumber = BigInt(block.height)
-  transaction.rejectionReason = dispatchError ? dispatchError.toString() : null
+  transaction.rejectionReason = reason.dispatchError ? reason.dispatchError.toString() : null
 
-  delete transferEvent.event.args.ethEventId
-
-  transaction.args = transferEvent.event.args
+  if (args && 'ethEventId' in args) {
+    const { ethEventId, ...restArgs } = args
+    transaction.args = restArgs
+  } else {
+    transaction.args = args || {}
+  }
   await ctx.store.upsert(transaction)
 }
 
