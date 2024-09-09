@@ -22,7 +22,8 @@ import {
   getAccountFromUnreservedEvent,
   getAccountFromWithdrawEvent,
   getAccountsFromTransferEvent,
-  getAccountsReserveRepatriatedEvent
+  getAccountsReserveRepatriatedEvent,
+  getStorageClass
 } from './eventHandlers'
 import { IBalance } from './types/custom/balance'
 
@@ -324,10 +325,14 @@ async function getBalancesAccountBalances(
   block: Block,
   accounts: Uint8Array[]
 ): Promise<IBalance[] | undefined> {
-  const storage = new BalancesAccountStorage(ctx, block)
+  const StorageClass = getStorageClass()
+  const storage = new StorageClass.BalancesAccountStorage(ctx, block)
   if (!storage.isExists) return undefined
-  if (storage.isV4) {
+  else if ('isV4' in storage && storage.isV4) {
     const data = await storage.asV4.getMany(accounts)
+    return data.map(d => ({ free: d.free, reserved: d.reserved }))
+  } else if ('isV73' in storage && storage.isV73) {
+    const data = await storage.asV73.getMany(accounts)
     return data.map(d => ({ free: d.free, reserved: d.reserved }))
   } else {
     throw new UnknownVersionError(`ParachainStakingNominatorStateStorage`)
@@ -339,10 +344,18 @@ async function getSystemAccountBalances(
   block: Block,
   accounts: Uint8Array[]
 ): Promise<IBalance[] | undefined> {
-  const storage = new SystemAccountStorage(ctx, block)
+  const StorageClass = getStorageClass()
+  const storage = new StorageClass.SystemAccountStorage(ctx, block)
   if (!storage.isExists) return undefined
-  if (storage.isV60) {
+
+  if ('isV60' in storage && storage.isV60) {
     const data = await storage.asV60.getMany(accounts)
+    return data.map(d => ({
+      free: d.data.free,
+      reserved: d.data.reserved
+    })) as IBalance[]
+  } else if ('isV73' in storage && storage.isV73) {
+    const data = await storage.asV73.getMany(accounts)
     return data.map(d => ({
       free: d.data.free,
       reserved: d.data.reserved

@@ -1,0 +1,18 @@
+{
+  "outDir": "../src/types/generated/ew-testnet",
+  "specVersions": "../../../packages/metadata/versions.ew-parachain.testnet.jsonl",
+  "typesBundle": "../../../packages/metadata/avn-types.json",
+  "events": [
+    "Balances.Transfer",
+    "Balances.Endowed",
+    "Balances.BalanceSet",
+    "Balances.Reserved",
+    "Balances.Unreserved",
+    "Balances.ReserveRepatriated",
+    "Balances.Deposit",
+    "Balances.Withdraw",
+    "Balances.Slashed"
+  ],
+  "calls": [],
+  "storage": ["System.Account", "Balances.Account", "Balances.TotalIssuance"]
+}
