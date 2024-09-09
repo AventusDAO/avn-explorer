@@ -25,12 +25,14 @@ codegen:
 typegen-parachain-testnet:
 	@yarn squid-substrate-typegen ./typegen/typegen-parachain.testnet.json
 
-
 typegen-parachain-dev:
 	@yarn squid-substrate-typegen ./typegen/typegen-parachain.dev.json
 
 typegen-vow-testnet:
 	@yarn squid-substrate-typegen ./typegen/typegen-vow.testnet.json
+
+typegen-ew-testnet:
+	@yarn squid-substrate-typegen ./typegen/typegen-ew.testnet.json
 
 
 .PHONY: process serve start codegen migration migrate up down typegen
