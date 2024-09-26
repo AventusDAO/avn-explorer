@@ -125,4 +125,3 @@ const getAddressSearchQuery = (value: string): EsQuery => ({
     fields: searchFields.address
   }
 })
-
