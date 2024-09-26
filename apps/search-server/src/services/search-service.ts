@@ -55,9 +55,7 @@ const processError = (err: any): Error => {
 
 export const searchForHexAddress = async (value: string) => {
   const isHash = avnHashRegex.test(value)
-  const publicKey = isHash ? value : decodeAccountToHex(value)
-
-  return await searchForHash(publicKey)
+  if (isHash) return await searchForHash(value)
 }
 
 async function performSearch(queryFunction: (value: string[]) => EsQuery, value: string[]) {
@@ -78,7 +76,7 @@ export const searchForHash = async (
     let items = []
     if (!data.hits.hits.length) {
       data = await performSearch(getMultiSearchAddressQuery, [value])
-      items = [{ type: 'address' as 'address', publicKey: value }]
+      items = [{ type: 'address' as 'address', hash: value }]
     } else {
       items = data.hits.hits.map(hit => {
         const isBlock = hit._index === config.db.blocksIndex
