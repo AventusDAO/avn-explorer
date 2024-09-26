@@ -8,7 +8,7 @@ interface ISearchResultItem extends EsItem {
 }
 
 interface SearchAddress {
-  publicKey: string
+  hash: string
 }
 
 export interface SearchResultBlock extends ISearchResultItem, SearchBlock {}

@@ -76,7 +76,7 @@ export const searchForHash = async (
     let items = []
     if (!data.hits.hits.length) {
       data = await performSearch(getMultiSearchAddressQuery, [value])
-      items = [{ type: 'address' as 'address', publicKey: value }]
+      items = [{ type: 'address' as 'address', hash: value }]
     } else {
       items = data.hits.hits.map(hit => {
         const isBlock = hit._index === config.db.blocksIndex
