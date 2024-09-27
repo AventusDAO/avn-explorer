@@ -39,7 +39,9 @@ const accountKeyring = new Keyring({ type: 'sr25519' })
 
 /** gets hex pk for given ss58 address */
 export function decodeAccountToHex(encodedAddress: string): string {
-  return u8aToHex(accountKeyring.decodeAddress(encodedAddress))
+  const isVow = process.env.VOW_MODE === 'true'
+  const prefix = isVow ? 2024 : 42
+  return u8aToHex(accountKeyring.decodeAddress(encodedAddress, undefined, prefix))
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -55,7 +57,8 @@ const processError = (err: any): Error => {
 
 export const searchForHexAddress = async (value: string) => {
   const isHash = avnHashRegex.test(value)
-  if (isHash) return await searchForHash(value)
+  const pk = isHash ? value : decodeAccountToHex(value)
+  return await searchForHash(pk)
 }
 
 async function performSearch(queryFunction: (value: string[]) => EsQuery, value: string[]) {
