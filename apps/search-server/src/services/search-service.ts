@@ -39,7 +39,7 @@ const accountKeyring = new Keyring({ type: 'sr25519' })
 
 /** gets hex pk for given ss58 address */
 export function decodeAccountToHex(encodedAddress: string): string {
-  const isAventus = process.env.VOW_MODE === 'true'
+  const isVow = process.env.VOW_MODE === 'true'
   const prefix = isAventus ? 2024 : 42
   return u8aToHex(accountKeyring.decodeAddress(encodedAddress, undefined, prefix))
 }
