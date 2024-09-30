@@ -32,7 +32,6 @@ import {
   SystemAccountStorage
 } from './types/generated/parachain-testnet/storage'
 import { Block, ChainContext } from './types/generated/parachain-testnet/support'
-import { encodeId } from '@avn/utils'
 import { processEncodedMigratedAccountData } from './migratedDataParser'
 import { UnknownVersionError } from '@avn/types'
 
@@ -102,13 +101,14 @@ async function processBalances(ctx: Context): Promise<void> {
     }
     if (lastStateTimestamp) {
       if (block.header.timestamp - lastStateTimestamp >= SAVE_PERIOD) {
-        const accountIdsU8 = [...accountIdsHex].map(id => decodeHex(id))
+        const accountIdsArr = [...accountIdsHex]
+        const accountIdsU8 = accountIdsArr.map(id => decodeHex(id))
         balances = await getBalances(ctx, block.header, accountIdsU8)
         if (!balances) {
           ctx.log.warn('No balances')
         }
 
-        await saveAccounts(ctx, block.header, accountIdsU8, balances)
+        await saveAccounts(ctx, block.header, accountIdsArr, balances)
         await saveRegularChainState(ctx, block.header)
 
         lastStateTimestamp = block.header.timestamp
@@ -116,27 +116,27 @@ async function processBalances(ctx: Context): Promise<void> {
       }
     }
   }
-
+  const accountIdsArr = [...accountIdsHex]
   const block = ctx.blocks[ctx.blocks.length - 1]
-  const accountIdsU8 = [...accountIdsHex].map(id => decodeHex(id))
+  const accountIdsU8 = accountIdsArr.map(id => decodeHex(id))
   balances = await getBalances(ctx, block.header, accountIdsU8)
 
-  await saveAccounts(ctx, block.header, accountIdsU8, balances)
-  await saveBalances(ctx, block.header, accountIdsU8, balances)
+  await saveAccounts(ctx, block.header, accountIdsArr, balances)
+  await saveBalances(ctx, block.header, accountIdsArr, balances)
   await saveCurrentChainState(ctx, block.header)
 }
 
 async function saveAccounts(
   ctx: Context,
   block: SubstrateBlock,
-  accountIds: Uint8Array[],
+  accountIds: string[],
   balances?: IBalance[]
 ) {
   const accounts = new Map<string, Account>()
   const deletions = new Map<string, Account>()
 
   for (let i = 0; i < accountIds.length; i++) {
-    const id = encodeId(accountIds[i])
+    const id = accountIds[i]
     const balance = balances?.[i]
 
     if (!balance) continue
@@ -163,13 +163,12 @@ async function saveAccounts(
 async function saveBalances(
   ctx: Context,
   block: SubstrateBlock,
-  accountIds: Uint8Array[],
+  accountIds: string[],
   balances?: IBalance[]
 ) {
   const balancesMap: { [id: string]: Balance } = {}
   const accountBalances = await Promise.all(
-    accountIds.map(async id => {
-      const accountId = encodeId(id)
+    accountIds.map(async accountId => {
       return await ctx.store.findOne(Balance, {
         where: { accountId },
         order: { updatedAt: 'DESC' }
@@ -178,13 +177,13 @@ async function saveBalances(
   )
 
   for (let i = 0; i < accountIds.length; i++) {
-    const id = encodeId(accountIds[i])
+    const id = accountIds[i]
     const balance = balances?.[i]
 
     if (!balance) continue
 
     const total = balance.free + balance.reserved
-    const dbBalance = accountBalances.find(a => a?.accountId === id)
+    const dbBalance = accountBalances.find((a: any) => a?.accountId === id)
 
     if (dbBalance && total === dbBalance.total) {
       continue
@@ -227,11 +226,9 @@ async function processBalancesCallItem(
           balances.push(migratedAccount.balance)
         }
       }
-
-      const accountIdsU8 = [...accountIdsHex].map(id => decodeHex(id))
-      // const block = ctx.blocks[ctx.blocks.length - 1]
-      await saveAccounts(ctx, block, accountIdsU8, balances)
-      await saveBalances(ctx, block, accountIdsU8, balances)
+      const accountIdsArr = [...accountIdsHex]
+      await saveAccounts(ctx, block, accountIdsArr, balances)
+      await saveBalances(ctx, block, accountIdsArr, balances)
       await saveCurrentChainState(ctx, block)
       break
     }
@@ -348,7 +345,13 @@ async function getSystemAccountBalances(
   const storage = new StorageClass.SystemAccountStorage(ctx, block)
   if (!storage.isExists) return undefined
 
-  if ('isV60' in storage && storage.isV60) {
+  if ('isV4' in storage && storage.isV4) {
+    const data = await storage.asV4.getMany(accounts)
+    return data.map(d => ({
+      free: d.data.free,
+      reserved: d.data.reserved
+    })) as IBalance[]
+  } else if ('isV60' in storage && storage.isV60) {
     const data = await storage.asV60.getMany(accounts)
     return data.map(d => ({
       free: d.data.free,
