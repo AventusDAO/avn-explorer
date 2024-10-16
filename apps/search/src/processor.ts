@@ -151,6 +151,7 @@ const mapExtrinsics = (block: BatchBlock<Item>): SearchExtrinsic[] => {
       let proxyRelayer: string | undefined
       let from: string | undefined
       let to: string | undefined
+      let proxyPayer: string | undefined
       if (item.name === 'AvnProxy.proxy') {
         const proxyArgs = item.call.args as ProxyCallArgs<unknown>
         proxySigner = proxyArgs.call.value.proof.signer
@@ -158,6 +159,7 @@ const mapExtrinsics = (block: BatchBlock<Item>): SearchExtrinsic[] => {
         proxyCallSection = proxyArgs.call.__kind
         proxyCallMethod = proxyArgs.call.value.__kind
         proxyRecipient = proxyArgs.paymentInfo.recipient
+        proxyPayer = proxyArgs.paymentInfo.payer
         from = proxyArgs.call.value?.from
         to = proxyArgs.call.value?.to
       }
@@ -180,6 +182,7 @@ const mapExtrinsics = (block: BatchBlock<Item>): SearchExtrinsic[] => {
         proxyCallSection,
         proxyCallMethod,
         proxyRecipient,
+        proxyPayer,
         from,
         to
       }

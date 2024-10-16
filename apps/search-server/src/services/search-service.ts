@@ -30,7 +30,7 @@ const defaultSort: EsSortItem = { timestamp: EsSortDirection.Desc }
  * Predefined search fields used for search so far
  */
 const searchFields: Record<string, EsSearchFields> = {
-  address: ['from', 'to', 'proxyRecipient', 'signer', 'proxySigner', 'proxyRelayer'],
+  address: ['from', 'to', 'proxyRecipient', 'signer', 'proxySigner', 'proxyRelayer', 'proxyPayer'],
   hash: ['hash']
 }
 
