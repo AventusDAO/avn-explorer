@@ -12,6 +12,11 @@ export interface SearchExtrinsic extends EsItem {
   signer: string
   nonce: number
   proxySigner?: string
+  proxyRelayer?: string
   proxyCallSection?: string
   proxyCallMethod?: string
+  proxyRecipient?: string
+  proxyPayer?: string
+  from?: string
+  to?: string
 }
