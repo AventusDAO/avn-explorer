@@ -102,7 +102,7 @@ async function getTokenManagerData(
 ): Promise<bigint> {
   const storage = new TokenManagerBalancesStorage(ctx, block)
 
-  return await storage.asV31.get([tokenId, accountId])
+  return await storage.asV58.get([tokenId, accountId])
 }
 
 export function extractPublicKey(tuple: string): string {
