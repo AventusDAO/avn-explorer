@@ -13,15 +13,15 @@ export class TokenManagerBalancesStorage extends StorageBase {
     /**
      *  The number of units of tokens held by any given account.
      */
-    get isV31(): boolean {
+    get isV58(): boolean {
         return this.getTypeHash() === '70874cd5f158184b9b398819cb71b85684c5adb4e5cc9e1065d1115dac23d5f2'
     }
 
     /**
      *  The number of units of tokens held by any given account.
      */
-    get asV31(): TokenManagerBalancesStorageV31 {
-        assert(this.isV31)
+    get asV58(): TokenManagerBalancesStorageV58 {
+        assert(this.isV58)
         return this as any
     }
 }
@@ -29,7 +29,7 @@ export class TokenManagerBalancesStorage extends StorageBase {
 /**
  *  The number of units of tokens held by any given account.
  */
-export interface TokenManagerBalancesStorageV31 {
+export interface TokenManagerBalancesStorageV58 {
     get(key: [Uint8Array, Uint8Array]): Promise<bigint>
     getAll(): Promise<bigint[]>
     getMany(keys: [Uint8Array, Uint8Array][]): Promise<bigint[]>
