@@ -1,6 +1,6 @@
 {
-  "outDir": "../src/types/generated/parachain-dev",
-  "specVersions": "../../../packages/metadata/versions.avn-parachain.dev.jsonl",
+  "outDir": "../src/types/generated/parachain-testnet",
+  "specVersions": "../../../packages/metadata/versions.avn-parachain.testnet.jsonl",
   "events": [
     "TokenManager.TokenLifted",
     "TokenManager.TokenTransferred",
