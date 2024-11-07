@@ -4,12 +4,8 @@ import {
   TokenManagerTokenLoweredEvent,
   TokenManagerTokenTransferredEvent
 } from '../types/generated/parachain-dev/events'
-import {
-  TokenManagerTokenLoweredEvent as TestnetTokenManagerTokenLoweredEvent
-} from '../types/generated/parachain-testnet/events'
-import {
-  TokenManagerTokenLoweredEvent as MainnetTokenManagerTokenLoweredEvent
-} from '../types/generated/parachain-mainnet/events'
+import { TokenManagerTokenLoweredEvent as TestnetTokenManagerTokenLoweredEvent } from '../types/generated/parachain-testnet/events'
+import { TokenManagerTokenLoweredEvent as MainnetTokenManagerTokenLoweredEvent } from '../types/generated/parachain-mainnet/events'
 import { UnknownVersionError } from '@avn/types'
 
 export const getTokenLoweredEventVersion = () => {
