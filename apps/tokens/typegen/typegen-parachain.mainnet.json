@@ -1,0 +1,33 @@
+{
+  "outDir": "../src/types/generated/parachain-mainnet",
+  "specVersions": "../../../packages/metadata/versions.avn-parachain.mainnet.jsonl",
+  "events": [
+    "Balances.Transfer",
+    "Balances.Endowed",
+    "Balances.BalanceSet",
+    "Balances.Reserved",
+    "Balances.Unreserved",
+    "Balances.ReserveRepatriated",
+    "Balances.Deposit",
+    "Balances.Withdraw",
+    "Balances.Slashed",
+    "EthBridge.EventAccepted",
+    "EthBridge.EventRejected",
+    "TokenManager.TokenLifted",
+    "TokenManager.TokenTransferred",
+    "TokenManager.TokenLowered",
+    "TokenManager.AvtLowered",
+    "TokenManager.AVTLifted",
+    "TokenManager.LowerRequested",
+    "NftManager.BatchCreated",
+    "NftManager.SingleNftMinted",
+    "NftManager.BatchNftMinted",
+    "NftManager.FiatNftTransfer",
+    "NftManager.EthNftTransfer",
+    "Scheduler.Scheduled",
+    "Scheduler.Dispatched",
+    "Scheduler.Canceled"
+  ],
+  "calls": [],
+  "storage": ["TokenManager.Balances", "System.Account", "Balances.Account"]
+}

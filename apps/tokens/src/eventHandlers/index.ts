@@ -4,13 +4,43 @@ import {
   TokenManagerTokenLoweredEvent,
   TokenManagerTokenTransferredEvent
 } from '../types/generated/parachain-dev/events'
+import { TokenManagerTokenLoweredEvent as TestnetTokenManagerTokenLoweredEvent } from '../types/generated/parachain-testnet/events'
+import { TokenManagerTokenLoweredEvent as MainnetTokenManagerTokenLoweredEvent } from '../types/generated/parachain-mainnet/events'
 import { UnknownVersionError } from '@avn/types'
 
-export const getTokenLowerData = (ctx: ChainContext, event: Event): RawTokenBalanceData => {
-  const data = new TokenManagerTokenLoweredEvent(ctx, event)
+export const getTokenLoweredEventVersion = () => {
+  switch (process.env.ENV) {
+    case 'dev':
+      return TokenManagerTokenLoweredEvent
+    case 'testnet':
+      return TestnetTokenManagerTokenLoweredEvent
+    case 'mainnet':
+      return MainnetTokenManagerTokenLoweredEvent
+    default:
+      return TokenManagerTokenLoweredEvent
+  }
+}
 
-  if (data.isV58) {
+export const getTokenLowerData = (ctx: ChainContext, event: Event): RawTokenBalanceData => {
+  const TokenLoweredEventClass = getTokenLoweredEventVersion()
+  const data = new TokenLoweredEventClass(ctx, event)
+
+  if ('isV58' in data && data.isV58) {
     const v10Data = data.asV58
+    return {
+      tokenId: v10Data.tokenId,
+      accountId: v10Data.recipient,
+      amount: v10Data.amount
+    }
+  } else if ('isV70' in data && data.isV70) {
+    const v10Data = data.asV70
+    return {
+      tokenId: v10Data.tokenId,
+      accountId: v10Data.recipient,
+      amount: v10Data.amount
+    }
+  } else if ('isV57' in data && data.isV57) {
+    const v10Data = data.asV57
     return {
       tokenId: v10Data.tokenId,
       accountId: v10Data.recipient,
