@@ -22,8 +22,8 @@ export const getTokenLoweredEventVersion = () => {
 }
 
 export const getTokenLowerData = (ctx: ChainContext, event: Event): RawTokenBalanceData => {
-  const tokenLoweredEventClass = getTokenLoweredEventVersion()
-  const data = new tokenLoweredEventClass(ctx, event)
+  const TokenLoweredEventClass = getTokenLoweredEventVersion()
+  const data = new TokenLoweredEventClass(ctx, event)
 
   if ('isV58' in data && data.isV58) {
     const v10Data = data.asV58
