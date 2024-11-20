@@ -18,7 +18,16 @@ export interface ExtrinsicDataQuery {
 const getTransactionsForAddressQuery = (value: string): EsQuery => ({
   multi_match: {
     query: value,
-    fields: ['from', 'to', 'proxyRecipient', 'signer', 'proxySigner', 'proxyRelayer', 'proxyPayer']
+    fields: [
+      'from',
+      'to',
+      'proxyRecipient',
+      'signer',
+      'proxySigner',
+      'proxyRelayer',
+      'proxyPayer',
+      'proxyOwner'
+    ]
   }
 })
 
