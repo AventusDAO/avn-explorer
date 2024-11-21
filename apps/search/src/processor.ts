@@ -161,9 +161,15 @@ const mapExtrinsics = (block: BatchBlock<Item>): SearchExtrinsic[] => {
         proxyCallMethod = proxyArgs.call.value.__kind
         proxyRecipient = proxyArgs.paymentInfo.recipient
         proxyPayer = proxyArgs.paymentInfo.payer
-        proxyOwner = proxyArgs.call.value.owner
         from = proxyArgs.call.value?.from
         to = proxyArgs.call.value?.to
+      } else if (item.name === 'NftManager.proxy') {
+        const proxyArgs = item.call.args as ProxyCallArgs<unknown>
+        proxySigner = proxyArgs.call.value.proof.signer
+        proxyRelayer = proxyArgs.call.value.proof.relayer
+        proxyCallSection = proxyArgs.call.__kind
+        proxyCallMethod = proxyArgs.call.value.__kind
+        proxyOwner = proxyArgs.call.value?.owner
       }
 
       return {
