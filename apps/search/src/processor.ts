@@ -36,6 +36,26 @@ const processor = getProcessor()
       }
     }
   } as const)
+  .addCall('NftManager.proxy', {
+    data: {
+      call: {
+        args: true,
+        error: true,
+        origin: false,
+        parent: false // fetch parent call data
+      },
+      extrinsic: {
+        signature: true,
+        success: true,
+        fee: false,
+        tip: false,
+        call: false,
+        calls: false,
+        events: false,
+        hash: true
+      }
+    }
+  } as const)
   // NOTE: keep the data as small as possible for wildcard '*' queries.
   // otherwise you might overload the archive gateway and see pool timeouts
   .addCall('*', {
@@ -104,96 +124,75 @@ const mapBlockBatch = (block: BatchBlock<Item>, extrinsics: SearchExtrinsic[]): 
 }
 
 const mapExtrinsics = (block: BatchBlock<Item>): SearchExtrinsic[] => {
-  const blockHeader: SubstrateBlock = block.header
-  const { height, timestamp } = blockHeader
+  const { height: blockHeight, timestamp } = block.header
   const chainGen = mapChainGen(block)
 
-  // find AvnProxy.InnerCallFailed events in the block, to be used for determining extrinsic success status
-  const innerCallFailedEvents = block.items.filter(
-    item => item.kind === 'event' && (item.event.name as string) === 'AvnProxy.InnerCallFailed'
+  const innerCallFailedEvents = new Set(
+    block.items
+      .filter((item: any) => item.kind === 'event' && item.event.name === 'AvnProxy.InnerCallFailed')
+      .map((event: any) => event.event.call?.id)
   )
 
   return block.items
-    .filter(item => item.kind === 'call')
-    .reduce((array, item) => {
-      // just for type safety
-      if (item.kind !== 'call') throw new Error(`item must be of 'call' kind`)
-      // reduce the items array to a smaller array based on the extrinsic.id of the call
-      // to get unique extrinsic items / avoid duplicating fees in utility.batchAll extrinsic
-      const hasSameExtrinsicAlready =
-        array.filter(i => i.kind === 'call' && i.extrinsic.id === item.extrinsic.id).length > 0
-      if (!hasSameExtrinsicAlready) array.push(item)
-      return array
-    }, new Array<Item>())
-    .map(item => {
-      // just for type safety
-      if (item.kind !== 'call') throw new Error(`item must be of 'call' kind`)
-      const name = item.call.name
-      const [section, method] = name.split('.')
+    .reduce((acc: any, item: any) => {
+      if (item.kind !== 'call') return acc
+      return acc.some((i: any) => i.extrinsic.id === item.extrinsic.id) ? acc : [...acc, item]
+    }, [])
+    .map((item: any) => {
+      const [section, method] = item.call.name.split('.')
+      const { signature, success: isProcessed, hash, id: refId } = item.extrinsic
+      const isSuccess = isProcessed && !innerCallFailedEvents.has(item.call.id)
 
-      const signature = item.extrinsic.signature
-      const isSigned = !!signature
-      const signer = signature?.address?.value
-      const nonce = signature?.signedExtensions?.CheckNonce
-      const isProcessed = item.extrinsic.success
-
-      const innerFailedEvent = innerCallFailedEvents.find(event => {
-        if (event.kind !== 'event') return undefined
-        if (event.event.call?.id === item.call.id) return event
-        return undefined
-      })
-      const isSuccess = isProcessed && innerFailedEvent === undefined
-
-      let proxySigner: string | undefined
-      let proxyCallSection: string | undefined
-      let proxyCallMethod: string | undefined
-      let proxyRecipient: string | undefined
-      let proxyRelayer: string | undefined
-      let from: string | undefined
-      let to: string | undefined
-      let proxyPayer: string | undefined
-      let proxyOwner: string | undefined
+      let proxyData = {}
       if (item.name === 'AvnProxy.proxy') {
-        const proxyArgs = item.call.args as ProxyCallArgs<unknown>
-        proxySigner = proxyArgs.call.value.proof.signer
-        proxyRelayer = proxyArgs.call.value.proof.relayer
-        proxyCallSection = proxyArgs.call.__kind
-        proxyCallMethod = proxyArgs.call.value.__kind
-        proxyRecipient = proxyArgs.paymentInfo.recipient
-        proxyPayer = proxyArgs.paymentInfo.payer
-        from = proxyArgs.call.value?.from
-        to = proxyArgs.call.value?.to
-      } else if (item.name === 'NftManager.proxy') {
-        const proxyArgs = item.call.args as ProxyCallArgs<unknown>
-        proxySigner = proxyArgs.call.value.proof.signer
-        proxyRelayer = proxyArgs.call.value.proof.relayer
-        proxyCallSection = proxyArgs.call.__kind
-        proxyCallMethod = proxyArgs.call.value.__kind
-        proxyOwner = proxyArgs.call.value?.owner
+        const args = item.call.args as ProxyCallArgs<unknown>
+        const { call, paymentInfo } = args
+        if (call.__kind.toLowerCase().includes('nft')) {
+          console.log("HELP !!! AvnProxy args", call)
+        }
+        proxyData = {
+          proxySigner: call.value.proof.signer,
+          proxyRelayer: call.value.proof.relayer,
+          proxyCallSection: call.__kind,
+          proxyCallMethod: call.value.__kind,
+          proxyRecipient: paymentInfo.recipient,
+          proxyPayer: paymentInfo.payer,
+          from: call.value?.from,
+          to: call.value?.to
+        }
+      } else if (item.name === 'NftManager.proxy') { // TODO: remove this block when highlander is decomissioned
+        const args = item.call.args as ProxyCallArgs<unknown>
+        if (args) {
+          const { call, paymentInfo } = args
+          if (['signed_mint_batch_nft', 'signed_transfer_fiat_nft'].includes(call.value.__kind)) {
+            console.log("HELP !!! NftManager args: ", call)
+            proxyData = {
+              proxySigner: call.value.proof.signer,
+              proxyRelayer: call.value.proof.relayer,
+              proxyCallSection: call.__kind,
+              proxyCallMethod: call.value.__kind,
+              nftManagerProxyOwner: (call.value?.owner || call.value?.newOwner),
+              from: call.value?.from,
+              to: call.value?.to
+            }
+          }
+        }
       }
 
       return {
-        refId: item.extrinsic.id,
+        refId,
         timestamp,
         chainGen,
-        blockHeight: height,
-        hash: item.extrinsic.hash,
+        blockHeight,
+        hash,
         section,
         method,
-        isSigned,
+        isSigned: !!signature,
         isProcessed,
         isSuccess,
-        signer,
-        nonce,
-        proxySigner,
-        proxyRelayer,
-        proxyCallSection,
-        proxyCallMethod,
-        proxyRecipient,
-        proxyPayer,
-        proxyOwner,
-        from,
-        to
+        signer: signature?.address?.value,
+        nonce: signature?.signedExtensions?.CheckNonce,
+        ...proxyData
       }
     })
 }
