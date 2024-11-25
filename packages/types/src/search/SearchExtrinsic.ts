@@ -17,6 +17,7 @@ export interface SearchExtrinsic extends EsItem {
   proxyCallMethod?: string
   proxyRecipient?: string
   proxyPayer?: string
+  nftManagerProxyOwner?: string
   from?: string
   to?: string
 }
