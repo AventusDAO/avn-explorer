@@ -6,8 +6,7 @@ export interface ProxyCallArgs<A> {
       proof: ProxyCallProof
       from?: string
       to?: string
-      owner?: string
-      newOwner?: string
+      t2TransferToPublicKey?: string
     }
   }
   paymentInfo: {

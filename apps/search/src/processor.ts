@@ -174,7 +174,7 @@ const mapExtrinsics = (block: BatchBlock<Item>): SearchExtrinsic[] => {
               proxyRelayer: call.value.proof.relayer,
               proxyCallSection: call.__kind,
               proxyCallMethod: call.value.__kind,
-              nftManagerProxyOwner: call.value?.owner || call.value?.newOwner,
+              nftManagerProxyOwner: call.value?.t2TransferToPublicKey,
               from: call.value?.from,
               to: call.value?.to
             }
