@@ -129,7 +129,9 @@ const mapExtrinsics = (block: BatchBlock<Item>): SearchExtrinsic[] => {
 
   const innerCallFailedEvents = new Set(
     block.items
-      .filter((item: any) => item.kind === 'event' && item.event.name === 'AvnProxy.InnerCallFailed')
+      .filter(
+        (item: any) => item.kind === 'event' && item.event.name === 'AvnProxy.InnerCallFailed'
+      )
       .map((event: any) => event.event.call?.id)
   )
 
@@ -148,7 +150,7 @@ const mapExtrinsics = (block: BatchBlock<Item>): SearchExtrinsic[] => {
         const args = item.call.args as ProxyCallArgs<unknown>
         const { call, paymentInfo } = args
         if (call.__kind.toLowerCase().includes('nft')) {
-          console.log("HELP !!! AvnProxy args", call)
+          console.log('HELP !!! AvnProxy args', call)
         }
         proxyData = {
           proxySigner: call.value.proof.signer,
@@ -160,18 +162,19 @@ const mapExtrinsics = (block: BatchBlock<Item>): SearchExtrinsic[] => {
           from: call.value?.from,
           to: call.value?.to
         }
-      } else if (item.name === 'NftManager.proxy') { // TODO: remove this block when highlander is decomissioned
+      } else if (item.name === 'NftManager.proxy') {
+        // TODO: remove this block when highlander is decomissioned
         const args = item.call.args as ProxyCallArgs<unknown>
         if (args) {
           const { call, paymentInfo } = args
           if (['signed_mint_batch_nft', 'signed_transfer_fiat_nft'].includes(call.value.__kind)) {
-            console.log("HELP !!! NftManager args: ", call)
+            console.log('HELP !!! NftManager args: ', call)
             proxyData = {
               proxySigner: call.value.proof.signer,
               proxyRelayer: call.value.proof.relayer,
               proxyCallSection: call.__kind,
               proxyCallMethod: call.value.__kind,
-              nftManagerProxyOwner: (call.value?.owner || call.value?.newOwner),
+              nftManagerProxyOwner: call.value?.owner || call.value?.newOwner,
               from: call.value?.from,
               to: call.value?.to
             }
