@@ -149,9 +149,6 @@ const mapExtrinsics = (block: BatchBlock<Item>): SearchExtrinsic[] => {
       if (item.name === 'AvnProxy.proxy') {
         const args = item.call.args as ProxyCallArgs<unknown>
         const { call, paymentInfo } = args
-        if (call.__kind.toLowerCase().includes('nft')) {
-          console.log('HELP !!! AvnProxy args', call)
-        }
         proxyData = {
           proxySigner: call.value.proof.signer,
           proxyRelayer: call.value.proof.relayer,
@@ -168,7 +165,6 @@ const mapExtrinsics = (block: BatchBlock<Item>): SearchExtrinsic[] => {
         if (args) {
           const { call, paymentInfo } = args
           if (['signed_mint_batch_nft', 'signed_transfer_fiat_nft'].includes(call.value.__kind)) {
-            console.log('HELP !!! NftManager args: ', call)
             proxyData = {
               proxySigner: call.value.proof.signer,
               proxyRelayer: call.value.proof.relayer,
