@@ -6,7 +6,7 @@ volumes:
 
 services:
   db:
-    image: postgres:14 # CockroachDB cluster might be a better fit for production deployment
+    image: postgres:14
     restart: always
     volumes:
       - db-data:/var/lib/postgresql/data
@@ -16,17 +16,17 @@ services:
       POSTGRES_DB: ${DB_NAME}
     ports:
       - '${DB_PORT}:5432'
+    networks:
+      avn-archive:
+        aliases:
+          - database
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U ${DB_USER} -d ${DB_NAME}']
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
-  # PG Admin is optional.
-  pgadmin:
-    container_name: pgadmin_container
-    image: dpage/pgadmin4
-    environment:
-      PGADMIN_DEFAULT_EMAIL: pgadmin4@pgadmin.org
-      PGADMIN_DEFAULT_PASSWORD: admin
-      PGADMIN_CONFIG_SERVER_MODE: 'False'
-    volumes:
-      - pgadmin-data:/var/lib/pgadmin
-    ports:
-      - '5544:80'
-    restart: unless-stopped
+networks:
+  avn-archive:
+    name: avn-archive-net
+    driver: bridge

@@ -9,6 +9,7 @@ import { TokenManagerTokenLoweredEvent as MainnetTokenManagerTokenLoweredEvent }
 import { UnknownVersionError } from '@avn/types'
 
 export const getTokenLoweredEventVersion = () => {
+  console.log("HELP !!!", process.env.ENV)
   switch (process.env.ENV) {
     case 'dev':
       return TokenManagerTokenLoweredEvent

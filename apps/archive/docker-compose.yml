@@ -6,20 +6,18 @@ services:
     image: subsquid/substrate-ingest:firesquid
     volumes:
       - ./../../packages/metadata/avn-types.json:/app/avn-types.json
-    command: [
+    command:
+      [
         '-e',
         '${AVN_NODE}',
-        # add another endpoint to increase archiving speed and reliability.
-        #  "-e", "wss://avn-parachain-2.dev.aventus.io",
-
         '-c',
-
-        '10', # allow up to 10 pending requests for the above endpoint (default is 5)
+        '10',
         '--out',
-        'postgres://${DB_USER}:${DB_PASS}@${DB_HOST}:${DB_PORT}/${DB_NAME}',
-        # custom types for the solochain
+        'postgres://${DB_USER}:${DB_PASS}@database:${DB_PORT}/${DB_NAME}',
         '--types-bundle',
-        '/app/avn-types.json'
+        '/app/avn-types.json',
+        '--start-block',
+        '4695107'
       ]
     networks:
       - avn-archive
@@ -30,15 +28,15 @@ services:
       DATABASE_MAX_CONNECTIONS: ${DATABASE_MAX_CONNECTIONS}
       DATABASE_STATEMENT_TIMEOUT: ${DATABASE_STATEMENT_TIMEOUT}
       RUST_LOG: 'actix_web=info,actix_server=info'
-    command: [
+    command:
+      [
         '--database-url',
-        'postgres://${DB_USER}:${DB_PASS}@${DB_HOST}:${DB_PORT}/${DB_NAME}',
+        'postgres://${DB_USER}:${DB_PASS}@database:${DB_PORT}/${DB_NAME}',
         '--database-max-connections',
         '20',
         '--database-statement-timeout',
         '30000',
         '--scan-max-value',
-        # default
         '100000'
       ]
     ports:
@@ -46,22 +44,17 @@ services:
     networks:
       - avn-archive
 
-  # Explorer service is optional.
-  # It provides rich GraphQL API for querying archived data.
-  # Many developers find it very useful for exploration and debugging.
   explorer:
     image: subsquid/substrate-explorer:firesquid
     environment:
-      DB_TYPE: postgres # set to `cockroach` for Cockroach DB
-      DB_HOST: ${DB_HOST}
+      DB_TYPE: postgres
+      DB_HOST: database
       DB_PORT: ${DB_PORT}
       DB_NAME: ${DB_NAME}
       DB_USER: ${DB_USER}
       DB_PASS: ${DB_PASS}
-      # setup sensible limits for production
       GQL_DB_STATEMENT_TIMEOUT_MS: 5000
       GQL_MAX_ROOT_FIELDS: 10
-      # GQL_MAX_RESPONSE_NODES: 300000
     ports:
       - '${EXPLORER_PORT}:3000'
     networks:
@@ -69,3 +62,5 @@ services:
 
 networks:
   avn-archive:
+    name: avn-archive-net # Use the same network name as in the first file
+    external: true # This tells Docker this network is created elsewhere
