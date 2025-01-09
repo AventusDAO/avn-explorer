@@ -27,7 +27,7 @@ jobs:
     name: AvN Explorer Account Monitor
     uses: ./.github/workflows/docker-build.yml
     with:
-      runner: avn-runner
+      runner: avn-runner-ubuntu-2404-x64
       short_image_name: account-monitor
       ecr_repository_prefix: explorer
       aws_region: eu-west-1
@@ -39,10 +39,23 @@ jobs:
     if: ${{ github.event_name == 'workflow_dispatch' && github.ref_name == 'main' }}
     uses: ./.github/workflows/docker-build.yml
     with:
-      runner: avn-runner
+      runner: avn-runner-ubuntu-2204-x64
       config_creds: false
       short_image_name: account-monitor
       ecr_repository_prefix: explorer
       aws_region: us-east-1
       aws_account_id: 541507968610
+      dockerfile: apps/account-monitor/Dockerfile
+
+  vow-docker-build:
+    name: VOW Explorer Account Monitor
+    if: ${{ github.event_name == 'workflow_dispatch' && github.ref_name == 'main' }}
+    uses: ./.github/workflows/docker-build.yml
+    with:
+      runner: avn-runner-ubuntu-2404-x64
+      config_creds: false
+      short_image_name: account-monitor
+      ecr_repository_prefix: explorer
+      aws_region: eu-west-2
+      aws_account_id: 222634380664
       dockerfile: apps/account-monitor/Dockerfile
