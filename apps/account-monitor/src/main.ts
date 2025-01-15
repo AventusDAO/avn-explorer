@@ -236,10 +236,12 @@ async function getTransfers(
           await recordSchedulerEventData(ctx, block, item)
         }
       } else if (item.kind === 'call') {
+        if (process.env.PREDICTION_MARKETS_ENABLED) {
         // @ts-expect-error
         const signedCallName = item.call.args?.call?.__kind ? `${item.call.args?.call?.__kind}.${item?.call?.args?.call?.value?.__kind}` : ''
         if (predictionMarketCalls.includes(item.call.name) || predictionMarketCalls.includes(signedCallName)) {
           await processPredictionMarketCall(ctx, item, block.header)
+        }
         }
       }
 
