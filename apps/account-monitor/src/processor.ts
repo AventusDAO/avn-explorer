@@ -51,7 +51,7 @@ const tokenManagerEvents = [
   'TokenManager.TokenLifted',
   'TokenManager.TokenLowered',
   'TokenManager.AvtLowered',
-  'TokenManager.AVTLifted',
+  'TokenManager.AVTLifted'
 ]
 addEventsWithConfig(processor, tokenManagerEvents, standardEventConfig)
 
@@ -75,17 +75,10 @@ const nftEventsWithIndex = [
 
 addEventsWithConfig(processor, nftEventsWithIndex, standardEventConfig)
 
-const nftEvents = [
-  'NftManager.FiatNftTransfer',
-  'NftManager.EthNftTransfer'
-]
+const nftEvents = ['NftManager.FiatNftTransfer', 'NftManager.EthNftTransfer']
 addEventsWithConfig(processor, nftEvents, standardEventConfig)
 
-const schedulerEvents = [
-  'Scheduler.Scheduled',
-  'Scheduler.Dispatched',
-  'Scheduler.Canceled'
-]
+const schedulerEvents = ['Scheduler.Scheduled', 'Scheduler.Dispatched', 'Scheduler.Canceled']
 const schedulerConfig = {
   data: {
     event: {

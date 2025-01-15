@@ -110,7 +110,11 @@ async function recordNftTransferData(
   await ctx.store.insert(nftTransfers)
 }
 
-async function recordSchedulerEventData(ctx: Ctx, block: { items: any[] }, item: any): Promise<void> {
+async function recordSchedulerEventData(
+  ctx: Ctx,
+  block: { items: any[] },
+  item: any
+): Promise<void> {
   if (item.kind !== 'event') return
 
   const events = block.items.filter((i: any) => i.kind === 'event')
@@ -118,7 +122,9 @@ async function recordSchedulerEventData(ctx: Ctx, block: { items: any[] }, item:
     item.name === 'Scheduler.Scheduled' &&
     events.some((e: any) => e.kind === 'event' && e.name === 'TokenManager.LowerRequested')
   ) {
-    const scheduledEvent = events.find((e: any) => e.kind === 'event' && e.name === 'TokenManager.LowerRequested')
+    const scheduledEvent = events.find(
+      (e: any) => e.kind === 'event' && e.name === 'TokenManager.LowerRequested'
+    )
     if (!scheduledEvent || scheduledEvent.kind !== 'event') return
 
     const record = new ScheduledLowerTransaction()
@@ -237,14 +243,18 @@ async function getTransfers(
         }
       } else if (item.kind === 'call') {
         if (process.env.PREDICTION_MARKETS_ENABLED) {
-        // @ts-expect-error
-        const signedCallName = item.call.args?.call?.__kind ? `${item.call.args?.call?.__kind}.${item?.call?.args?.call?.value?.__kind}` : ''
-        if (predictionMarketCalls.includes(item.call.name) || predictionMarketCalls.includes(signedCallName)) {
-          await processPredictionMarketCall(ctx, item, block.header)
-        }
+          // @ts-expect-error
+          const signedCallName = item.call.args?.call?.__kind
+            ? `${item.call.args?.call?.__kind}.${item?.call?.args?.call?.value?.__kind}`
+            : ''
+          if (
+            predictionMarketCalls.includes(item.call.name) ||
+            predictionMarketCalls.includes(signedCallName)
+          ) {
+            await processPredictionMarketCall(ctx, item, block.header)
+          }
         }
       }
-
     }
 
     await processMappingData(
@@ -273,8 +283,6 @@ async function getTransfers(
     )
   }
 }
-
-
 
 async function processMappingData(
   ctx: Ctx,
@@ -333,7 +341,7 @@ function getEventTransferData(
   const payer = item.event?.call?.args?.paymentInfo?.payer
 
   const relayer =
-  // @ts-expect-error
+    // @ts-expect-error
     item.event?.call?.origin?.value?.value?.value || item.event?.call?.origin?.value?.value
 
   return {

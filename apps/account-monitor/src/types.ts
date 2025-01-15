@@ -61,19 +61,9 @@ const eventCategories = {
     'FiatNftTransfer',
     'EthNftTransfer'
   ],
-  scheduler: [
-    'Scheduled',
-    'Dispatched',
-    'Canceled'
-  ],
-  ethereum: [
-    'EthereumEventAdded',
-    'NftEthereumEventAdded'
-  ],
-  ethBridge: [
-    'EventRejected',
-    'EventAccepted'
-  ]
+  scheduler: ['Scheduled', 'Dispatched', 'Canceled'],
+  ethereum: ['EthereumEventAdded', 'NftEthereumEventAdded'],
+  ethBridge: ['EventRejected', 'EventAccepted']
 } as const
 
 // Generate fully qualified event names
