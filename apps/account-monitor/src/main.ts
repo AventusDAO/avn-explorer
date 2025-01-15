@@ -65,7 +65,7 @@ async function processEvents(ctx: Ctx): Promise<void> {
 
   const avtHash = getKeyByValue(tokenLookupMap, 'AVT')
   ctx.log.child('state').info(`getting transfers`)
-  await getTransfers(ctx, tokenLookupMap, avtHash || '')
+  await getTransfers(ctx, tokenLookupMap, avtHash ?? '')
   ctx.log.child('state').info(`recording at block`)
 }
 
