@@ -3,7 +3,8 @@ import { EventItem } from '@subsquid/substrate-processor/lib/interfaces/dataSele
 import { Store } from '@subsquid/typeorm-store'
 import processor from './processor'
 
-export interface TransferEventData {
+// Base transfer event interface
+export interface BaseTransferEvent {
   id: string
   blockNumber: number
   timestamp: Date
@@ -16,11 +17,13 @@ export interface TransferEventData {
   payer: Uint8Array | undefined
   nonce: bigint
 }
-export interface NftTransferEventData extends TransferEventData {
+
+// Specific transfer event types extending the base interface
+export interface NftTransferEventData extends BaseTransferEvent {
   nftId: string
 }
 
-export interface TokenTransferEventData extends TransferEventData {
+export interface TokenTransferEventData extends BaseTransferEvent {
   amount: bigint
   tokenName: string | undefined
   tokenId: Uint8Array
@@ -30,11 +33,75 @@ export interface TokenTransferEventData extends TransferEventData {
   lowerId: number | undefined
 }
 
-export type TransferData = TokenTransferEventData | NftTransferEventData | undefined
+// Consolidated event categories
+const eventCategories = {
+  balances: [
+    'Transfer',
+    'Endowed',
+    'BalanceSet',
+    'Reserved',
+    'Unreserved',
+    'ReserveRepatriated',
+    'Deposit',
+    'Withdraw',
+    'Slashed'
+  ],
+  tokenManager: [
+    'TokenTransferred',
+    'TokenLifted',
+    'TokenLowered',
+    'AvtLowered',
+    'AVTLifted',
+    'LowerRequested'
+  ],
+  nftManager: [
+    'BatchCreated',
+    'SingleNftMinted',
+    'BatchNftMinted',
+    'FiatNftTransfer',
+    'EthNftTransfer'
+  ],
+  scheduler: [
+    'Scheduled',
+    'Dispatched',
+    'Canceled'
+  ],
+  ethereum: [
+    'EthereumEventAdded',
+    'NftEthereumEventAdded'
+  ],
+  ethBridge: [
+    'EventRejected',
+    'EventAccepted'
+  ]
+} as const
 
+// Generate fully qualified event names
+const generateEventNames = (category: string, events: readonly string[]): string[] =>
+  events.map(event => `${category}.${event}`)
+
+// Export event name types and arrays
+export type EventName =
+  | `Balances.${typeof eventCategories.balances[number]}`
+  | `TokenManager.${typeof eventCategories.tokenManager[number]}`
+  | `NftManager.${typeof eventCategories.nftManager[number]}`
+
+export const schedulerEventNames = generateEventNames('Scheduler', eventCategories.scheduler)
+export const eventNames = [
+  ...generateEventNames('Balances', eventCategories.balances),
+  ...generateEventNames('TokenManager', eventCategories.tokenManager),
+  ...generateEventNames('NftManager', eventCategories.nftManager)
+]
+export const transactionEvents = [
+  ...generateEventNames('EthereumEvents', eventCategories.ethereum),
+  ...generateEventNames('EthBridge', eventCategories.ethBridge)
+]
+
+// Processor types
 export type Item = BatchProcessorItem<typeof processor>
 export type Ctx = BatchContext<Store, Item>
 
+// Event types
 export type TransfersEventItem = EventItem<
   EventName,
   {
@@ -46,93 +113,42 @@ export type TransfersEventItem = EventItem<
   }
 >
 
-export type EventNormalizers = {
-  [K in TransfersEventItem['name']]: EventNormalizer<Extract<TransfersEventItem, { name: K }>>
+// Token transfer normalizer return type
+type TokenTransferNormalized = {
+  from: Uint8Array | undefined
+  to: Uint8Array | undefined
+  amount: bigint
+  tokenId: Uint8Array
+  payer?: Uint8Array
+  lowerId?: number
+  scheduleName?: Uint8Array
+  senderNonce?: bigint | undefined
+  t1Recipient?: Uint8Array
 }
 
-export type EventName =
-  | 'Balances.Transfer'
-  | 'Balances.Endowed'
-  | 'Balances.BalanceSet'
-  | 'Balances.Reserved'
-  | 'Balances.Unreserved'
-  | 'Balances.ReserveRepatriated'
-  | 'Balances.Deposit'
-  | 'Balances.Withdraw'
-  | 'Balances.Slashed'
-  | 'TokenManager.TokenTransferred'
-  | 'TokenManager.TokenLifted'
-  | 'TokenManager.TokenLowered'
-  | 'TokenManager.AvtLowered'
-  | 'TokenManager.AVTLifted'
-  | 'TokenManager.LowerRequested'
-  | 'NftManager.BatchCreated'
-  | 'NftManager.SingleNftMinted'
-  | 'NftManager.BatchNftMinted'
-  | 'NftManager.FiatNftTransfer'
-  | 'NftManager.EthNftTransfer'
+// NFT transfer normalizer return type
+type NftTransferNormalized = {
+  from: Uint8Array | undefined
+  to: Uint8Array
+  nftId: bigint
+  totalSupply: number | bigint
+  payer?: Uint8Array
+}
 
-export const schedulerEventNames = [
-  'Scheduler.Scheduled',
-  'Scheduler.Dispatched',
-  'Scheduler.Canceled'
-]
-
-export const eventNames = [
-  'Balances.Transfer',
-  'Balances.Endowed',
-  'Balances.BalanceSet',
-  'Balances.Reserved',
-  'Balances.Unreserved',
-  'Balances.ReserveRepatriated',
-  'Balances.Deposit',
-  'Balances.Withdraw',
-  'Balances.Slashed',
-  'TokenManager.TokenTransferred',
-  'TokenManager.TokenLifted',
-  'TokenManager.TokenLowered',
-  'TokenManager.AvtLowered',
-  'TokenManager.AVTLifted',
-  'TokenManager.LowerRequested',
-  'NftManager.BatchCreated',
-  'NftManager.SingleNftMinted',
-  'NftManager.BatchNftMinted',
-  'NftManager.FiatNftTransfer',
-  'NftManager.EthNftTransfer'
-]
-
-export const transactionEvents = [
-  'EthereumEvents.EthereumEventAdded',
-  'EthereumEvents.NftEthereumEventAdded',
-  'EthBridge.EventRejected',
-  'EthBridge.EventAccepted'
-]
-
+// Event normalizer types
 export type EventNormalizer<T extends TransfersEventItem> = (
   ctx: Ctx,
   item: T,
   avtHash?: string
-) =>
-  | {
-      from: Uint8Array | undefined
-      to: Uint8Array | undefined
-      amount: bigint
-      tokenId: Uint8Array
-      payer?: Uint8Array
-      lowerId?: number
-      scheduleName?: Uint8Array
-      senderNonce?: bigint | undefined
-      t1Recipient?: Uint8Array
-    }
-  | {
-      from: Uint8Array | undefined
-      to: Uint8Array
-      nftId: bigint
-      totalSupply: number | bigint
-      payer?: Uint8Array
-    }
+) => TokenTransferNormalized | NftTransferNormalized
+
+export type EventNormalizers = {
+  [K in TransfersEventItem['name']]: EventNormalizer<Extract<TransfersEventItem, { name: K }>>
+}
 
 export type BalanceType = {
   free: bigint
   reserved: bigint
 }
+
+export type TransferData = TokenTransferEventData | NftTransferEventData | undefined

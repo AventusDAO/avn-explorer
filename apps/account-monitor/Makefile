@@ -33,5 +33,8 @@ typegen-testnet:
 typegen-parachain:
 	@yarn squid-substrate-typegen ./typegen/typegen-parachain.dev.json
 
+typegen-vow-testnet:
+	@yarn squid-substrate-typegen ./typegen/typegen-vow.testnet.json
+
 
 .PHONY: up down build process serve reset reprocess migrate migration codegen typegen-testnet typegen-parachain
