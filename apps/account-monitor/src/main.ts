@@ -245,7 +245,8 @@ async function getTransfers(
         if (process.env.PREDICTION_MARKETS_ENABLED) {
           // @ts-expect-error
           const signedCallName = item.call.args?.call?.__kind
-            ? `${item.call.args?.call?.__kind}.${item?.call?.args?.call?.value?.__kind}`
+            ? // @ts-expect-error
+              `${item.call.args?.call?.__kind}.${item?.call?.args?.call?.value?.__kind}`
             : ''
           if (
             predictionMarketCalls.includes(item.call.name) ||
