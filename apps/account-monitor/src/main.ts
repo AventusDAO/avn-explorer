@@ -10,10 +10,15 @@ import {
   AccountNft,
   NftTransfer,
   ScheduledLowerTransaction,
-  CrossChainTransactionEvent
+  CrossChainTransactionEvent,
+  PredictionMarketAssetTransfer,
+  PredictionMarketShareRedemption,
+  PredictionMarketTokenWithdrawal,
+  PredictionMarketTrade,
+  PredictionMarketCreation
 } from './model'
 import { randomUUID } from 'crypto'
-import processor from './processor'
+import processor, { predictionMarketCalls } from './processor'
 import {
   Ctx,
   eventNames,
@@ -21,8 +26,9 @@ import {
   TokenTransferEventData,
   transactionEvents,
   TransferData,
-  TransferEventData,
-  TransfersEventItem
+  BaseTransferEvent,
+  TransfersEventItem,
+  Item
 } from './types'
 import { getEvent } from './chainEventHandlers'
 import {
@@ -34,12 +40,13 @@ import {
   mapNftEntities,
   mapTokenEntities
 } from './mappingFuncitons'
+import { processPredictionMarketCall } from './chainCallHandlers'
 
-async function createTokenLookupMap(ctx: Ctx): Promise<Map<any, any>> {
+async function createTokenLookupMap(ctx: Ctx): Promise<Map<string, string>> {
   const tokenLookupData = await getTokenLookupData(ctx)
   const tokenLookupMap = new Map<string, string>()
 
-  tokenLookupData.forEach((token: any) => {
+  tokenLookupData.forEach((token: TokenLookup) => {
     tokenLookupMap.set(token.tokenId, token.tokenName)
   })
   return tokenLookupMap
@@ -58,7 +65,7 @@ async function processEvents(ctx: Ctx): Promise<void> {
 
   const avtHash = getKeyByValue(tokenLookupMap, 'AVT')
   ctx.log.child('state').info(`getting transfers`)
-  await getTransfers(ctx, tokenLookupMap, avtHash)
+  await getTransfers(ctx, tokenLookupMap, avtHash ?? '')
   ctx.log.child('state').info(`recording at block`)
 }
 
@@ -103,13 +110,23 @@ async function recordNftTransferData(
   await ctx.store.insert(nftTransfers)
 }
 
-async function recordSchedulerEventData(ctx: Ctx, block: any, item: any): Promise<void> {
+async function recordSchedulerEventData(
+  ctx: Ctx,
+  block: { items: any[] },
+  item: any
+): Promise<void> {
+  if (item.kind !== 'event') return
+
   const events = block.items.filter((i: any) => i.kind === 'event')
   if (
     item.name === 'Scheduler.Scheduled' &&
-    events.some((e: any) => e.name === 'TokenManager.LowerRequested')
+    events.some((e: any) => e.kind === 'event' && e.name === 'TokenManager.LowerRequested')
   ) {
-    const scheduledEvent = events.find((e: any) => e.name === 'TokenManager.LowerRequested')
+    const scheduledEvent = events.find(
+      (e: any) => e.kind === 'event' && e.name === 'TokenManager.LowerRequested'
+    )
+    if (!scheduledEvent || scheduledEvent.kind !== 'event') return
+
     const record = new ScheduledLowerTransaction()
     record.id = `${item.event.args.when}-${item.event.args.index}`
     record.name = item.name
@@ -125,21 +142,21 @@ async function recordSchedulerEventData(ctx: Ctx, block: any, item: any): Promis
       where: { id: `${item.event.args.task[0]}-${item.event.args.task[1]}` }
     })
     if (!record) {
-      console.log('No record was found')
+      ctx.log.info('No record was found')
       return
     }
     record.name = item.name
-    await ctx.store.upsert(record)
+    await ctx.store.save(record)
   } else if (item.name === 'Scheduler.Canceled') {
     const record = await ctx.store.findOne(ScheduledLowerTransaction, {
       where: { id: `${item.event.args.when}-${item.event.args.index}` }
     })
     if (!record) {
-      console.log('No record was found')
+      ctx.log.info('No record was found')
       return
     }
     record.name = item.name
-    await ctx.store.upsert(record)
+    await ctx.store.save(record)
   }
 }
 
@@ -148,6 +165,8 @@ async function processTransferEvent(
   transferEvent: any,
   block: SubstrateBlock
 ): Promise<void> {
+  if (transferEvent.kind !== 'event') return
+
   const {
     name,
     event: { args, extrinsic }
@@ -174,7 +193,7 @@ async function processTransferEvent(
   } else {
     transaction.args = args || {}
   }
-  await ctx.store.upsert(transaction)
+  await ctx.store.save(transaction)
 }
 
 async function getTransfers(
@@ -192,31 +211,53 @@ async function getTransfers(
     const nfts: Map<string, Nft> = new Map()
     const accountNfts: Map<string, AccountNft> = new Map()
     const nftTransfers: NftTransfer[] = []
-    for (const item of block.items) {
-      if (item.kind === 'event' && transactionEvents.includes(item.name)) {
-        await processTransferEvent(ctx, item, block.header)
-      }
 
-      if (item.kind === 'event' && eventNames.includes(item.name)) {
-        const transfer = getTransferData(
-          ctx,
-          block.header,
-          item as TransfersEventItem,
-          tokenLookupMap,
-          avtHash
-        )
-        if (
-          (transfer?.pallet === 'TokenManager' || transfer?.pallet === 'Balances') &&
-          'amount' in transfer
-        ) {
-          transfersData.push(transfer)
-        } else if (transfer?.pallet === 'NftManager' && 'nftId' in transfer) {
-          nftTransfersData.push(transfer)
+    for (const item of block.items) {
+      if (item.kind === 'event') {
+        if (transactionEvents.includes(item.name)) {
+          await processTransferEvent(ctx, item, block.header)
         }
-      } else if (item.kind === 'event' && item.name.toLowerCase().includes('scheduler')) {
-        await recordSchedulerEventData(ctx, block, item)
+
+        if (eventNames.includes(item.name)) {
+          // Check if the event has the required properties for TransfersEventItem
+
+          const transfer = getTransferData(
+            ctx,
+            block.header,
+            // @ts-expect-error
+            item as TransfersEventItem,
+            tokenLookupMap,
+            avtHash
+          )
+          if (
+            transfer &&
+            (transfer.pallet === 'TokenManager' || transfer.pallet === 'Balances') &&
+            'amount' in transfer
+          ) {
+            transfersData.push(transfer as TokenTransferEventData)
+          } else if (transfer && transfer.pallet === 'NftManager' && 'nftId' in transfer) {
+            nftTransfersData.push(transfer as NftTransferEventData)
+          }
+        } else if (item.name.toLowerCase().includes('scheduler')) {
+          await recordSchedulerEventData(ctx, block, item)
+        }
+      } else if (item.kind === 'call') {
+        if (process.env.PREDICTION_MARKETS_ENABLED) {
+          // @ts-expect-error
+          const signedCallName = item.call.args?.call?.__kind
+            ? // @ts-expect-error
+              `${item.call.args?.call?.__kind}.${item?.call?.args?.call?.value?.__kind}`
+            : ''
+          if (
+            predictionMarketCalls.includes(item.call.name) ||
+            predictionMarketCalls.includes(signedCallName)
+          ) {
+            await processPredictionMarketCall(ctx, item, block.header)
+          }
+        }
       }
     }
+
     await processMappingData(
       ctx,
       block.header,
@@ -230,6 +271,7 @@ async function getTransfers(
       nfts,
       accountNfts
     )
+
     await recordTransferData(
       ctx,
       accounts,
@@ -276,14 +318,15 @@ function getTransferData(
   avtHash: string
 ): TransferData {
   const event = getEvent(ctx, item, avtHash)
-  if (!event) throw new Error()
   const palletInfoArray = item.name.split('.')
-  if (event && Object.keys(event).includes('tokenId')) {
-    const tokenTransfer = getTokenEventTransferData(block, item, event, tokensMap, palletInfoArray)
-    return tokenTransfer
+
+  if (!event) throw new Error('Failed to get event data')
+
+  if ('tokenId' in event) {
+    return getTokenEventTransferData(block, item, event, tokensMap, palletInfoArray)
   }
 
-  if (event && Object.keys(event).includes('nftId')) {
+  if ('nftId' in event) {
     return getNftEventTransferData(block, item, event, palletInfoArray)
   }
 
@@ -295,7 +338,7 @@ function getEventTransferData(
   item: TransfersEventItem,
   event: any,
   palletInfoArray: string[]
-): TransferEventData {
+): BaseTransferEvent {
   const payer = item.event?.call?.args?.paymentInfo?.payer
 
   const relayer =
@@ -313,7 +356,7 @@ function getEventTransferData(
     method: palletInfoArray[1],
     payer: payer ? decodeHex(payer) : undefined,
     relayer: relayer ? decodeHex(relayer) : undefined,
-    nonce: item.event.extrinsic?.signature?.signedExtensions?.CheckNonce ?? 0
+    nonce: BigInt(item.event.extrinsic?.signature?.signedExtensions?.CheckNonce ?? 0)
   }
 }
 
@@ -325,7 +368,7 @@ function getTokenEventTransferData(
   palletInfoArray: string[]
 ): TokenTransferEventData {
   const tokenId = toHex(event.tokenId)
-  const tokenName = tokensMap.has(tokenId) ? tokensMap.get(tokenId) : ''
+  const tokenName = tokensMap.has(tokenId) ? tokensMap.get(tokenId) : undefined
 
   return {
     ...getEventTransferData(block, item, event, palletInfoArray),
@@ -347,11 +390,11 @@ function getNftEventTransferData(
 ): NftTransferEventData {
   return {
     ...getEventTransferData(block, item, event, palletInfoArray),
-    nftId: event.nftId
+    nftId: event.nftId.toString()
   }
 }
 
-function getKeyByValue(map: Map<any, any>, searchValue: any): any | undefined {
+function getKeyByValue(map: Map<string, string>, searchValue: string): string | undefined {
   for (const [key, value] of map.entries()) {
     if (value === searchValue) {
       return key

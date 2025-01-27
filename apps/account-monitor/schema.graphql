@@ -3,6 +3,8 @@ type Account @entity {
   avtBalance: BigInt! @index
   tokens: [AccountToken!]! @derivedFrom(field: "account")
   nfts: [AccountNft!]! @derivedFrom(field: "account")
+  marketsAsOracle: [PredictionMarketCreation!]! @derivedFrom(field: "oracle")
+  receivedTransfers: [PredictionMarketAssetTransfer!]! @derivedFrom(field: "to")
 }
 
 type AccountNft @entity {
@@ -92,4 +94,61 @@ type CrossChainTransactionEvent @entity {
   extrinsicSuccess: Boolean!
   extrinsicBlockNumber: BigInt! @index
   rejectionReason: String
+}
+
+type PredictionMarketCreation @entity {
+  id: ID!
+  blockNumber: BigInt @index
+
+  amount: String @index
+  baseAssetKind: String @index
+  baseAssetValue: Int
+  creatorFee: Int
+  disputeDuration: Int
+  gracePeriod: Int
+  oracleDuration: Int
+  disputeMechanism: String @index
+  marketType: String @index
+  oracle: Account! @index
+  spotPrices: [String!]
+  swapFee: String
+}
+
+type PredictionMarketTrade @entity {
+  id: ID!
+  blockNumber: BigInt @index
+
+  operationType: String! @index # "buy" or "sell"
+  amountIn: String @index
+  marketId: String @index
+  maxPrice: String
+  assetCount: Int
+  assetKind: String @index
+  assetValue: [String!]
+  strategy: String @index
+}
+
+type PredictionMarketTokenWithdrawal @entity {
+  id: ID!
+  blockNumber: BigInt @index
+
+  amount: String @index
+  token: String @index
+}
+
+type PredictionMarketShareRedemption @entity {
+  id: ID!
+  blockNumber: BigInt @index
+
+  marketId: String @index
+}
+
+type PredictionMarketAssetTransfer @entity {
+  id: ID!
+  blockNumber: BigInt @index
+
+  amount: String @index
+  to: Account! @index
+  token: String @index
+  kind: String @index
 }
