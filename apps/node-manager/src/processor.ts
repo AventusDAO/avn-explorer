@@ -20,7 +20,7 @@ const standardEventConfig = {
         hash: true,
         indexInBlock: true
       },
-      call: { origin: true, args: true },
+      call: { origin: true, args: true }
     }
   }
 } as const
@@ -62,7 +62,7 @@ async function main(ctx: Context): Promise<void> {
 export const processNodeRegistered: EventProcessor = async ({
   store,
   event,
-  blockTimestamp,
+  blockTimestamp
 }: ProcessingContext) => {
   // @ts-expect-error
   const { owner, node } = event.event.args

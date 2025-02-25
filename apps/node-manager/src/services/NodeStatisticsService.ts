@@ -34,7 +34,7 @@ export class NodeStatisticsService {
         .select('COALESCE(SUM(reward.amount), 0)', 'totalAmount')
         .where('reward.owner_id = :accountId', { accountId })
         .andWhere('reward.blockTimestamp >= :startTime', {
-          startTime: twentyFourHoursAgo 
+          startTime: twentyFourHoursAgo
         })
         .getRawOne()
 
@@ -71,7 +71,8 @@ export class NodeStatisticsService {
     } catch (error) {
       if (error instanceof NotFoundError) throw error
       throw new DatabaseError(
-        `Failed to get rewards in time range for account ${accountId}: ${error instanceof Error ? error.message : 'Unknown error'
+        `Failed to get rewards in time range for account ${accountId}: ${
+          error instanceof Error ? error.message : 'Unknown error'
         }`
       )
     }
@@ -158,7 +159,8 @@ export class NodeStatisticsService {
     } catch (error) {
       if (error instanceof NotFoundError) throw error
       throw new DatabaseError(
-        `Failed to get reward count for account ${accountId}: ${error instanceof Error ? error.message : 'Unknown error'
+        `Failed to get reward count for account ${accountId}: ${
+          error instanceof Error ? error.message : 'Unknown error'
         }`
       )
     }
@@ -186,7 +188,8 @@ export class NodeStatisticsService {
     } catch (error) {
       if (error instanceof NotFoundError) throw error
       throw new DatabaseError(
-        `Failed to get average reward for account ${accountId}: ${error instanceof Error ? error.message : 'Unknown error'
+        `Failed to get average reward for account ${accountId}: ${
+          error instanceof Error ? error.message : 'Unknown error'
         }`
       )
     }
