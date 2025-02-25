@@ -1,0 +1,21 @@
+type Account @entity {
+  id: ID!
+  nodes: [Node!]! @derivedFrom(field: "owner")
+  rewards: [Reward!]! @derivedFrom(field: "owner")
+}
+
+type Reward @entity {
+  id: ID!
+  rewardPeriod: BigInt!
+  owner: Account
+  node: Node
+  amount: BigInt!
+  blockTimestamp: DateTime!
+}
+
+type Node @entity {
+  id: ID!
+  owner: Account!
+  rewards: [Reward!]! @derivedFrom(field: "node")
+  blockTimestamp: DateTime!
+}
