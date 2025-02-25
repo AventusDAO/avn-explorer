@@ -1,0 +1,20 @@
+{
+  "outDir": "../src/types/generated/truth-network-dev",
+  "specVersions": "../../../packages/metadata/versions.truth-network.testnet.jsonl",
+  "events": [
+    "NodeManager.NodeRegistered",
+    "NodeManager.RewardPeriodLengthSet",
+    "NodeManager.NewRewardPeriodStarted",
+    "NodeManager.RewardPayoutCompleted",
+    "NodeManager.RewardPaid",
+    "NodeManager.ErrorPayingReward",
+    "NodeManager.NodeRegistrarSet",
+    "NodeManager.BatchSizeSet",
+    "NodeManager.HeartbeatPeriodSet",
+    "NodeManager.HeartbeatReceived",
+    "NodeManager.RewardAmountSet",
+    "NodeManager.RewardToggled"
+  ],
+  "calls": [],
+  "storage": []
+}

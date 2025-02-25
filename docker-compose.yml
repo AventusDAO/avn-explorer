@@ -16,6 +16,8 @@ services:
       POSTGRES_DB: ${DB_NAME}
     ports:
       - '${DB_PORT}:5432'
+    networks:
+      - avn-archive
 
   # PG Admin is optional.
   pgadmin:
@@ -30,3 +32,8 @@ services:
     ports:
       - '5544:80'
     restart: unless-stopped
+    networks:
+      - avn-archive
+networks:
+  avn-archive:
+    name: avn-archive

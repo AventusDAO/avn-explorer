@@ -29,3 +29,6 @@ versions-ew-testnet:
 
 versions-vow-testnet:
 	@yarn squid-substrate-metadata-explorer --chain wss://chain-internal.testnet.voucherledger.com --archive https://archive-explorer.testnet.voucherledger.com/graphql --out ./versions.vow-parachain.testnet.jsonl
+
+versions-truth-network-testnet:
+	@yarn squid-substrate-metadata-explorer --chain wss://chain-internal.testnet.truth-network.io --archive https://archive-explorer.testnet.truth-network.io/graphql --out ./versions.truth-network.testnet.jsonl
