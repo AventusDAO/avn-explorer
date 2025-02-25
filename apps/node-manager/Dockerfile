@@ -7,8 +7,8 @@ WORKDIR /app
 COPY yarn.lock package.json .yarnrc.yml tsconfig.json .
 COPY .yarn .yarn
 COPY packages packages
-COPY apps/example-processor apps/example-processor
+COPY apps/node-manager apps/node-manager
 
 RUN yarn install && \
     yarn build:packages && \
-    yarn workspace @avn/example-processor run build
+    yarn workspace @avn/node-manager run build
