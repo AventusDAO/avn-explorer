@@ -7,8 +7,8 @@ export interface ProxyCallArgs<A> {
       from?: string
       to?: string
       t2TransferToPublicKey?: string
-      nodeManagerOwner?: string
-      nodeManagerNodeId?: string
+      owner?: string
+      node?: string
     }
   }
   paymentInfo: {
