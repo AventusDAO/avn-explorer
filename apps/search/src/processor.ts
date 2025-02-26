@@ -159,7 +159,7 @@ const mapExtrinsics = (block: BatchBlock<Item>): SearchExtrinsic[] => {
           proxyOwner: call.value?.owner,
           proxyNode: call.value?.node,
           from: call.value?.from,
-          to: call.value?.to,
+          to: call.value?.to
         }
       } else if (item.name === 'NftManager.proxy') {
         // TODO: remove this block when highlander is decomissioned
