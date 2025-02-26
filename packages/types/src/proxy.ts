@@ -7,7 +7,7 @@ export interface ProxyCallArgs<A> {
       from?: string
       to?: string
       t2TransferToPublicKey?: string
-      owner?: string
+      nodeManagerOwner?: string
       nodeManagerNodeId?: string
     }
   }
