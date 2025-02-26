@@ -22,6 +22,6 @@ export interface SearchExtrinsic extends EsItem {
   nftManagerProxyOwner?: string
   from?: string
   to?: string
-  owner?: string
+  nodeManagerOwner?: string
   node?: string
 }
