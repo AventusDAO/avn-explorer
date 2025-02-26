@@ -157,7 +157,7 @@ const mapExtrinsics = (block: BatchBlock<Item>): SearchExtrinsic[] => {
           proxyRecipient: paymentInfo?.recipient,
           proxyPayer: paymentInfo?.payer,
           proxyOwner: call.value?.owner,
-          proxyNode: call.value?.node,
+          proxyNodeManagerNodeId: call.value?.node,
           from: call.value?.from,
           to: call.value?.to
         }
