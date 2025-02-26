@@ -61,7 +61,7 @@ const processor = getProcessor()
   .addCall('*', {
     data: {
       call: {
-        args: false,
+        args: true,
         error: true,
         origin: false,
         parent: false
@@ -156,14 +156,16 @@ const mapExtrinsics = (block: BatchBlock<Item>): SearchExtrinsic[] => {
           proxyCallMethod: call.value.__kind,
           proxyRecipient: paymentInfo?.recipient,
           proxyPayer: paymentInfo?.payer,
+          proxyOwner: call.value?.owner,
+          proxyNode: call.value?.node,
           from: call.value?.from,
-          to: call.value?.to
+          to: call.value?.to,
         }
       } else if (item.name === 'NftManager.proxy') {
         // TODO: remove this block when highlander is decomissioned
         const args = item.call.args as ProxyCallArgs<unknown>
         if (args) {
-          const { call, paymentInfo } = args
+          const { call } = args
           if (['signed_mint_batch_nft', 'signed_transfer_fiat_nft'].includes(call.value.__kind)) {
             proxyData = {
               proxySigner: call.value.proof.signer,
@@ -191,6 +193,8 @@ const mapExtrinsics = (block: BatchBlock<Item>): SearchExtrinsic[] => {
         isSuccess,
         signer: signature?.address?.value,
         nonce: signature?.signedExtensions?.CheckNonce,
+        node: item.call?.args?.node,
+        owner: item.call?.args?.owner,
         ...proxyData
       }
     })
