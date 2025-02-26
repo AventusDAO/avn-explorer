@@ -42,7 +42,7 @@ const searchFields: Record<string, EsSearchFields> = {
     'proxyOwner',
     'proxyNode',
     'owner',
-    'node'
+    'nodeManagerNodeId'
   ],
   hash: ['hash']
 }
