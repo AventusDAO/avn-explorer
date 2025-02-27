@@ -38,7 +38,11 @@ const searchFields: Record<string, EsSearchFields> = {
     'proxySigner',
     'proxyRelayer',
     'proxyPayer',
-    'nftManagerProxyOwner'
+    'nftManagerProxyOwner',
+    'proxyNodeManagerOwner',
+    'proxyNodeManagerNodeId',
+    'nodeManagerOwner',
+    'nodeManagerNodeId'
   ],
   hash: ['hash']
 }
