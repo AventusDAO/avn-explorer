@@ -27,9 +27,9 @@ const getTransactionsForAddressQuery = (value: string): EsQuery => ({
       'proxyRelayer',
       'proxyPayer',
       'nftManagerProxyOwner',
-      'proxyOwner',
-      'proxyNode',
-      'owner',
+      'proxyNodeManagerOwner',
+      'proxyNodeManagerNodeId',
+      'nodeManagerOwner',
       'nodeManagerNodeId'
     ]
   }

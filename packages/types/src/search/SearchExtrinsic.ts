@@ -17,11 +17,11 @@ export interface SearchExtrinsic extends EsItem {
   proxyCallMethod?: string
   proxyRecipient?: string
   proxyPayer?: string
-  proxyOwner?: string
-  proxyNode?: string
+  proxyNodeManagerOwner?: string
+  proxyNodeManagerNodeId?: string
   nftManagerProxyOwner?: string
   from?: string
   to?: string
   nodeManagerOwner?: string
-  node?: string
+  nodeManagerNodeId?: string
 }

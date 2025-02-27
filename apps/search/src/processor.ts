@@ -193,8 +193,8 @@ const mapExtrinsics = (block: BatchBlock<Item>): SearchExtrinsic[] => {
         isSuccess,
         signer: signature?.address?.value,
         nonce: signature?.signedExtensions?.CheckNonce,
-        node: item.call?.args?.node,
-        owner: item.call?.args?.owner,
+        nodeManagerNodeId: item.call?.args?.node,
+        nodeManagerOwner: item.call?.args?.owner,
         ...proxyData
       }
     })
