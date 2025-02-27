@@ -2,6 +2,7 @@ import 'reflect-metadata'
 import { Query, Resolver, Arg } from 'type-graphql'
 import { EntityManager } from 'typeorm'
 import { NodeStatisticsService } from '../../services/NodeStatisticsService'
+import { validateAndParse, validateDateRange } from '../../utils/dateValidation'
 
 @Resolver()
 export class NodeStatisticsResolver {
@@ -17,12 +18,17 @@ export class NodeStatisticsResolver {
   @Query(() => BigInt)
   async getAccountRewardsInTimeRange(
     @Arg('accountId') accountId: string,
-    @Arg('startTime') startTime: Date,
-    @Arg('endTime') endTime: Date
+    @Arg('startTime') startTime: string,
+    @Arg('endTime') endTime: string
   ): Promise<bigint> {
+    const fromDate = validateAndParse(startTime, 'fromDate');
+    const toDate = validateAndParse(endTime, 'toDate');
+
+    validateDateRange(fromDate, toDate, 'fromDate', 'toDate');
+
     const manager = await this.tx()
     const nodeStatisticsService = new NodeStatisticsService(manager)
-    return await nodeStatisticsService.getAccountRewardsInTimeRange(accountId, startTime, endTime)
+    return await nodeStatisticsService.getAccountRewardsInTimeRange(accountId, fromDate, toDate)
   }
 
   @Query(() => BigInt)
@@ -49,22 +55,32 @@ export class NodeStatisticsResolver {
   @Query(() => Number)
   async getRewardCountInTimeRange(
     @Arg('accountId') accountId: string,
-    @Arg('startTime') startTime: Date,
-    @Arg('endTime') endTime: Date
+    @Arg('startTime') startTime: string,
+    @Arg('endTime') endTime: string
   ): Promise<number> {
+    const fromDate = validateAndParse(startTime, 'fromDate');
+    const toDate = validateAndParse(endTime, 'toDate');
+
+    validateDateRange(fromDate, toDate, 'fromDate', 'toDate');
+
     const manager = await this.tx()
     const nodeStatisticsService = new NodeStatisticsService(manager)
-    return await nodeStatisticsService.getRewardCountInTimeRange(accountId, startTime, endTime)
+    return await nodeStatisticsService.getRewardCountInTimeRange(accountId, fromDate, toDate)
   }
 
   @Query(() => BigInt)
   async getAverageRewardInTimeRange(
     @Arg('accountId') accountId: string,
-    @Arg('startTime') startTime: Date,
-    @Arg('endTime') endTime: Date
+    @Arg('startTime') startTime: string,
+    @Arg('endTime') endTime: string
   ): Promise<bigint> {
+    const fromDate = validateAndParse(startTime, 'fromDate');
+    const toDate = validateAndParse(endTime, 'toDate');
+
+    validateDateRange(fromDate, toDate, 'fromDate', 'toDate');
+
     const manager = await this.tx()
     const nodeStatisticsService = new NodeStatisticsService(manager)
-    return await nodeStatisticsService.getAverageRewardInTimeRange(accountId, startTime, endTime)
+    return await nodeStatisticsService.getAverageRewardInTimeRange(accountId, fromDate, toDate)
   }
 }
