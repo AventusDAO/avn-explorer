@@ -21,10 +21,10 @@ export class NodeStatisticsResolver {
     @Arg('startTime') startTime: string,
     @Arg('endTime') endTime: string
   ): Promise<bigint> {
-    const fromDate = validateAndParse(startTime, 'fromDate');
-    const toDate = validateAndParse(endTime, 'toDate');
+    const fromDate = validateAndParse(startTime, 'fromDate')
+    const toDate = validateAndParse(endTime, 'toDate')
 
-    validateDateRange(fromDate, toDate, 'fromDate', 'toDate');
+    validateDateRange(fromDate, toDate, 'fromDate', 'toDate')
 
     const manager = await this.tx()
     const nodeStatisticsService = new NodeStatisticsService(manager)
@@ -58,10 +58,10 @@ export class NodeStatisticsResolver {
     @Arg('startTime') startTime: string,
     @Arg('endTime') endTime: string
   ): Promise<number> {
-    const fromDate = validateAndParse(startTime, 'fromDate');
-    const toDate = validateAndParse(endTime, 'toDate');
+    const fromDate = validateAndParse(startTime, 'fromDate')
+    const toDate = validateAndParse(endTime, 'toDate')
 
-    validateDateRange(fromDate, toDate, 'fromDate', 'toDate');
+    validateDateRange(fromDate, toDate, 'fromDate', 'toDate')
 
     const manager = await this.tx()
     const nodeStatisticsService = new NodeStatisticsService(manager)
@@ -74,10 +74,10 @@ export class NodeStatisticsResolver {
     @Arg('startTime') startTime: string,
     @Arg('endTime') endTime: string
   ): Promise<bigint> {
-    const fromDate = validateAndParse(startTime, 'fromDate');
-    const toDate = validateAndParse(endTime, 'toDate');
+    const fromDate = validateAndParse(startTime, 'fromDate')
+    const toDate = validateAndParse(endTime, 'toDate')
 
-    validateDateRange(fromDate, toDate, 'fromDate', 'toDate');
+    validateDateRange(fromDate, toDate, 'fromDate', 'toDate')
 
     const manager = await this.tx()
     const nodeStatisticsService = new NodeStatisticsService(manager)
