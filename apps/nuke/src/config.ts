@@ -12,6 +12,7 @@ export interface DatabaseConfig {
     | 'search'
     | 'account-monitor'
     | 'nft'
+    | 'node-manager'
   reset: boolean
   db?: string
   user?: string
@@ -106,5 +107,12 @@ export const getDbConfigs: () => Readonly<DatabaseConfig[]> = () =>
       db: process.env.DB_SCHEMA_SOLOCHAIN_SEARCH,
       user: process.env.DB_USER_SOLOCHAIN_SEARCH,
       pass: process.env.DB_PASS_SOLOCHAIN_SEARCH
+    },
+    {
+      name: 'node-manager',
+      reset: process.env.RESET_NODE_MANAGER === 'true',
+      db: process.env.DB_SCHEMA_NODEMANAGER,
+      user: process.env.DB_USER_NODEMANAGER,
+      pass: process.env.DB_PASS_NODEMANAGER
     }
   ])

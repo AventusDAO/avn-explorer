@@ -70,6 +70,11 @@ RESET_SOLOCHAIN_SEARCH=false
 DB_SCHEMA_SOLOCHAIN_SEARCH=solochain-search
 DB_USER_SOLOCHAIN_SEARCH=postgres
 DB_PASS_SOLOCHAIN_SEARCH=postgres
+
+RESET_NODE_MANAGER=false
+DB_SCHEMA_NODEMANAGER=node-manager
+DB_USER_NODEMANAGER=postgres
+DB_PASS_NODEMANAGER=postgres
 ```
 
 > NOTE: don't forget to append new env vars when adding a new processor
