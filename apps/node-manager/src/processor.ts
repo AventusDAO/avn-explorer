@@ -46,14 +46,12 @@ async function main(ctx: Context): Promise<void> {
   for (const block of ctx.blocks) {
     for (const item of block.items) {
       if (item.kind === 'event' && nodeManagerEvents.includes(item.name)) {
-        if (nodeManagerEvents.includes(item.name)) {
-          await processEvent({
-            store: ctx.store,
-            event: item,
-            blockTimestamp: block.header.timestamp,
-            log: ctx.log
-          })
-        }
+        await processEvent({
+          store: ctx.store,
+          event: item,
+          blockTimestamp: block.header.timestamp,
+          log: ctx.log
+        })
       }
     }
   }
@@ -101,8 +99,7 @@ export const processRewardPaid: EventProcessor = async ({
   }
 
   const reward = new Reward({
-    // @ts-expect-error
-    id: `${blockTimestamp}-${event.event.extrinsic.indexInBlock}`,
+    id: `${event.event.id}`,
     rewardPeriod,
     owner: account,
     node: nodeEntity,
