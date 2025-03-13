@@ -87,7 +87,6 @@ export const processRewardPaid: EventProcessor = async ({
   blockTimestamp,
   log
 }: ProcessingContext) => {
-  // @ts-expect-error
   const { rewardPeriod, owner, node, amount } = event.event.args
   log.info(
     `Processing RewardPaid event: ${rewardPeriod}, Owner: ${owner}, node: ${node}, ${amount}`
@@ -102,8 +101,7 @@ export const processRewardPaid: EventProcessor = async ({
   }
 
   const reward = new Reward({
-    // @ts-expect-error
-    id: `${blockTimestamp}-${event.event.extrinsic.indexInBlock}`,
+    id: `${event.event.id}`,
     rewardPeriod,
     owner: account,
     node: nodeEntity,
