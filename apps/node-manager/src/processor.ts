@@ -89,9 +89,6 @@ export const processRewardPaid: EventProcessor = async ({
 }: ProcessingContext) => {
   // @ts-expect-error
   const { rewardPeriod, owner, node, amount } = event.event.args
-  log.info(
-    `Processing RewardPaid event: ${rewardPeriod}, Owner: ${owner}, node: ${node}, ${amount}`
-  )
 
   const account = await store.get(Account, owner)
   const nodeEntity = await store.get(Node, node)
@@ -110,7 +107,6 @@ export const processRewardPaid: EventProcessor = async ({
     blockTimestamp: new Date(blockTimestamp)
   })
   await store.save(reward)
-  log.info(`Saved: ${node}`)
 }
 
 const eventHandlers: Record<string, EventProcessor> = {
@@ -122,8 +118,6 @@ export const processEvent = async (ctx: ProcessingContext): Promise<void> => {
   const handler = eventHandlers[ctx.event.name]
   if (handler) {
     await handler(ctx)
-  } else {
-    ctx.log.error(`No handler for event: ${ctx.event.name}`)
   }
 }
 
