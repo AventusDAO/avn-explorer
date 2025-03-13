@@ -8,7 +8,8 @@ export const argsSearchableSections = Object.freeze([
   'EthereumEvents',
   'NftManager',
   'TokenManager',
-  'TransactionPayment'
+  'TransactionPayment',
+  'NodeManager'
 ])
 
 export type RecursiveArray<T> = Array<RecursiveArray<T> | T>
