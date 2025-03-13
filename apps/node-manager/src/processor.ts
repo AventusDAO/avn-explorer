@@ -93,7 +93,9 @@ export const processRewardPaid: EventProcessor = async ({
 }: ProcessingContext) => {
   // @ts-expect-error
   const { rewardPeriod, owner, node, amount } = event.event.args
-  log.info(`Processing RewardPaid event: ${rewardPeriod}, Owner: ${owner}, node: ${node}, ${amount}`)
+  log.info(
+    `Processing RewardPaid event: ${rewardPeriod}, Owner: ${owner}, node: ${node}, ${amount}`
+  )
 
   const account = await store.get(Account, owner)
   const nodeEntity = await store.get(Node, node)
