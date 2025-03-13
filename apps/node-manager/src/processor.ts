@@ -45,17 +45,13 @@ export type EventProcessor = (ctx: ProcessingContext) => Promise<void>
 async function main(ctx: Context): Promise<void> {
   for (const block of ctx.blocks) {
     for (const item of block.items) {
-      ctx.log.info(`Processing item: ${item.kind} ${item.name}`)
       if (item.kind === 'event' && nodeManagerEvents.includes(item.name)) {
-        if (nodeManagerEvents.includes(item.name)) {
-          ctx.log.info(`Processing event: ${JSON.stringify(item)}`)
-          await processEvent({
-            store: ctx.store,
-            event: item,
-            blockTimestamp: block.header.timestamp,
-            log: ctx.log
-          })
-        }
+        await processEvent({
+          store: ctx.store,
+          event: item,
+          blockTimestamp: block.header.timestamp,
+          log: ctx.log
+        })
       }
     }
   }
@@ -115,6 +111,7 @@ export const processRewardPaid: EventProcessor = async ({
     blockTimestamp: new Date(blockTimestamp)
   })
   await store.save(reward)
+  log.info(`Saved: ${node}`)
 }
 
 const eventHandlers: Record<string, EventProcessor> = {
