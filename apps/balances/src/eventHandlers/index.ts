@@ -20,7 +20,11 @@ export const VOW_MODE: VowMode = process.env.VOW_MODE === 'true'
 export const EW_MODE: EwMode = process.env.EW_MODE === 'true'
 export const TRUTH_MODE: VowMode = process.env.TRUTH_MODE === 'true'
 
-export function getStorageClass(): typeof VowStorage | typeof EwStorage | typeof ParachainStorage | typeof TruthStorage {
+export function getStorageClass():
+  | typeof VowStorage
+  | typeof EwStorage
+  | typeof ParachainStorage
+  | typeof TruthStorage {
   if (VOW_MODE) {
     return VowStorage
   } else if (EW_MODE) {
@@ -32,7 +36,11 @@ export function getStorageClass(): typeof VowStorage | typeof EwStorage | typeof
   }
 }
 
-export function getEventClass(): typeof VowEvents | typeof EwEvents | typeof ParachainEvents | typeof TruthEvents {
+export function getEventClass():
+  | typeof VowEvents
+  | typeof EwEvents
+  | typeof ParachainEvents
+  | typeof TruthEvents {
   if (VOW_MODE) {
     return VowEvents
   } else if (EW_MODE) {
