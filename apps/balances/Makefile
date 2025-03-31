@@ -34,5 +34,8 @@ typegen-vow-testnet:
 typegen-ew-testnet:
 	@yarn squid-substrate-typegen ./typegen/typegen-ew.testnet.json
 
+typegen-truth-dev:
+	@yarn squid-substrate-typegen ./typegen/typegen-truth.dev.json
+
 
 .PHONY: process serve start codegen migration migrate up down typegen
