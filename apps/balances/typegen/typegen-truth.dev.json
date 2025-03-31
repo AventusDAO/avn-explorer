@@ -1,0 +1,19 @@
+{
+    "outDir": "../src/types/generated/truth-dev",
+    "specVersions": "../../../packages/metadata/versions.truth-network.testnet.jsonl",
+    "typesBundle": "../../../packages/metadata/avn-types.json",
+    "events": [
+      "Balances.Transfer",
+      "Balances.Endowed",
+      "Balances.BalanceSet",
+      "Balances.Reserved",
+      "Balances.Unreserved",
+      "Balances.ReserveRepatriated",
+      "Balances.Deposit",
+      "Balances.Withdraw",
+      "Balances.Slashed"
+    ],
+    "calls": [],
+    "storage": ["System.Account", "Balances.Account", "Balances.TotalIssuance"]
+  }
+  

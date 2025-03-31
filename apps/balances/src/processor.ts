@@ -331,6 +331,9 @@ async function getBalancesAccountBalances(
   } else if ('isV73' in storage && storage.isV73) {
     const data = await storage.asV73.getMany(accounts)
     return data.map(d => ({ free: d.free, reserved: d.reserved }))
+  } else if ('isV3' in storage && storage.isV3) {
+    const data = await storage.asV3.getMany(accounts)
+    return data.map(d => ({ free: d.free, reserved: d.reserved }))
   } else {
     throw new UnknownVersionError(`ParachainStakingNominatorStateStorage`)
   }
@@ -359,6 +362,12 @@ async function getSystemAccountBalances(
     })) as IBalance[]
   } else if ('isV73' in storage && storage.isV73) {
     const data = await storage.asV73.getMany(accounts)
+    return data.map(d => ({
+      free: d.data.free,
+      reserved: d.data.reserved
+    })) as IBalance[]
+  } else if ('isV3' in storage && storage.isV3) {
+    const data = await storage.asV3.getMany(accounts)
     return data.map(d => ({
       free: d.data.free,
       reserved: d.data.reserved
