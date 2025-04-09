@@ -51,7 +51,8 @@ const tokenManagerEvents = [
   'TokenManager.TokenLifted',
   'TokenManager.TokenLowered',
   'TokenManager.AvtLowered',
-  'TokenManager.AVTLifted'
+  'TokenManager.AVTLifted',
+  'TokenManager.LowerRequested'
 ]
 addEventsWithConfig(processor, tokenManagerEvents, standardEventConfig)
 
