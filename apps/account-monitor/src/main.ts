@@ -10,7 +10,7 @@ import {
   AccountNft,
   NftTransfer,
   ScheduledLowerTransaction,
-  CrossChainTransactionEvent,
+  CrossChainTransactionEvent
 } from './model'
 import { randomUUID } from 'crypto'
 import processor, { predictionMarketCalls } from './processor'
@@ -23,7 +23,7 @@ import {
   TransferData,
   BaseTransferEvent,
   TransfersEventItem,
-  schedulerEventNames,
+  schedulerEventNames
 } from './types'
 import { getEvent } from './chainEventHandlers'
 import {
