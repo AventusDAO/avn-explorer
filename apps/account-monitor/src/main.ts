@@ -11,11 +11,6 @@ import {
   NftTransfer,
   ScheduledLowerTransaction,
   CrossChainTransactionEvent,
-  PredictionMarketAssetTransfer,
-  PredictionMarketShareRedemption,
-  PredictionMarketTokenWithdrawal,
-  PredictionMarketTrade,
-  PredictionMarketCreation
 } from './model'
 import { randomUUID } from 'crypto'
 import processor, { predictionMarketCalls } from './processor'
@@ -28,7 +23,7 @@ import {
   TransferData,
   BaseTransferEvent,
   TransfersEventItem,
-  Item
+  schedulerEventNames,
 } from './types'
 import { getEvent } from './chainEventHandlers'
 import {
@@ -238,7 +233,9 @@ async function getTransfers(
           } else if (transfer && transfer.pallet === 'NftManager' && 'nftId' in transfer) {
             nftTransfersData.push(transfer as NftTransferEventData)
           }
-        } else if (item.name.toLowerCase().includes('scheduler')) {
+        }
+
+        if (schedulerEventNames.includes(item.name)) {
           await recordSchedulerEventData(ctx, block, item)
         }
       } else if (item.kind === 'call') {
