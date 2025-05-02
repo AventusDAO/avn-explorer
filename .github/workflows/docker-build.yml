@@ -6,7 +6,7 @@ on:
       runner:
         required: false
         type: string
-        default: ubuntu-latest
+        default: gh-ubuntu-2404-x64
       short_image_name:
         required: true
         type: string

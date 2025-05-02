@@ -27,7 +27,6 @@ jobs:
     name: AvN Explorer Errors
     uses: ./.github/workflows/docker-build.yml
     with:
-      runner: gh-ubuntu-2404-x64
       short_image_name: errors
       ecr_repository_prefix: explorer
       aws_region: eu-west-1
