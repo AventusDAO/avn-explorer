@@ -54,4 +54,3 @@ jobs:
       create_commit_hash_dtag: true
       create_git_ref_dtag: ${{ startsWith(github.ref, 'refs/tags/') }}
     secrets: inherit
-
