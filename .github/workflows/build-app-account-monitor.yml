@@ -25,22 +25,32 @@ on:
 jobs:
   avn-docker-build:
     name: AvN Explorer Account Monitor
-    uses: ./.github/workflows/docker-build.yml
+    uses: Aventus-Network-Services/shared-workflows/.github/workflows/docker-build.yaml@v5.10.0
     with:
-      short_image_name: account-monitor
-      ecr_repository_prefix: explorer
       aws_region: eu-west-1
       aws_account_id: 931945598683
-      dockerfile: apps/account-monitor/Dockerfile
+      docker_file_path: apps/account-monitor/Dockerfile
+      ecr_repository_name: explorer/account-monitor
+      default_branch: main
+      create_pr_dtag: ${{ startsWith(github.ref, 'refs/pull/') }}
+      create_latest_dtag: ${{ github.ref == 'refs/heads/main' }}
+      create_commit_hash_dtag: true
+      create_git_ref_dtag: ${{ startsWith(github.ref, 'refs/tags/') }}
+    secrets: inherit
 
   ew-docker-build:
     name: EW Explorer Account Monitor
     if: ${{ github.event_name == 'workflow_dispatch' && github.ref_name == 'main' }}
-    uses: ./.github/workflows/docker-build.yml
+    uses: Aventus-Network-Services/shared-workflows/.github/workflows/docker-build.yaml@v5.10.0
     with:
       config_creds: false
-      short_image_name: account-monitor
-      ecr_repository_prefix: explorer
       aws_region: us-east-1
       aws_account_id: 541507968610
-      dockerfile: apps/account-monitor/Dockerfile
+      docker_file_path: apps/account-monitor/Dockerfile
+      ecr_repository_name: explorer/account-monitor
+      default_branch: main
+      create_pr_dtag: ${{ startsWith(github.ref, 'refs/pull/') }}
+      create_latest_dtag: ${{ github.ref == 'refs/heads/main' }}
+      create_commit_hash_dtag: true
+      create_git_ref_dtag: ${{ startsWith(github.ref, 'refs/tags/') }}
+    secrets: inherit
