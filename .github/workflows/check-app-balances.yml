@@ -19,7 +19,7 @@ jobs:
     name: Check Balances App
     uses: Aventus-Network-Services/shared-workflows/.github/workflows/check-yarn-application.yml@v5.11.0
     with:
-    build_command: |
-      yarn workspace @avn/types run build
-      yarn workspace @avn/config run build
-      yarn workspace @avn/utils run build
+      build_command: |
+        yarn workspace @avn/types run build
+        yarn workspace @avn/config run build
+        yarn workspace @avn/utils run build
