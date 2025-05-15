@@ -6,25 +6,12 @@ on:
     paths:
       - 'packages/metadata/**'
 
-defaults:
-  run:
-    working-directory: packages/metadata
-
 jobs:
-  check_metadata_package:
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: '18.6'
-          cache: 'yarn'
-      - name: Install dependencies
-        run: yarn
-      - name: Build dependency packages
-        run: |
-          yarn workspace @avn/types run build
-          yarn workspace @avn/config run build
-      - name: Run Typescript checks
-        run: yarn types:check
+  check_search_app:
+    name: Check Tokens App
+    uses: Aventus-Network-Services/shared-workflows/.github/workflows/check-yarn-application.yml@v5.12.0
+    with:
+      working_directory: packages/metadata
+      build_command: |
+        yarn workspace @avn/types run build
+        yarn workspace @avn/config run build

@@ -10,15 +10,12 @@ on:
       - 'packages/config/**'
       - 'packages/utils/**'
 
-defaults:
-  run:
-    working-directory: apps/balances
-
 jobs:
   check_balances_app:
     name: Check Balances App
-    uses: Aventus-Network-Services/shared-workflows/.github/workflows/check-yarn-application.yml@v5.11.0
+    uses: Aventus-Network-Services/shared-workflows/.github/workflows/check-yarn-application.yml@v5.12.0
     with:
+      working_directory: apps/balances
       build_command: |
         yarn workspace @avn/types run build
         yarn workspace @avn/config run build
