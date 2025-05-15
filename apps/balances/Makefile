@@ -39,3 +39,4 @@ typegen-truth-dev:
 
 
 .PHONY: process serve start codegen migration migrate up down typegen
+
