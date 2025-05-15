@@ -29,4 +29,3 @@ typegen-parachain-dev:
 
 
 .PHONY: up down build process serve reset reprocess migrate migration codegen typegen-testnet typegen-parachain
-
