@@ -2,7 +2,7 @@ name: Check Balances app
 
 on:
   pull_request:
-    branches: [devops-1115]
+    branches: [main]
     paths:
       - 'apps/balances/**'
       # check if one of the used packages is changed
