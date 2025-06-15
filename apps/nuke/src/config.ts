@@ -13,6 +13,7 @@ export interface DatabaseConfig {
     | 'account-monitor'
     | 'nft'
     | 'node-manager'
+    | 'assets'
   reset: boolean
   db?: string
   user?: string
@@ -114,5 +115,12 @@ export const getDbConfigs: () => Readonly<DatabaseConfig[]> = () =>
       db: process.env.DB_SCHEMA_NODEMANAGER,
       user: process.env.DB_USER_NODEMANAGER,
       pass: process.env.DB_PASS_NODEMANAGER
+    },
+    {
+      name: 'assets',
+      reset: process.env.RESET_ASSETS === 'true',
+      db: process.env.DB_SCHEMA_ASSETS,
+      user: process.env.DB_USER_ASSETS,
+      pass: process.env.DB_PASS_ASSETS,
     }
   ])
