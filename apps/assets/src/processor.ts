@@ -7,12 +7,12 @@ import {
 import { TokensAccountsStorage, AssetRegistryMetadataStorage } from './types/generated/truth-testnet/storage'
 import { Store, TypeormDatabase } from '@subsquid/typeorm-store'
 import { getProcessor } from '@avn/config'
-
+import { randomUUID } from 'crypto'
 
 import { Asset as AssetModel, Balance } from "./model";
 import { getAccountFromEndowedEvent, getAccountFromBalanceSetEvent, getAccountFromDustLostEvent, getAccountFromUnreservedEvent, getAccountFromReservedEvent, getAccountFromWithdrawnEvent, getAccountFromSlashedEvent, getAccountFromDepositedEvent, getAccountFromLockSetEvent, getAccountFromLockRemovedEvent, getAccountFromLockedEvent, getAccountsFromTransferEvent, getAccountsFromReserveRepatriatedEvent, getAccountFromUnlockedEvent, ExtractedData, getDataFromAssetRegisteredEvent, getDataFromAssetUpdatedEvent } from './eventHandlers';
 import { Asset, Asset_ForeignAsset, AssetMetadata, Type_440 } from './types/generated/truth-testnet/v3';
-import { u8aToString } from '@polkadot/util'
+import { u8aToHex } from '@polkadot/util'
 
 const processor = getProcessor()
   .addEvent('Tokens.Endowed', {
@@ -76,9 +76,9 @@ async function main(ctx: Context): Promise<void> {
       if (item.kind === 'event') {
         switch (item.name) {
           case 'AssetRegistry.RegisteredAsset':
-            const asset = getDataFromAssetRegisteredEvent(ctx, item.event)
+            const asset: AssetModel | undefined = getDataFromAssetRegisteredEvent(ctx, item.event)
             if (asset) {
-              await ctx.store.save(asset);
+              await ctx.store.save<AssetModel>(asset);
             }
 
             break;
@@ -120,7 +120,8 @@ async function processAssetBalanceEventItem(
     const balance = await getAssetBalance(ctx, block, data.currency, data.account)
     const asset = await getAsset(ctx, block, data.currency)
     return new Balance({
-      account: u8aToString(data.account),
+      id: randomUUID(),
+      account: u8aToHex(data.account),
       free: balance.free,
       reserved: balance.reserved,
       asset,

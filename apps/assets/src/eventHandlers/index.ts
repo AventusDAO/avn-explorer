@@ -1,7 +1,7 @@
 import { UnknownVersionError } from '@avn/types'
 import { ChainContext, Event } from '../types/generated/truth-testnet/support'
 import type { Asset as v3Asset } from '../types/generated/truth-testnet/v3'
-import { u8aToString } from '@polkadot/util'
+import { u8aToString, u8aToHex } from '@polkadot/util'
 
 import * as TruthEvents from '../types/generated/truth-testnet/events'
 import { Asset } from '../model'
@@ -18,15 +18,15 @@ export function getDataFromAssetRegisteredEvent(ctx: ChainContext, event: Event)
   if ('isV3' in data && data.isV3) {
     if (data.asV3.assetId.__kind === "ForeignAsset") {
         const metadata = data.asV3.metadata;
-        return {
+        return new Asset( {
             id: `ForeignAsset-${data.asV3.assetId.value}`,
             symbol: u8aToString(metadata?.symbol),
-            ethAddress: u8aToString(metadata?.additional?.ethAddress),
+            ethAddress: u8aToHex(metadata?.additional?.ethAddress),
             name: u8aToString(metadata?.name),
             decimals: metadata?.decimals,
             baseAsset: metadata?.additional?.allowAsBaseAsset ?? false,
             holders: []
-        }
+        })
     }
     return undefined
   } else {
@@ -40,14 +40,14 @@ export function getDataFromAssetUpdatedEvent(ctx: ChainContext, event: Event): P
   if ('isV3' in data && data.isV3) {
     if (data.asV3.assetId.__kind === "ForeignAsset") {
         const metadata = data.asV3.metadata;
-        return {
+        return new Asset({
             id: `ForeignAsset-${data.asV3.assetId.value}`,
             symbol: u8aToString(metadata?.symbol),
-            ethAddress: u8aToString(metadata?.additional?.ethAddress),
+            ethAddress: u8aToHex(metadata?.additional?.ethAddress),
             name: u8aToString(metadata?.name),
             decimals: metadata?.decimals,
             baseAsset: metadata?.additional?.allowAsBaseAsset ?? false,
-        }
+        })
     }
     return undefined
   } else {
