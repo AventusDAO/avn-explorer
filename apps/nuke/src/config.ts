@@ -121,6 +121,6 @@ export const getDbConfigs: () => Readonly<DatabaseConfig[]> = () =>
       reset: process.env.RESET_ASSETS === 'true',
       db: process.env.DB_SCHEMA_ASSETS,
       user: process.env.DB_USER_ASSETS,
-      pass: process.env.DB_PASS_ASSETS,
+      pass: process.env.DB_PASS_ASSETS
     }
   ])

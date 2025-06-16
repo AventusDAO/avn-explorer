@@ -1,5 +1,5 @@
 type Asset @entity {
-  id: ID!                # Asset ID
+  id: ID! # Asset ID
   symbol: String!
   ethAddress: String!
   name: String
@@ -9,10 +9,10 @@ type Asset @entity {
 }
 
 type Balance @entity {
-  id: ID!                # assetId-accountId
+  id: ID! # assetId-accountId
   asset: Asset!
   account: String!
   free: BigInt!
   reserved: BigInt!
-  updatedAt: BigInt!     # block number
+  updatedAt: BigInt! # block number
 }

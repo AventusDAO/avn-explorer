@@ -6,27 +6,28 @@ import { u8aToString, u8aToHex } from '@polkadot/util'
 import * as TruthEvents from '../types/generated/truth-testnet/events'
 import { Asset } from '../model'
 
-
-
 export const TRUTH_MODE: boolean = process.env.TRUTH_MODE === 'true'
 
-export type ExtractedData = {account: Uint8Array, currency: v3Asset }
+export type ExtractedData = { account: Uint8Array; currency: v3Asset }
 
-export function getDataFromAssetRegisteredEvent(ctx: ChainContext, event: Event): Asset | undefined {
+export function getDataFromAssetRegisteredEvent(
+  ctx: ChainContext,
+  event: Event
+): Asset | undefined {
   const data = new TruthEvents.AssetRegistryRegisteredAssetEvent(ctx, event)
 
   if ('isV3' in data && data.isV3) {
-    if (data.asV3.assetId.__kind === "ForeignAsset") {
-        const metadata = data.asV3.metadata;
-        return new Asset( {
-            id: `ForeignAsset-${data.asV3.assetId.value}`,
-            symbol: u8aToString(metadata?.symbol),
-            ethAddress: u8aToHex(metadata?.additional?.ethAddress),
-            name: u8aToString(metadata?.name),
-            decimals: metadata?.decimals,
-            baseAsset: metadata?.additional?.allowAsBaseAsset ?? false,
-            holders: []
-        })
+    if (data.asV3.assetId.__kind === 'ForeignAsset') {
+      const metadata = data.asV3.metadata
+      return new Asset({
+        id: `ForeignAsset-${data.asV3.assetId.value}`,
+        symbol: u8aToString(metadata?.symbol),
+        ethAddress: u8aToHex(metadata?.additional?.ethAddress),
+        name: u8aToString(metadata?.name),
+        decimals: metadata?.decimals,
+        baseAsset: metadata?.additional?.allowAsBaseAsset ?? false,
+        holders: []
+      })
     }
     return undefined
   } else {
@@ -34,20 +35,23 @@ export function getDataFromAssetRegisteredEvent(ctx: ChainContext, event: Event)
   }
 }
 
-export function getDataFromAssetUpdatedEvent(ctx: ChainContext, event: Event): Pick<Asset, "id" | "symbol" | "ethAddress"| "name"| "decimals" | "baseAsset"> | undefined {
+export function getDataFromAssetUpdatedEvent(
+  ctx: ChainContext,
+  event: Event
+): Pick<Asset, 'id' | 'symbol' | 'ethAddress' | 'name' | 'decimals' | 'baseAsset'> | undefined {
   const data = new TruthEvents.AssetRegistryUpdatedAssetEvent(ctx, event)
 
   if ('isV3' in data && data.isV3) {
-    if (data.asV3.assetId.__kind === "ForeignAsset") {
-        const metadata = data.asV3.metadata;
-        return new Asset({
-            id: `ForeignAsset-${data.asV3.assetId.value}`,
-            symbol: u8aToString(metadata?.symbol),
-            ethAddress: u8aToHex(metadata?.additional?.ethAddress),
-            name: u8aToString(metadata?.name),
-            decimals: metadata?.decimals,
-            baseAsset: metadata?.additional?.allowAsBaseAsset ?? false,
-        })
+    if (data.asV3.assetId.__kind === 'ForeignAsset') {
+      const metadata = data.asV3.metadata
+      return new Asset({
+        id: `ForeignAsset-${data.asV3.assetId.value}`,
+        symbol: u8aToString(metadata?.symbol),
+        ethAddress: u8aToHex(metadata?.additional?.ethAddress),
+        name: u8aToString(metadata?.name),
+        decimals: metadata?.decimals,
+        baseAsset: metadata?.additional?.allowAsBaseAsset ?? false
+      })
     }
     return undefined
   } else {
@@ -55,12 +59,15 @@ export function getDataFromAssetUpdatedEvent(ctx: ChainContext, event: Event): P
   }
 }
 
-export function getDataFromEndowedEvent(ctx: ChainContext, event: Event): ExtractedData | undefined {
+export function getDataFromEndowedEvent(
+  ctx: ChainContext,
+  event: Event
+): ExtractedData | undefined {
   const data = new TruthEvents.TokensEndowedEvent(ctx, event)
 
   if ('isV3' in data && data.isV3) {
-    if (data.asV3.currencyId.__kind === "ForeignAsset") {
-        return {account: data.asV3.who, currency: data.asV3.currencyId}
+    if (data.asV3.currencyId.__kind === 'ForeignAsset') {
+      return { account: data.asV3.who, currency: data.asV3.currencyId }
     }
     return undefined
   } else {
@@ -68,12 +75,15 @@ export function getDataFromEndowedEvent(ctx: ChainContext, event: Event): Extrac
   }
 }
 
-export function getDataFromDustLostEvent(ctx: ChainContext, event: Event): ExtractedData | undefined {
+export function getDataFromDustLostEvent(
+  ctx: ChainContext,
+  event: Event
+): ExtractedData | undefined {
   const data = new TruthEvents.TokensDustLostEvent(ctx, event)
 
   if ('isV3' in data && data.isV3) {
-    if (data.asV3.currencyId.__kind === "ForeignAsset") {
-        return {account: data.asV3.who, currency: data.asV3.currencyId}
+    if (data.asV3.currencyId.__kind === 'ForeignAsset') {
+      return { account: data.asV3.who, currency: data.asV3.currencyId }
     }
     return undefined
   } else {
@@ -81,15 +91,18 @@ export function getDataFromDustLostEvent(ctx: ChainContext, event: Event): Extra
   }
 }
 
-export function getDataFromTransferEvent(ctx: ChainContext, event: Event): ExtractedData[] | undefined {
+export function getDataFromTransferEvent(
+  ctx: ChainContext,
+  event: Event
+): ExtractedData[] | undefined {
   const data = new TruthEvents.TokensTransferEvent(ctx, event)
 
   if ('isV3' in data && data.isV3) {
-    if (data.asV3.currencyId.__kind === "ForeignAsset") {
-        return [
-            {account: data.asV3.from, currency: data.asV3.currencyId},
-            {account: data.asV3.to, currency: data.asV3.currencyId}
-        ]
+    if (data.asV3.currencyId.__kind === 'ForeignAsset') {
+      return [
+        { account: data.asV3.from, currency: data.asV3.currencyId },
+        { account: data.asV3.to, currency: data.asV3.currencyId }
+      ]
     }
     return undefined
   } else {
@@ -97,12 +110,15 @@ export function getDataFromTransferEvent(ctx: ChainContext, event: Event): Extra
   }
 }
 
-export function getDataFromReservedEvent(ctx: ChainContext, event: Event): ExtractedData | undefined {
+export function getDataFromReservedEvent(
+  ctx: ChainContext,
+  event: Event
+): ExtractedData | undefined {
   const data = new TruthEvents.TokensReservedEvent(ctx, event)
 
   if ('isV3' in data && data.isV3) {
-    if (data.asV3.currencyId.__kind === "ForeignAsset") {
-        return {account: data.asV3.who, currency: data.asV3.currencyId}
+    if (data.asV3.currencyId.__kind === 'ForeignAsset') {
+      return { account: data.asV3.who, currency: data.asV3.currencyId }
     }
     return undefined
   } else {
@@ -110,12 +126,15 @@ export function getDataFromReservedEvent(ctx: ChainContext, event: Event): Extra
   }
 }
 
-export function getDataFromUnreservedEvent(ctx: ChainContext, event: Event): ExtractedData | undefined {
+export function getDataFromUnreservedEvent(
+  ctx: ChainContext,
+  event: Event
+): ExtractedData | undefined {
   const data = new TruthEvents.TokensUnreservedEvent(ctx, event)
 
   if ('isV3' in data && data.isV3) {
-    if (data.asV3.currencyId.__kind === "ForeignAsset") {
-        return {account: data.asV3.who, currency: data.asV3.currencyId}
+    if (data.asV3.currencyId.__kind === 'ForeignAsset') {
+      return { account: data.asV3.who, currency: data.asV3.currencyId }
     }
     return undefined
   } else {
@@ -123,16 +142,18 @@ export function getDataFromUnreservedEvent(ctx: ChainContext, event: Event): Ext
   }
 }
 
-export function getDataFromReserveRepatriatedEvent(ctx: ChainContext, event: Event): ExtractedData[] | undefined {
-
+export function getDataFromReserveRepatriatedEvent(
+  ctx: ChainContext,
+  event: Event
+): ExtractedData[] | undefined {
   const data = new TruthEvents.TokensReserveRepatriatedEvent(ctx, event)
 
   if ('isV3' in data && data.isV3) {
-    if (data.asV3.currencyId.__kind === "ForeignAsset") {
-        return [
-            {account: data.asV3.from, currency: data.asV3.currencyId},
-            {account: data.asV3.to, currency: data.asV3.currencyId}
-        ]
+    if (data.asV3.currencyId.__kind === 'ForeignAsset') {
+      return [
+        { account: data.asV3.from, currency: data.asV3.currencyId },
+        { account: data.asV3.to, currency: data.asV3.currencyId }
+      ]
     }
     return undefined
   } else {
@@ -140,13 +161,15 @@ export function getDataFromReserveRepatriatedEvent(ctx: ChainContext, event: Eve
   }
 }
 
-export function getDataFromBalanceSetEvent(ctx: ChainContext, event: Event): ExtractedData | undefined {
-
+export function getDataFromBalanceSetEvent(
+  ctx: ChainContext,
+  event: Event
+): ExtractedData | undefined {
   const data = new TruthEvents.TokensBalanceSetEvent(ctx, event)
 
   if ('isV3' in data && data.isV3) {
-    if (data.asV3.currencyId.__kind === "ForeignAsset") {
-        return {account: data.asV3.who, currency: data.asV3.currencyId}
+    if (data.asV3.currencyId.__kind === 'ForeignAsset') {
+      return { account: data.asV3.who, currency: data.asV3.currencyId }
     }
     return undefined
   } else {
@@ -154,13 +177,15 @@ export function getDataFromBalanceSetEvent(ctx: ChainContext, event: Event): Ext
   }
 }
 
-export function getDataFromWithdrawnEvent(ctx: ChainContext, event: Event): ExtractedData | undefined {
-
+export function getDataFromWithdrawnEvent(
+  ctx: ChainContext,
+  event: Event
+): ExtractedData | undefined {
   const data = new TruthEvents.TokensWithdrawnEvent(ctx, event)
 
   if ('isV3' in data && data.isV3) {
-    if (data.asV3.currencyId.__kind === "ForeignAsset") {
-        return {account: data.asV3.who, currency: data.asV3.currencyId}
+    if (data.asV3.currencyId.__kind === 'ForeignAsset') {
+      return { account: data.asV3.who, currency: data.asV3.currencyId }
     }
     return undefined
   } else {
@@ -168,13 +193,15 @@ export function getDataFromWithdrawnEvent(ctx: ChainContext, event: Event): Extr
   }
 }
 
-export function getDataFromSlashedEvent(ctx: ChainContext, event: Event): ExtractedData | undefined {
-
+export function getDataFromSlashedEvent(
+  ctx: ChainContext,
+  event: Event
+): ExtractedData | undefined {
   const data = new TruthEvents.TokensSlashedEvent(ctx, event)
 
   if ('isV3' in data && data.isV3) {
-    if (data.asV3.currencyId.__kind === "ForeignAsset") {
-        return {account: data.asV3.who, currency: data.asV3.currencyId}
+    if (data.asV3.currencyId.__kind === 'ForeignAsset') {
+      return { account: data.asV3.who, currency: data.asV3.currencyId }
     }
     return undefined
   } else {
@@ -182,13 +209,15 @@ export function getDataFromSlashedEvent(ctx: ChainContext, event: Event): Extrac
   }
 }
 
-export function getDataFromDepositedEvent(ctx: ChainContext, event: Event): ExtractedData | undefined {
-
+export function getDataFromDepositedEvent(
+  ctx: ChainContext,
+  event: Event
+): ExtractedData | undefined {
   const data = new TruthEvents.TokensDepositedEvent(ctx, event)
 
   if ('isV3' in data && data.isV3) {
-    if (data.asV3.currencyId.__kind === "ForeignAsset") {
-        return {account: data.asV3.who, currency: data.asV3.currencyId}
+    if (data.asV3.currencyId.__kind === 'ForeignAsset') {
+      return { account: data.asV3.who, currency: data.asV3.currencyId }
     }
     return undefined
   } else {
@@ -196,13 +225,15 @@ export function getDataFromDepositedEvent(ctx: ChainContext, event: Event): Extr
   }
 }
 
-export function getDataFromLockSetEvent(ctx: ChainContext, event: Event): ExtractedData | undefined {
-
+export function getDataFromLockSetEvent(
+  ctx: ChainContext,
+  event: Event
+): ExtractedData | undefined {
   const data = new TruthEvents.TokensLockSetEvent(ctx, event)
 
   if ('isV3' in data && data.isV3) {
-    if (data.asV3.currencyId.__kind === "ForeignAsset") {
-        return {account: data.asV3.who, currency: data.asV3.currencyId}
+    if (data.asV3.currencyId.__kind === 'ForeignAsset') {
+      return { account: data.asV3.who, currency: data.asV3.currencyId }
     }
     return undefined
   } else {
@@ -210,13 +241,15 @@ export function getDataFromLockSetEvent(ctx: ChainContext, event: Event): Extrac
   }
 }
 
-export function getDataFromLockRemovedEvent(ctx: ChainContext, event: Event): ExtractedData | undefined {
-
+export function getDataFromLockRemovedEvent(
+  ctx: ChainContext,
+  event: Event
+): ExtractedData | undefined {
   const data = new TruthEvents.TokensLockRemovedEvent(ctx, event)
 
   if ('isV3' in data && data.isV3) {
-    if (data.asV3.currencyId.__kind === "ForeignAsset") {
-        return {account: data.asV3.who, currency: data.asV3.currencyId}
+    if (data.asV3.currencyId.__kind === 'ForeignAsset') {
+      return { account: data.asV3.who, currency: data.asV3.currencyId }
     }
     return undefined
   } else {
@@ -225,12 +258,11 @@ export function getDataFromLockRemovedEvent(ctx: ChainContext, event: Event): Ex
 }
 
 export function getDataFromLockedEvent(ctx: ChainContext, event: Event): ExtractedData | undefined {
-
   const data = new TruthEvents.TokensLockedEvent(ctx, event)
 
   if ('isV3' in data && data.isV3) {
-    if (data.asV3.currencyId.__kind === "ForeignAsset") {
-        return {account: data.asV3.who, currency: data.asV3.currencyId}
+    if (data.asV3.currencyId.__kind === 'ForeignAsset') {
+      return { account: data.asV3.who, currency: data.asV3.currencyId }
     }
     return undefined
   } else {
@@ -238,13 +270,15 @@ export function getDataFromLockedEvent(ctx: ChainContext, event: Event): Extract
   }
 }
 
-export function getDataFromUnlockedEvent(ctx: ChainContext, event: Event): ExtractedData | undefined {
-
+export function getDataFromUnlockedEvent(
+  ctx: ChainContext,
+  event: Event
+): ExtractedData | undefined {
   const data = new TruthEvents.TokensUnlockedEvent(ctx, event)
 
   if ('isV3' in data && data.isV3) {
-    if (data.asV3.currencyId.__kind === "ForeignAsset") {
-        return {account: data.asV3.who, currency: data.asV3.currencyId}
+    if (data.asV3.currencyId.__kind === 'ForeignAsset') {
+      return { account: data.asV3.who, currency: data.asV3.currencyId }
     }
     return undefined
   } else {
