@@ -9,9 +9,9 @@ module.exports = class Data1749856092950 {
     }
 
     async down(db) {
+        await db.query(`ALTER TABLE "balance" DROP CONSTRAINT "FK_7d8cc22f3f813ce146e741e7ff4"`)
         await db.query(`DROP TABLE "balance"`)
         await db.query(`DROP INDEX "public"."IDX_7d8cc22f3f813ce146e741e7ff"`)
         await db.query(`DROP TABLE "asset"`)
-        await db.query(`ALTER TABLE "balance" DROP CONSTRAINT "FK_7d8cc22f3f813ce146e741e7ff4"`)
     }
 }

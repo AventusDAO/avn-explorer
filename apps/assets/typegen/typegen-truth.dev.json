@@ -1,6 +1,6 @@
 {
   "outDir": "../src/types/generated/truth-dev",
-  "specVersions": "../../../packages/metadata/versions.truth-network.testnet.jsonl",
+  "specVersions": "../../../packages/metadata/versions.truth-network.dev.jsonl",
   "events": [
 	"Tokens.Endowed",
 	"Tokens.DustLost",
