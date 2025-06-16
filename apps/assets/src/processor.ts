@@ -4,9 +4,7 @@ import {
   BatchProcessorItem,
   SubstrateBlock
 } from '@subsquid/substrate-processor'
-import {
-  TokensAccountsStorage,
-} from './types/generated/truth-testnet/storage'
+import { TokensAccountsStorage } from './types/generated/truth-testnet/storage'
 import { Store, TypeormDatabase } from '@subsquid/typeorm-store'
 import { getProcessor } from '@avn/config'
 import { randomUUID } from 'crypto'
@@ -31,11 +29,7 @@ import {
   getDataFromAssetRegisteredEvent,
   getDataFromAssetUpdatedEvent
 } from './eventHandlers'
-import {
-  Asset,
-  Asset_ForeignAsset,
-  Type_440
-} from './types/generated/truth-testnet/v3'
+import { Asset, Asset_ForeignAsset, Type_440 } from './types/generated/truth-testnet/v3'
 import { u8aToHex } from '@polkadot/util'
 
 const processor = getProcessor()
@@ -99,13 +93,14 @@ async function main(ctx: Context): Promise<void> {
     for (const item of block.items) {
       if (item.kind === 'event') {
         switch (item.name) {
-          case 'AssetRegistry.RegisteredAsset':
-            const asset: AssetModel | undefined = getDataFromAssetRegisteredEvent(ctx, item.event)
+          case 'AssetRegistry.RegisteredAsset': {
+            const asset = getDataFromAssetRegisteredEvent(ctx, item.event)
             if (asset) {
               await ctx.store.save<AssetModel>(asset)
             }
 
             break
+          }
           case 'AssetRegistry.UpdatedAsset': {
             const asset = getDataFromAssetUpdatedEvent(ctx, item.event)
             if (asset) {
@@ -135,7 +130,7 @@ async function processAssetBalanceEventItem(
   item: EventItem,
   block: SubstrateBlock
 ): Promise<Balance[] | undefined> {
-  const eventData = getEventData(ctx, item, block)
+  const eventData = getEventData(ctx, item)
   if (!eventData) return undefined
 
   return await Promise.all(
@@ -173,11 +168,7 @@ async function getAsset(
   return await ctx.store.get(AssetModel, `ForeignAsset-${(assetId as Asset_ForeignAsset).value}`)
 }
 
-function getEventData(
-  ctx: Context,
-  item: EventItem,
-  block: SubstrateBlock
-): ExtractedData[] | undefined {
+function getEventData(ctx: Context, item: EventItem): ExtractedData[] | undefined {
   switch (item.name) {
     case 'Tokens.Endowed': {
       const result = getDataFromEndowedEvent(ctx, item.event)
@@ -189,7 +180,7 @@ function getEventData(
     }
     case 'Tokens.Transfer': {
       const result = getDataFromTransferEvent(ctx, item.event)
-      return result || undefined
+      return result ?? undefined
     }
     case 'Tokens.Reserved': {
       const result = getDataFromReservedEvent(ctx, item.event)
@@ -201,7 +192,7 @@ function getEventData(
     }
     case 'Tokens.ReserveRepatriated': {
       const result = getDataFromReserveRepatriatedEvent(ctx, item.event)
-      return result || undefined
+      return result ?? undefined
     }
     case 'Tokens.BalanceSet': {
       const result = getDataFromBalanceSetEvent(ctx, item.event)
