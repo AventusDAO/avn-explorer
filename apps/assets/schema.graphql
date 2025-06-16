@@ -1,0 +1,18 @@
+type Asset @entity {
+  id: ID! # Asset ID
+  symbol: String!
+  ethAddress: String!
+  name: String
+  decimals: Int
+  baseAsset: Boolean!
+  holders: [Balance!] @derivedFrom(field: "asset")
+}
+
+type Balance @entity {
+  id: ID! # assetId-accountId
+  asset: Asset!
+  account: String!
+  free: BigInt!
+  reserved: BigInt!
+  updatedAt: BigInt! # block number
+}
