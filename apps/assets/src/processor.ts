@@ -10,7 +10,7 @@ import { getProcessor } from '@avn/config'
 import { randomUUID } from 'crypto'
 
 import { Asset as AssetModel, Balance } from "./model";
-import { getAccountFromEndowedEvent, getAccountFromBalanceSetEvent, getAccountFromDustLostEvent, getAccountFromUnreservedEvent, getAccountFromReservedEvent, getAccountFromWithdrawnEvent, getAccountFromSlashedEvent, getAccountFromDepositedEvent, getAccountFromLockSetEvent, getAccountFromLockRemovedEvent, getAccountFromLockedEvent, getAccountsFromTransferEvent, getAccountsFromReserveRepatriatedEvent, getAccountFromUnlockedEvent, ExtractedData, getDataFromAssetRegisteredEvent, getDataFromAssetUpdatedEvent } from './eventHandlers';
+import { getDataFromEndowedEvent, getDataFromBalanceSetEvent, getDataFromDustLostEvent, getDataFromUnreservedEvent, getDataFromReservedEvent, getDataFromWithdrawnEvent, getDataFromSlashedEvent, getDataFromDepositedEvent, getDataFromLockSetEvent, getDataFromLockRemovedEvent, getDataFromLockedEvent, getDataFromTransferEvent, getDataFromReserveRepatriatedEvent, getDataFromUnlockedEvent, ExtractedData, getDataFromAssetRegisteredEvent, getDataFromAssetUpdatedEvent } from './eventHandlers';
 import { Asset, Asset_ForeignAsset, AssetMetadata, Type_440 } from './types/generated/truth-testnet/v3';
 import { u8aToHex } from '@polkadot/util'
 
@@ -157,59 +157,59 @@ function getEventData(
 
   switch (item.name) {
     case 'Tokens.Endowed': {
-      const result = getAccountFromEndowedEvent(ctx, item.event)
+      const result = getDataFromEndowedEvent(ctx, item.event)
       return result ? [result] : undefined;
     }
     case 'Tokens.DustLost': {
-      const result = getAccountFromDustLostEvent(ctx, item.event)
+      const result = getDataFromDustLostEvent(ctx, item.event)
       return result ? [result] : undefined;
     }
     case 'Tokens.Transfer': {
-      const result = getAccountsFromTransferEvent(ctx, item.event)
+      const result = getDataFromTransferEvent(ctx, item.event)
       return result || undefined;
     }
     case 'Tokens.Reserved': {
-      const result = getAccountFromReservedEvent(ctx, item.event)
+      const result = getDataFromReservedEvent(ctx, item.event)
       return result ? [result] : undefined;
     }
     case 'Tokens.Unreserved': {
-      const result = getAccountFromUnreservedEvent(ctx, item.event)
+      const result = getDataFromUnreservedEvent(ctx, item.event)
       return result ? [result] : undefined;
     }
     case 'Tokens.ReserveRepatriated': {
-      const result = getAccountsFromReserveRepatriatedEvent(ctx, item.event)
+      const result = getDataFromReserveRepatriatedEvent(ctx, item.event)
       return result || undefined;
     }
     case 'Tokens.BalanceSet': {
-      const result = getAccountFromBalanceSetEvent(ctx, item.event)
+      const result = getDataFromBalanceSetEvent(ctx, item.event)
       return result ? [result] : undefined;
     }
     case 'Tokens.Withdrawn': {
-      const result = getAccountFromWithdrawnEvent(ctx, item.event)
+      const result = getDataFromWithdrawnEvent(ctx, item.event)
       return result ? [result] : undefined;
     }
     case 'Tokens.Slashed': {
-      const result = getAccountFromSlashedEvent(ctx, item.event)
+      const result = getDataFromSlashedEvent(ctx, item.event)
       return result ? [result] : undefined;
     }
     case 'Tokens.Deposited': {
-      const result = getAccountFromDepositedEvent(ctx, item.event)
+      const result = getDataFromDepositedEvent(ctx, item.event)
       return result ? [result] : undefined;
     }
     case 'Tokens.LockSet': {
-      const result = getAccountFromLockSetEvent(ctx, item.event)
+      const result = getDataFromLockSetEvent(ctx, item.event)
       return result ? [result] : undefined;
     }
     case 'Tokens.LockRemoved': {
-      const result = getAccountFromLockRemovedEvent(ctx, item.event)
+      const result = getDataFromLockRemovedEvent(ctx, item.event)
       return result ? [result] : undefined;
     }
     case 'Tokens.Locked': {
-      const result = getAccountFromLockedEvent(ctx, item.event)
+      const result = getDataFromLockedEvent(ctx, item.event)
       return result ? [result] : undefined;
     }
     case 'Tokens.Unlocked': {
-      const result = getAccountFromUnlockedEvent(ctx, item.event)
+      const result = getDataFromUnlockedEvent(ctx, item.event)
       return result ? [result] : undefined;
     }
   }

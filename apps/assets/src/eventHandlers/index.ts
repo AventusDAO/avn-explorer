@@ -55,7 +55,7 @@ export function getDataFromAssetUpdatedEvent(ctx: ChainContext, event: Event): P
   }
 }
 
-export function getAccountFromEndowedEvent(ctx: ChainContext, event: Event): ExtractedData | undefined {
+export function getDataFromEndowedEvent(ctx: ChainContext, event: Event): ExtractedData | undefined {
   const data = new TruthEvents.TokensEndowedEvent(ctx, event)
 
   if ('isV3' in data && data.isV3) {
@@ -68,7 +68,7 @@ export function getAccountFromEndowedEvent(ctx: ChainContext, event: Event): Ext
   }
 }
 
-export function getAccountFromDustLostEvent(ctx: ChainContext, event: Event): ExtractedData | undefined {
+export function getDataFromDustLostEvent(ctx: ChainContext, event: Event): ExtractedData | undefined {
   const data = new TruthEvents.TokensDustLostEvent(ctx, event)
 
   if ('isV3' in data && data.isV3) {
@@ -81,7 +81,7 @@ export function getAccountFromDustLostEvent(ctx: ChainContext, event: Event): Ex
   }
 }
 
-export function getAccountsFromTransferEvent(ctx: ChainContext, event: Event): ExtractedData[] | undefined {
+export function getDataFromTransferEvent(ctx: ChainContext, event: Event): ExtractedData[] | undefined {
   const data = new TruthEvents.TokensTransferEvent(ctx, event)
 
   if ('isV3' in data && data.isV3) {
@@ -97,7 +97,7 @@ export function getAccountsFromTransferEvent(ctx: ChainContext, event: Event): E
   }
 }
 
-export function getAccountFromReservedEvent(ctx: ChainContext, event: Event): ExtractedData | undefined {
+export function getDataFromReservedEvent(ctx: ChainContext, event: Event): ExtractedData | undefined {
   const data = new TruthEvents.TokensReservedEvent(ctx, event)
 
   if ('isV3' in data && data.isV3) {
@@ -110,7 +110,7 @@ export function getAccountFromReservedEvent(ctx: ChainContext, event: Event): Ex
   }
 }
 
-export function getAccountFromUnreservedEvent(ctx: ChainContext, event: Event): ExtractedData | undefined {
+export function getDataFromUnreservedEvent(ctx: ChainContext, event: Event): ExtractedData | undefined {
   const data = new TruthEvents.TokensUnreservedEvent(ctx, event)
 
   if ('isV3' in data && data.isV3) {
@@ -123,7 +123,7 @@ export function getAccountFromUnreservedEvent(ctx: ChainContext, event: Event): 
   }
 }
 
-export function getAccountsFromReserveRepatriatedEvent(ctx: ChainContext, event: Event): ExtractedData[] | undefined {
+export function getDataFromReserveRepatriatedEvent(ctx: ChainContext, event: Event): ExtractedData[] | undefined {
 
   const data = new TruthEvents.TokensReserveRepatriatedEvent(ctx, event)
 
@@ -140,7 +140,7 @@ export function getAccountsFromReserveRepatriatedEvent(ctx: ChainContext, event:
   }
 }
 
-export function getAccountFromBalanceSetEvent(ctx: ChainContext, event: Event): ExtractedData | undefined {
+export function getDataFromBalanceSetEvent(ctx: ChainContext, event: Event): ExtractedData | undefined {
 
   const data = new TruthEvents.TokensBalanceSetEvent(ctx, event)
 
@@ -154,7 +154,7 @@ export function getAccountFromBalanceSetEvent(ctx: ChainContext, event: Event): 
   }
 }
 
-export function getAccountFromWithdrawnEvent(ctx: ChainContext, event: Event): ExtractedData | undefined {
+export function getDataFromWithdrawnEvent(ctx: ChainContext, event: Event): ExtractedData | undefined {
 
   const data = new TruthEvents.TokensWithdrawnEvent(ctx, event)
 
@@ -168,7 +168,7 @@ export function getAccountFromWithdrawnEvent(ctx: ChainContext, event: Event): E
   }
 }
 
-export function getAccountFromSlashedEvent(ctx: ChainContext, event: Event): ExtractedData | undefined {
+export function getDataFromSlashedEvent(ctx: ChainContext, event: Event): ExtractedData | undefined {
 
   const data = new TruthEvents.TokensSlashedEvent(ctx, event)
 
@@ -182,7 +182,7 @@ export function getAccountFromSlashedEvent(ctx: ChainContext, event: Event): Ext
   }
 }
 
-export function getAccountFromDepositedEvent(ctx: ChainContext, event: Event): ExtractedData | undefined {
+export function getDataFromDepositedEvent(ctx: ChainContext, event: Event): ExtractedData | undefined {
 
   const data = new TruthEvents.TokensDepositedEvent(ctx, event)
 
@@ -196,7 +196,7 @@ export function getAccountFromDepositedEvent(ctx: ChainContext, event: Event): E
   }
 }
 
-export function getAccountFromLockSetEvent(ctx: ChainContext, event: Event): ExtractedData | undefined {
+export function getDataFromLockSetEvent(ctx: ChainContext, event: Event): ExtractedData | undefined {
 
   const data = new TruthEvents.TokensLockSetEvent(ctx, event)
 
@@ -210,7 +210,7 @@ export function getAccountFromLockSetEvent(ctx: ChainContext, event: Event): Ext
   }
 }
 
-export function getAccountFromLockRemovedEvent(ctx: ChainContext, event: Event): ExtractedData | undefined {
+export function getDataFromLockRemovedEvent(ctx: ChainContext, event: Event): ExtractedData | undefined {
 
   const data = new TruthEvents.TokensLockRemovedEvent(ctx, event)
 
@@ -224,7 +224,7 @@ export function getAccountFromLockRemovedEvent(ctx: ChainContext, event: Event):
   }
 }
 
-export function getAccountFromLockedEvent(ctx: ChainContext, event: Event): ExtractedData | undefined {
+export function getDataFromLockedEvent(ctx: ChainContext, event: Event): ExtractedData | undefined {
 
   const data = new TruthEvents.TokensLockedEvent(ctx, event)
 
@@ -238,7 +238,7 @@ export function getAccountFromLockedEvent(ctx: ChainContext, event: Event): Extr
   }
 }
 
-export function getAccountFromUnlockedEvent(ctx: ChainContext, event: Event): ExtractedData | undefined {
+export function getDataFromUnlockedEvent(ctx: ChainContext, event: Event): ExtractedData | undefined {
 
   const data = new TruthEvents.TokensUnlockedEvent(ctx, event)
 
