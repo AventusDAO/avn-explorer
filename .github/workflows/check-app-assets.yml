@@ -1,0 +1,22 @@
+name: Check Assets app
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - 'apps/assets/**'
+      # check if one of the used packages is changed
+      - 'packages/types/**'
+      - 'packages/config/**'
+      - 'packages/utils/**'
+
+jobs:
+  check_nft_app:
+    name: Check Assets App
+    uses: Aventus-Network-Services/shared-workflows/.github/workflows/check-yarn-application.yml@v5.12.0
+    with:
+      working_directory: apps/assets
+      build_command: |
+        yarn workspace @avn/types run build
+        yarn workspace @avn/config run build
+        yarn workspace @avn/utils run build

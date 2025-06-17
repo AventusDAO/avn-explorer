@@ -1,0 +1,37 @@
+name: Build Assets
+
+on:
+  workflow_dispatch:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    branches:
+      - main
+    paths:
+      - 'apps/assets/**'
+      - 'packages/types/**'
+      - 'packages/config/**'
+      - 'packages/utils/**'
+  push:
+    branches:
+      - main
+    paths:
+      - 'apps/assets/**'
+      - 'packages/types/**'
+      - 'packages/config/**'
+      - 'packages/utils/**'
+
+jobs:
+  avn-docker-build:
+    name: AvN Explorer Assets
+    uses: Aventus-Network-Services/shared-workflows/.github/workflows/docker-build.yaml@v5.10.0
+    with:
+      aws_region: eu-west-1
+      aws_account_id: 931945598683
+      docker_file_path: apps/assets/Dockerfile
+      ecr_repository_name: explorer/assets
+      default_branch: main
+      create_pr_dtag: ${{ startsWith(github.ref, 'refs/pull/') }}
+      create_latest_dtag: ${{ github.ref == 'refs/heads/main' }}
+      create_commit_hash_dtag: true
+      create_git_ref_dtag: ${{ startsWith(github.ref, 'refs/tags/') }}
+    secrets: inherit
