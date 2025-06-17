@@ -252,9 +252,9 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@avn/assets-processor@workspace:apps/assets":
+"@avn/assets@workspace:apps/assets":
   version: 0.0.0-use.local
-  resolution: "@avn/assets-processor@workspace:apps/assets"
+  resolution: "@avn/assets@workspace:apps/assets"
   dependencies:
     "@avn/config": ^1.0.0
     "@avn/metadata": "workspace:^"
