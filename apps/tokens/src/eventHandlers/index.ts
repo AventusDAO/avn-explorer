@@ -33,7 +33,7 @@ export const getTokenLowerData = (ctx: ChainContext, event: Event): RawTokenBala
       accountId: v58Data.recipient,
       amount: v58Data.amount
     }
-  } 
+  }
   // Handle testnet environment (V70)
   else if ('isV70' in data && data.isV70) {
     const v70Data = data.asV70
@@ -42,7 +42,7 @@ export const getTokenLowerData = (ctx: ChainContext, event: Event): RawTokenBala
       accountId: v70Data.recipient,
       amount: v70Data.amount
     }
-  } 
+  }
   // Handle mainnet environment (V57)
   else if ('isV57' in data && data.isV57) {
     const v57Data = data.asV57
@@ -60,8 +60,7 @@ export const getTokenLowerData = (ctx: ChainContext, event: Event): RawTokenBala
       accountId: v4Data.recipient,
       amount: v4Data.amount
     }
-  } 
-  else {
+  } else {
     throw new UnknownVersionError(data.constructor.name)
   }
 }
