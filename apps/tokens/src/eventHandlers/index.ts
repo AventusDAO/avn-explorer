@@ -25,28 +25,43 @@ export const getTokenLowerData = (ctx: ChainContext, event: Event): RawTokenBala
   const TokenLoweredEventClass = getTokenLoweredEventVersion()
   const data = new TokenLoweredEventClass(ctx, event)
 
+  // Handle dev environment (V58)
   if ('isV58' in data && data.isV58) {
-    const v10Data = data.asV58
+    const v58Data = data.asV58
     return {
-      tokenId: v10Data.tokenId,
-      accountId: v10Data.recipient,
-      amount: v10Data.amount
+      tokenId: v58Data.tokenId,
+      accountId: v58Data.recipient,
+      amount: v58Data.amount
     }
-  } else if ('isV70' in data && data.isV70) {
-    const v10Data = data.asV70
+  } 
+  // Handle testnet environment (V70)
+  else if ('isV70' in data && data.isV70) {
+    const v70Data = data.asV70
     return {
-      tokenId: v10Data.tokenId,
-      accountId: v10Data.recipient,
-      amount: v10Data.amount
+      tokenId: v70Data.tokenId,
+      accountId: v70Data.recipient,
+      amount: v70Data.amount
     }
-  } else if ('isV57' in data && data.isV57) {
-    const v10Data = data.asV57
+  } 
+  // Handle mainnet environment (V57)
+  else if ('isV57' in data && data.isV57) {
+    const v57Data = data.asV57
     return {
-      tokenId: v10Data.tokenId,
-      accountId: v10Data.recipient,
-      amount: v10Data.amount
+      tokenId: v57Data.tokenId,
+      accountId: v57Data.recipient,
+      amount: v57Data.amount
     }
-  } else {
+  }
+  // Handle mainnet environment (V4)
+  else if ('isV4' in data && data.isV4) {
+    const v4Data = data.asV4
+    return {
+      tokenId: v4Data.tokenId,
+      accountId: v4Data.recipient,
+      amount: v4Data.amount
+    }
+  } 
+  else {
     throw new UnknownVersionError(data.constructor.name)
   }
 }
