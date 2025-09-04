@@ -85,7 +85,7 @@ async function recordTokenTransferData(
   tokens: Map<string, Token>,
   accountTokens: Map<string, AccountToken>,
   transfers: TokenTransfer[]
-): Promise<void> {  
+): Promise<void> {
   await ctx.store.save([...accounts.values()])
   await ctx.store.save([...tokens.values()])
   await ctx.store.save([...accountTokens.values()])
@@ -99,7 +99,7 @@ async function recordNftTransferData(
   nfts: Map<string, Nft>,
   accountNfts: Map<string, AccountNft>,
   nftTransfers: NftTransfer[]
-): Promise<void> {  
+): Promise<void> {
   await ctx.store.save([...accounts.values()])
   await ctx.store.save([...nfts.values()])
   await ctx.store.save([...accountNfts.values()])
@@ -236,7 +236,7 @@ async function getTransfers(
         if (schedulerEventNames.includes(item.name)) {
           await recordSchedulerEventData(ctx, block, item)
         }
-      } else if (item.kind === 'call') {        
+      } else if (item.kind === 'call') {
         if (process.env.PREDICTION_MARKETS_ENABLED) {
           // @ts-expect-error
           const signedCallName = item.call.args?.call?.__kind
@@ -278,11 +278,7 @@ async function getTransfers(
       nftTransfers
     )
 
-    await TransactionProcessor.processBlockTransactionCount(
-      ctx,
-      block.header,
-      block.items,
-    )
+    await TransactionProcessor.processBlockTransactionCount(ctx, block.header, block.items)
   }
 }
 

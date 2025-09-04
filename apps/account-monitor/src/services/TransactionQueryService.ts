@@ -12,7 +12,7 @@ export class TransactionQueryService {
 
   private async executeAggregateQuery(query: string, params: any[]): Promise<any[]> {
     try {
-      const result = await this.manager.query(query, params)      
+      const result = await this.manager.query(query, params)
       return result || []
     } catch (error) {
       throw new Error('Error executing database operation')
@@ -20,19 +20,18 @@ export class TransactionQueryService {
   }
 
   async getTotalSignedTransactions(): Promise<number> {
-    
     const query = `
       SELECT COALESCE(SUM(total_signed_transactions), 0) as totalCount
       FROM block_transaction_count
     `
     const result = await this.executeAggregateQuery(query, [])
     const totalCount = parseInt(result[0]?.totalcount || '0', 10)
-    
+
     return totalCount
   }
 
   async getTransactionCountsByBlockRange(
-    startBlock: bigint, 
+    startBlock: bigint,
     endBlock: bigint
   ): Promise<TransactionCountResult[]> {
     const query = `
@@ -44,8 +43,11 @@ export class TransactionQueryService {
       WHERE block_number >= $1 AND block_number <= $2
       ORDER BY block_number ASC
     `
-    
-    const result = await this.executeAggregateQuery(query, [startBlock.toString(), endBlock.toString()])
+
+    const result = await this.executeAggregateQuery(query, [
+      startBlock.toString(),
+      endBlock.toString()
+    ])
     return result.map(row => ({
       blockTimestamp: new Date(row.blockTimestamp),
       blockNumber: BigInt(row.blockNumber),
@@ -53,19 +55,19 @@ export class TransactionQueryService {
     }))
   }
 
-  async getTotalSignedTransactionsInRange(
-    startBlock: bigint, 
-    endBlock: bigint
-  ): Promise<number> {
+  async getTotalSignedTransactionsInRange(startBlock: bigint, endBlock: bigint): Promise<number> {
     const query = `
       SELECT COALESCE(SUM(total_signed_transactions), 0) as totalCount
       FROM block_transaction_count
       WHERE block_number >= $1 AND block_number <= $2
     `
-    
-    const result = await this.executeAggregateQuery(query, [startBlock.toString(), endBlock.toString()])
+
+    const result = await this.executeAggregateQuery(query, [
+      startBlock.toString(),
+      endBlock.toString()
+    ])
     const totalCount = parseInt(result[0]?.totalcount || '0', 10)
-    
+
     return totalCount
   }
 
@@ -79,7 +81,7 @@ export class TransactionQueryService {
       ORDER BY block_number DESC
       LIMIT $1
     `
-    
+
     const result = await this.executeAggregateQuery(query, [limit])
     return result.map(row => ({
       blockTimestamp: new Date(row.blockTimestamp),
@@ -106,7 +108,7 @@ export class TransactionQueryService {
       blockTimestamp,
       totalSignedTransactions: signedTransactionCount
     })
-    
+
     await this.manager.save(record)
   }
 }

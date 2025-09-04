@@ -123,14 +123,14 @@ predictionMarketCalls.forEach(call => {
 })
 
 processor.addCall('*', {
-    data: {
-      call: {
-        args: true,
-        error: true,
-        origin: true,
-        parent: false,
-      },
+  data: {
+    call: {
+      args: true,
+      error: true,
+      origin: true,
+      parent: false
     }
-  } as const)
+  }
+} as const)
 
 export default processor

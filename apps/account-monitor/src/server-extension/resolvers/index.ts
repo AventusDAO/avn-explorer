@@ -2,7 +2,10 @@ import 'reflect-metadata'
 import { Query, Resolver, Arg, ObjectType, Field, Int } from 'type-graphql'
 import { Any, EntityManager } from 'typeorm'
 import { InvalidInputError, TokenTransferService } from '../../services/TokenStatisticsService'
-import { TransactionQueryService, TransactionCountResult } from '../../services/TransactionQueryService'
+import {
+  TransactionQueryService,
+  TransactionCountResult
+} from '../../services/TransactionQueryService'
 import { TokenTransfer } from '../../model'
 
 @ObjectType()
@@ -165,12 +168,14 @@ export class TokenStatisticsResolver {
     }
   }
 
-  @Query(() => Int, { 
-    description: "Get total number of signed transactions across all blocks or within a block range"
+  @Query(() => Int, {
+    description: 'Get total number of signed transactions across all blocks or within a block range'
   })
   async getTotalSignedTransactions(
-    @Arg('startBlock', { nullable: true, description: "Start block number (inclusive)" }) startBlock?: string,
-    @Arg('endBlock', { nullable: true, description: "End block number (inclusive)" }) endBlock?: string
+    @Arg('startBlock', { nullable: true, description: 'Start block number (inclusive)' })
+    startBlock?: string,
+    @Arg('endBlock', { nullable: true, description: 'End block number (inclusive)' })
+    endBlock?: string
   ): Promise<number> {
     const manager = await this.tx()
     const service = new TransactionQueryService(manager)
@@ -183,7 +188,7 @@ export class TokenStatisticsResolver {
       if (startBlock && endBlock) {
         const start = BigInt(startBlock)
         const end = BigInt(endBlock)
-        
+
         if (start > end) {
           throw new Error('startBlock cannot be greater than endBlock')
         }
@@ -200,12 +205,19 @@ export class TokenStatisticsResolver {
   }
 
   @Query(() => TransactionCountSummary, {
-    description: "Get detailed transaction count data with block information"
+    description: 'Get detailed transaction count data with block information'
   })
   async getTransactionCountSummary(
-    @Arg('startBlock', { nullable: true, description: "Start block number (inclusive)" }) startBlock?: string,
-    @Arg('endBlock', { nullable: true, description: "End block number (inclusive)" }) endBlock?: string,
-    @Arg('limit', () => Int, { nullable: true, defaultValue: 100, description: "Maximum number of blocks to return" }) limit: number = 100
+    @Arg('startBlock', { nullable: true, description: 'Start block number (inclusive)' })
+    startBlock?: string,
+    @Arg('endBlock', { nullable: true, description: 'End block number (inclusive)' })
+    endBlock?: string,
+    @Arg('limit', () => Int, {
+      nullable: true,
+      defaultValue: 100,
+      description: 'Maximum number of blocks to return'
+    })
+    limit: number = 100
   ): Promise<TransactionCountSummary> {
     const manager = await this.tx()
     const service = new TransactionQueryService(manager)
@@ -225,7 +237,7 @@ export class TokenStatisticsResolver {
       if (startBlock && endBlock) {
         const start = BigInt(startBlock)
         const end = BigInt(endBlock)
-        
+
         if (start > end) {
           throw new Error('startBlock cannot be greater than endBlock')
         }
@@ -254,13 +266,16 @@ export class TokenStatisticsResolver {
   }
 
   @Query(() => [TransactionCountData], {
-    description: "Get transaction count data for specific blocks"
+    description: 'Get transaction count data for specific blocks'
   })
   async getTransactionCountByBlocks(
-    @Arg('blockNumbers', () => [String], { description: "Array of specific block numbers to query" }) blockNumbers: string[]
+    @Arg('blockNumbers', () => [String], {
+      description: 'Array of specific block numbers to query'
+    })
+    blockNumbers: string[]
   ): Promise<TransactionCountData[]> {
     const manager = await this.tx()
-    
+
     try {
       if (blockNumbers.length === 0) {
         return []
@@ -289,8 +304,11 @@ export class TokenStatisticsResolver {
         ORDER BY block_number ASC
       `
 
-      const result = await manager.query(query, validBlockNumbers.map(bn => bn.toString()))
-      
+      const result = await manager.query(
+        query,
+        validBlockNumbers.map(bn => bn.toString())
+      )
+
       return result.map((row: any) => ({
         blockTimestamp: new Date(row.blockTimestamp),
         blockNumber: row.blockNumber,
