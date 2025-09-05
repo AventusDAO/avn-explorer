@@ -83,7 +83,7 @@ export class TransactionProcessor {
         items: blockItems
       })
 
-      if (!signedTransactionCount) {
+      if (!signedTransactionCount || signedTransactionCount == 0) {
         return
       }
 
