@@ -20,8 +20,7 @@ export interface TransactionDetails {
   isSignedTransaction: boolean
 }
 
-export class TransactionProcessor {
-  static countSignedTransactionsInBlock(block: any): {
+  export function countSignedTransactionsInBlock(block: any): {
     count: number
   } {
     if (!block.items || !Array.isArray(block.items)) {
@@ -33,7 +32,7 @@ export class TransactionProcessor {
     let signedTransactionCount = 0
 
     for (const item of block.items) {
-      const isSignedTransaction = this.isSignedTransaction(item.call?.origin)
+      const isSignedTransaction = isSignedTransactionFunction(item.call?.origin)
       if (isSignedTransaction) {
         signedTransactionCount++
       }
@@ -44,7 +43,7 @@ export class TransactionProcessor {
     }
   }
 
-  private static isSignedTransaction(origin: any): boolean {
+  function isSignedTransactionFunction(origin: any): boolean {
     if (origin?.value?.__kind === 'Signed') {
       return true
     }
@@ -60,7 +59,7 @@ export class TransactionProcessor {
     return false
   }
 
-  static async processBlockTransactionCount(
+  export async function processBlockTransactionCount(
     ctx: Ctx,
     block: SubstrateBlock,
     blockItems: unknown[]
@@ -79,7 +78,7 @@ export class TransactionProcessor {
         return
       }
 
-      const { count: signedTransactionCount } = this.countSignedTransactionsInBlock({
+      const { count: signedTransactionCount } = countSignedTransactionsInBlock({
         items: blockItems
       })
 
@@ -123,4 +122,4 @@ export class TransactionProcessor {
       ctx.log.error(`Error processing transaction count for block ${block.height}: ${error}`)
     }
   }
-}
+

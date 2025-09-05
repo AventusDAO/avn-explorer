@@ -234,7 +234,7 @@ export class TokenStatisticsResolver {
         throw new Error('Limit cannot exceed 1000 blocks')
       }
 
-      if ((startBlock && !endBlock) || (!startBlock && endBlock)) {
+      if ((startBlock && !endBlock) ?? (!startBlock && endBlock)) {
         throw new Error('Both startBlock and endBlock must be provided when specifying a range')
       }
 

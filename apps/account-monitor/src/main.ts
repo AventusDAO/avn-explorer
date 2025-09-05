@@ -36,7 +36,7 @@ import {
   mapTokenEntities
 } from './mappingFuncitons'
 import { processPredictionMarketCall } from './chainCallHandlers'
-import { TransactionProcessor } from './services/TransactionProcessor'
+import { processBlockTransactionCount } from './services/TransactionProcessor'
 
 async function createTokenLookupMap(ctx: Ctx): Promise<Map<string, string>> {
   const tokenLookupData = await getTokenLookupData(ctx)
@@ -278,7 +278,7 @@ async function getTransfers(
       nftTransfers
     )
 
-    await TransactionProcessor.processBlockTransactionCount(ctx, block.header, block.items)
+    await processBlockTransactionCount(ctx, block.header, block.items)
   }
 }
 

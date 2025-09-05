@@ -24,6 +24,6 @@ export class BlockTransactionCount {
     blockTimestamp!: Date
 
     @Field(() => Int)
-    @Column_("int16", {nullable: false})
+    @Column_("numeric", {nullable: false})
     totalSignedTransactions!: number
 }
