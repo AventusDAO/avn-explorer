@@ -1,5 +1,5 @@
 import { EntityManager } from 'typeorm'
-import { BlockTransactionCount } from '../model'
+import { BlockTransactionCount, BlockTransactionTotal } from '../model'
 
 export interface TransactionCountResult {
   blockTimestamp: Date
@@ -20,14 +20,14 @@ export class TransactionQueryService {
   }
 
   async getTotalSignedTransactions(): Promise<number> {
-    const query = `
-      SELECT COALESCE(SUM(total_signed_transactions), 0) as totalCount
-      FROM block_transaction_count
-    `
-    const result = await this.executeAggregateQuery(query, [])
-    const totalCount = parseInt(result[0]?.totalcount || '0', 10)
-
-    return totalCount
+    try {
+      const totalRecord = await this.manager.findOne(BlockTransactionTotal, {
+        where: { id: 'total' }
+      })
+      return totalRecord?.totalSignedTransactions ?? 0
+    } catch (error) {
+      throw new Error('Error executing database operation')
+    }
   }
 
   async getTransactionCountsByBlockRange(

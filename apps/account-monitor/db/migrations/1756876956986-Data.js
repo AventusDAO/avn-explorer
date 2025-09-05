@@ -6,13 +6,13 @@ module.exports = class Data1756876956986 {
         await db.query(`CREATE INDEX "IDX_5844c7dfdacdda0f00fc9ddabb" ON "block_transaction_count" ("block_number") `)
         await db.query(`CREATE INDEX "IDX_9ac069552a6988066eb77a29f5" ON "block_transaction_count" ("block_timestamp") `)
 
-        await db.query(`GRANT USAGE ON SCHEMA public To readonly`)
-        await db.query(`GRANT SELECT ON ALL TABLES IN SCHEMA public TO readonly`)
-        await db.query(`GRANT SELECT ON ALL SEQUENCES IN SCHEMA public TO readonly`) 
+        // await db.query(`GRANT USAGE ON SCHEMA public To readonly`)
+        // await db.query(`GRANT SELECT ON ALL TABLES IN SCHEMA public TO readonly`)
+        // await db.query(`GRANT SELECT ON ALL SEQUENCES IN SCHEMA public TO readonly`) 
 
-        await db.query(`GRANT USAGE ON SCHEMA public To explorer_ro`)
-        await db.query(`GRANT SELECT ON ALL TABLES IN SCHEMA public TO explorer_ro`)
-        await db.query(`GRANT SELECT ON ALL SEQUENCES IN SCHEMA public TO explorer_ro`)
+        // await db.query(`GRANT USAGE ON SCHEMA public To explorer_ro`)
+        // await db.query(`GRANT SELECT ON ALL TABLES IN SCHEMA public TO explorer_ro`)
+        // await db.query(`GRANT SELECT ON ALL SEQUENCES IN SCHEMA public TO explorer_ro`)
     }
 
     async down(db) {

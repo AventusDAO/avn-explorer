@@ -159,3 +159,8 @@ type BlockTransactionCount @entity {
   blockTimestamp: DateTime! @index
   totalSignedTransactions: Int!
 }
+
+type BlockTransactionTotal @entity {
+  id: ID!
+  totalSignedTransactions: Int!
+}

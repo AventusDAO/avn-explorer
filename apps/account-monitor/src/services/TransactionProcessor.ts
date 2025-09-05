@@ -1,6 +1,6 @@
 import { SubstrateBlock } from '@subsquid/substrate-processor'
 import { Ctx } from '../types'
-import { BlockTransactionCount, TokenTransfer, NftTransfer } from '../model'
+import { BlockTransactionCount, BlockTransactionTotal } from '../model'
 
 export interface SignedTransactionInfo {
   blockNumber: bigint
@@ -30,30 +30,11 @@ export class TransactionProcessor {
     }
 
     let signedTransactionCount = 0
-    const processedExtrinsics = new Set<string>()
 
     for (const item of block.items) {
-      let extrinsicHash: string | null = null
-      let origin: any = null
-      let signature: any = null
-      let extrinsicIndex = 0
-      let callName = ''
-
-      if (item.kind === 'call' && this.isSignedTransaction(item.call?.origin)) {
-        extrinsicHash = item.extrinsic.hash
-        signature = item.extrinsic.signature
-        origin = item.call?.origin
-        extrinsicIndex = item.extrinsic.indexInBlock || 0
-        callName = item.call?.name || ''
-      }
-
-      if (extrinsicHash && !processedExtrinsics.has(extrinsicHash)) {
-        const isSignedTransaction = this.isSignedTransaction(origin)
-
-        if (isSignedTransaction) {
-          signedTransactionCount++
-          processedExtrinsics.add(extrinsicHash)
-        }
+      const isSignedTransaction = this.isSignedTransaction(item.call?.origin)
+      if (isSignedTransaction) {
+        signedTransactionCount++
       }
     }
 
@@ -81,29 +62,29 @@ export class TransactionProcessor {
   static async processBlockTransactionCount(
     ctx: Ctx,
     block: SubstrateBlock,
-    blockItems: any[]
+    blockItems: unknown[]
   ): Promise<void> {
     try {
       const blockNumber = BigInt(block.height)
       const blockTimestamp = new Date(block.timestamp)
 
-      if (!blockItems || !Array.isArray(blockItems)) {
+      if (!Array.isArray(blockItems) || blockItems.length === 0) {
         return
       }
-
       const existing = await ctx.store.findOne(BlockTransactionCount, {
         where: { id: blockNumber.toString() }
       })
-
       if (existing) {
         return
       }
 
-      const result = this.countSignedTransactionsInBlock({
+      const { count: signedTransactionCount } = this.countSignedTransactionsInBlock({
         items: blockItems
       })
 
-      const { count: signedTransactionCount } = result
+      if (!signedTransactionCount) {
+        return
+      }
 
       const transactionCountRecord = new BlockTransactionCount({
         id: blockNumber.toString(),
@@ -115,6 +96,21 @@ export class TransactionProcessor {
       try {
         if (signedTransactionCount) {
           await ctx.store.save(transactionCountRecord)
+
+          const totalId = 'total'
+          let totalRecord = await ctx.store.findOne(BlockTransactionTotal, {
+            where: { id: totalId }
+          })
+
+          if (!totalRecord) {
+            totalRecord = new BlockTransactionTotal({
+              id: totalId,
+              totalSignedTransactions: 0
+            })
+          }
+
+          totalRecord.totalSignedTransactions += signedTransactionCount
+          await ctx.store.save(totalRecord)
         }
       } catch (saveError) {
         if (saveError instanceof Error && saveError.message.includes('duplicate')) {

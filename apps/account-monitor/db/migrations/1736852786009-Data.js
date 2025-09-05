@@ -31,14 +31,6 @@ module.exports = class Data1736852786009 {
         await db.query(`CREATE INDEX "IDX_4383dd6ac49ad5af577285f89c" ON "prediction_market_share_redemption" ("market_id") `)
         await db.query(`ALTER TABLE "prediction_market_creation" ADD CONSTRAINT "FK_14ba274a826105fb66f780515aa" FOREIGN KEY ("oracle_id") REFERENCES "account"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`)
         await db.query(`ALTER TABLE "prediction_market_asset_transfer" ADD CONSTRAINT "FK_e253398b8a8d31c1877da8b4ce2" FOREIGN KEY ("to_id") REFERENCES "account"("id") ON DELETE NO ACTION ON UPDATE NO ACTION`)
-
-        // await db.query(`GRANT USAGE ON SCHEMA public To readonly`)
-        // await db.query(`GRANT SELECT ON ALL TABLES IN SCHEMA public TO readonly`)
-        // await db.query(`GRANT SELECT ON ALL SEQUENCES IN SCHEMA public TO readonly`) 
-
-        // await db.query(`GRANT USAGE ON SCHEMA public To explorer_ro`)
-        // await db.query(`GRANT SELECT ON ALL TABLES IN SCHEMA public TO explorer_ro`)
-        // await db.query(`GRANT SELECT ON ALL SEQUENCES IN SCHEMA public TO explorer_ro`)
     }
 
     async down(db) {

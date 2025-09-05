@@ -169,37 +169,41 @@ export class TokenStatisticsResolver {
   }
 
   @Query(() => Int, {
-    description: 'Get total number of signed transactions across all blocks or within a block range'
+    description: 'Get total number of signed transactions across all blocks'
   })
-  async getTotalSignedTransactions(
-    @Arg('startBlock', { nullable: true, description: 'Start block number (inclusive)' })
-    startBlock?: string,
-    @Arg('endBlock', { nullable: true, description: 'End block number (inclusive)' })
-    endBlock?: string
+  async getTotalSignedTransactions(): Promise<number> {
+    const manager = await this.tx()
+    const service = new TransactionQueryService(manager)
+
+    try {
+      return await service.getTotalSignedTransactions()
+    } catch (error) {
+      console.error('Error getting total signed transactions:', error)
+      throw new Error('Failed to retrieve transaction count data')
+    }
+  }
+
+  @Query(() => Int, {
+    description: 'Get total number of signed transactions within a block range'
+  })
+  async getTotalSignedTransactionsInRange(
+    @Arg('startBlock', { description: 'Start block number (inclusive)' }) startBlock: string,
+    @Arg('endBlock', { description: 'End block number (inclusive)' }) endBlock: string
   ): Promise<number> {
     const manager = await this.tx()
     const service = new TransactionQueryService(manager)
 
     try {
-      if ((startBlock && !endBlock) || (!startBlock && endBlock)) {
-        throw new Error('Both startBlock and endBlock must be provided when specifying a range')
+      const start = BigInt(startBlock)
+      const end = BigInt(endBlock)
+
+      if (start > end) {
+        throw new Error('startBlock cannot be greater than endBlock')
       }
 
-      if (startBlock && endBlock) {
-        const start = BigInt(startBlock)
-        const end = BigInt(endBlock)
-
-        if (start > end) {
-          throw new Error('startBlock cannot be greater than endBlock')
-        }
-
-        return await service.getTotalSignedTransactionsInRange(start, end)
-      }
-
-      // Return total across all blocks if no range specified
-      return await service.getTotalSignedTransactions()
+      return await service.getTotalSignedTransactionsInRange(start, end)
     } catch (error) {
-      console.error('Error getting total signed transactions:', error)
+      console.error('Error getting total signed transactions in range:', error)
       throw new Error('Failed to retrieve transaction count data')
     }
   }
