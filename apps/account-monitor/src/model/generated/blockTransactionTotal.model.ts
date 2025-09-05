@@ -9,6 +9,6 @@ export class BlockTransactionTotal {
     @PrimaryColumn_()
     id!: string
 
-    @Column_("int4", {nullable: false})
+    @Column_("int16", {nullable: false})
     totalSignedTransactions!: number
 }
