@@ -82,7 +82,7 @@ export async function processBlockTransactionCount(
       items: blockItems
     })
 
-    if (!signedTransactionCount || signedTransactionCount == 0) {
+    if (!signedTransactionCount || signedTransactionCount === 0) {
       return
     }
 
