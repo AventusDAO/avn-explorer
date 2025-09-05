@@ -152,3 +152,15 @@ type PredictionMarketAssetTransfer @entity {
   token: String @index
   kind: String @index
 }
+
+type BlockTransactionCount @entity {
+  id: ID!
+  blockNumber: BigInt! @index
+  blockTimestamp: DateTime! @index
+  totalSignedTransactions: Int!
+}
+
+type BlockTransactionTotal @entity {
+  id: ID!
+  totalSignedTransactions: Int!
+}

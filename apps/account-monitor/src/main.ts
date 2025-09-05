@@ -36,6 +36,7 @@ import {
   mapTokenEntities
 } from './mappingFuncitons'
 import { processPredictionMarketCall } from './chainCallHandlers'
+import { processBlockTransactionCount } from './services/TransactionProcessor'
 
 async function createTokenLookupMap(ctx: Ctx): Promise<Map<string, string>> {
   const tokenLookupData = await getTokenLookupData(ctx)
@@ -214,13 +215,10 @@ async function getTransfers(
         }
 
         if (eventNames.includes(item.name)) {
-          // Check if the event has the required properties for TransfersEventItem
-
           const transfer = getTransferData(
             ctx,
             block.header,
-            // @ts-expect-error
-            item as TransfersEventItem,
+            item as unknown as TransfersEventItem,
             tokenLookupMap,
             avtHash
           )
@@ -279,6 +277,8 @@ async function getTransfers(
       accountNfts,
       nftTransfers
     )
+
+    await processBlockTransactionCount(ctx, block.header, block.items)
   }
 }
 

@@ -1,0 +1,1 @@
+export const DB_TOTAL_ID = 'total'

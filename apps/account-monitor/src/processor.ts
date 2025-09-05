@@ -20,7 +20,7 @@ const standardCallConfig = {
     call: {
       args: false,
       error: true,
-      origin: false,
+      origin: true,
       parent: false
     },
     extrinsic: {
@@ -121,5 +121,16 @@ export const predictionMarketCalls = [
 predictionMarketCalls.forEach(call => {
   processor.addCall(call, standardCallConfig)
 })
+
+processor.addCall('*', {
+  data: {
+    call: {
+      args: true,
+      error: true,
+      origin: true,
+      parent: false
+    }
+  }
+} as const)
 
 export default processor
