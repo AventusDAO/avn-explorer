@@ -1,6 +1,7 @@
 import { SubstrateBlock } from '@subsquid/substrate-processor'
 import { Ctx } from '../types'
 import { BlockTransactionCount, BlockTransactionTotal } from '../model'
+import { DB_TOTAL_ID } from '../constants'
 
 export interface SignedTransactionInfo {
   blockNumber: bigint
@@ -94,24 +95,21 @@ export class TransactionProcessor {
       })
 
       try {
-        if (signedTransactionCount) {
-          await ctx.store.save(transactionCountRecord)
+        await ctx.store.save(transactionCountRecord)
 
-          const totalId = 'total'
-          let totalRecord = await ctx.store.findOne(BlockTransactionTotal, {
-            where: { id: totalId }
+        let totalRecord = await ctx.store.findOne(BlockTransactionTotal, {
+          where: { id: DB_TOTAL_ID }
+        })
+
+        if (!totalRecord) {
+          totalRecord = new BlockTransactionTotal({
+            id: DB_TOTAL_ID,
+            totalSignedTransactions: 0
           })
-
-          if (!totalRecord) {
-            totalRecord = new BlockTransactionTotal({
-              id: totalId,
-              totalSignedTransactions: 0
-            })
-          }
-
-          totalRecord.totalSignedTransactions += signedTransactionCount
-          await ctx.store.save(totalRecord)
         }
+
+        totalRecord.totalSignedTransactions += signedTransactionCount
+        await ctx.store.save(totalRecord)
       } catch (saveError) {
         if (saveError instanceof Error && saveError.message.includes('duplicate')) {
           ctx.log

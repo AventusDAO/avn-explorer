@@ -1,5 +1,6 @@
 import { EntityManager } from 'typeorm'
 import { BlockTransactionCount, BlockTransactionTotal } from '../model'
+import { DB_TOTAL_ID } from '../constants'
 
 export interface TransactionCountResult {
   blockTimestamp: Date
@@ -22,7 +23,7 @@ export class TransactionQueryService {
   async getTotalSignedTransactions(): Promise<number> {
     try {
       const totalRecord = await this.manager.findOne(BlockTransactionTotal, {
-        where: { id: 'total' }
+        where: { id: DB_TOTAL_ID }
       })
       return totalRecord?.totalSignedTransactions ?? 0
     } catch (error) {
@@ -95,27 +96,5 @@ export class TransactionQueryService {
       where: { id: blockNumber.toString() }
     })
     return !!existing
-  }
-
-  async saveBlockTransactionCount(
-    blockNumber: bigint,
-    blockTimestamp: Date,
-    signedTransactionCount: number
-  ): Promise<void> {
-    const record = new BlockTransactionCount({
-      id: blockNumber.toString(),
-      blockNumber,
-      blockTimestamp,
-      totalSignedTransactions: signedTransactionCount
-    })
-
-    await this.manager.save(record)
-  }
-}
-
-export class TransactionQueryError extends Error {
-  constructor(message: string) {
-    super(message)
-    this.name = 'TransactionQueryError'
   }
 }

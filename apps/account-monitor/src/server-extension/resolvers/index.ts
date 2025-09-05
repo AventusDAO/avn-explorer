@@ -289,29 +289,30 @@ export class TokenStatisticsResolver {
         throw new Error('Cannot query more than 100 blocks at once')
       }
 
-      const validBlockNumbers = blockNumbers.map(bn => {
-        try {
-          return BigInt(bn)
-        } catch {
-          throw new Error(`Invalid block number: ${bn}`)
-        }
-      })
+      const decimal = /^(0|[1-9]\d*)$/
+      const { placeholders, params } = blockNumbers.reduce(
+        (acc, raw, i) => {
+          const bn = raw.trim()
+          if (!decimal.test(bn)) throw new Error(`Invalid block number: ${raw}`)
+          const normalized = BigInt(bn).toString()
+          acc.params.push(normalized)
+          acc.placeholders.push(`$${i + 1}`)
+          return acc
+        },
+        { placeholders: [] as string[], params: [] as string[] }
+      )
 
-      const placeholders = validBlockNumbers.map((_, i) => `$${i + 1}`).join(',')
       const query = `
         SELECT 
           block_timestamp as "blockTimestamp",
           block_number as "blockNumber",
           total_signed_transactions as "totalNumTransactions"
         FROM block_transaction_count
-        WHERE block_number IN (${placeholders})
+        WHERE block_number IN (${placeholders.join(',')})
         ORDER BY block_number ASC
       `
 
-      const result = await manager.query(
-        query,
-        validBlockNumbers.map(bn => bn.toString())
-      )
+      const result = await manager.query(query, params)
 
       return result.map((row: any) => ({
         blockTimestamp: new Date(row.blockTimestamp),
