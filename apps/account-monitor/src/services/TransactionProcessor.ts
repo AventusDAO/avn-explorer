@@ -20,27 +20,32 @@ export interface TransactionDetails {
   isSignedTransaction: boolean
 }
 
-export function countSignedTransactionsInBlock(block: any): {
-  count: number
-} {
+export function countSignedTransactionsInBlock(block: any): { count: number } {
   if (!block.items || !Array.isArray(block.items)) {
-    return {
-      count: 0
-    }
+    return { count: 0 }
   }
 
-  let signedTransactionCount = 0
+  const signedExtrinsicKeys = new Set<string>()
 
   for (const item of block.items) {
     const isSignedTransaction = isSignedTransactionFunction(item.call?.origin)
-    if (isSignedTransaction) {
-      signedTransactionCount++
+    if (!isSignedTransaction) continue
+
+    const hash: string | undefined = item?.extrinsic?.hash
+    const indexInBlock: number | undefined = item?.extrinsic?.indexInBlock
+
+    if (hash && typeof indexInBlock === 'number') {
+      signedExtrinsicKeys.add(`${hash}:${indexInBlock}`)
+      continue
+    }
+
+    if (hash) {
+      signedExtrinsicKeys.add(hash)
+      continue
     }
   }
 
-  return {
-    count: signedTransactionCount
-  }
+  return { count: signedExtrinsicKeys.size }
 }
 
 function isSignedTransactionFunction(origin: any): boolean {
