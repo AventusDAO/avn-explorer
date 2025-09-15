@@ -26,6 +26,7 @@ const standardCallConfig = {
     extrinsic: {
       signature: true,
       success: true,
+      indexInBlock: true,
       fee: false,
       tip: false,
       call: false,
@@ -129,6 +130,12 @@ processor.addCall('*', {
       error: true,
       origin: true,
       parent: false
+    },
+    extrinsic: {
+      signature: true,
+      success: true,
+      hash: true,
+      indexInBlock: true
     }
   }
 } as const)
