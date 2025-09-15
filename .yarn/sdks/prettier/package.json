@@ -3,5 +3,9 @@
   "version": "2.8.0-sdk",
   "main": "./index.js",
   "type": "commonjs",
-  "bin": "./bin-prettier.js"
+  "bin": "./bin-prettier.js",
+  "resolutions": {
+    "strip-ansi": "6.0.1",
+    "error-ex": "1.3.2"
+  }
 }
