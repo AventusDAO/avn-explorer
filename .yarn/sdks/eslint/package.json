@@ -10,5 +10,9 @@
     "./package.json": "./package.json",
     ".": "./lib/api.js",
     "./use-at-your-own-risk": "./lib/unsupported-api.js"
+  },
+  "resolutions": {
+    "strip-ansi": "6.0.1",
+    "error-ex": "1.3.2"
   }
 }
