@@ -31,17 +31,13 @@ export function countSignedTransactionsInBlock(block: any): { count: number } {
     const isSignedTransaction = isSignedTransactionFunction(item.call?.origin)
     if (!isSignedTransaction) continue
 
+    // TODO: if duplication of counting we should further debug this function
+    // to see if there are more signed functions that are batched
+
     const hash: string | undefined = item?.extrinsic?.hash
-    const indexInBlock: number | undefined = item?.extrinsic?.indexInBlock
-
-    if (hash && typeof indexInBlock === 'number') {
-      signedExtrinsicKeys.add(`${hash}:${indexInBlock}`)
-      continue
-    }
-
+    const indexInBlock: number | undefined = item?.extrinsic?.indexInBlock ?? 0
     if (hash) {
-      signedExtrinsicKeys.add(hash)
-      continue
+      signedExtrinsicKeys.add(`${hash}:${indexInBlock}`)
     }
   }
 
