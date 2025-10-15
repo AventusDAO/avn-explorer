@@ -9,7 +9,11 @@ import { Account, Node, Reward } from './model'
 
 const processor = getProcessor()
 
-export const nodeManagerEvents = ['NodeManager.NodeRegistered', 'NodeManager.RewardPaid']
+export const nodeManagerEvents = [
+  'NodeManager.NodeRegistered',
+  'NodeManager.NodeDeregistered',
+  'NodeManager.RewardPaid'
+]
 
 const standardEventConfig = {
   data: {
@@ -81,6 +85,25 @@ export const processNodeRegistered: EventProcessor = async ({
   await store.save(nodeEntity)
 }
 
+export const processNodeDeregistered: EventProcessor = async ({
+  store,
+  event,
+  blockTimestamp,
+  log
+}: ProcessingContext) => {
+  // @ts-expect-error
+  const { owner, node } = event.event.args
+
+  const nodeEntity = await store.get(Node, node)
+
+  if (!nodeEntity) {
+    log.warn(`Node not found for deregistration: ${node}`)
+    return
+  }
+
+  await store.remove(nodeEntity)
+}
+
 export const processRewardPaid: EventProcessor = async ({
   store,
   event,
@@ -111,7 +134,8 @@ export const processRewardPaid: EventProcessor = async ({
 
 const eventHandlers: Record<string, EventProcessor> = {
   'NodeManager.NodeRegistered': processNodeRegistered,
-  'NodeManager.RewardPaid': processRewardPaid
+  'NodeManager.RewardPaid': processRewardPaid,
+  'NodeManager.NodeDeregistered': processNodeDeregistered
 }
 
 export const processEvent = async (ctx: ProcessingContext): Promise<void> => {
