@@ -104,24 +104,30 @@ DB_PASS_ASSETS=
 ## Usage Examples
 
 ### Reset height only (for node-manager)
+
 ```bash
 RESET_NODE_MANAGER=false
 RESET_HEIGHT_NODE_MANAGER=true
 ```
+
 This will connect to the node-manager database and set `squid_processor.status.height = 0` without dropping any tables.
 
 ### Drop all tables (full reset)
+
 ```bash
 RESET_NODE_MANAGER=true
 RESET_HEIGHT_NODE_MANAGER=false
 ```
+
 This will drop all tables in both `public` and `squid_processor` schemas.
 
 ### Both flags enabled
+
 ```bash
 RESET_NODE_MANAGER=true
 RESET_HEIGHT_NODE_MANAGER=true
 ```
+
 Height reset is skipped automatically since dropping tables makes it redundant. Only table dropping will occur.
 
 > NOTE: don't forget to append new env vars when adding a new processor
