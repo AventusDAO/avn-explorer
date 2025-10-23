@@ -15,6 +15,7 @@ export interface DatabaseConfig {
     | 'node-manager'
     | 'assets'
   reset: boolean
+  resetHeight?: boolean
   db?: string
   user?: string
   pass?: string
@@ -30,6 +31,7 @@ export const getDbConfigs: () => Readonly<DatabaseConfig[]> = () =>
     {
       name: 'archive',
       reset: process.env.RESET_ARCHIVE === 'true',
+      resetHeight: process.env.RESET_HEIGHT_ARCHIVE === 'true',
       db: process.env.DB_SCHEMA_ARCHIVE,
       user: process.env.DB_USER_ARCHIVE,
       pass: process.env.DB_PASS_ARCHIVE
@@ -37,6 +39,7 @@ export const getDbConfigs: () => Readonly<DatabaseConfig[]> = () =>
     {
       name: 'errors',
       reset: process.env.RESET_ERRORS === 'true',
+      resetHeight: process.env.RESET_HEIGHT_ERRORS === 'true',
       db: process.env.DB_SCHEMA_ERRORS,
       user: process.env.DB_USER_ERRORS,
       pass: process.env.DB_PASS_ERRORS
@@ -44,6 +47,7 @@ export const getDbConfigs: () => Readonly<DatabaseConfig[]> = () =>
     {
       name: 'fees',
       reset: process.env.RESET_FEES === 'true',
+      resetHeight: process.env.RESET_HEIGHT_FEES === 'true',
       db: process.env.DB_SCHEMA_FEES,
       user: process.env.DB_USER_FEES,
       pass: process.env.DB_PASS_FEES
@@ -51,6 +55,7 @@ export const getDbConfigs: () => Readonly<DatabaseConfig[]> = () =>
     {
       name: 'balances',
       reset: process.env.RESET_BALANCES === 'true',
+      resetHeight: process.env.RESET_HEIGHT_BALANCES === 'true',
       db: process.env.DB_SCHEMA_BALANCES,
       user: process.env.DB_USER_BALANCES,
       pass: process.env.DB_PASS_BALANCES
@@ -58,6 +63,7 @@ export const getDbConfigs: () => Readonly<DatabaseConfig[]> = () =>
     {
       name: 'staking',
       reset: process.env.RESET_STAKING === 'true',
+      resetHeight: process.env.RESET_HEIGHT_STAKING === 'true',
       db: process.env.DB_SCHEMA_STAKING,
       user: process.env.DB_USER_STAKING,
       pass: process.env.DB_PASS_STAKING
@@ -65,6 +71,7 @@ export const getDbConfigs: () => Readonly<DatabaseConfig[]> = () =>
     {
       name: 'summary',
       reset: process.env.RESET_SUMMARY === 'true',
+      resetHeight: process.env.RESET_HEIGHT_SUMMARY === 'true',
       db: process.env.DB_SCHEMA_SUMMARY,
       user: process.env.DB_USER_SUMMARY,
       pass: process.env.DB_PASS_SUMMARY
@@ -72,6 +79,7 @@ export const getDbConfigs: () => Readonly<DatabaseConfig[]> = () =>
     {
       name: 'tokens',
       reset: process.env.RESET_TOKENS === 'true',
+      resetHeight: process.env.RESET_HEIGHT_TOKENS === 'true',
       db: process.env.DB_SCHEMA_TOKENS,
       user: process.env.DB_USER_TOKENS,
       pass: process.env.DB_PASS_TOKENS
@@ -79,6 +87,7 @@ export const getDbConfigs: () => Readonly<DatabaseConfig[]> = () =>
     {
       name: 'account-monitor',
       reset: process.env.RESET_ACCOUNT_MONITOR === 'true',
+      resetHeight: process.env.RESET_HEIGHT_ACCOUNT_MONITOR === 'true',
       db: process.env.DB_SCHEMA_ACCOUNT_MONITOR,
       user: process.env.DB_USER_ACCOUNT_MONITOR,
       pass: process.env.DB_PASS_ACCOUNT_MONITOR
@@ -86,6 +95,7 @@ export const getDbConfigs: () => Readonly<DatabaseConfig[]> = () =>
     {
       name: 'nft',
       reset: process.env.RESET_NFT === 'true',
+      resetHeight: process.env.RESET_HEIGHT_NFT === 'true',
       db: process.env.DB_SCHEMA_NFT,
       user: process.env.DB_USER_NFT,
       pass: process.env.DB_PASS_NFT
@@ -93,6 +103,7 @@ export const getDbConfigs: () => Readonly<DatabaseConfig[]> = () =>
     {
       name: 'search',
       reset: process.env.RESET_SEARCH === 'true',
+      resetHeight: process.env.RESET_HEIGHT_SEARCH === 'true',
       db: process.env.DB_SCHEMA_SEARCH,
       user: process.env.DB_USER_SEARCH,
       pass: process.env.DB_PASS_SEARCH,
@@ -105,6 +116,7 @@ export const getDbConfigs: () => Readonly<DatabaseConfig[]> = () =>
     {
       name: 'solochain-search',
       reset: process.env.RESET_SOLOCHAIN_SEARCH === 'true',
+      resetHeight: process.env.RESET_HEIGHT_SOLOCHAIN_SEARCH === 'true',
       db: process.env.DB_SCHEMA_SOLOCHAIN_SEARCH,
       user: process.env.DB_USER_SOLOCHAIN_SEARCH,
       pass: process.env.DB_PASS_SOLOCHAIN_SEARCH
@@ -112,6 +124,7 @@ export const getDbConfigs: () => Readonly<DatabaseConfig[]> = () =>
     {
       name: 'node-manager',
       reset: process.env.RESET_NODE_MANAGER === 'true',
+      resetHeight: process.env.RESET_HEIGHT_NODE_MANAGER === 'true',
       db: process.env.DB_SCHEMA_NODEMANAGER,
       user: process.env.DB_USER_NODEMANAGER,
       pass: process.env.DB_PASS_NODEMANAGER
@@ -119,6 +132,7 @@ export const getDbConfigs: () => Readonly<DatabaseConfig[]> = () =>
     {
       name: 'assets',
       reset: process.env.RESET_ASSETS === 'true',
+      resetHeight: process.env.RESET_HEIGHT_ASSETS === 'true',
       db: process.env.DB_SCHEMA_ASSETS,
       user: process.env.DB_USER_ASSETS,
       pass: process.env.DB_PASS_ASSETS
