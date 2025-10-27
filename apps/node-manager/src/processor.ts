@@ -94,16 +94,16 @@ export const processNodeDeregistered: EventProcessor = async ({
   // @ts-expect-error
   const { owner, node } = event.event.args
 
-  const nodeEntity = await store.get(Node, node, {
-    relations: { rewards: true }
-  })
+  const nodeEntity = await store.get(Node, node)
 
   if (!nodeEntity) {
     log.warn(`Node not found for deregistration: ${node}`)
     return
   }
 
-  const rewards = nodeEntity.rewards || []
+  const rewards = await store.find(Reward, {
+    where: { node: { id: nodeEntity.id } }
+  })
 
   if (rewards.length > 0) {
     log.info(`Node ${node} deregistered with ${rewards.length} reward records`)
