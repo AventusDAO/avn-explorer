@@ -16,7 +16,7 @@ const clearSchemaTables = async (schemaName: string, client: typeof Client) => {
   }
 }
 
-const resetProcessorHeight = async (config: DatabaseConfig, client: typeof Client) => {
+const resetProcessorHeight = async (config: DatabaseConfig, client: typeof Client, targetHeight: number) => {
   try {
     // Check if status table exists
     const checkTableQuery = `
@@ -32,11 +32,11 @@ const resetProcessorHeight = async (config: DatabaseConfig, client: typeof Clien
       throw new Error(`Table status does not exist in ${config.db}`)
     }
 
-    // Reset height to 0
-    const updateQuery = `UPDATE squid_processor.status SET height = 0;`
-    console.log(`Resetting height to 0 in ${config.db}...`)
-    await client.query(updateQuery)
-    console.log(`Height reset complete for ${config.db}`)
+    // Reset height to target block
+    const updateQuery = `UPDATE squid_processor.status SET height = $1;`
+    console.log(`Resetting height to ${targetHeight} in ${config.db}...`)
+    await client.query(updateQuery, [targetHeight])
+    console.log(`Height reset complete for ${config.db} (height = ${targetHeight})`)
   } catch (error) {
     console.error(`Error resetting height for ${config.db}:`, error)
     throw error
@@ -47,7 +47,7 @@ const clearDatabase = async (config: DatabaseConfig) => {
   const { db, reset, resetHeight, user, pass } = config
 
   // Skip if neither reset nor resetHeight is enabled
-  if (!reset && !resetHeight) return
+  if (!reset && typeof resetHeight !== 'number') return
 
   if (!db) throw new Error('Missing db env var')
   if (!user || !pass) throw new Error('Missing user or pass env var')
@@ -90,8 +90,8 @@ const clearDatabase = async (config: DatabaseConfig) => {
     await client.connect()
 
     // Reset height if requested and not dropping tables (since dropping makes height reset redundant)
-    if (resetHeight && !reset) {
-      await resetProcessorHeight(config, client)
+    if (typeof resetHeight === 'number' && !reset) {
+      await resetProcessorHeight(config, client, resetHeight)
     }
 
     // Drop all tables if reset is enabled
@@ -117,11 +117,14 @@ const main = async () => {
   const schemaConfigs = getDbConfigs()
   console.log(
     'Config: ',
-    schemaConfigs.map(({ reset, resetHeight, db }) => ({
-      db,
-      reset,
-      resetHeight
-    }))
+    schemaConfigs.map(({ reset, resetHeight, db }) => {
+      const heightValue = typeof resetHeight === 'number' ? resetHeight : 'disabled'
+      return {
+        db,
+        reset,
+        resetHeight: heightValue
+      }
+    })
   )
 
   for (const config of schemaConfigs) {

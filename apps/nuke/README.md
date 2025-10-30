@@ -5,7 +5,10 @@ Utility app / script to clear data in the multitenant DB configuration.
 ## Features
 
 - **Full Reset (`RESET_*`)**: Drops all tables in the database (both `public` and `squid_processor` schemas)
-- **Height Reset (`RESET_HEIGHT_*`)**: Resets the processor height to 0 in `squid_processor.status` table without dropping tables
+- **Height Reset (`RESET_HEIGHT_*`)**: Resets the processor height in `squid_processor.status` table without dropping tables
+  - Set to `true` to reset to 0 (backward compatible)
+  - Set to a numeric value (e.g., `12345`) to reset to a specific block height
+  - Set to `false` or leave unset to disable
 - Both operations can be enabled independently or together (if both are enabled, height reset is skipped since dropping tables makes it redundant)
 
 ## Configuration
@@ -103,7 +106,7 @@ DB_PASS_ASSETS=
 
 ## Usage Examples
 
-### Reset height only (for node-manager)
+### Reset height to 0 (backward compatible)
 
 ```bash
 RESET_NODE_MANAGER=false
@@ -111,6 +114,15 @@ RESET_HEIGHT_NODE_MANAGER=true
 ```
 
 This will connect to the node-manager database and set `squid_processor.status.height = 0` without dropping any tables.
+
+### Reset height to specific block
+
+```bash
+RESET_NODE_MANAGER=false
+RESET_HEIGHT_NODE_MANAGER=12345
+```
+
+This will connect to the node-manager database and set `squid_processor.status.height = 12345` without dropping any tables. The processor will resume indexing from block 12345.
 
 ### Drop all tables (full reset)
 
