@@ -70,7 +70,7 @@ export const processNodeRegistered: EventProcessor = async ({
   const { owner, node } = event.event.args
 
   const nodeEntity = await store.get(Node, node)
-  
+
   if (nodeEntity) {
     return
   }
