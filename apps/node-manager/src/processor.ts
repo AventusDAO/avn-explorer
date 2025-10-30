@@ -69,6 +69,12 @@ export const processNodeRegistered: EventProcessor = async ({
   // @ts-expect-error
   const { owner, node } = event.event.args
 
+  const nodeEntity = await store.get(Node, node)
+  
+  if (nodeEntity) {
+    return
+  }
+
   let account = await store.get(Account, owner)
   if (!account) {
     account = new Account({
@@ -77,12 +83,13 @@ export const processNodeRegistered: EventProcessor = async ({
     await store.save(account)
   }
 
-  const nodeEntity = new Node({
+  const newNode = new Node({
     id: node,
     owner: account,
-    blockTimestamp: new Date(blockTimestamp)
+    blockTimestamp: new Date(blockTimestamp),
+    registered: true
   })
-  await store.save(nodeEntity)
+  await store.save(newNode)
 }
 
 export const processNodeDeregistered: EventProcessor = async ({
@@ -101,7 +108,8 @@ export const processNodeDeregistered: EventProcessor = async ({
     return
   }
 
-  await store.remove(nodeEntity)
+  nodeEntity.registered = false
+  await store.save(nodeEntity)
 }
 
 export const processRewardPaid: EventProcessor = async ({

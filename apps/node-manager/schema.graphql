@@ -18,4 +18,5 @@ type Node @entity {
   owner: Account!
   rewards: [Reward!]! @derivedFrom(field: "node")
   blockTimestamp: DateTime!
+  registered: Boolean!
 }
