@@ -16,7 +16,11 @@ const clearSchemaTables = async (schemaName: string, client: typeof Client) => {
   }
 }
 
-const resetProcessorHeight = async (config: DatabaseConfig, client: typeof Client, targetHeight: number) => {
+const resetProcessorHeight = async (
+  config: DatabaseConfig,
+  client: typeof Client,
+  targetHeight: number
+) => {
   try {
     // Check if status table exists
     const checkTableQuery = `

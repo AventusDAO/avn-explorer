@@ -37,7 +37,9 @@ const parseResetHeight = (value: string | undefined): number | undefined => {
   if (value === 'true') return 0 // Backward compatibility: true means reset to 0
   const num = parseInt(value, 10)
   if (isNaN(num) || num < 0) {
-    throw new Error(`Invalid RESET_HEIGHT value: ${value}. Must be "true", "false", or a non-negative number`)
+    throw new Error(
+      `Invalid RESET_HEIGHT value: ${value}. Must be "true", "false", or a non-negative number`
+    )
   }
   return num
 }
