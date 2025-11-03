@@ -51,7 +51,8 @@ const clearDatabase = async (config: DatabaseConfig) => {
   const { db, reset, resetHeight, user, pass } = config
 
   // Skip if neither reset nor resetHeight is enabled
-  if (!reset && typeof resetHeight !== 'number') return
+  // resetHeight can be true, a number, false, or undefined - skip only if false/undefined
+  if (!reset && (resetHeight === false || resetHeight === undefined)) return
 
   if (!db) throw new Error('Missing db env var')
   if (!user || !pass) throw new Error('Missing user or pass env var')
@@ -94,8 +95,9 @@ const clearDatabase = async (config: DatabaseConfig) => {
     await client.connect()
 
     // Reset height if requested and not dropping tables (since dropping makes height reset redundant)
-    if (typeof resetHeight === 'number' && !reset) {
-      await resetProcessorHeight(config, client, resetHeight)
+    if ((resetHeight === true || typeof resetHeight === 'number') && !reset) {
+      const targetHeight = resetHeight === true ? 0 : resetHeight
+      await resetProcessorHeight(config, client, targetHeight)
     }
 
     // Drop all tables if reset is enabled
@@ -121,14 +123,11 @@ const main = async () => {
   const schemaConfigs = getDbConfigs()
   console.log(
     'Config: ',
-    schemaConfigs.map(({ reset, resetHeight, db }) => {
-      const heightValue = typeof resetHeight === 'number' ? resetHeight : 'disabled'
-      return {
-        db,
-        reset,
-        resetHeight: heightValue
-      }
-    })
+    schemaConfigs.map(({ reset, resetHeight, db }) => ({
+      db,
+      reset,
+      resetHeight
+    }))
   )
 
   for (const config of schemaConfigs) {

@@ -15,7 +15,7 @@ export interface DatabaseConfig {
     | 'node-manager'
     | 'assets'
   reset: boolean
-  resetHeight?: number
+  resetHeight?: number | boolean
   db?: string
   user?: string
   pass?: string
@@ -28,13 +28,14 @@ export interface DatabaseConfig {
 
 /**
  * Parses RESET_HEIGHT environment variable value.
- * - "true" ? returns 0 (backward compatible: reset to 0)
- * - numeric string ? returns the number (reset to specific block)
- * - "false" or unset ? returns undefined (no reset)
+ * - "true" → returns true (reset to block 0)
+ * - numeric string → returns the number (reset to specific block)
+ * - "false" → returns false (disabled)
+ * - unset → returns undefined (disabled)
  */
-const parseResetHeight = (value: string | undefined): number | undefined => {
+const parseResetHeight = (value: string | undefined): number | boolean | undefined => {
   if (!value || value === 'false') return undefined
-  if (value === 'true') return 0 // Backward compatibility: true means reset to 0
+  if (value === 'true') return 0
   const num = parseInt(value, 10)
   if (isNaN(num) || num < 0) {
     throw new Error(
