@@ -16,7 +16,17 @@ const clearSchemaTables = async (schemaName: string, client: typeof Client) => {
   }
 }
 
-const resetProcessorHeight = async (config: DatabaseConfig, client: typeof Client) => {
+const isResettingHeight = (
+  resetHeight: number | boolean | undefined
+): resetHeight is true | number => {
+  return resetHeight === true || typeof resetHeight === 'number'
+}
+
+const resetProcessorHeight = async (
+  config: DatabaseConfig,
+  client: typeof Client,
+  targetHeight: number
+) => {
   try {
     // Check if status table exists
     const checkTableQuery = `
@@ -32,11 +42,11 @@ const resetProcessorHeight = async (config: DatabaseConfig, client: typeof Clien
       throw new Error(`Table status does not exist in ${config.db}`)
     }
 
-    // Reset height to 0
-    const updateQuery = `UPDATE squid_processor.status SET height = 0;`
-    console.log(`Resetting height to 0 in ${config.db}...`)
-    await client.query(updateQuery)
-    console.log(`Height reset complete for ${config.db}`)
+    // Reset height to target block
+    const updateQuery = `UPDATE squid_processor.status SET height = $1;`
+    console.log(`Resetting height to ${targetHeight} in ${config.db}...`)
+    await client.query(updateQuery, [targetHeight])
+    console.log(`Height reset complete for ${config.db} (height = ${targetHeight})`)
   } catch (error) {
     console.error(`Error resetting height for ${config.db}:`, error)
     throw error
@@ -47,7 +57,8 @@ const clearDatabase = async (config: DatabaseConfig) => {
   const { db, reset, resetHeight, user, pass } = config
 
   // Skip if neither reset nor resetHeight is enabled
-  if (!reset && !resetHeight) return
+  // resetHeight can be true, a number, false, or undefined - skip only if false/undefined
+  if (!reset && !isResettingHeight(resetHeight)) return
 
   if (!db) throw new Error('Missing db env var')
   if (!user || !pass) throw new Error('Missing user or pass env var')
@@ -90,8 +101,9 @@ const clearDatabase = async (config: DatabaseConfig) => {
     await client.connect()
 
     // Reset height if requested and not dropping tables (since dropping makes height reset redundant)
-    if (resetHeight && !reset) {
-      await resetProcessorHeight(config, client)
+    if (isResettingHeight(resetHeight) && !reset) {
+      const targetHeight = resetHeight === true ? 0 : resetHeight
+      await resetProcessorHeight(config, client, targetHeight)
     }
 
     // Drop all tables if reset is enabled
