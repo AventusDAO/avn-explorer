@@ -16,7 +16,7 @@ export class NodeStatisticsService {
 
   private async verifyNode(nodeId: string): Promise<void> {
     const node = await this.manager.findOne(NetworkNode, {
-      where: { id: nodeId }
+      where: { id: nodeId, registered: true }
     })
     if (!node) {
       throw new NotFoundError(`Node with ID ${nodeId} not found`)
@@ -127,6 +127,7 @@ export class NodeStatisticsService {
       const count = await this.manager
         .createQueryBuilder(NetworkNode, 'node')
         .where('node.owner_id = :accountId', { accountId })
+        .andWhere('node.registered = true')
         .getCount()
 
       return count

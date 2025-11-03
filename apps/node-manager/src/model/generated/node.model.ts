@@ -20,4 +20,7 @@ export class Node {
 
     @Column_("timestamp with time zone", {nullable: false})
     blockTimestamp!: Date
+
+    @Column_("bool", {nullable: false, default: true})
+    registered!: boolean
 }
