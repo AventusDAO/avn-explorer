@@ -16,6 +16,12 @@ const clearSchemaTables = async (schemaName: string, client: typeof Client) => {
   }
 }
 
+const isResettingHeight = (
+  resetHeight: number | boolean | undefined
+): resetHeight is true | number => {
+  return resetHeight === true || typeof resetHeight === 'number'
+}
+
 const resetProcessorHeight = async (
   config: DatabaseConfig,
   client: typeof Client,
@@ -52,7 +58,7 @@ const clearDatabase = async (config: DatabaseConfig) => {
 
   // Skip if neither reset nor resetHeight is enabled
   // resetHeight can be true, a number, false, or undefined - skip only if false/undefined
-  if (!reset && (resetHeight === false || resetHeight === undefined)) return
+  if (!reset && !isResettingHeight(resetHeight)) return
 
   if (!db) throw new Error('Missing db env var')
   if (!user || !pass) throw new Error('Missing user or pass env var')
@@ -95,7 +101,7 @@ const clearDatabase = async (config: DatabaseConfig) => {
     await client.connect()
 
     // Reset height if requested and not dropping tables (since dropping makes height reset redundant)
-    if ((resetHeight === true || typeof resetHeight === 'number') && !reset) {
+    if (isResettingHeight(resetHeight) && !reset) {
       const targetHeight = resetHeight === true ? 0 : resetHeight
       await resetProcessorHeight(config, client, targetHeight)
     }
