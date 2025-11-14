@@ -215,6 +215,29 @@ export interface BalancesAccountStorageV60 {
     getPairsPaged(pageSize: number, key: Uint8Array): AsyncIterable<[k: Uint8Array, v: v60.AccountData][]>
 }
 
+export class EthBridgeRequestQueueStorage extends StorageBase {
+    protected getPrefix() {
+        return 'EthBridge'
+    }
+
+    protected getName() {
+        return 'RequestQueue'
+    }
+
+    get isV58(): boolean {
+        return this.getTypeHash() === '71e46153d402eb28c3cd8b02d489826ed4ddd06cd2790df4ac38711eba9752c0'
+    }
+
+    get asV58(): EthBridgeRequestQueueStorageV58 {
+        assert(this.isV58)
+        return this as any
+    }
+}
+
+export interface EthBridgeRequestQueueStorageV58 {
+    get(): Promise<(v58.Request[] | undefined)>
+}
+
 export class SystemAccountStorage extends StorageBase {
     protected getPrefix() {
         return 'System'
