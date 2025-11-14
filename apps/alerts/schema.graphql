@@ -1,57 +1,8 @@
-type BalanceConfig @entity {
+type Alert @entity {
   id: ID!
-  accountAddress: String! @index
-  prometheusTags: String!
-  warningThreshold: String!
-  dangerThreshold: String!
-  createdAt: DateTime!
-  updatedAt: DateTime!
-}
-
-type BalanceState @entity {
-  id: ID!
-  accountAddress: String! @index @unique
-  lastCheckedBlock: Int!
-  lastCheckedTimestamp: DateTime!
-  currentBalance: String!
-  isWarning: Boolean!
-  isDanger: Boolean!
-  config: BalanceConfig!
-  updatedAt: DateTime!
-}
-
-type EventConfig @entity {
-  id: ID!
-  eventName: String! @index
-  prometheusTags: String!
-  includeMetadata: Boolean!
-  createdAt: DateTime!
-  updatedAt: DateTime!
-}
-
-type BalanceAlert @entity {
-  id: ID!
-  accountAddress: String! @index
-  alertType: String! @index
-  threshold: String!
-  actualBalance: String!
-  blockNumber: Int! @index
-  timestamp: DateTime! @index
-  config: BalanceConfig!
-  createdAt: DateTime!
-}
-
-type EventOccurrence @entity {
-  id: ID!
-  eventName: String! @index
-  blockNumber: Int! @index
-  timestamp: DateTime! @index
-  extrinsicHash: String @index
-  eventIndex: Int!
-  section: String! @index
-  method: String! @index
-  metadata: String
-  args: String!
-  config: EventConfig!
+  alertMessage: String! @index
+  isWarning: Boolean! @index
+  isError: Boolean! @index
+  expireAt: DateTime! @index
   createdAt: DateTime!
 }

@@ -1,8 +1,8 @@
 import {Entity as Entity_, Column as Column_, PrimaryColumn as PrimaryColumn_, Index as Index_} from "typeorm"
 
 @Entity_()
-export class BalanceConfig {
-    constructor(props?: Partial<BalanceConfig>) {
+export class Alert {
+    constructor(props?: Partial<Alert>) {
         Object.assign(this, props)
     }
 
@@ -11,20 +11,20 @@ export class BalanceConfig {
 
     @Index_()
     @Column_("text", {nullable: false})
-    accountAddress!: string
+    alertMessage!: string
 
-    @Column_("text", {nullable: false})
-    prometheusTags!: string
+    @Index_()
+    @Column_("bool", {nullable: false})
+    isWarning!: boolean
 
-    @Column_("text", {nullable: false})
-    warningThreshold!: string
+    @Index_()
+    @Column_("bool", {nullable: false})
+    isError!: boolean
 
-    @Column_("text", {nullable: false})
-    dangerThreshold!: string
+    @Index_()
+    @Column_("timestamp with time zone", {nullable: false})
+    expireAt!: Date
 
     @Column_("timestamp with time zone", {nullable: false})
     createdAt!: Date
-
-    @Column_("timestamp with time zone", {nullable: false})
-    updatedAt!: Date
 }

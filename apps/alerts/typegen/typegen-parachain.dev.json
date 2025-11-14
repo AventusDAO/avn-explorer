@@ -3,6 +3,5 @@
   "specVersions": "../../../packages/metadata/versions.avn-parachain.dev.jsonl",
   "events": [],
   "calls": [],
-  "storage": ["System.Account", "Balances.Account"]
+  "storage": ["System.Account", "Balances.Account", "EthBridge.RequestQueue"]
 }
-
