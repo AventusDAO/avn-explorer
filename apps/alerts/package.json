@@ -16,6 +16,7 @@
   "dependencies": {
     "@avn/config": "^1.0.0",
     "@avn/metadata": "workspace:^",
+    "@avn/processor-common": "workspace:^",
     "@avn/types": "^1.0.0",
     "@avn/utils": "^1.0.0",
     "@polkadot/api": "^10.6.1",
