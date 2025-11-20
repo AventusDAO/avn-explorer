@@ -3,13 +3,13 @@ export interface ConcurrencyOptions {
   onError?: (error: Error, item: any) => void
 }
 
-export async function processInParallel<T, R>(
+export async function processInParallelOrdered<T, R>(
   items: T[],
   processor: (item: T) => Promise<R>,
   options: ConcurrencyOptions = {}
-): Promise<R[]> {
+): Promise<(R | null)[]> {
   const { concurrency = 5, onError } = options
-  const results: R[] = []
+  const results: (R | null)[] = []
 
   for (let i = 0; i < items.length; i += concurrency) {
     const batch = items.slice(i, i + concurrency)
@@ -21,19 +21,24 @@ export async function processInParallel<T, R>(
         if (onError) {
           onError(err, item)
         }
-        return null as unknown as R
+        return null
       }
     })
 
     const batchResults = await Promise.all(batchPromises)
-    for (const result of batchResults) {
-      if (result !== null) {
-        results.push(result)
-      }
-    }
+    results.push(...batchResults)
   }
 
   return results
+}
+
+export async function processInParallel<T, R>(
+  items: T[],
+  processor: (item: T) => Promise<R>,
+  options: ConcurrencyOptions = {}
+): Promise<R[]> {
+  const results = await processInParallelOrdered(items, processor, options)
+  return results.filter((result): result is R => result !== null)
 }
 
 export function getDefaultConcurrency(): number {
