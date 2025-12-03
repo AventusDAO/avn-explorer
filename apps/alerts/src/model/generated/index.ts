@@ -1,1 +1,1 @@
-export * from "./tokenExample.model"
+export * from "./alert.model"
