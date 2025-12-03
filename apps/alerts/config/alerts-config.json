@@ -1,0 +1,36 @@
+{
+  "balances": [
+    {
+      "accountAddress": "5GrwvaEF5zXb26Fz9rcQpDWS57CtERHpNehXCPcNoHGKutQY",
+      "prometheusTags": "environment=dev,network=aventus,account_type=treasury,priority=critical",
+      "warningThreshold": "1000000000000000000",
+      "dangerThreshold": "500000000000000000"
+    },
+    {
+      "accountAddress": "5FHneW46xGXgs5mUiveU4sbTyGBzmstUspZC92UhjJM694ty",
+      "prometheusTags": "environment=dev,network=aventus,account_type=validator_pool,priority=high",
+      "warningThreshold": "5000000000000000000",
+      "dangerThreshold": "2000000000000000000"
+    }
+  ],
+  "events": [
+    {
+      "eventName": "Balances.Transfer",
+      "prometheusTags": "environment=dev,network=aventus,type=transfer",
+      "includeMetadata": true
+    },
+    {
+      "eventName": "System.ExtrinsicFailed",
+      "prometheusTags": "environment=dev,network=aventus,type=error",
+      "includeMetadata": true
+    }
+  ],
+  "queues": [
+    {
+      "queueName": "ethBridge.requestQueue",
+      "prometheusTags": "environment=dev,network=aventus,type=bridge",
+      "warningThreshold": "10",
+      "errorThreshold": "50"
+    }
+  ]
+}
