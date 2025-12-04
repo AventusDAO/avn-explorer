@@ -92,7 +92,7 @@ async function insertData(): Promise<void> {
         await client.query(query, values)
       }
     }
-    console.log('Data inserted successfully!')
+    console.info('Data inserted successfully!')
     process.exit(0)
   } catch (error) {
     console.error('Error inserting data:', error)

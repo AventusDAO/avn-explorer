@@ -11,7 +11,7 @@ const clearSchemaTables = async (schemaName: string, client: typeof Client) => {
 
   for (const { schemaname, tablename } of tables) {
     const dropQuery = `DROP TABLE ${schemaname}.${tablename} CASCADE;`
-    console.log(`Dropping ${schemaname}.${tablename}`)
+    console.info(`Dropping ${schemaname}.${tablename}`)
     await client.query(dropQuery)
   }
 }
@@ -44,9 +44,9 @@ const resetProcessorHeight = async (
 
     // Reset height to target block
     const updateQuery = `UPDATE squid_processor.status SET height = $1;`
-    console.log(`Resetting height to ${targetHeight} in ${config.db}...`)
+    console.info(`Resetting height to ${targetHeight} in ${config.db}...`)
     await client.query(updateQuery, [targetHeight])
-    console.log(`Height reset complete for ${config.db} (height = ${targetHeight})`)
+    console.info(`Height reset complete for ${config.db} (height = ${targetHeight})`)
   } catch (error) {
     console.error(`Error resetting height for ${config.db}:`, error)
     throw error
@@ -76,7 +76,7 @@ const clearDatabase = async (config: DatabaseConfig) => {
     if (config.name === 'search' && config.resetIndexes === true) {
       const { esUrl, esBlocksIndex, esExtrinsicsIndex, esEventsIndex } = config
       if (esUrl && esBlocksIndex && esExtrinsicsIndex && esEventsIndex) {
-        console.log('Clearing ElasticSearch indices...')
+        console.info('Clearing ElasticSearch indices...')
         const endpoints = [esBlocksIndex, esExtrinsicsIndex, esEventsIndex].map(
           e => `${esUrl}/${e}`
         )
@@ -89,7 +89,7 @@ const clearDatabase = async (config: DatabaseConfig) => {
             return response
           })
           await Promise.all(deleteRequests)
-          console.log('ElasticSearch indices cleared successfully')
+          console.info('ElasticSearch indices cleared successfully')
         } catch (error) {
           console.error('Error clearing ElasticSearch indices:', error)
           throw error
@@ -97,7 +97,7 @@ const clearDatabase = async (config: DatabaseConfig) => {
       }
     }
 
-    console.log(`Connecting user to ${db}...`)
+    console.info(`Connecting user to ${db}...`)
     await client.connect()
 
     // Reset height if requested and not dropping tables (since dropping makes height reset redundant)
@@ -110,7 +110,7 @@ const clearDatabase = async (config: DatabaseConfig) => {
     if (reset) {
       await clearSchemaTables('public', client)
       await clearSchemaTables('squid_processor', client)
-      console.log(`Done clearing ${db}.`)
+      console.info(`Done clearing ${db}.`)
     }
 
     await client.end()
@@ -127,7 +127,7 @@ const clearDatabase = async (config: DatabaseConfig) => {
 
 const main = async () => {
   const schemaConfigs = getDbConfigs()
-  console.log(
+  console.info(
     'Config: ',
     schemaConfigs.map(({ reset, resetHeight, db }) => ({
       db,
