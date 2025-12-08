@@ -1,7 +1,7 @@
 name: Check Types package
 
 on:
-  pull_request:
+  pull_request_target:
     branches: [main]
     paths:
       - 'packages/config/**'

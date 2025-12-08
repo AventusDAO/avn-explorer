@@ -2,7 +2,7 @@ name: Build Balances
 
 on:
   workflow_dispatch:
-  pull_request:
+  pull_request_target:
     types: [opened, synchronize, reopened, ready_for_review]
     branches:
       - main
@@ -21,29 +21,13 @@ on:
       - 'packages/utils/**'
 
 jobs:
-  avn-docker-build:
-    name: AvN Explorer Balances
-    uses: Aventus-Network-Services/shared-workflows/.github/workflows/docker-build.yaml@v5.10.0
+  docker-build:
+    name: Explorer Balances
+    uses: Aventus-Network-Services/shared-workflows/.github/workflows/docker-build.yaml@v5.17.0
     with:
-      aws_region: eu-west-1
-      aws_account_id: 931945598683
-      docker_file_path: apps/balances/Dockerfile
-      ecr_repository_name: explorer/balances
-      default_branch: main
-      create_pr_dtag: ${{ startsWith(github.ref, 'refs/pull/') }}
-      create_latest_dtag: ${{ github.ref == 'refs/heads/main' }}
-      create_commit_hash_dtag: true
-      create_git_ref_dtag: ${{ startsWith(github.ref, 'refs/tags/') }}
-    secrets: inherit
-
-  ew-docker-build:
-    name: EW Explorer Balances
-    if: ${{ github.event_name == 'workflow_dispatch' && github.ref_name == 'main' }}
-    uses: Aventus-Network-Services/shared-workflows/.github/workflows/docker-build.yaml@v5.10.0
-    with:
-      config_creds: false
+      ecr_registry_type: public
       aws_region: us-east-1
-      aws_account_id: 541507968610
+      aws_account_id: 931945598683
       docker_file_path: apps/balances/Dockerfile
       ecr_repository_name: explorer/balances
       default_branch: main

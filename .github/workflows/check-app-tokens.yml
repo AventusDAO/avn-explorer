@@ -1,7 +1,7 @@
 name: Check Tokens app
 
 on:
-  pull_request:
+  pull_request_target:
     branches: [main]
     paths:
       - 'apps/tokens/**'
