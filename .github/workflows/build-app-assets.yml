@@ -23,8 +23,9 @@ on:
 jobs:
   docker-build:
     name: Explorer Assets
-    uses: Aventus-Network-Services/shared-workflows/.github/workflows/docker-build.yaml@v5.17.0
+    uses: AventusDAO/shared-workflows/.github/workflows/docker-build.yaml@v5.17.0
     with:
+      runner: arc-ubuntu-2404-x64
       ecr_registry_type: public
       aws_region: us-east-1
       aws_account_id: 931945598683
