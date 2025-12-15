@@ -9,7 +9,7 @@ on:
 jobs:
   check_config_package:
     name: Check Config Package
-    uses: Aventus-Network-Services/shared-workflows/.github/workflows/check-yarn-application.yml@v5.12.0
+    uses: AventusDAO/shared-workflows/.github/workflows/check-yarn-application.yml@v5.12.0
     with:
       working_directory: packages/config
       build_packages: false
