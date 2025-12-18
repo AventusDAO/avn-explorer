@@ -2,6 +2,7 @@ name: Check Node Manager app
 
 on:
   pull_request_target:
+    types: [opened, synchronize, reopened, ready_for_review, edited]
     branches: [main]
     paths:
       - 'apps/node-manager/**'
@@ -13,8 +14,10 @@ on:
 jobs:
   check_node_manager_app:
     name: Check Node Manager App
-    uses: AventusDAO/shared-workflows/.github/workflows/check-yarn-application.yml@v5.12.0
+    uses: AventusDAO/shared-workflows/.github/workflows/check-yarn-application.yml@v5.20.0
     with:
+      checkout_repository: ${{github.event.pull_request.head.repo.full_name}}
+      checkout_ref: ${{github.event.pull_request.head.ref}}
       working_directory: apps/node-manager
       build_command: |
         yarn workspace @avn/types run build

@@ -3,7 +3,7 @@ name: Build Node Manager
 on:
   workflow_dispatch:
   pull_request_target:
-    types: [opened, synchronize, reopened, ready_for_review]
+    types: [opened, synchronize, reopened, ready_for_review, edited]
     branches:
       - main
     paths:
@@ -23,9 +23,8 @@ on:
 jobs:
   docker-build:
     name: Explorer Node Manager
-    uses: AventusDAO/shared-workflows/.github/workflows/docker-build.yaml@v5.17.0
+    uses: AventusDAO/shared-workflows/.github/workflows/docker-build.yaml@v5.20.0
     with:
-      runner: arc-ubuntu-2404-x64
       ecr_registry_type: public
       aws_region: us-east-1
       aws_account_id: 931945598683
@@ -36,4 +35,6 @@ jobs:
       create_latest_dtag: ${{ github.ref == 'refs/heads/main' }}
       create_commit_hash_dtag: true
       create_git_ref_dtag: ${{ startsWith(github.ref, 'refs/tags/') }}
+      checkout_repository: ${{github.event.pull_request.head.repo.full_name}}
+      checkout_ref: ${{github.event.pull_request.head.ref}}
     secrets: inherit
