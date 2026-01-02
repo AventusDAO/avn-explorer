@@ -1,3 +1,5 @@
+import { CONCURRENCY_CONFIG } from './constants'
+
 export interface ConcurrencyOptions {
   concurrency?: number
   onError?: (error: Error, item: any) => void
@@ -8,7 +10,7 @@ export async function processInParallelOrdered<T, R>(
   processor: (item: T) => Promise<R>,
   options: ConcurrencyOptions = {}
 ): Promise<(R | null)[]> {
-  const { concurrency = 5, onError } = options
+  const { concurrency = CONCURRENCY_CONFIG.DEFAULT, onError } = options
   const results: (R | null)[] = []
 
   for (let i = 0; i < items.length; i += concurrency) {
@@ -51,5 +53,5 @@ export function getDefaultConcurrency(): number {
     }
   }
 
-  return 5
+  return CONCURRENCY_CONFIG.DEFAULT
 }

@@ -5,6 +5,7 @@ export const RETRY_CONFIG = {
 } as const
 
 export const CONCURRENCY_CONFIG = {
+  DEFAULT: 5,
   BLOCK_PROCESSING: 5000, // Process 5 blocks in parallel
   EVENT_PROCESSING: 10000, // Process 10 events in parallel
   ITEM_PROCESSING: 20000 // Process 20 items in parallel
