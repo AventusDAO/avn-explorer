@@ -249,6 +249,7 @@ __metadata:
   dependencies:
     "@avn/config": ^1.0.0
     "@avn/metadata": "workspace:^"
+    "@avn/processor-common": "workspace:^"
     "@avn/types": ^1.0.0
     "@avn/utils": ^1.0.0
     "@polkadot/api": ^10.6.1
@@ -546,7 +547,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@avn/processor-common@workspace:packages/processor-common":
+"@avn/processor-common@workspace:^, @avn/processor-common@workspace:packages/processor-common":
   version: 0.0.0-use.local
   resolution: "@avn/processor-common@workspace:packages/processor-common"
   dependencies:
