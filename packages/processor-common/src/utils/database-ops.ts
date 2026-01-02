@@ -9,7 +9,7 @@ import { Store } from '@subsquid/typeorm-store'
 export interface BatchSaveOptions {
   batchSize?: number
   log?: any
-  entityName?: string
+  entityName: string
 }
 
 /**
@@ -19,9 +19,9 @@ export interface BatchSaveOptions {
 export async function batchSave<T>(
   store: Store,
   entities: T[],
-  options: BatchSaveOptions = {}
+  options: BatchSaveOptions
 ): Promise<void> {
-  const { batchSize = 1000, log, entityName = 'entities' } = options
+  const { batchSize = 1000, log, entityName } = options
 
   if (entities.length === 0) {
     return
@@ -45,9 +45,9 @@ export async function batchSave<T>(
 export async function batchInsert<T>(
   store: Store,
   entities: T[],
-  options: BatchSaveOptions = {}
+  options: BatchSaveOptions
 ): Promise<void> {
-  const { batchSize = 1000, log, entityName = 'entities' } = options
+  const { batchSize = 1000, log, entityName } = options
 
   if (entities.length === 0) {
     return

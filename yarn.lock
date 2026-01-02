@@ -243,6 +243,42 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@avn/alerts@workspace:apps/alerts":
+  version: 0.0.0-use.local
+  resolution: "@avn/alerts@workspace:apps/alerts"
+  dependencies:
+    "@avn/config": ^1.0.0
+    "@avn/metadata": "workspace:^"
+    "@avn/types": ^1.0.0
+    "@avn/utils": ^1.0.0
+    "@polkadot/api": ^10.6.1
+    "@polkadot/util": ^12.6.1
+    "@subsquid/cli": ^2.4.3
+    "@subsquid/graphql-server": ^4.2.0
+    "@subsquid/logger": ^1.3.0
+    "@subsquid/ss58": ^0.1.4
+    "@subsquid/substrate-processor": ^2.4.1
+    "@subsquid/substrate-typegen": ^2.2.1
+    "@subsquid/typeorm-codegen": ^1.3.0
+    "@subsquid/typeorm-migration": ^1.2.0
+    "@subsquid/typeorm-store": ^0.2.2
+    "@types/express": ^4.17.17
+    "@types/node": ^18.11.9
+    class-validator: ^0.14.0
+    dotenv: ^10.0.0
+    express: ^4.18.2
+    graphql: ^15.8.0
+    graphql-scalars: ^1.22.4
+    nodemon: ^2.0.20
+    pg: ^8.11.0
+    prom-client: ^15.1.3
+    reflect-metadata: ^0.1.13
+    type-graphql: ^1.2.0-rc.1
+    typeorm: ^0.3.16
+    typescript: ^4.9.3
+  languageName: unknown
+  linkType: soft
+
 "@avn/archive@workspace:apps/archive":
   version: 0.0.0-use.local
   resolution: "@avn/archive@workspace:apps/archive"
@@ -507,6 +543,20 @@ __metadata:
     dotenv: ^10.0.0
     pg: ^8.11.0
     typescript: ^4.9.3
+  languageName: unknown
+  linkType: soft
+
+"@avn/processor-common@workspace:packages/processor-common":
+  version: 0.0.0-use.local
+  resolution: "@avn/processor-common@workspace:packages/processor-common"
+  dependencies:
+    "@subsquid/logger": ^1.3.0
+    "@subsquid/substrate-processor": ^2.4.1
+    "@subsquid/typeorm-store": ^0.2.2
+    "@types/node": ^18.11.9
+    typescript: ^4.9.3
+  peerDependencies:
+    typeorm: ^0.3.16
   languageName: unknown
   linkType: soft
 
@@ -2179,6 +2229,13 @@ __metadata:
   dependencies:
     "@octokit/openapi-types": ^12.11.0
   checksum: fd6f75e0b19b90d1a3d244d2b0c323ed8f2f05e474a281f60a321986683548ef2e0ec2b3a946aa9405d6092e055344455f69f58957c60f58368c8bdda5b7d2ab
+  languageName: node
+  linkType: hard
+
+"@opentelemetry/api@npm:^1.4.0":
+  version: 1.9.0
+  resolution: "@opentelemetry/api@npm:1.9.0"
+  checksum: 9e88e59d53ced668f3daaecfd721071c5b85a67dd386f1c6f051d1be54375d850016c881f656ffbe9a03bedae85f7e89c2f2b635313f9c9b195ad033cdc31020
   languageName: node
   linkType: hard
 
@@ -11225,6 +11282,16 @@ __metadata:
   dependencies:
     tdigest: ^0.1.1
   checksum: d4c04e57616c72643dd02862d0d4bde09cf8869a19d0aef5e7b785e6e27d02439b66cdc165e3492f62d579fa91579183820870cc757a09b99399d2d02f46b9f1
+  languageName: node
+  linkType: hard
+
+"prom-client@npm:^15.1.3":
+  version: 15.1.3
+  resolution: "prom-client@npm:15.1.3"
+  dependencies:
+    "@opentelemetry/api": ^1.4.0
+    tdigest: ^0.1.1
+  checksum: 9a57f3c16f39aa9a03da021883a4231c0bb56fc9d02f6ef9c28f913379f275640a5a33b98d9946ebf53c71011a29b580e9d2d6e3806cb1c229a3f59c65993968
   languageName: node
   linkType: hard
 

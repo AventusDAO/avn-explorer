@@ -7,7 +7,7 @@ import { batchSave, batchInsert } from '../utils/database-ops'
 export abstract class BaseService {
   constructor(protected store: Store, protected log?: any) {}
 
-  protected handleError(error: unknown, context?: Record<string, any>): never {
+  protected handleAndThrow(error: unknown, context?: Record<string, any>): never {
     const message = formatError(error, context)
     this.log?.error(message)
     throw error instanceof Error ? error : new Error(String(error))
@@ -26,7 +26,7 @@ export abstract class BaseService {
           ...context
         } as RetryContext)
       }
-      this.handleError(error, context)
+      this.handleAndThrow(error, context)
     }
   }
 
@@ -64,7 +64,7 @@ export abstract class BaseService {
 
   protected async saveBatch<T>(
     entities: T[],
-    options: { batchSize?: number; entityName?: string } = {}
+    options: { batchSize?: number; entityName: string }
   ): Promise<void> {
     await batchSave(this.store, entities, {
       ...options,
@@ -74,12 +74,11 @@ export abstract class BaseService {
 
   protected async insertBatch<T>(
     entities: T[],
-    options: { batchSize?: number; entityName?: string } = {}
+    options: { batchSize?: number; entityName: string }
   ): Promise<void> {
     await batchInsert(this.store, entities, {
       ...options,
       log: this.log
     })
   }
-
 }

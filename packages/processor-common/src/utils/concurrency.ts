@@ -20,8 +20,9 @@ export async function processInParallelOrdered<T, R>(
         const err = error instanceof Error ? error : new Error(String(error))
         if (onError) {
           onError(err, item)
+          return null
         }
-        return null
+        throw err
       }
     })
 

@@ -25,7 +25,7 @@ export function collectEvents<T extends ProcessableItem>(
   let eventIndex = 0
 
   for (const item of items) {
-    if (item.kind === 'event' && eventNames.includes(item.name)) {
+    if (item.kind === 'event' && matchesAnyName(item, eventNames)) {
       const collected: CollectedEvent<T> = {
         item,
         index: eventIndex++
@@ -61,7 +61,7 @@ export function collectCalls<T extends ProcessableItem>(
   let callIndex = 0
 
   for (const item of items) {
-    if (item.kind === 'call' && callNames.includes(item.name)) {
+    if (item.kind === 'call' && matchesAnyName(item, callNames)) {
       const collected: CollectedEvent<T> = {
         item,
         index: callIndex++
@@ -99,5 +99,6 @@ export function isCall(item: ProcessableItem): boolean {
 }
 
 export function matchesAnyName(item: ProcessableItem, names: string[]): boolean {
-  return names.includes(item.name)
+  const lowerName = item.name.toLowerCase()
+  return names.some(name => name.toLowerCase() === lowerName)
 }

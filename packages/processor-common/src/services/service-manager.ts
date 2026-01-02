@@ -1,17 +1,20 @@
 import { Store } from '@subsquid/typeorm-store'
+import { BaseService } from './base-service'
 
-export class ServiceManager {
+export class ServiceManager extends BaseService {
   private services = new Map<string, any>()
   private initialized = new Set<string>()
 
-  constructor(private store: Store, private log?: any) {}
+  constructor(store: Store, log?: any) {
+    super(store, log)
+  }
 
   register<T>(name: string, factory: () => T): T {
     if (!this.services.has(name)) {
       this.services.set(name, factory())
       this.log?.debug(`Registered service: ${name}`)
     }
-    return this.services.get(name)
+    return this.get<T>(name) as T
   }
 
   get<T>(name: string): T | undefined {
@@ -25,9 +28,10 @@ export class ServiceManager {
         this.initialized.add(name)
         this.log?.debug(`Initialized service: ${name}`)
       } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : String(error)
-        this.log?.error(`Failed to initialize service ${name}: ${errorMessage}`)
-        throw error
+        this.handleAndThrow(error, {
+          service: name,
+          operation: 'initialize'
+        })
       }
     }
   }

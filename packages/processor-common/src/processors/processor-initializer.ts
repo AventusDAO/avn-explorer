@@ -51,7 +51,8 @@ export class StandardErrorHandler {
     const message = formatError(error, context)
     const logContext: Record<string, any> = {
       ...context,
-      error: errorMessage
+      error: errorMessage,
+      timestamp: new Date().toISOString()
     }
 
     if (errorStack) {
