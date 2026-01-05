@@ -8,6 +8,7 @@ import { MoreThan } from 'typeorm'
 import { ChainStorageService } from './chain-storage.service'
 import { ConfigService, QueueConfig } from './config.service'
 import { retryWithBackoff, RetryContext, RETRY_CONFIG, BaseService } from '@avn/processor-common'
+import { queueWarningGauge, queueErrorGauge } from '../prometheus-metrics'
 
 export interface ProcessingResult {
   alerts: Alert[]
@@ -98,6 +99,9 @@ export class QueueMonitoringService extends BaseService {
           if (alert) {
             alerts.push(alert)
           }
+        } else {
+          // Healthy - clear any existing alerts for this queue
+          await this.clearQueueAlerts(config, now)
         }
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : String(error)
@@ -108,6 +112,28 @@ export class QueueMonitoringService extends BaseService {
     }
 
     return { alerts }
+  }
+
+  private async clearQueueAlerts(config: QueueConfig, now: Date): Promise<void> {
+    const activeAlerts = await this.store.find(Alert, {
+      where: {
+        alertMessage: MoreThan(''),
+        expireAt: MoreThan(now)
+      }
+    })
+
+    const alertsToRemove = activeAlerts.filter(
+      a =>
+        a.alertMessage.includes(`Queue warning for ${config.queueName}`) ||
+        a.alertMessage.includes(`Queue error for ${config.queueName}`)
+    )
+
+    if (alertsToRemove.length > 0) {
+      await this.store.remove(alertsToRemove)
+      // Explicitly set metrics to 0
+      queueWarningGauge.set({ queue: config.queueName }, 0)
+      queueErrorGauge.set({ queue: config.queueName }, 0)
+    }
   }
 
   private async createQueueAlert(

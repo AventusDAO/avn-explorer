@@ -5,6 +5,7 @@ import { MoreThan } from 'typeorm'
 import { decodeId } from '@avn/utils'
 import { ChainStorageService, IBalance } from './chain-storage.service'
 import { ConfigService, BalanceConfig } from './config.service'
+import { balanceWarningGauge, balanceErrorGauge } from '../prometheus-metrics'
 import {
   retryWithBackoff,
   RetryContext,
@@ -141,9 +142,30 @@ export class BalanceMonitoringService extends BaseService {
         now,
         log
       )
+    } else {
+      await this.clearBalanceAlerts(config, now)
     }
 
     return null
+  }
+
+  private async clearBalanceAlerts(config: BalanceConfig, now: Date): Promise<void> {
+    const activeAlerts = await this.store.find(Alert, {
+      where: {
+        alertMessage: MoreThan(''),
+        expireAt: MoreThan(now)
+      }
+    })
+
+    const alertsToRemove = activeAlerts.filter(a =>
+      a.alertMessage.includes(`account ${config.accountAddress}`)
+    )
+
+    if (alertsToRemove.length > 0) {
+      await this.store.remove(alertsToRemove)
+      balanceWarningGauge.set({ account: config.accountAddress }, 0)
+      balanceErrorGauge.set({ account: config.accountAddress }, 0)
+    }
   }
 
   private async createBalanceAlert(
