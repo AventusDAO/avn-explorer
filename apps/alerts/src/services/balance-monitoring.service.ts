@@ -161,7 +161,6 @@ export class BalanceMonitoringService extends BaseService {
       config.accountAddress
     }: ${balance.toString()} < ${threshold}`
 
-    // Use batchFind for efficient querying (even for single query)
     const existingAlertsArray = await this.store.find(Alert, {
       where: {
         alertMessage: alertMessage,
@@ -188,11 +187,15 @@ export class BalanceMonitoringService extends BaseService {
 
     if (isError) {
       this.logError(
-        `🚨 DANGER: Account ${config.accountAddress} balance ${balance.toString()} <= ${threshold}. Tags: ${config.prometheusTags}`
+        `🚨 DANGER: Account ${
+          config.accountAddress
+        } balance ${balance.toString()} <= ${threshold}. Tags: ${config.prometheusTags}`
       )
     } else {
       this.logWarn(
-        `⚠️ WARNING: Account ${config.accountAddress} balance ${balance.toString()} <= ${threshold}. Tags: ${config.prometheusTags}`
+        `⚠️ WARNING: Account ${
+          config.accountAddress
+        } balance ${balance.toString()} <= ${threshold}. Tags: ${config.prometheusTags}`
       )
     }
 

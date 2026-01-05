@@ -37,4 +37,3 @@ export interface QueueConfig {
   warningThreshold: string
   errorThreshold: string
 }
-

@@ -25,17 +25,12 @@ export function loadConfigFromFile(): ConfigData {
   if (!configPath) {
     const baseDir = getDirname()
 
-    // Try multiple paths in order of likelihood
     const possiblePaths = [
-      // 1. Relative to compiled location (lib/services -> config)
       path.join(baseDir, '..', '..', 'config', 'alerts-config.json'),
-      // 2. Relative to current working directory (if running from apps/alerts)
       path.join(process.cwd(), 'config', 'alerts-config.json'),
-      // 3. From project root (if running from monorepo root)
       path.join(process.cwd(), 'apps', 'alerts', 'config', 'alerts-config.json')
     ]
 
-    // Find first existing path
     for (const possiblePath of possiblePaths) {
       if (fs.existsSync(possiblePath)) {
         configPath = possiblePath
@@ -43,7 +38,6 @@ export function loadConfigFromFile(): ConfigData {
       }
     }
 
-    // If none found, use the most likely one for error message
     if (!configPath) {
       configPath = possiblePaths[0]
     }
@@ -77,4 +71,3 @@ export function loadConfigFromFile(): ConfigData {
 
   return parsed as ConfigData
 }
-

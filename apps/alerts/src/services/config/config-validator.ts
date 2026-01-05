@@ -15,12 +15,10 @@ export function validateConfig(config: ConfigData): void {
     throw new Error('Config must have an events array')
   }
 
-  // Validate queue configs (optional)
   if (config.queues && !Array.isArray(config.queues)) {
     throw new Error('Config queues must be an array if provided')
   }
 
-  // Validate balance configs
   for (const bc of config.balances) {
     if (!bc.accountAddress || !validateSS58Address(bc.accountAddress)) {
       throw new Error(`Invalid account address: ${bc.accountAddress}`)
@@ -179,4 +177,3 @@ export function validateConfig(config: ConfigData): void {
     }
   }
 }
-

@@ -21,11 +21,7 @@ export class MetricsUpdater {
     this.async = options.async ?? false
   }
 
-  async updateMetrics(
-    store: Store,
-    newAlerts: Alert[],
-    log?: any
-  ): Promise<void> {
+  async updateMetrics(store: Store, newAlerts: Alert[], log?: any): Promise<void> {
     this.blockCount++
 
     const shouldDoFullUpdate = this.blockCount % this.fullUpdateInterval === 0
@@ -33,7 +29,7 @@ export class MetricsUpdater {
     const updateFn = async () => {
       try {
         const hasEventAlerts = newAlerts.some(alert => alert.alertMessage.includes('Event'))
-        
+
         if (shouldDoFullUpdate || hasEventAlerts) {
           await updatePrometheusMetricsFull(store)
           if (log) {
@@ -61,8 +57,7 @@ export class MetricsUpdater {
 
     if (this.async) {
       if (this.updatePromise) {
-        await this.updatePromise.catch(() => {
-        })
+        await this.updatePromise.catch(() => {})
       }
       this.updatePromise = updateFn()
     } else {
@@ -92,4 +87,3 @@ export class MetricsUpdater {
     return this.blockCount
   }
 }
-

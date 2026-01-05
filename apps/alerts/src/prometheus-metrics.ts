@@ -143,7 +143,7 @@ export async function updatePrometheusMetricsIncremental(
   for (const [sectionMethod, count] of eventErrorCounts.entries()) {
     eventErrorGauge.set({ section_method: sectionMethod }, count)
   }
-  
+
   // Note: Event metrics with counts require full update for accuracy
   // If there are event alerts, we should do a full update
   if (eventWarningCounts.size > 0 || eventErrorCounts.size > 0) {
@@ -276,4 +276,3 @@ export async function updatePrometheusMetrics(
     }
   }
 }
-

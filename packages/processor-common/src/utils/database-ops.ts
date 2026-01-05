@@ -67,4 +67,3 @@ export async function batchInsert<T>(
     log.info(`Inserted ${entities.length} ${entityName} in batches of ${batchSize}`)
   }
 }
-

@@ -28,19 +28,13 @@ export {
   type CollectedEvent
 } from './utils/event-collection'
 
-export {
-  batchSave,
-  batchInsert
-} from './utils/database-ops'
+export { batchSave, batchInsert } from './utils/database-ops'
 
 export { BaseService } from './services/base-service'
 
 export { ServiceManager } from './services/service-manager'
 
-export {
-  collectBlockEvents,
-  processBlockEvents
-} from './processors/block-processor'
+export { collectBlockEvents, processBlockEvents } from './processors/block-processor'
 
 export { ResultAggregator } from './processors/result-aggregator'
 
