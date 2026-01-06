@@ -221,7 +221,7 @@ export class EventProcessingService {
     if (log) {
       log.info(
         `Event: ${eventName} at block ${block.height} (alert ${
-          this.eventAlertCounts.get(eventName) || 0 + 1
+          (this.eventAlertCounts.get(eventName) || 0) + 1
         }/${this.maxAlertFrequency})`
       )
     }
