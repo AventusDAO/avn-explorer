@@ -68,9 +68,6 @@ export class EventProcessingService {
     for (const key of expiredKeys) {
       this.eventAlertCounts.delete(key)
     }
-
-    if (expiredKeys.length > 0) {
-    }
   }
 
   destroy(): void {
