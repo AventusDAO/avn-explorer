@@ -1,6 +1,21 @@
 import * as fs from 'fs'
 import * as path from 'path'
-import { ConfigData } from './types'
+import { ConfigData, BalanceConfig, EventConfig, QueueConfig } from './types'
+
+function parseEnvArray<T>(envVar: string | undefined, name: string): T[] | undefined {
+  if (!envVar) return undefined
+  try {
+    const parsed = JSON.parse(envVar)
+    if (!Array.isArray(parsed)) {
+      throw new Error(`${name} must be a JSON array`)
+    }
+    return parsed as T[]
+  } catch (error) {
+    throw new Error(
+      `Failed to parse ${name}: ${error instanceof Error ? error.message : String(error)}`
+    )
+  }
+}
 
 export function loadConfigFromFile(): ConfigData {
   const getDirname = (): string => {
@@ -17,6 +32,36 @@ export function loadConfigFromFile(): ConfigData {
       // Ignore
     }
     return process.cwd()
+  }
+
+  // Check for individual env vars (highest priority)
+  const envBalances = parseEnvArray<BalanceConfig>(process.env.ALERTS_BALANCES, 'ALERTS_BALANCES')
+  const envEvents = parseEnvArray<EventConfig>(process.env.ALERTS_EVENTS, 'ALERTS_EVENTS')
+  const envQueues = parseEnvArray<QueueConfig>(process.env.ALERTS_QUEUES, 'ALERTS_QUEUES')
+
+  if (envBalances || envEvents || envQueues) {
+    return {
+      balances: envBalances || [],
+      events: envEvents || [],
+      queues: envQueues || []
+    }
+  }
+
+  // Check if config is provided via single JSON environment variable
+  if (process.env.ALERTS_CONFIG_JSON) {
+    try {
+      const parsed = JSON.parse(process.env.ALERTS_CONFIG_JSON)
+      if (!parsed || typeof parsed !== 'object') {
+        throw new Error('ALERTS_CONFIG_JSON must contain a valid JSON object')
+      }
+      return parsed as ConfigData
+    } catch (error) {
+      throw new Error(
+        `Failed to parse ALERTS_CONFIG_JSON: ${
+          error instanceof Error ? error.message : String(error)
+        }`
+      )
+    }
   }
 
   // Resolve config path: prefer env var, then try multiple locations

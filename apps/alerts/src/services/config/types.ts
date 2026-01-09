@@ -1,21 +1,7 @@
 export interface ConfigData {
-  balances: Array<{
-    accountAddress: string
-    prometheusTags: string
-    warningThreshold: string
-    dangerThreshold: string
-  }>
-  events: Array<{
-    eventName: string
-    prometheusTags: string
-    includeMetadata: boolean
-  }>
-  queues?: Array<{
-    queueName: string
-    prometheusTags: string
-    warningThreshold: string
-    errorThreshold: string
-  }>
+  balances: Array<BalanceConfig>
+  events: Array<EventConfig>
+  queues?: Array<QueueConfig>
 }
 
 export interface BalanceConfig {
