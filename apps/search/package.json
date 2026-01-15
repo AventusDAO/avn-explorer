@@ -7,8 +7,9 @@
     "build": "rm -rf lib && tsc",
     "build:watch": "tsc -w",
     "dev": "nodemon",
-    "processor:start": "node lib/processor.js",
+    "processor:start": "yarn db:init && node lib/processor.js",
     "processor:debug": "node --inspect --enable-source-maps -r dotenv/config lib/processor.js",
+    "db:init": "node ../../packages/utils/scripts/init-db.js",
     "db:reset": "node ./scripts/reset-es.js && node ../../packages/utils/scripts/reset-db.js"
   },
   "dependencies": {
