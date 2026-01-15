@@ -2,7 +2,8 @@ export {
   ConfigService,
   type BalanceConfig,
   type EventConfig,
-  type QueueConfig
+  type QueueConfig,
+  type AlertSeverity
 } from './config.service'
 export { ChainStorageService } from './chain-storage.service'
 export {

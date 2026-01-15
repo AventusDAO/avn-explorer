@@ -105,6 +105,13 @@ export function validateConfig(config: ConfigData): void {
     if (typeof ec.includeMetadata !== 'boolean') {
       throw new Error('Each event config must have a valid includeMetadata boolean')
     }
+
+    const validSeverities = ['info', 'warning', 'error']
+    if (ec.severity !== undefined && !validSeverities.includes(ec.severity)) {
+      throw new Error(
+        `Invalid severity: ${ec.severity}. Must be one of: ${validSeverities.join(', ')}`
+      )
+    }
   }
 
   if (config.queues) {

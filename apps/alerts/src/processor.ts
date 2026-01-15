@@ -40,38 +40,40 @@ const processor = getProcessor().addEvent('*', {
 export type Item = BatchProcessorItem<typeof processor>
 export type Ctx = BatchContext<Store, Item>
 
+function createServices(store: Store, context: ProcessorInitContext) {
+  const { serviceManager, log: logger } = context
+
+  const configService = serviceManager.register('config', () => new ConfigService())
+  const chainStorageService = serviceManager.register(
+    'chainStorage',
+    () => new ChainStorageService()
+  )
+
+  const balanceMonitoringService = new BalanceMonitoringService(
+    store,
+    logger,
+    configService,
+    chainStorageService
+  )
+  const eventProcessingService = new EventProcessingService(configService)
+  const queueMonitoringService = new QueueMonitoringService(
+    store,
+    logger,
+    configService,
+    chainStorageService
+  )
+
+  return {
+    configService,
+    chainStorageService,
+    balanceMonitoringService,
+    eventProcessingService,
+    queueMonitoringService
+  }
+}
+
 function initializeServices(store: Store, log: any) {
-  return initializeProcessorServices(store, log, (context: ProcessorInitContext) => {
-    const { serviceManager, log: logger } = context
-
-    const configService = serviceManager.register('config', () => new ConfigService())
-    const chainStorageService = serviceManager.register(
-      'chainStorage',
-      () => new ChainStorageService()
-    )
-
-    const balanceMonitoringService = new BalanceMonitoringService(
-      store,
-      logger,
-      configService,
-      chainStorageService
-    )
-    const eventProcessingService = new EventProcessingService(configService)
-    const queueMonitoringService = new QueueMonitoringService(
-      store,
-      logger,
-      configService,
-      chainStorageService
-    )
-
-    return {
-      configService,
-      chainStorageService,
-      balanceMonitoringService,
-      eventProcessingService,
-      queueMonitoringService
-    }
-  })
+  return initializeProcessorServices(store, log, context => createServices(store, context))
 }
 
 async function processBlock(
@@ -142,14 +144,7 @@ async function main(ctx: Ctx): Promise<void> {
       process.env.ALERTS_METRICS_FULL_UPDATE_INTERVAL || '100',
       10
     )
-    // Default to synchronous (false) to avoid transaction closure issues
-    // The Store is tied to the batch transaction which closes after main() completes
-    // Async updates would try to use a closed transaction
-    const asyncMetrics = process.env.ALERTS_METRICS_ASYNC === 'true'
-    metricsUpdater = new MetricsUpdater({
-      fullUpdateInterval,
-      async: asyncMetrics
-    })
+    metricsUpdater = new MetricsUpdater({ fullUpdateInterval })
   }
 
   if (!serviceManager.isInitialized('config')) {

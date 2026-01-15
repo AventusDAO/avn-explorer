@@ -4,8 +4,9 @@ import { SubstrateBlock } from '@subsquid/substrate-processor'
 import { MoreThan } from 'typeorm'
 import { decodeId } from '@avn/utils'
 import { ChainStorageService, IBalance } from './chain-storage.service'
-import { ConfigService, BalanceConfig } from './config.service'
+import { ConfigService, BalanceConfig, AlertSeverity } from './config.service'
 import { balanceWarningGauge, balanceErrorGauge } from '../prometheus-metrics'
+import { ALERT_EXPIRATION_HOURS } from '../utils/constants'
 import {
   retryWithBackoff,
   RetryContext,
@@ -42,7 +43,6 @@ export class BalanceMonitoringService extends BaseService {
 
     const alerts: Alert[] = []
     const now = new Date()
-    const blockTimestamp = new Date(block.timestamp)
 
     const accountsU8 = balanceConfigs.map(config => decodeId(config.accountAddress))
 
@@ -63,19 +63,29 @@ export class BalanceMonitoringService extends BaseService {
       return { alerts: [] }
     }
 
+    const processBalanceItem = async ({
+      config,
+      balance
+    }: {
+      config: BalanceConfig
+      balance: IBalance
+    }): Promise<Alert | null> => {
+      return this.processAccount(config, balance, block, now, log)
+    }
+
+    const handleBalanceError = (error: Error, { config }: { config: BalanceConfig }): void => {
+      if (log) {
+        log.error(`Error processing account ${config.accountAddress}: ${error.message}`)
+      }
+    }
+
     try {
       const accountResults = await processInParallel(
         balanceConfigs.map((config, i) => ({ config, balance: balances[i] })),
-        async ({ config, balance }: { config: BalanceConfig; balance: IBalance }) => {
-          return this.processAccount(config, balance, block, blockTimestamp, now, log)
-        },
+        processBalanceItem,
         {
           concurrency: CONCURRENCY_CONFIG.ITEM_PROCESSING,
-          onError: (error: Error, { config }: { config: BalanceConfig }) => {
-            if (log) {
-              log.error(`Error processing account ${config.accountAddress}: ${error.message}`)
-            }
-          }
+          onError: handleBalanceError
         }
       )
 
@@ -87,8 +97,9 @@ export class BalanceMonitoringService extends BaseService {
 
       return { alerts }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error)
-      const errorStack = error instanceof Error ? error.stack : undefined
+      const isError = error instanceof Error
+      const errorMessage = isError ? error.message : String(error)
+      const errorStack = isError ? error.stack : undefined
       if (log) {
         log.error(`Failed to check balances for block ${block.height}`, {
           blockHeight: block.height,
@@ -105,7 +116,6 @@ export class BalanceMonitoringService extends BaseService {
     config: BalanceConfig,
     balance: IBalance | null | undefined,
     block: SubstrateBlock,
-    blockTimestamp: Date,
     now: Date,
     log?: any
   ): Promise<Alert | null> {
@@ -125,9 +135,8 @@ export class BalanceMonitoringService extends BaseService {
         config,
         totalBalance,
         config.dangerThreshold,
-        true, // isError
+        'error',
         block,
-        blockTimestamp,
         now,
         log
       )
@@ -136,9 +145,8 @@ export class BalanceMonitoringService extends BaseService {
         config,
         totalBalance,
         config.warningThreshold,
-        false, // isWarning
+        'warning',
         block,
-        blockTimestamp,
         now,
         log
       )
@@ -150,16 +158,13 @@ export class BalanceMonitoringService extends BaseService {
   }
 
   private async clearBalanceAlerts(config: BalanceConfig, now: Date): Promise<void> {
-    const activeAlerts = await this.store.find(Alert, {
+    const alertsToRemove = await this.store.find(Alert, {
       where: {
-        alertMessage: MoreThan(''),
+        alertType: 'balance',
+        sourceIdentifier: config.accountAddress,
         expireAt: MoreThan(now)
       }
     })
-
-    const alertsToRemove = activeAlerts.filter(a =>
-      a.alertMessage.includes(`account ${config.accountAddress}`)
-    )
 
     if (alertsToRemove.length > 0) {
       await this.store.remove(alertsToRemove)
@@ -172,36 +177,40 @@ export class BalanceMonitoringService extends BaseService {
     config: BalanceConfig,
     balance: bigint,
     threshold: string,
-    isError: boolean,
+    severity: AlertSeverity,
     block: SubstrateBlock,
-    blockTimestamp: Date,
     now: Date,
     log?: any
   ): Promise<Alert | null> {
-    const alertType = isError ? 'danger' : 'warning'
-    const alertMessage = `Balance ${alertType} for account ${
+    const isError = severity === 'error'
+    const severityLabel = isError ? 'danger' : 'warning'
+    const alertMessage = `Balance ${severityLabel} for account ${
       config.accountAddress
     }: ${balance.toString()} < ${threshold}`
 
-    const existingAlertsArray = await this.store.find(Alert, {
+    const existingAlerts = await this.store.find(Alert, {
       where: {
-        alertMessage: alertMessage,
+        alertType: 'balance',
+        sourceIdentifier: config.accountAddress,
+        isError: isError,
         expireAt: MoreThan(now)
       }
     })
-    const existingAlerts = existingAlertsArray
 
     if (existingAlerts.length > 0) {
       return null
     }
 
+    const expirationHours = isError ? ALERT_EXPIRATION_HOURS.ERROR : ALERT_EXPIRATION_HOURS.WARNING
     const expireAt = new Date(now)
-    expireAt.setHours(expireAt.getHours() + (isError ? 24 * 7 : 24))
+    expireAt.setHours(expireAt.getHours() + expirationHours)
 
     const alert = new Alert({
-      id: `${config.accountAddress}-${alertType}-${block.height}-${Date.now()}`,
+      id: `${config.accountAddress}-${severityLabel}-${block.height}-${Date.now()}`,
+      alertType: 'balance',
+      sourceIdentifier: config.accountAddress,
       alertMessage: alertMessage,
-      isWarning: !isError,
+      isWarning: severity === 'warning',
       isError: isError,
       expireAt: expireAt,
       createdAt: now

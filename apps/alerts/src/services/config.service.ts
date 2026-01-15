@@ -4,9 +4,9 @@
  */
 import { loadConfigFromFile } from './config/config-loader'
 import { validateConfig } from './config/config-validator'
-import { BalanceConfig, EventConfig, QueueConfig, ConfigData } from './config/types'
+import { BalanceConfig, EventConfig, QueueConfig, ConfigData, DEFAULT_ALERT_SEVERITY } from './config/types'
 
-export type { BalanceConfig, EventConfig, QueueConfig, ConfigData } from './config/types'
+export type { BalanceConfig, EventConfig, QueueConfig, ConfigData, AlertSeverity } from './config/types'
 
 export class ConfigService {
   private balanceConfigs: BalanceConfig[] = []
@@ -29,7 +29,8 @@ export class ConfigService {
     this.eventConfigs = config.events.map(ec => ({
       eventName: ec.eventName,
       prometheusTags: ec.prometheusTags,
-      includeMetadata: ec.includeMetadata
+      includeMetadata: ec.includeMetadata,
+      severity: ec.severity ?? DEFAULT_ALERT_SEVERITY
     }))
 
     this.queueConfigs = (config.queues || []).map(qc => ({

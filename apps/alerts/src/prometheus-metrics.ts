@@ -45,21 +45,6 @@ export const queueErrorGauge = new Gauge({
   registers: [register]
 })
 
-function extractAccountFromBalanceAlert(message: string): string | null {
-  const match = message.match(/Balance (?:warning|danger) for account ([^:]+):/)
-  return match ? match[1].trim() : null
-}
-
-function extractEventNameFromAlert(message: string): string | null {
-  const match = message.match(/Event ([A-Za-z][A-Za-z0-9_]*\.[A-Za-z][A-Za-z0-9_]*) occurred/)
-  return match ? match[1].trim() : null
-}
-
-function extractQueueNameFromAlert(message: string): string | null {
-  const match = message.match(/Queue (?:warning|error) for ([^:]+):/)
-  return match ? match[1].trim() : null
-}
-
 /**
  * Full metrics update - queries all active alerts and updates all metrics
  * Use this for periodic full updates or initialization
@@ -86,36 +71,35 @@ export async function updatePrometheusMetricsFull(store: Store): Promise<void> {
   const eventErrorCounts = new Map<string, number>()
 
   for (const alert of activeAlerts) {
-    if (alert.alertMessage.includes('Balance')) {
-      const account = extractAccountFromBalanceAlert(alert.alertMessage)
-      if (account) {
+    const identifier = alert.sourceIdentifier
+
+    switch (alert.alertType) {
+      case 'balance':
         if (alert.isWarning) {
-          balanceWarningGauge.set({ account }, 1)
+          balanceWarningGauge.set({ account: identifier }, 1)
         }
         if (alert.isError) {
-          balanceErrorGauge.set({ account }, 1)
+          balanceErrorGauge.set({ account: identifier }, 1)
         }
-      }
-    } else if (alert.alertMessage.includes('Event')) {
-      const eventName = extractEventNameFromAlert(alert.alertMessage)
-      if (eventName) {
+        break
+
+      case 'event':
         if (alert.isWarning) {
-          eventWarningCounts.set(eventName, (eventWarningCounts.get(eventName) || 0) + 1)
+          eventWarningCounts.set(identifier, (eventWarningCounts.get(identifier) || 0) + 1)
         }
         if (alert.isError) {
-          eventErrorCounts.set(eventName, (eventErrorCounts.get(eventName) || 0) + 1)
+          eventErrorCounts.set(identifier, (eventErrorCounts.get(identifier) || 0) + 1)
         }
-      }
-    } else if (alert.alertMessage.includes('Queue')) {
-      const queueName = extractQueueNameFromAlert(alert.alertMessage)
-      if (queueName) {
+        break
+
+      case 'queue':
         if (alert.isWarning) {
-          queueWarningGauge.set({ queue: queueName }, 1)
+          queueWarningGauge.set({ queue: identifier }, 1)
         }
         if (alert.isError) {
-          queueErrorGauge.set({ queue: queueName }, 1)
+          queueErrorGauge.set({ queue: identifier }, 1)
         }
-      }
+        break
     }
   }
 
@@ -152,38 +136,37 @@ export async function updatePrometheusMetricsIncremental(
   const activeNewAlerts = newAlerts.filter(alert => alert.expireAt > now)
 
   for (const alert of activeNewAlerts) {
-    if (alert.alertMessage.includes('Balance')) {
-      const account = extractAccountFromBalanceAlert(alert.alertMessage)
-      if (account) {
-        seenAccounts.add(account)
+    const identifier = alert.sourceIdentifier
+
+    switch (alert.alertType) {
+      case 'balance':
+        seenAccounts.add(identifier)
         if (alert.isWarning) {
-          balanceWarningGauge.set({ account }, 1)
+          balanceWarningGauge.set({ account: identifier }, 1)
         }
         if (alert.isError) {
-          balanceErrorGauge.set({ account }, 1)
+          balanceErrorGauge.set({ account: identifier }, 1)
         }
-      }
-    } else if (alert.alertMessage.includes('Event')) {
-      const eventName = extractEventNameFromAlert(alert.alertMessage)
-      if (eventName) {
+        break
+
+      case 'event':
         if (alert.isWarning) {
-          eventWarningCounts.set(eventName, (eventWarningCounts.get(eventName) || 0) + 1)
+          eventWarningCounts.set(identifier, (eventWarningCounts.get(identifier) || 0) + 1)
         }
         if (alert.isError) {
-          eventErrorCounts.set(eventName, (eventErrorCounts.get(eventName) || 0) + 1)
+          eventErrorCounts.set(identifier, (eventErrorCounts.get(identifier) || 0) + 1)
         }
-      }
-    } else if (alert.alertMessage.includes('Queue')) {
-      const queueName = extractQueueNameFromAlert(alert.alertMessage)
-      if (queueName) {
-        seenQueues.add(queueName)
+        break
+
+      case 'queue':
+        seenQueues.add(identifier)
         if (alert.isWarning) {
-          queueWarningGauge.set({ queue: queueName }, 1)
+          queueWarningGauge.set({ queue: identifier }, 1)
         }
         if (alert.isError) {
-          queueErrorGauge.set({ queue: queueName }, 1)
+          queueErrorGauge.set({ queue: identifier }, 1)
         }
-      }
+        break
     }
   }
 

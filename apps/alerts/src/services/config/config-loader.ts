@@ -1,6 +1,6 @@
 import * as fs from 'fs'
 import * as path from 'path'
-import { ConfigData, BalanceConfig, EventConfig, QueueConfig } from './types'
+import { ConfigData, BalanceConfig, EventConfigInput, QueueConfig } from './types'
 
 function parseEnvArray<T>(envVar: string | undefined, name: string): T[] | undefined {
   if (!envVar) return undefined
@@ -36,7 +36,7 @@ export function loadConfigFromFile(): ConfigData {
 
   // Check for individual env vars (highest priority)
   const envBalances = parseEnvArray<BalanceConfig>(process.env.ALERTS_BALANCES, 'ALERTS_BALANCES')
-  const envEvents = parseEnvArray<EventConfig>(process.env.ALERTS_EVENTS, 'ALERTS_EVENTS')
+  const envEvents = parseEnvArray<EventConfigInput>(process.env.ALERTS_EVENTS, 'ALERTS_EVENTS')
   const envQueues = parseEnvArray<QueueConfig>(process.env.ALERTS_QUEUES, 'ALERTS_QUEUES')
 
   if (envBalances || envEvents || envQueues) {

@@ -5,6 +5,7 @@ import { Alert } from '../model'
 import { SubstrateBlock } from '@subsquid/substrate-processor'
 import { ConfigService, EventConfig } from './config.service'
 import { collectBlockEvents, processBlockEvents, StandardErrorHandler } from '@avn/processor-common'
+import { ALERT_EXPIRATION_HOURS } from '../utils/constants'
 
 export interface EventItem {
   kind: string
@@ -192,7 +193,6 @@ export class EventProcessingService {
     log?: any
   ): Alert {
     const now = new Date()
-    const blockTimestamp = new Date(block.timestamp)
     const [section, method] = eventName.split('.')
 
     let alertMessage = `Event ${eventName} occurred at block ${block.height}`
@@ -200,17 +200,20 @@ export class EventProcessingService {
       alertMessage += ` (extrinsic: ${item.event.extrinsic.hash})`
     }
 
+    const expirationHours = ALERT_EXPIRATION_HOURS[config.severity.toUpperCase() as keyof typeof ALERT_EXPIRATION_HOURS]
     const expireAt = new Date(now)
-    expireAt.setHours(expireAt.getHours() + 1)
+    expireAt.setHours(expireAt.getHours() + expirationHours)
 
     const eventId = item.event.id || `${Date.now()}-${Math.random().toString(36).substring(2, 11)}`
     const alertId = `event-${eventName}-${block.height}-${eventIndex}-${eventId}`
 
     const alert = new Alert({
       id: alertId,
+      alertType: 'event',
+      sourceIdentifier: eventName,
       alertMessage: alertMessage,
-      isWarning: true, // Events are warnings, not errors
-      isError: false,
+      isWarning: config.severity === 'warning',
+      isError: config.severity === 'error',
       expireAt: expireAt,
       createdAt: now
     })
@@ -218,7 +221,7 @@ export class EventProcessingService {
     if (log) {
       log.info(
         `Event: ${eventName} at block ${block.height} (alert ${
-          (this.eventAlertCounts.get(eventName) || 0) + 1
+          (this.eventAlertCounts.get(eventName)?.count || 0) + 1
         }/${this.maxAlertFrequency})`
       )
     }

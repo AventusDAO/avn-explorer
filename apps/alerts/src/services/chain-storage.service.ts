@@ -11,7 +11,17 @@ export interface IBalance {
   reserved: bigint
 }
 
+type QueueStorageHandler = (ctx: ChainContext, block: Block) => Promise<number | undefined>
+
 export class ChainStorageService {
+  /**
+   * Registry of typed queue storage handlers.
+   * Add new queues here when you need type-safe version checking.
+   * Queues not in this registry will use the generic fallback.
+   */
+  private readonly queueHandlers: Map<string, QueueStorageHandler> = new Map([
+    ['EthBridge.RequestQueue', this.getEthBridgeRequestQueueCount.bind(this)]
+  ])
   async getBalances(
     ctx: ChainContext,
     block: Block,
@@ -73,45 +83,63 @@ export class ChainStorageService {
     storagePrefix: string,
     storageName: string
   ): Promise<number | undefined> {
+    const queueKey = `${storagePrefix}.${storageName}`
+    const typedHandler = this.queueHandlers.get(queueKey)
+
     try {
-      if (storagePrefix === 'EthBridge' && storageName === 'RequestQueue') {
-        const storage = new EthBridgeRequestQueueStorage(ctx, block)
-        if (!storage.isExists) {
-          return undefined
-        }
-
-        if ('isV58' in storage && storage.isV58) {
-          const queue = await storage.asV58.get()
-          if (!queue) {
-            return 0 // Queue exists but is empty
-          }
-          return Array.isArray(queue) ? queue.length : 0
-        }
-
-        throw new UnknownVersionError(`EthBridgeRequestQueueStorage`)
+      // Use typed handler if available (provides version checking and type safety)
+      if (typedHandler) {
+        return await typedHandler(ctx, block)
       }
 
-      const storage = await ctx._chain.getStorage(block.hash, storagePrefix, storageName)
-
-      if (!storage) {
-        return undefined
-      }
-
-      if (Array.isArray(storage)) {
-        return storage.length
-      }
-
-      if (storage && typeof storage === 'object' && 'length' in storage) {
-        return Number(storage.length)
-      }
-
-      if (typeof storage === 'number') {
-        return storage
-      }
-
-      return undefined
+      // Generic fallback for queues without typed handlers
+      return await this.getGenericQueueCount(ctx, block, storagePrefix, storageName)
     } catch (error) {
       return undefined
     }
+  }
+
+  private async getEthBridgeRequestQueueCount(
+    ctx: ChainContext,
+    block: Block
+  ): Promise<number | undefined> {
+    const storage = new EthBridgeRequestQueueStorage(ctx, block)
+    if (!storage.isExists) {
+      return undefined
+    }
+
+    if (storage.isV58) {
+      const queue = await storage.asV58.get()
+      return queue?.length ?? 0
+    }
+
+    throw new UnknownVersionError('EthBridgeRequestQueueStorage')
+  }
+
+  private async getGenericQueueCount(
+    ctx: ChainContext,
+    block: Block,
+    storagePrefix: string,
+    storageName: string
+  ): Promise<number | undefined> {
+    const storage = await ctx._chain.getStorage(block.hash, storagePrefix, storageName)
+
+    if (!storage) {
+      return undefined
+    }
+
+    if (Array.isArray(storage)) {
+      return storage.length
+    }
+
+    if (typeof storage === 'object' && 'length' in storage) {
+      return Number(storage.length)
+    }
+
+    if (typeof storage === 'number') {
+      return storage
+    }
+
+    return undefined
   }
 }

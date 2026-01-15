@@ -11,6 +11,14 @@ export class Alert {
 
     @Index_()
     @Column_("text", {nullable: false})
+    alertType!: string
+
+    @Index_()
+    @Column_("text", {nullable: false})
+    sourceIdentifier!: string
+
+    @Index_()
+    @Column_("text", {nullable: false})
     alertMessage!: string
 
     @Index_()

@@ -6,9 +6,10 @@ import { Alert } from '../model'
 import { SubstrateBlock } from '@subsquid/substrate-processor'
 import { MoreThan } from 'typeorm'
 import { ChainStorageService } from './chain-storage.service'
-import { ConfigService, QueueConfig } from './config.service'
+import { ConfigService, QueueConfig, AlertSeverity } from './config.service'
 import { retryWithBackoff, RetryContext, RETRY_CONFIG, BaseService } from '@avn/processor-common'
 import { queueWarningGauge, queueErrorGauge } from '../prometheus-metrics'
+import { ALERT_EXPIRATION_HOURS } from '../utils/constants'
 
 export interface ProcessingResult {
   alerts: Alert[]
@@ -37,7 +38,6 @@ export class QueueMonitoringService extends BaseService {
 
     const alerts: Alert[] = []
     const now = new Date()
-    const blockTimestamp = new Date(block.timestamp)
 
     for (const config of queueConfigs) {
       try {
@@ -78,9 +78,8 @@ export class QueueMonitoringService extends BaseService {
             config,
             queueCount,
             errorThreshold,
-            true, // isError
+            'error',
             block,
-            blockTimestamp,
             now
           )
           if (alert) {
@@ -91,9 +90,8 @@ export class QueueMonitoringService extends BaseService {
             config,
             queueCount,
             warningThreshold,
-            false, // isWarning
+            'warning',
             block,
-            blockTimestamp,
             now
           )
           if (alert) {
@@ -115,22 +113,16 @@ export class QueueMonitoringService extends BaseService {
   }
 
   private async clearQueueAlerts(config: QueueConfig, now: Date): Promise<void> {
-    const activeAlerts = await this.store.find(Alert, {
+    const alertsToRemove = await this.store.find(Alert, {
       where: {
-        alertMessage: MoreThan(''),
+        alertType: 'queue',
+        sourceIdentifier: config.queueName,
         expireAt: MoreThan(now)
       }
     })
 
-    const alertsToRemove = activeAlerts.filter(
-      a =>
-        a.alertMessage.includes(`Queue warning for ${config.queueName}`) ||
-        a.alertMessage.includes(`Queue error for ${config.queueName}`)
-    )
-
     if (alertsToRemove.length > 0) {
       await this.store.remove(alertsToRemove)
-      // Explicitly set metrics to 0
       queueWarningGauge.set({ queue: config.queueName }, 0)
       queueErrorGauge.set({ queue: config.queueName }, 0)
     }
@@ -140,17 +132,19 @@ export class QueueMonitoringService extends BaseService {
     config: QueueConfig,
     queueCount: number,
     threshold: number,
-    isError: boolean,
+    severity: AlertSeverity,
     block: SubstrateBlock,
-    blockTimestamp: Date,
     now: Date
   ): Promise<Alert | null> {
-    const alertType = isError ? 'error' : 'warning'
-    const alertMessage = `Queue ${alertType} for ${config.queueName}: ${queueCount} >= ${threshold}`
+    const isError = severity === 'error'
+    const severityLabel = isError ? 'error' : 'warning'
+    const alertMessage = `Queue ${severityLabel} for ${config.queueName}: ${queueCount} >= ${threshold}`
 
     const existingAlerts = await this.store.find(Alert, {
       where: {
-        alertMessage: alertMessage,
+        alertType: 'queue',
+        sourceIdentifier: config.queueName,
+        isError: isError,
         expireAt: MoreThan(now)
       }
     })
@@ -159,13 +153,16 @@ export class QueueMonitoringService extends BaseService {
       return null
     }
 
+    const expirationHours = isError ? ALERT_EXPIRATION_HOURS.ERROR : ALERT_EXPIRATION_HOURS.WARNING
     const expireAt = new Date(now)
-    expireAt.setHours(expireAt.getHours() + (isError ? 24 * 7 : 24))
+    expireAt.setHours(expireAt.getHours() + expirationHours)
 
     const alert = new Alert({
-      id: `${config.queueName}-${alertType}-${block.height}-${Date.now()}`,
+      id: `${config.queueName}-${severityLabel}-${block.height}-${Date.now()}`,
+      alertType: 'queue',
+      sourceIdentifier: config.queueName,
       alertMessage: alertMessage,
-      isWarning: !isError,
+      isWarning: severity === 'warning',
       isError: isError,
       expireAt: expireAt,
       createdAt: now
