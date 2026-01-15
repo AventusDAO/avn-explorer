@@ -140,6 +140,22 @@ export class QueueMonitoringService extends BaseService {
     const severityLabel = isError ? 'error' : 'warning'
     const alertMessage = `Queue ${severityLabel} for ${config.queueName}: ${queueCount} >= ${threshold}`
 
+    // When escalating to error, clear any existing warning alerts
+    if (isError) {
+      const warningAlerts = await this.store.find(Alert, {
+        where: {
+          alertType: 'queue',
+          sourceIdentifier: config.queueName,
+          isWarning: true,
+          expireAt: MoreThan(now)
+        }
+      })
+      if (warningAlerts.length > 0) {
+        await this.store.remove(warningAlerts)
+        queueWarningGauge.set({ queue: config.queueName }, 0)
+      }
+    }
+
     const existingAlerts = await this.store.find(Alert, {
       where: {
         alertType: 'queue',

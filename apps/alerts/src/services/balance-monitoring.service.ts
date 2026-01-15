@@ -188,6 +188,22 @@ export class BalanceMonitoringService extends BaseService {
       config.accountAddress
     }: ${balance.toString()} < ${threshold}`
 
+    // When escalating to error, clear any existing warning alerts
+    if (isError) {
+      const warningAlerts = await this.store.find(Alert, {
+        where: {
+          alertType: 'balance',
+          sourceIdentifier: config.accountAddress,
+          isWarning: true,
+          expireAt: MoreThan(now)
+        }
+      })
+      if (warningAlerts.length > 0) {
+        await this.store.remove(warningAlerts)
+        balanceWarningGauge.set({ account: config.accountAddress }, 0)
+      }
+    }
+
     const existingAlerts = await this.store.find(Alert, {
       where: {
         alertType: 'balance',
