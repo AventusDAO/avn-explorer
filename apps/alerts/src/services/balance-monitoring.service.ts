@@ -214,6 +214,7 @@ export class BalanceMonitoringService extends BaseService {
     })
 
     if (existingAlerts.length > 0) {
+      // We already have an active alert so do nothing.
       return null
     }
 
