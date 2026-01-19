@@ -72,6 +72,11 @@ export const processNodeRegistered: EventProcessor = async ({
   const nodeEntity = await store.get(Node, node)
 
   if (nodeEntity) {
+    if (!nodeEntity.registered) {
+      nodeEntity.registered = true
+      nodeEntity.blockTimestamp = new Date(blockTimestamp)
+      await store.save(nodeEntity)
+    }
     return
   }
 
