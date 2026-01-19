@@ -5,8 +5,6 @@
  * the required database and role if they don't exist.
  *
  * Environment variables:
- * - DB_ADMIN_HOST: Admin connection host (defaults to DB_HOST)
- * - DB_ADMIN_PORT: Admin connection port (defaults to DB_PORT or 5432)
  * - DB_ADMIN_USER: Admin username (required for DB creation)
  * - DB_ADMIN_PASS: Admin password (required for DB creation)
  * - DB_NAME: Target database name to create
@@ -19,8 +17,8 @@
 const { Client } = require("pg");
 
 async function initDatabase() {
-  const adminHost = process.env.DB_ADMIN_HOST || process.env.DB_HOST || "localhost";
-  const adminPort = process.env.DB_ADMIN_PORT || process.env.DB_PORT || "5432";
+  const adminHost = process.env.DB_HOST || "localhost";
+  const adminPort = process.env.DB_PORT || "5432";
   const adminUser = process.env.DB_ADMIN_USER;
   const adminPass = process.env.DB_ADMIN_PASS;
 
