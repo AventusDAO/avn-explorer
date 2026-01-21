@@ -1,4 +1,3 @@
-
 export interface ErrorContext {
   blockHeight?: number
   blockNumber?: number

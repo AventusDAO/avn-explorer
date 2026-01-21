@@ -5,6 +5,7 @@ down:
 	@docker-compose down
 
 build:
+	@yarn workspace @avn/processor-common run build
 	@yarn build
 
 process: migrate

@@ -16,8 +16,6 @@ jobs:
     name: Check Tokens App
     uses: AventusDAO/shared-workflows/.github/workflows/check-yarn-application.yml@v5.20.0
     with:
-      checkout_repository: ${{github.event.pull_request.head.repo.full_name}}
-      checkout_ref: ${{github.event.pull_request.head.ref}}
       working_directory: apps/tokens
       build_command: |
         yarn workspace @avn/types run build

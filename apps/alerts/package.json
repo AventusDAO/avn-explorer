@@ -7,15 +7,17 @@
     "build": "rm -rf lib && tsc",
     "build:watch": "tsc -w",
     "dev": "nodemon",
-    "processor:start": "yarn db:migrate && node lib/processor.js",
+    "processor:start": "yarn db:init && yarn db:migrate && node lib/processor.js",
     "processor:debug": "node --inspect --enable-source-maps -r dotenv/config lib/processor.js",
     "server:start": "squid-graphql-server",
+    "db:init": "node ../../packages/utils/scripts/init-db.js",
     "db:reset": "node ../../packages/utils/scripts/reset-db.js",
     "db:migrate": "yarn squid-typeorm-migration-apply"
   },
   "dependencies": {
     "@avn/config": "^1.0.0",
     "@avn/metadata": "workspace:^",
+    "@avn/processor-common": "workspace:^",
     "@avn/types": "^1.0.0",
     "@avn/utils": "^1.0.0",
     "@polkadot/api": "^10.6.1",
