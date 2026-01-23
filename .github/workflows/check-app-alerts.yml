@@ -1,0 +1,25 @@
+name: Check Alerts app
+
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened, ready_for_review, edited]
+    branches: [main]
+    paths:
+      - 'apps/alerts/**'
+      # check if one of the used packages is changed
+      - 'packages/types/**'
+      - 'packages/config/**'
+      - 'packages/utils/**'
+
+jobs:
+  check_alerts_app:
+    name: Check Alerts App
+    uses: AventusDAO/shared-workflows/.github/workflows/check-yarn-application.yml@v5.20.0
+    with:
+      checkout_repository: ${{github.event.pull_request.head.repo.full_name}}
+      checkout_ref: ${{github.event.pull_request.head.ref}}
+      working_directory: apps/alerts
+      build_command: |
+        yarn workspace @avn/types run build
+        yarn workspace @avn/config run build
+        yarn workspace @avn/utils run build
