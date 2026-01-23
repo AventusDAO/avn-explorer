@@ -8,7 +8,7 @@ on:
       - 'packages/types/**'
 
 jobs:
-  check_types_package:
+  check:
     name: Check Types Package
     uses: AventusDAO/shared-workflows/.github/workflows/check-yarn-application.yml@v5.20.0
     with:

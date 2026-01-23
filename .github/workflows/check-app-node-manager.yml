@@ -12,7 +12,7 @@ on:
       - 'packages/utils/**'
 
 jobs:
-  check_node_manager_app:
+  check:
     name: Check Node Manager App
     uses: AventusDAO/shared-workflows/.github/workflows/check-yarn-application.yml@v5.20.0
     with:

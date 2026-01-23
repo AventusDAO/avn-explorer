@@ -25,7 +25,7 @@ on:
 jobs:
   docker-build:
     name: Explorer Account Monitor
-    uses: AventusDAO/shared-workflows/.github/workflows/docker-build.yaml@v5.20.0
+    uses: AventusDAO/shared-workflows/.github/workflows/docker-build.yaml@v5.22.0
     with:
       ecr_registry_type: public
       aws_region: us-east-1

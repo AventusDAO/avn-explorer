@@ -5,7 +5,7 @@ on:
     branches: [main]
 
 jobs:
-  test_migrated_data_parsing:
+  check:
     runs-on: ubuntu-latest
 
     steps:
