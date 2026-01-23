@@ -1,4 +1,4 @@
-name: Check Staking app
+name: Check Alerts app
 
 on:
   pull_request_target:
