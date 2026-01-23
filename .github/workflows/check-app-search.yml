@@ -16,7 +16,7 @@ defaults:
     working-directory: apps/search
 
 jobs:
-  check_search_app:
+  check:
     name: Check Search App
     uses: AventusDAO/shared-workflows/.github/workflows/check-yarn-application.yml@v5.20.0
     with:

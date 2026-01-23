@@ -12,7 +12,7 @@ on:
       - 'packages/utils/**'
 
 jobs:
-  check_nft_app:
+  check:
     name: Check Assets App
     uses: AventusDAO/shared-workflows/.github/workflows/check-yarn-application.yml@v5.20.0
     with:
