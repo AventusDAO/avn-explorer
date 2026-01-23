@@ -74,15 +74,17 @@ async function initDatabase() {
 
     if (dbResult.rowCount === 0) {
       console.log(`[init-db] Creating database: ${dbName}`);
-      await client.query(`CREATE DATABASE "${dbName}" OWNER "${dbUser}"`);
+      // Create database without owner first to avoid SET ROLE requirement
+      await client.query(`CREATE DATABASE "${dbName}"`);
       console.log(`[init-db] Database ${dbName} created successfully`);
     } else {
       console.log(`[init-db] Database ${dbName} already exists`);
     }
 
-    // Ensure privileges are set (idempotent operations)
+    // Ensure privileges and ownership are set (idempotent operations)
     console.log(`[init-db] Ensuring privileges for ${dbUser} on ${dbName}`);
     await client.query(`GRANT ALL PRIVILEGES ON DATABASE "${dbName}" TO "${dbUser}"`);
+    // Set owner after database creation to avoid SET ROLE requirement during CREATE
     await client.query(`ALTER DATABASE "${dbName}" OWNER TO "${dbUser}"`);
 
     console.log("[init-db] Database initialization completed successfully");
