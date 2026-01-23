@@ -1,0 +1,40 @@
+name: Build Alerts
+
+on:
+  workflow_dispatch:
+  pull_request_target:
+    types: [opened, synchronize, reopened, ready_for_review, edited]
+    branches:
+      - main
+    paths:
+      - 'apps/alerts/**'
+      - 'packages/types/**'
+      - 'packages/config/**'
+      - 'packages/utils/**'
+  push:
+    branches:
+      - main
+    paths:
+      - 'apps/alerts/**'
+      - 'packages/types/**'
+      - 'packages/config/**'
+      - 'packages/utils/**'
+
+jobs:
+  docker-build:
+    name: Explorer Alerts
+    uses: AventusDAO/shared-workflows/.github/workflows/docker-build.yaml@v5.20.0
+    with:
+      ecr_registry_type: public
+      aws_region: us-east-1
+      aws_account_id: 931945598683
+      docker_file_path: apps/alerts/Dockerfile
+      ecr_repository_name: explorer/alerts
+      default_branch: main
+      create_pr_dtag: ${{ startsWith(github.ref, 'refs/pull/') }}
+      create_latest_dtag: ${{ github.ref == 'refs/heads/main' }}
+      create_commit_hash_dtag: true
+      create_git_ref_dtag: ${{ startsWith(github.ref, 'refs/tags/') }}
+      checkout_repository: ${{github.event.pull_request.head.repo.full_name}}
+      checkout_ref: ${{github.event.pull_request.head.ref}}
+    secrets: inherit
