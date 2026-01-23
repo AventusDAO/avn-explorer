@@ -18,7 +18,7 @@ jobs:
     with:
       checkout_repository: ${{github.event.pull_request.head.repo.full_name}}
       checkout_ref: ${{github.event.pull_request.head.ref}}
-      working_directory: apps/token
+      working_directory: apps/tokens
       build_command: |
         yarn workspace @avn/types run build
         yarn workspace @avn/config run build
