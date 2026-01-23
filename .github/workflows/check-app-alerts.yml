@@ -10,6 +10,7 @@ on:
       - 'packages/types/**'
       - 'packages/config/**'
       - 'packages/utils/**'
+      - 'packages/processor-common/**'
 
 jobs:
   check:
@@ -23,3 +24,4 @@ jobs:
         yarn workspace @avn/types run build
         yarn workspace @avn/config run build
         yarn workspace @avn/utils run build
+        yarn workspace @avn/processor-common run build
