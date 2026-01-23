@@ -12,7 +12,7 @@ on:
       - 'packages/utils/**'
 
 jobs:
-  check_search_app:
+  check_alerts_app:
     name: Check Alerts App
     uses: AventusDAO/shared-workflows/.github/workflows/check-yarn-application.yml@v5.20.0
     with:
