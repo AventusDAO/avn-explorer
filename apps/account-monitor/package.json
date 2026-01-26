@@ -7,10 +7,11 @@
     "build": "rm -rf lib && tsc",
     "build:watch": "tsc -w",
     "dev": "nodemon",
-    "processor:start": "yarn db:migrate && node lib/insertCurrenciesInLookupTable.js && node lib/main.js",
+    "processor:start": "yarn db:init && yarn db:migrate && node lib/insertCurrenciesInLookupTable.js && node lib/main.js",
     "processor:debug": "node --inspect --enable-source-maps -r dotenv/config lib/insertCurrenciesInLookupTable.js && node --inspect --enable-source-maps -r dotenv/config lib/main.js",
     "seedCoins": "node --inspect --enable-source-maps -r dotenv/config lib/insertCurrenciesInLookupTable.js",
     "server:start": "squid-graphql-server",
+    "db:init": "node ../../packages/utils/scripts/init-db.js",
     "db:reset": "node ../../packages/utils/scripts/reset-db.js",
     "db:migrate": "yarn squid-typeorm-migration-apply"
   },

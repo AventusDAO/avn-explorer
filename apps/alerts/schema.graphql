@@ -1,0 +1,10 @@
+type Alert @entity {
+  id: ID!
+  alertType: String! @index
+  sourceIdentifier: String! @index
+  alertMessage: String! @index
+  isWarning: Boolean! @index
+  isError: Boolean! @index
+  expireAt: DateTime! @index
+  createdAt: DateTime!
+}

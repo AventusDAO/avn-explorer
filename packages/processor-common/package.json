@@ -1,0 +1,25 @@
+{
+  "name": "@avn/processor-common",
+  "version": "1.0.0",
+  "private": true,
+  "packageManager": "yarn@3.3.0",
+  "main": "lib/index.js",
+  "typings": "lib/index.d.ts",
+  "scripts": {
+    "types:check": "tsc --pretty --noEmit",
+    "build": "rm -rf lib && tsc",
+    "build:watch": "tsc -w"
+  },
+  "dependencies": {
+    "@subsquid/logger": "^1.3.0",
+    "@subsquid/substrate-processor": "^2.4.1",
+    "@subsquid/typeorm-store": "^0.2.2"
+  },
+  "peerDependencies": {
+    "typeorm": "^0.3.16"
+  },
+  "devDependencies": {
+    "@types/node": "^18.11.9",
+    "typescript": "^4.9.3"
+  }
+}
