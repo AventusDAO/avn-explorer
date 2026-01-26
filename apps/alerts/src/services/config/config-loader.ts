@@ -3,12 +3,14 @@ import * as path from 'path'
 import { ConfigData, BalanceConfig, EventConfigInput, QueueConfig } from './types'
 
 function parseEnvArray<T>(envVar: string | undefined, name: string): T[] | undefined {
-  if (!envVar) return undefined
+  // Treat empty or whitespace-only strings as undefined (not set)
+  if (!envVar || !envVar.trim()) return undefined
   try {
     const parsed = JSON.parse(envVar)
     if (!Array.isArray(parsed)) {
       throw new Error(`${name} must be a JSON array`)
     }
+    // Empty arrays are valid - return them as-is
     return parsed as T[]
   } catch (error) {
     throw new Error(
@@ -48,9 +50,11 @@ export function loadConfigFromFile(): ConfigData {
   }
 
   // Check if config is provided via single JSON environment variable
-  if (process.env.ALERTS_CONFIG_JSON) {
+  // Treat empty or whitespace-only strings as not set
+  const configJson = process.env.ALERTS_CONFIG_JSON?.trim()
+  if (configJson) {
     try {
-      const parsed = JSON.parse(process.env.ALERTS_CONFIG_JSON)
+      const parsed = JSON.parse(configJson)
       if (!parsed || typeof parsed !== 'object') {
         throw new Error('ALERTS_CONFIG_JSON must contain a valid JSON object')
       }
@@ -65,7 +69,8 @@ export function loadConfigFromFile(): ConfigData {
   }
 
   // Resolve config path: prefer env var, then try multiple locations
-  let configPath = process.env.ALERTS_CONFIG_PATH
+  // Treat empty or whitespace-only strings as not set
+  let configPath = process.env.ALERTS_CONFIG_PATH?.trim() || undefined
 
   if (!configPath) {
     const baseDir = getDirname()
@@ -82,25 +87,28 @@ export function loadConfigFromFile(): ConfigData {
         break
       }
     }
+  }
 
-    if (!configPath) {
-      configPath = possiblePaths[0]
+  // If no config file found and no env vars provided, return empty config
+  if (!configPath || !fs.existsSync(configPath)) {
+    return {
+      balances: [],
+      events: [],
+      queues: []
     }
   }
 
-  if (!fs.existsSync(configPath)) {
-    const baseDir = getDirname()
-    const triedPaths = [
-      path.join(baseDir, '..', '..', 'config', 'alerts-config.json'),
-      path.join(process.cwd(), 'config', 'alerts-config.json'),
-      path.join(process.cwd(), 'apps', 'alerts', 'config', 'alerts-config.json')
-    ]
-    throw new Error(
-      `Config file not found at: ${configPath}. Tried paths: ${triedPaths.join(', ')}`
-    )
+  const fileContent = fs.readFileSync(configPath, 'utf-8')
+  
+  // Handle empty or whitespace-only files
+  if (!fileContent || !fileContent.trim()) {
+    return {
+      balances: [],
+      events: [],
+      queues: []
+    }
   }
 
-  const fileContent = fs.readFileSync(configPath, 'utf-8')
   let parsed: unknown
   try {
     parsed = JSON.parse(fileContent)

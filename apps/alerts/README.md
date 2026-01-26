@@ -68,7 +68,7 @@ yarn processor:start
 ```
 
 The processor will:
-- Load configuration from environment variables or config file
+- Load configuration from environment variables (recommended) or config file
 - Connect to the chain archive
 - Start processing blocks
 - Expose metrics at `http://localhost:3001/metrics`
@@ -79,32 +79,178 @@ The processor will:
 
 The processor supports multiple configuration methods (in priority order):
 
-#### Option 1: Separate Environment Variables (Recommended)
+1. **Environment Variables** (Recommended) ← Use this!
+2. Config file path (fallback for legacy setups)
+
+### Recommended: Environment Variables Configuration
+
+Use separate environment variables for each configuration section. This is the **preferred method** for all deployments, especially production.
+
+#### Required Environment Variables
 
 ```bash
-# Balance monitoring
+# Database
+DB_NAME=alerts
+DB_USER=postgres
+DB_PASS=postgres
+DB_HOST=localhost
+DB_PORT=5432
+
+# Chain
+CHAIN_URL=wss://avn-parachain-internal.dev.aventus.network
+ARCHIVE_GATEWAY_URL=https://archive-gateway.dev.aventus.network/graphql
+
+# Metrics (optional)
+METRICS_PORT=3001
+ALERTS_METRICS_FULL_UPDATE_INTERVAL=100
+```
+
+#### Alert Configuration via Environment Variables
+
+Configure alerts using three separate environment variables. Each variable contains a JSON array of configurations.
+
+##### 1. Balance Monitoring (`ALERTS_BALANCES`)
+
+Monitor account balances and get alerts when they drop below thresholds.
+
+```bash
+ALERTS_BALANCES='[
+  {
+    "accountAddress": "5GR39XQv4pAMyJHh9qUUi21cnMqgGD4RYidbJLv8D5fTB7Zh",
+    "prometheusTags": "environment=dev,network=aventus,account_type=anchoring,priority=critical",
+    "warningThreshold": "1000000000000000000",
+    "dangerThreshold": "500000000000000000"
+  },
+  {
+    "accountAddress": "5Cf1MLM11BUNXiGyzeo5fAKZTCEPvheWTkRHFw5Hy7AW1naY",
+    "prometheusTags": "environment=dev,network=aventus,account_type=relayer,priority=high",
+    "warningThreshold": "5000000000000000000",
+    "dangerThreshold": "2000000000000000000"
+  }
+]'
+```
+
+**Field Descriptions:**
+- `accountAddress`: The SS58 address of the account to monitor
+- `prometheusTags`: Comma-separated tags for Prometheus metrics (e.g., `environment=dev,network=aventus`)
+- `warningThreshold`: Balance threshold for warning alerts (in smallest unit, e.g., Wei for AVT)
+- `dangerThreshold`: Balance threshold for error alerts (must be lower than warning)
+
+**Example Values:**
+- `"1000000000000000000"` = 1 AVT (18 decimals)
+- `"500000000000000000"` = 0.5 AVT
+
+##### 2. Event Monitoring (`ALERTS_EVENTS`)
+
+Monitor specific blockchain events and get alerts when they occur.
+
+```bash
+ALERTS_EVENTS='[
+  {
+    "eventName": "Summary.RootPassedValidation",
+    "prometheusTags": "environment=dev,network=aventus,type=info",
+    "includeMetadata": true,
+    "severity": "info"
+  },
+  {
+    "eventName": "TokenManager.FailedToGenerateLowerProof",
+    "prometheusTags": "environment=dev,network=aventus,type=error",
+    "includeMetadata": true,
+    "severity": "error"
+  }
+]'
+```
+
+**Field Descriptions:**
+- `eventName`: Format `"Section.Method"` (e.g., `"Summary.RootPassedValidation"`)
+- `prometheusTags`: Comma-separated tags for Prometheus metrics
+- `includeMetadata`: If `true`, includes extrinsic hash in alert message
+- `severity`: Optional - `"info"`, `"warning"`, or `"error"` (defaults to `"warning"`)
+
+##### 3. Queue Monitoring (`ALERTS_QUEUES`)
+
+Monitor storage queue sizes to detect backpressure.
+
+```bash
+ALERTS_QUEUES='[
+  {
+    "queueName": "EthBridge.RequestQueue",
+    "prometheusTags": "environment=dev,network=aventus,type=bridge",
+    "warningThreshold": "10",
+    "errorThreshold": "50"
+  }
+]'
+```
+
+**Field Descriptions:**
+- `queueName`: Format `"Section.StorageName"` (e.g., `"EthBridge.RequestQueue"`)
+- `prometheusTags`: Comma-separated tags for Prometheus metrics
+- `warningThreshold`: Queue size threshold for warning alerts (integer as string)
+- `errorThreshold`: Queue size threshold for error alerts (must be higher than warning)
+
+#### Complete Example Configuration
+
+Here's a complete `.env` file example:
+
+```bash
+# Database
+DB_NAME=alerts
+DB_USER=postgres
+DB_PASS=postgres
+DB_HOST=localhost
+DB_PORT=5432
+
+# Chain
+CHAIN_URL=wss://avn-parachain-internal.dev.aventus.network
+ARCHIVE_GATEWAY_URL=https://archive-gateway.dev.aventus.network/graphql
+
+# Metrics
+METRICS_PORT=3001
+
+# Balance Monitoring
 ALERTS_BALANCES='[{"accountAddress":"5GR39XQv4pAMyJHh9qUUi21cnMqgGD4RYidbJLv8D5fTB7Zh","prometheusTags":"environment=dev,network=aventus,account_type=anchoring,priority=critical","warningThreshold":"1000000000000000000","dangerThreshold":"500000000000000000"}]'
 
-# Event monitoring
+# Event Monitoring
 ALERTS_EVENTS='[{"eventName":"Summary.RootPassedValidation","prometheusTags":"environment=dev,network=aventus,type=info","includeMetadata":true}]'
 
-# Queue monitoring
+# Queue Monitoring
 ALERTS_QUEUES='[{"queueName":"EthBridge.RequestQueue","prometheusTags":"environment=dev,network=aventus,type=bridge","warningThreshold":"10","errorThreshold":"50"}]'
 ```
 
-#### Option 2: Single JSON Environment Variable
+### Alternative: Single JSON Environment Variable
+
+If you prefer a single environment variable, you can use `ALERTS_CONFIG_JSON`:
 
 ```bash
-ALERTS_CONFIG_JSON='{"balances":[...],"events":[...],"queues":[...]}'
+ALERTS_CONFIG_JSON='{
+  "balances": [...],
+  "events": [...],
+  "queues": [...]
+}'
 ```
 
-#### Option 3: Config File Path
+> **Note:** We recommend using separate environment variables (`ALERTS_BALANCES`, `ALERTS_EVENTS`, `ALERTS_QUEUES`) as they are easier to manage and update independently.
+
+### Legacy: Config File (Not Recommended)
+
+Config files are supported for backward compatibility but are **not recommended** for new deployments.
+
+If you must use a config file:
 
 ```bash
 ALERTS_CONFIG_PATH=/path/to/alerts-config.json
 ```
 
-### Configuration Schema
+The processor will also auto-discover config files in these locations:
+- `../../config/alerts-config.json`
+- `./config/alerts-config.json`
+- `./apps/alerts/config/alerts-config.json`
+
+## Deployment Guide
+
+### For DevOps: Kubernetes Deployment
+
+#### Using ConfigMaps and Secrets
 
 #### Balance Configuration
 
@@ -127,28 +273,36 @@ ALERTS_CONFIG_PATH=/path/to/alerts-config.json
 }
 ```
 
-#### Queue Configuration
-
-```typescript
-{
-  queueName: string            // Format: "Section.StorageName" (e.g., "EthBridge.RequestQueue")
-  prometheusTags: string
-  warningThreshold: string    // Integer string
-  errorThreshold: string      // Integer string
-}
-```
-
-### Required Environment Variables
+#### Using Docker Run
 
 ```bash
-# Database
+docker run -d \
+  --name alerts-processor \
+  -e DB_NAME=alerts \
+  -e DB_USER=postgres \
+  -e DB_PASS=postgres \
+  -e DB_HOST=postgres \
+  -e DB_PORT=5432 \
+  -e CHAIN_URL=wss://avn-parachain-internal.dev.aventus.network \
+  -e ARCHIVE_GATEWAY_URL=https://archive-gateway.dev.aventus.network/graphql \
+  -e METRICS_PORT=3001 \
+  -e ALERTS_BALANCES='[{"accountAddress":"5GR39XQv4pAMyJHh9qUUi21cnMqgGD4RYidbJLv8D5fTB7Zh","prometheusTags":"environment=prod,network=aventus,account_type=anchoring,priority=critical","warningThreshold":"1000000000000000000","dangerThreshold":"500000000000000000"}]' \
+  -e ALERTS_EVENTS='[{"eventName":"Summary.RootPassedValidation","prometheusTags":"environment=prod,network=aventus,type=info","includeMetadata":true}]' \
+  -e ALERTS_QUEUES='[{"queueName":"EthBridge.RequestQueue","prometheusTags":"environment=prod,network=aventus,type=bridge","warningThreshold":"10","errorThreshold":"50"}]' \
+  -p 3001:3001 \
+  your-registry/alerts-processor:latest
+```
+
+#### Using .env File with Docker
+
+Create a `.env` file:
+
+```bash
 DB_NAME=alerts
 DB_USER=postgres
 DB_PASS=postgres
-DB_HOST=localhost
+DB_HOST=postgres
 DB_PORT=5432
-
-# Chain
 CHAIN_URL=wss://avn-parachain-internal.dev.aventus.network
 ARCHIVE_GATEWAY_URL=https://archive-gateway.dev.aventus.network/graphql
 
@@ -156,6 +310,28 @@ ARCHIVE_GATEWAY_URL=https://archive-gateway.dev.aventus.network/graphql
 METRICS_PORT=3001
 ALERTS_METRICS_FULL_UPDATE_INTERVAL=100
 ```
+
+
+1. **Copy the example file:**
+   - Open the `env.example` file in the `apps/alerts` folder
+   - Copy it and save as `.env` in the same folder
+
+2. **Edit the `.env` file:**
+   - Open `.env` in a text editor
+   - Update the account addresses you want to monitor
+   - Update the thresholds (the numbers that trigger alerts)
+   - Save the file
+
+3. **Run the processor:**
+   - Ask your DevOps team or technical lead to help you start the processor
+   - They can use the commands in the "Quick Start" section above
+
+**What each setting means:**
+- `ALERTS_BALANCES`: Which accounts to monitor and when to alert
+- `ALERTS_EVENTS`: Which blockchain events should trigger alerts
+- `ALERTS_QUEUES`: Which queues to monitor for backpressure
+
+**Need help?** Contact your DevOps team or technical lead.
 
 ## Running the Processor
 
@@ -332,8 +508,31 @@ query {
 # Check config validation
 yarn types:check
 
-# Verify environment variables
-cat .env | grep ALERTS_
+# Verify environment variables are set
+echo $ALERTS_BALANCES
+echo $ALERTS_EVENTS
+echo $ALERTS_QUEUES
+
+# Check if variables are properly formatted JSON
+echo $ALERTS_BALANCES | jq .
+```
+
+**Common JSON formatting errors:**
+- Missing quotes around the entire JSON array
+- Trailing commas in JSON
+- Unescaped quotes inside strings
+- Missing commas between array elements
+
+**Fix**: Ensure your environment variables are valid JSON arrays wrapped in single quotes:
+```bash
+# ✅ Correct
+ALERTS_BALANCES='[{"accountAddress":"...","prometheusTags":"..."}]'
+
+# ❌ Wrong - missing quotes
+ALERTS_BALANCES=[{"accountAddress":"..."}]
+
+# ❌ Wrong - double quotes instead of single
+ALERTS_BALANCES="[{\"accountAddress\":\"...\"}]"
 ```
 
 **Issue**: Database connection failed
@@ -343,6 +542,9 @@ docker ps | grep postgres
 
 # Verify connection string
 echo $DB_HOST $DB_PORT $DB_NAME
+
+# Test connection
+psql -h $DB_HOST -p $DB_PORT -U $DB_USER -d $DB_NAME
 ```
 
 ### No Alerts Being Created
@@ -351,10 +553,16 @@ echo $DB_HOST $DB_PORT $DB_NAME
 - Check logs for "Config loaded from file"
 - Verify `ALERTS_BALANCES`, `ALERTS_EVENTS`, or `ALERTS_QUEUES` are set
 - Check config validation errors in logs
+- Verify environment variables are exported (use `export ALERTS_BALANCES=...`)
 
 **Issue**: Thresholds too high
 - Verify account balances are actually below thresholds
 - Check queue sizes manually via chain storage
+
+**Issue**: Environment variables not passed to container
+- In Docker: Verify `-e` flags or `--env-file` is used
+- In Kubernetes: Check ConfigMap/Secret is mounted correctly
+- Verify environment variables are visible inside container: `docker exec <container> env | grep ALERTS`
 
 ### Metrics Not Updating
 
@@ -369,6 +577,7 @@ make process
 **Issue**: Metrics server not running
 - Check logs for "Prometheus metrics server listening"
 - Verify `METRICS_PORT` is not blocked
+- Test endpoint: `curl http://localhost:3001/metrics`
 
 ### Balance Alerts Not Clearing
 
@@ -379,6 +588,27 @@ make process
 ```sql
 DELETE FROM alert WHERE alert_type IS NULL;
 ```
+
+### Environment Variable Issues
+
+**Issue**: JSON parsing errors
+```bash
+# Validate JSON before setting
+echo '[...]' | jq .
+
+# Test in container
+docker exec <container> sh -c 'echo $ALERTS_BALANCES | jq .'
+```
+
+**Issue**: Special characters in environment variables
+- Use single quotes around JSON to prevent shell interpretation
+- Escape inner quotes if needed: `'{"key":"value"}'`
+- For Kubernetes, use `|` for multiline YAML strings
+
+**Issue**: Environment variables not persisting
+- In Docker Compose: Check `environment:` section
+- In Kubernetes: Verify ConfigMap/Secret is created and referenced
+- Restart pod/deployment after updating ConfigMap
 
 ## Architecture
 
