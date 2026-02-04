@@ -4,7 +4,7 @@ import { ConfigData, BalanceConfig, EventConfigInput, QueueConfig } from './type
 
 function parseEnvArray<T>(envVar: string | undefined, name: string): T[] | undefined {
   // Treat empty or whitespace-only strings as undefined (not set)
-  if (!envVar || !envVar.trim()) return undefined
+  if (!envVar?.trim()) return undefined
   try {
     const parsed = JSON.parse(envVar)
     if (!Array.isArray(parsed)) {
@@ -25,9 +25,9 @@ export function loadConfigFromFile(): ConfigData {
       return __dirname
     }
     try {
-      // @ts-ignore
+      // @ts-expect-error
       if (typeof require !== 'undefined' && require.main) {
-        // @ts-ignore
+        // @ts-expect-error
         return path.dirname(require.main.filename)
       }
     } catch {
@@ -41,11 +41,11 @@ export function loadConfigFromFile(): ConfigData {
   const envEvents = parseEnvArray<EventConfigInput>(process.env.ALERTS_EVENTS, 'ALERTS_EVENTS')
   const envQueues = parseEnvArray<QueueConfig>(process.env.ALERTS_QUEUES, 'ALERTS_QUEUES')
 
-  if (envBalances || envEvents || envQueues) {
+  if (envBalances ?? envEvents ?? envQueues) {
     return {
-      balances: envBalances || [],
-      events: envEvents || [],
-      queues: envQueues || []
+      balances: envBalances ?? [],
+      events: envEvents ?? [],
+      queues: envQueues ?? []
     }
   }
 
@@ -70,7 +70,7 @@ export function loadConfigFromFile(): ConfigData {
 
   // Resolve config path: prefer env var, then try multiple locations
   // Treat empty or whitespace-only strings as not set
-  let configPath = process.env.ALERTS_CONFIG_PATH?.trim() || undefined
+  let configPath = process.env.ALERTS_CONFIG_PATH?.trim() ?? undefined
 
   if (!configPath) {
     const baseDir = getDirname()
@@ -90,7 +90,14 @@ export function loadConfigFromFile(): ConfigData {
   }
 
   // If no config file found and no env vars provided, return empty config
-  if (!configPath || !fs.existsSync(configPath)) {
+  if (!configPath) {
+    return {
+      balances: [],
+      events: [],
+      queues: []
+    }
+  }
+  if (!fs.existsSync(configPath)) {
     return {
       balances: [],
       events: [],
@@ -99,9 +106,9 @@ export function loadConfigFromFile(): ConfigData {
   }
 
   const fileContent = fs.readFileSync(configPath, 'utf-8')
-  
+
   // Handle empty or whitespace-only files
-  if (!fileContent || !fileContent.trim()) {
+  if (!fileContent?.trim()) {
     return {
       balances: [],
       events: [],

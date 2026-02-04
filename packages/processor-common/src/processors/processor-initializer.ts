@@ -10,11 +10,11 @@ import { formatError } from '../utils/error-handling'
  * Logger interface for consistent logging across processors
  */
 export interface ProcessorLogger {
-  debug(message: string, context?: Record<string, any>): void
-  info(message: string, context?: Record<string, any>): void
-  warn(message: string, context?: Record<string, any>): void
-  error(message: string, context?: Record<string, any>): void
-  child?(name: string): ProcessorLogger
+  debug: (message: string, context?: Record<string, any>) => void
+  info: (message: string, context?: Record<string, any>) => void
+  warn: (message: string, context?: Record<string, any>) => void
+  error: (message: string, context?: Record<string, any>) => void
+  child?: (name: string) => ProcessorLogger
 }
 
 /**
@@ -33,7 +33,7 @@ export interface StandardErrorContext {
  * Provides consistent error formatting and logging across all processors
  */
 export class StandardErrorHandler {
-  constructor(private log: ProcessorLogger) {}
+  constructor(private readonly log: ProcessorLogger) {}
 
   /**
    * Handle and log an error with standardized format
@@ -78,7 +78,7 @@ export class StandardErrorHandler {
   handleBlockError(error: unknown, blockHeight: number, operation?: string): void {
     this.handleError(error, {
       blockHeight,
-      operation: operation || 'block processing',
+      operation: operation ?? 'block processing',
       serviceName: 'processor'
     })
   }
@@ -95,7 +95,7 @@ export class StandardErrorHandler {
     this.handleError(error, {
       blockHeight,
       eventName,
-      operation: operation || 'event processing',
+      operation: operation ?? 'event processing',
       serviceName: 'processor'
     })
   }
@@ -106,7 +106,7 @@ export class StandardErrorHandler {
  * Provides consistent logging format across all processors
  */
 export class StandardLogger implements ProcessorLogger {
-  constructor(private baseLog: any, private context: string = 'processor') {}
+  constructor(private readonly baseLog: any, private readonly context: string = 'processor') {}
 
   debug(message: string, context?: Record<string, any>): void {
     if (context) {

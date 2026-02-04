@@ -30,13 +30,13 @@ interface EventAlertCountEntry {
 }
 
 export class EventProcessingService {
-  private eventAlertCounts = new Map<string, EventAlertCountEntry>()
+  private readonly eventAlertCounts = new Map<string, EventAlertCountEntry>()
   private readonly maxAlertFrequency: number
   private readonly ttlMs: number
-  private cleanupInterval: NodeJS.Timeout | null = null
+  private cleanupInterval: ReturnType<typeof setInterval> | null = null
 
-  constructor(private configService: ConfigService) {
-    this.maxAlertFrequency = parseInt(process.env.ALERTS_EVENT_ALERT_FREQUENCY || '1', 10)
+  constructor(private readonly configService: ConfigService) {
+    this.maxAlertFrequency = parseInt(process.env.ALERTS_EVENT_ALERT_FREQUENCY ?? '1', 10)
 
     if (isNaN(this.maxAlertFrequency) || this.maxAlertFrequency < 1) {
       throw new Error(
@@ -44,7 +44,7 @@ export class EventProcessingService {
       )
     }
 
-    this.ttlMs = 60 * 60 * 1000  // 1hr
+    this.ttlMs = 60 * 60 * 1000 // 1hr
 
     this.startCleanupTimer()
   }
@@ -98,7 +98,7 @@ export class EventProcessingService {
     }
 
     const currentEntry = this.eventAlertCounts.get(eventName)
-    const count = currentEntry?.count || 0
+    const count = currentEntry?.count ?? 0
 
     if (count >= this.maxAlertFrequency) {
       return null
@@ -156,6 +156,18 @@ export class EventProcessingService {
       return { alerts: [] }
     }
 
+    const defaultErrorHandler: StandardErrorHandler = {
+      handleEventError: (error: Error, blockHeight: number, eventName: string) => {
+        if (log) {
+          log.error(`Failed to process event ${eventName}`, {
+            error: error.message,
+            blockHeight
+          })
+        }
+      }
+    }
+    const handler = errorHandler ?? defaultErrorHandler
+
     const alerts = await processBlockEvents(
       collectedEvents as any, // Type assertion needed due to generic type inference
       async (event: EventItem, index: number) => {
@@ -163,17 +175,7 @@ export class EventProcessingService {
         const eventIndex = collectedEvent?.index ?? index
         return this.processEventItem(event, block, eventIndex, log)
       },
-      errorHandler ||
-        ({
-          handleEventError: (error: Error, blockHeight: number, eventName: string) => {
-            if (log) {
-              log.error(`Failed to process event ${eventName}`, {
-                error: error.message,
-                blockHeight
-              })
-            }
-          }
-        } as StandardErrorHandler),
+      handler,
       block.height,
       {
         concurrency,
@@ -200,28 +202,31 @@ export class EventProcessingService {
       alertMessage += ` (extrinsic: ${item.event.extrinsic.hash})`
     }
 
-    const expirationHours = ALERT_EXPIRATION_HOURS[config.severity.toUpperCase() as keyof typeof ALERT_EXPIRATION_HOURS]
+    const expirationHours =
+      ALERT_EXPIRATION_HOURS[
+        config.severity.toUpperCase() as keyof typeof ALERT_EXPIRATION_HOURS
+      ] ?? 1
     const expireAt = new Date(now)
     expireAt.setHours(expireAt.getHours() + expirationHours)
 
-    const eventId = item.event.id || `${Date.now()}-${Math.random().toString(36).substring(2, 11)}`
+    const eventId = item.event.id ?? `${Date.now()}-${Math.random().toString(36).substring(2, 11)}`
     const alertId = `event-${eventName}-${block.height}-${eventIndex}-${eventId}`
 
     const alert = new Alert({
       id: alertId,
       alertType: 'event',
       sourceIdentifier: eventName,
-      alertMessage: alertMessage,
+      alertMessage,
       isWarning: config.severity === 'warning',
       isError: config.severity === 'error',
-      expireAt: expireAt,
+      expireAt,
       createdAt: now
     })
 
     if (log) {
       log.info(
         `Event: ${eventName} at block ${block.height} (alert ${
-          (this.eventAlertCounts.get(eventName)?.count || 0) + 1
+          (this.eventAlertCounts.get(eventName)?.count ?? 0) + 1
         }/${this.maxAlertFrequency})`
       )
     }

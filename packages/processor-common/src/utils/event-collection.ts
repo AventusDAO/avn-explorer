@@ -19,9 +19,9 @@ export function collectEvents<T extends ProcessableItem>(
     blockTimestamp?: number
     blockHeight?: number
   } = {}
-): CollectedEvent<T>[] {
+): Array<CollectedEvent<T>> {
   const { includeMetadata = false, blockTimestamp, blockHeight } = options
-  const events: CollectedEvent<T>[] = []
+  const events: Array<CollectedEvent<T>> = []
   let eventIndex = 0
 
   for (const item of items) {
@@ -55,9 +55,9 @@ export function collectCalls<T extends ProcessableItem>(
     blockTimestamp?: number
     blockHeight?: number
   } = {}
-): CollectedEvent<T>[] {
+): Array<CollectedEvent<T>> {
   const { includeMetadata = false, blockTimestamp, blockHeight } = options
-  const calls: CollectedEvent<T>[] = []
+  const calls: Array<CollectedEvent<T>> = []
   let callIndex = 0
 
   for (const item of items) {

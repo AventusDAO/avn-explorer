@@ -4,16 +4,28 @@
  */
 import { loadConfigFromFile } from './config/config-loader'
 import { validateConfig } from './config/config-validator'
-import { BalanceConfig, EventConfig, QueueConfig, ConfigData, DEFAULT_ALERT_SEVERITY } from './config/types'
+import {
+  BalanceConfig,
+  EventConfig,
+  QueueConfig,
+  ConfigData,
+  DEFAULT_ALERT_SEVERITY
+} from './config/types'
 
-export type { BalanceConfig, EventConfig, QueueConfig, ConfigData, AlertSeverity } from './config/types'
+export type {
+  BalanceConfig,
+  EventConfig,
+  QueueConfig,
+  ConfigData,
+  AlertSeverity
+} from './config/types'
 
 export class ConfigService {
   private balanceConfigs: BalanceConfig[] = []
   private eventConfigs: EventConfig[] = []
-  private eventConfigsMap: Map<string, EventConfig> = new Map()
+  private readonly eventConfigsMap: Map<string, EventConfig> = new Map()
   private queueConfigs: QueueConfig[] = []
-  private queueConfigsMap: Map<string, QueueConfig> = new Map()
+  private readonly queueConfigsMap: Map<string, QueueConfig> = new Map()
 
   loadFromFile(log?: any): void {
     const config = loadConfigFromFile()
@@ -33,7 +45,7 @@ export class ConfigService {
       severity: ec.severity ?? DEFAULT_ALERT_SEVERITY
     }))
 
-    this.queueConfigs = (config.queues || []).map(qc => ({
+    this.queueConfigs = (config.queues ?? []).map(qc => ({
       queueName: qc.queueName,
       prometheusTags: qc.prometheusTags,
       warningThreshold: qc.warningThreshold,

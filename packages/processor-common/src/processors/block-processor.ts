@@ -5,17 +5,17 @@ import { StandardErrorHandler } from './processor-initializer'
 export function collectBlockEvents<T extends { kind: string; name: string }>(
   block: { items: T[]; header: { timestamp: number; height: number } },
   eventNames: string[]
-): CollectedEvent<T>[] {
+): Array<CollectedEvent<T>> {
   const collected = collectEvents(block.items as any, eventNames, {
     includeMetadata: true,
     blockTimestamp: block.header.timestamp,
     blockHeight: block.header.height
   })
-  return collected as CollectedEvent<T>[]
+  return collected as Array<CollectedEvent<T>>
 }
 
 export async function processBlockEvents<TEvent, TResult>(
-  events: CollectedEvent<TEvent>[],
+  events: Array<CollectedEvent<TEvent>>,
   processor: (event: TEvent, index: number) => Promise<TResult>,
   errorHandler: StandardErrorHandler,
   blockHeight: number,

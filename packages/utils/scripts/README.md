@@ -9,6 +9,7 @@ Utility scripts for PostgreSQL database management.
 Initializes a PostgreSQL database and role for squid deployments. This script is idempotent and safe to run multiple times.
 
 **Features:**
+
 - Creates role if it doesn't exist
 - Creates database if it doesn't exist
 - Grants privileges and sets ownership
@@ -16,17 +17,17 @@ Initializes a PostgreSQL database and role for squid deployments. This script is
 
 **Environment Variables:**
 
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `DB_ADMIN_HOST` | No | Admin connection host (defaults to `DB_HOST` or `localhost`) |
-| `DB_ADMIN_PORT` | No | Admin connection port (defaults to `DB_PORT` or `5432`) |
-| `DB_ADMIN_USER` | Yes* | Admin username with CREATE DATABASE/ROLE privileges |
-| `DB_ADMIN_PASS` | Yes* | Admin password |
-| `DB_NAME` | Yes | Target database name to create |
-| `DB_USER` | Yes | Target role name to create |
-| `DB_PASS` | Yes | Target role password |
+| Variable        | Required | Description                                                  |
+| --------------- | -------- | ------------------------------------------------------------ |
+| `DB_ADMIN_HOST` | No       | Admin connection host (defaults to `DB_HOST` or `localhost`) |
+| `DB_ADMIN_PORT` | No       | Admin connection port (defaults to `DB_PORT` or `5432`)      |
+| `DB_ADMIN_USER` | Yes\*    | Admin username with CREATE DATABASE/ROLE privileges          |
+| `DB_ADMIN_PASS` | Yes\*    | Admin password                                               |
+| `DB_NAME`       | Yes      | Target database name to create                               |
+| `DB_USER`       | Yes      | Target role name to create                                   |
+| `DB_PASS`       | Yes      | Target role password                                         |
 
-*If `DB_ADMIN_USER` and `DB_ADMIN_PASS` are not set, the script skips initialization. This is useful for local development where docker-compose creates the database automatically.
+\*If `DB_ADMIN_USER` and `DB_ADMIN_PASS` are not set, the script skips initialization. This is useful for local development where docker-compose creates the database automatically.
 
 **Usage:**
 
@@ -44,10 +45,10 @@ Drops and recreates a database. **Use with caution** - this destroys all data.
 
 **Environment Variables:**
 
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `DB_PORT` | Yes | PostgreSQL port |
-| `DB_NAME` | Yes | Database name to reset |
+| Variable  | Required | Description            |
+| --------- | -------- | ---------------------- |
+| `DB_PORT` | Yes      | PostgreSQL port        |
+| `DB_NAME` | Yes      | Database name to reset |
 
 **Usage:**
 

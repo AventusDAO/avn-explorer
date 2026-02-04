@@ -141,7 +141,7 @@ async function main(ctx: Ctx): Promise<void> {
 
   if (!metricsUpdater) {
     const fullUpdateInterval = parseInt(
-      process.env.ALERTS_METRICS_FULL_UPDATE_INTERVAL || '100',
+      process.env.ALERTS_METRICS_FULL_UPDATE_INTERVAL ?? '100',
       10
     )
     metricsUpdater = new MetricsUpdater({ fullUpdateInterval })

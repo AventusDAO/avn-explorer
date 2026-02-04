@@ -1,7 +1,7 @@
 export interface ConfigData {
-  balances: Array<BalanceConfig>
-  events: Array<EventConfigInput>
-  queues?: Array<QueueConfig>
+  balances: BalanceConfig[]
+  events: EventConfigInput[]
+  queues?: QueueConfig[]
 }
 
 export interface BalanceConfig {
