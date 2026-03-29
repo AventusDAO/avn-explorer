@@ -1,13 +1,8 @@
-import { Store } from '@subsquid/typeorm-store'
 import { BaseService } from './base-service'
 
 export class ServiceManager extends BaseService {
-  private services = new Map<string, any>()
-  private initialized = new Set<string>()
-
-  constructor(store: Store, log?: any) {
-    super(store, log)
-  }
+  private readonly services = new Map<string, any>()
+  private readonly initialized = new Set<string>()
 
   register<T>(name: string, factory: () => T): T {
     if (!this.services.has(name)) {

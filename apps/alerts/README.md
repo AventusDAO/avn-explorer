@@ -5,11 +5,13 @@ A real-time monitoring and alerting processor for the Aventus blockchain. Monito
 ## Overview
 
 The Alerts Processor continuously monitors:
+
 - **Account Balances**: Tracks operational accounts (relayers, anchoring services) against configurable thresholds
 - **Blockchain Events**: Detects specific events (e.g., `Summary.RootPassedValidation`, `TokenManager.FailedToGenerateLowerProof`)
 - **Storage Queues**: Monitors queue sizes (e.g., `EthBridge.RequestQueue`) for backpressure detection
 
 Alerts are:
+
 - Stored in PostgreSQL with expiration timestamps
 - Exposed as Prometheus metrics at `/metrics` endpoint
 - Auto-resolved when conditions return to healthy
@@ -68,6 +70,7 @@ yarn processor:start
 ```
 
 The processor will:
+
 - Load configuration from environment variables (recommended) or config file
 - Connect to the chain archive
 - Start processing blocks
@@ -131,12 +134,14 @@ ALERTS_BALANCES='[
 ```
 
 **Field Descriptions:**
+
 - `accountAddress`: The SS58 address of the account to monitor
 - `prometheusTags`: Comma-separated tags for Prometheus metrics (e.g., `environment=dev,network=aventus`)
 - `warningThreshold`: Balance threshold for warning alerts (in smallest unit, e.g., Wei for AVT)
 - `dangerThreshold`: Balance threshold for error alerts (must be lower than warning)
 
 **Example Values:**
+
 - `"1000000000000000000"` = 1 AVT (18 decimals)
 - `"500000000000000000"` = 0.5 AVT
 
@@ -162,6 +167,7 @@ ALERTS_EVENTS='[
 ```
 
 **Field Descriptions:**
+
 - `eventName`: Format `"Section.Method"` (e.g., `"Summary.RootPassedValidation"`)
 - `prometheusTags`: Comma-separated tags for Prometheus metrics
 - `includeMetadata`: If `true`, includes extrinsic hash in alert message
@@ -183,6 +189,7 @@ ALERTS_QUEUES='[
 ```
 
 **Field Descriptions:**
+
 - `queueName`: Format `"Section.StorageName"` (e.g., `"EthBridge.RequestQueue"`)
 - `prometheusTags`: Comma-separated tags for Prometheus metrics
 - `warningThreshold`: Queue size threshold for warning alerts (integer as string)
@@ -242,6 +249,7 @@ ALERTS_CONFIG_PATH=/path/to/alerts-config.json
 ```
 
 The processor will also auto-discover config files in these locations:
+
 - `../../config/alerts-config.json`
 - `./config/alerts-config.json`
 - `./apps/alerts/config/alerts-config.json`
@@ -256,10 +264,10 @@ The processor will also auto-discover config files in these locations:
 
 ```typescript
 {
-  accountAddress: string        // SS58 address
-  prometheusTags: string       // Comma-separated tags (e.g., "env=dev,type=relayer")
-  warningThreshold: string     // BigInt string (avt)
-  dangerThreshold: string      // BigInt string (avt)
+  accountAddress: string // SS58 address
+  prometheusTags: string // Comma-separated tags (e.g., "env=dev,type=relayer")
+  warningThreshold: string // BigInt string (avt)
+  dangerThreshold: string // BigInt string (avt)
 }
 ```
 
@@ -267,9 +275,9 @@ The processor will also auto-discover config files in these locations:
 
 ```typescript
 {
-  eventName: string            // Format: "Section.Method" (e.g., "Summary.RootPassedValidation")
+  eventName: string // Format: "Section.Method" (e.g., "Summary.RootPassedValidation")
   prometheusTags: string
-  includeMetadata: boolean     // Include extrinsic hash in alert message
+  includeMetadata: boolean // Include extrinsic hash in alert message
 }
 ```
 
@@ -311,12 +319,13 @@ METRICS_PORT=3001
 ALERTS_METRICS_FULL_UPDATE_INTERVAL=100
 ```
 
-
 1. **Copy the example file:**
+
    - Open the `env.example` file in the `apps/alerts` folder
    - Copy it and save as `.env` in the same folder
 
 2. **Edit the `.env` file:**
+
    - Open `.env` in a text editor
    - Update the account addresses you want to monitor
    - Update the thresholds (the numbers that trigger alerts)
@@ -327,6 +336,7 @@ ALERTS_METRICS_FULL_UPDATE_INTERVAL=100
    - They can use the commands in the "Quick Start" section above
 
 **What each setting means:**
+
 - `ALERTS_BALANCES`: Which accounts to monitor and when to alert
 - `ALERTS_EVENTS`: Which blockchain events should trigger alerts
 - `ALERTS_QUEUES`: Which queues to monitor for backpressure
@@ -379,16 +389,19 @@ make codegen     # Generate TypeORM entities from schema
 #### 1. Test Balance Monitoring
 
 1. Configure a test account with low thresholds:
+
 ```bash
 ALERTS_BALANCES='[{"accountAddress":"YOUR_TEST_ACCOUNT","prometheusTags":"test=true","warningThreshold":"1000000000000000000","dangerThreshold":"500000000000000000"}]'
 ```
 
 2. Start processor and verify metrics:
+
 ```bash
 curl http://localhost:3001/metrics | grep avn_balance
 ```
 
 3. Expected output when balance is low:
+
 ```
 avn_balance_error{account="YOUR_TEST_ACCOUNT"} 1
 ```
@@ -396,11 +409,13 @@ avn_balance_error{account="YOUR_TEST_ACCOUNT"} 1
 #### 2. Test Event Monitoring
 
 1. Configure an event that fires frequently:
+
 ```bash
 ALERTS_EVENTS='[{"eventName":"System.NewAccount","prometheusTags":"test=true","includeMetadata":true}]'
 ```
 
 2. Check metrics after processing blocks:
+
 ```bash
 curl http://localhost:3001/metrics | grep avn_event
 ```
@@ -408,11 +423,13 @@ curl http://localhost:3001/metrics | grep avn_event
 #### 3. Test Queue Monitoring
 
 1. Configure queue monitoring:
+
 ```bash
 ALERTS_QUEUES='[{"queueName":"EthBridge.RequestQueue","prometheusTags":"test=true","warningThreshold":"1","errorThreshold":"5"}]'
 ```
 
 2. Monitor queue size:
+
 ```bash
 curl http://localhost:3001/metrics | grep avn_queue
 ```
@@ -433,6 +450,7 @@ SELECT * FROM alert WHERE alert_type = 'balance' AND expire_at > NOW();
 ### Integration Testing
 
 1. **Start test environment**:
+
 ```bash
 make up
 make migrate
@@ -440,12 +458,14 @@ make process
 ```
 
 2. **Monitor logs** for alert creation:
+
 ```bash
 # Look for alert messages
 grep "DANGER\|WARNING" processor.log
 ```
 
 3. **Check Prometheus metrics**:
+
 ```bash
 curl http://localhost:3001/metrics
 ```
@@ -484,9 +504,10 @@ make serve
 ```
 
 Query alerts:
+
 ```graphql
 query {
-  alerts(where: {expireAt_gt: "2024-01-01T00:00:00Z"}) {
+  alerts(where: { expireAt_gt: "2024-01-01T00:00:00Z" }) {
     id
     alertType
     sourceIdentifier
@@ -504,6 +525,7 @@ query {
 ### Processor Won't Start
 
 **Issue**: Configuration errors
+
 ```bash
 # Check config validation
 yarn types:check
@@ -518,12 +540,14 @@ echo $ALERTS_BALANCES | jq .
 ```
 
 **Common JSON formatting errors:**
+
 - Missing quotes around the entire JSON array
 - Trailing commas in JSON
 - Unescaped quotes inside strings
 - Missing commas between array elements
 
 **Fix**: Ensure your environment variables are valid JSON arrays wrapped in single quotes:
+
 ```bash
 # ✅ Correct
 ALERTS_BALANCES='[{"accountAddress":"...","prometheusTags":"..."}]'
@@ -536,6 +560,7 @@ ALERTS_BALANCES="[{\"accountAddress\":\"...\"}]"
 ```
 
 **Issue**: Database connection failed
+
 ```bash
 # Check database is running
 docker ps | grep postgres
@@ -550,16 +575,19 @@ psql -h $DB_HOST -p $DB_PORT -U $DB_USER -d $DB_NAME
 ### No Alerts Being Created
 
 **Issue**: Config not loaded
+
 - Check logs for "Config loaded from file"
 - Verify `ALERTS_BALANCES`, `ALERTS_EVENTS`, or `ALERTS_QUEUES` are set
 - Check config validation errors in logs
 - Verify environment variables are exported (use `export ALERTS_BALANCES=...`)
 
 **Issue**: Thresholds too high
+
 - Verify account balances are actually below thresholds
 - Check queue sizes manually via chain storage
 
 **Issue**: Environment variables not passed to container
+
 - In Docker: Verify `-e` flags or `--env-file` is used
 - In Kubernetes: Check ConfigMap/Secret is mounted correctly
 - Verify environment variables are visible inside container: `docker exec <container> env | grep ALERTS`
@@ -567,6 +595,7 @@ psql -h $DB_HOST -p $DB_PORT -U $DB_USER -d $DB_NAME
 ### Metrics Not Updating
 
 **Issue**: Old alerts in database
+
 ```bash
 # Clear old alerts
 make reset
@@ -575,6 +604,7 @@ make process
 ```
 
 **Issue**: Metrics server not running
+
 - Check logs for "Prometheus metrics server listening"
 - Verify `METRICS_PORT` is not blocked
 - Test endpoint: `curl http://localhost:3001/metrics`
@@ -582,6 +612,7 @@ make process
 ### Balance Alerts Not Clearing
 
 **Issue**: Old alert format in database
+
 - Alerts created before schema update may not have `alertType`/`sourceIdentifier`
 - Solution: Reset database or manually delete old alerts
 
@@ -592,6 +623,7 @@ DELETE FROM alert WHERE alert_type IS NULL;
 ### Environment Variable Issues
 
 **Issue**: JSON parsing errors
+
 ```bash
 # Validate JSON before setting
 echo '[...]' | jq .
@@ -601,11 +633,13 @@ docker exec <container> sh -c 'echo $ALERTS_BALANCES | jq .'
 ```
 
 **Issue**: Special characters in environment variables
+
 - Use single quotes around JSON to prevent shell interpretation
 - Escape inner quotes if needed: `'{"key":"value"}'`
 - For Kubernetes, use `|` for multiline YAML strings
 
 **Issue**: Environment variables not persisting
+
 - In Docker Compose: Check `environment:` section
 - In Kubernetes: Verify ConfigMap/Secret is created and referenced
 - Restart pod/deployment after updating ConfigMap

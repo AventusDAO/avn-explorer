@@ -9,9 +9,9 @@ export async function processInParallelOrdered<T, R>(
   items: T[],
   processor: (item: T) => Promise<R>,
   options: ConcurrencyOptions = {}
-): Promise<(R | null)[]> {
+): Promise<Array<R | null>> {
   const { concurrency = CONCURRENCY_CONFIG.DEFAULT, onError } = options
-  const results: (R | null)[] = []
+  const results: Array<R | null> = []
 
   for (let i = 0; i < items.length; i += concurrency) {
     const batch = items.slice(i, i + concurrency)

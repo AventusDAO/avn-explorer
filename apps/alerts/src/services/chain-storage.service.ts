@@ -22,6 +22,7 @@ export class ChainStorageService {
   private readonly queueHandlers: Map<string, QueueStorageHandler> = new Map([
     ['EthBridge.RequestQueue', this.getEthBridgeRequestQueueCount.bind(this)]
   ])
+
   async getBalances(
     ctx: ChainContext,
     block: Block,

@@ -37,5 +37,5 @@ export async function retryWithBackoff<T>(
       stack: lastError?.stack
     })
   }
-  throw lastError || new Error('Unknown error in retry')
+  throw lastError ?? new Error('Unknown error in retry')
 }

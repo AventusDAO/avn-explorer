@@ -1,5 +1,5 @@
 export class ResultAggregator<TKey, TValue> {
-  private map = new Map<TKey, TValue>()
+  private readonly map = new Map<TKey, TValue>()
 
   add(key: TKey, value: TValue): void {
     this.map.set(key, value)

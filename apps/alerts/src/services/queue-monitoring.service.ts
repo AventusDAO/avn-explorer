@@ -19,8 +19,8 @@ export class QueueMonitoringService extends BaseService {
   constructor(
     store: Store,
     log: any,
-    private configService: ConfigService,
-    private chainStorageService: ChainStorageService
+    private readonly configService: ConfigService,
+    private readonly chainStorageService: ChainStorageService
   ) {
     super(store, log)
   }
@@ -49,6 +49,7 @@ export class QueueMonitoringService extends BaseService {
           continue
         }
 
+        const retryContext: RetryContext = { log, blockHeight: block.height }
         const queueCount = await retryWithBackoff(
           async () => {
             return await this.chainStorageService.getQueueCount(
@@ -60,7 +61,7 @@ export class QueueMonitoringService extends BaseService {
           },
           RETRY_CONFIG.MAX_RETRIES,
           RETRY_CONFIG.BASE_DELAY_MS,
-          { log, blockHeight: block.height } as RetryContext
+          retryContext
         )
 
         if (queueCount === undefined) {
@@ -160,7 +161,7 @@ export class QueueMonitoringService extends BaseService {
       where: {
         alertType: 'queue',
         sourceIdentifier: config.queueName,
-        isError: isError,
+        isError,
         expireAt: MoreThan(now)
       }
     })
@@ -177,10 +178,10 @@ export class QueueMonitoringService extends BaseService {
       id: `${config.queueName}-${severityLabel}-${block.height}-${Date.now()}`,
       alertType: 'queue',
       sourceIdentifier: config.queueName,
-      alertMessage: alertMessage,
+      alertMessage,
       isWarning: severity === 'warning',
-      isError: isError,
-      expireAt: expireAt,
+      isError,
+      expireAt,
       createdAt: now
     })
 

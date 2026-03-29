@@ -24,8 +24,8 @@ export class BalanceMonitoringService extends BaseService {
   constructor(
     store: Store,
     log: any,
-    private configService: ConfigService,
-    private chainStorageService: ChainStorageService
+    private readonly configService: ConfigService,
+    private readonly chainStorageService: ChainStorageService
   ) {
     super(store, log)
   }
@@ -46,6 +46,7 @@ export class BalanceMonitoringService extends BaseService {
 
     const accountsU8 = balanceConfigs.map(config => decodeId(config.accountAddress))
 
+    const retryContext: RetryContext = { log, blockHeight: block.height }
     const balances = await retryWithBackoff(
       async () => {
         const result = await this.chainStorageService.getBalances(ctx, block as any, accountsU8)
@@ -56,7 +57,7 @@ export class BalanceMonitoringService extends BaseService {
       },
       RETRY_CONFIG.MAX_RETRIES,
       RETRY_CONFIG.BASE_DELAY_MS,
-      { log, blockHeight: block.height } as RetryContext
+      retryContext
     )
 
     if (!balances) {
@@ -70,7 +71,7 @@ export class BalanceMonitoringService extends BaseService {
       config: BalanceConfig
       balance: IBalance
     }): Promise<Alert | null> => {
-      return this.processAccount(config, balance, block, now, log)
+      return await this.processAccount(config, balance, block, now, log)
     }
 
     const handleBalanceError = (error: Error, { config }: { config: BalanceConfig }): void => {
@@ -208,7 +209,7 @@ export class BalanceMonitoringService extends BaseService {
       where: {
         alertType: 'balance',
         sourceIdentifier: config.accountAddress,
-        isError: isError,
+        isError,
         expireAt: MoreThan(now)
       }
     })
@@ -226,10 +227,10 @@ export class BalanceMonitoringService extends BaseService {
       id: `${config.accountAddress}-${severityLabel}-${block.height}-${Date.now()}`,
       alertType: 'balance',
       sourceIdentifier: config.accountAddress,
-      alertMessage: alertMessage,
+      alertMessage,
       isWarning: severity === 'warning',
-      isError: isError,
-      expireAt: expireAt,
+      isError,
+      expireAt,
       createdAt: now
     })
 

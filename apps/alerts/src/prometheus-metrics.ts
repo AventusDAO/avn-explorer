@@ -85,10 +85,10 @@ export async function updatePrometheusMetricsFull(store: Store): Promise<void> {
 
       case 'event':
         if (alert.isWarning) {
-          eventWarningCounts.set(identifier, (eventWarningCounts.get(identifier) || 0) + 1)
+          eventWarningCounts.set(identifier, (eventWarningCounts.get(identifier) ?? 0) + 1)
         }
         if (alert.isError) {
-          eventErrorCounts.set(identifier, (eventErrorCounts.get(identifier) || 0) + 1)
+          eventErrorCounts.set(identifier, (eventErrorCounts.get(identifier) ?? 0) + 1)
         }
         break
 
@@ -151,10 +151,10 @@ export async function updatePrometheusMetricsIncremental(
 
       case 'event':
         if (alert.isWarning) {
-          eventWarningCounts.set(identifier, (eventWarningCounts.get(identifier) || 0) + 1)
+          eventWarningCounts.set(identifier, (eventWarningCounts.get(identifier) ?? 0) + 1)
         }
         if (alert.isError) {
-          eventErrorCounts.set(identifier, (eventErrorCounts.get(identifier) || 0) + 1)
+          eventErrorCounts.set(identifier, (eventErrorCounts.get(identifier) ?? 0) + 1)
         }
         break
 

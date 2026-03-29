@@ -21,10 +21,16 @@ export abstract class BaseService {
       return await fn()
     } catch (error) {
       if (isRetryableError(error)) {
-        return await retryWithBackoff(fn, RETRY_CONFIG.MAX_RETRIES, RETRY_CONFIG.BASE_DELAY_MS, {
+        const retryContext: RetryContext = {
           log: this.log,
           ...context
-        } as RetryContext)
+        }
+        return await retryWithBackoff(
+          fn,
+          RETRY_CONFIG.MAX_RETRIES,
+          RETRY_CONFIG.BASE_DELAY_MS,
+          retryContext
+        )
       }
       this.handleAndThrow(error, context)
     }

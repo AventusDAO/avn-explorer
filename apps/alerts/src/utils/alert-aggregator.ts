@@ -10,7 +10,7 @@ export function aggregateAlerts(
   const allAlerts: Alert[] = []
 
   for (const result of blockResults) {
-    if (result && result.alerts) {
+    if (result?.alerts) {
       allAlerts.push(...result.alerts)
     }
   }
@@ -33,9 +33,7 @@ export function aggregateAlertsWithStats(
 } {
   const alerts = aggregateAlerts(blockResults)
   const blockCount = blockResults.length
-  const blocksWithAlerts = blockResults.filter(
-    result => result && result.alerts && result.alerts.length > 0
-  ).length
+  const blocksWithAlerts = blockResults.filter(result => (result?.alerts?.length ?? 0) > 0).length
 
   return {
     alerts,
